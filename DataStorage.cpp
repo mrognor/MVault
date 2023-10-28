@@ -18,9 +18,35 @@ class DataSaver
 private:
     void* Ptr = nullptr;
     DataTypeSaver* DataType = nullptr;
+    std::size_t DataTypeSize = 0;
 
 public:
     DataSaver() {}
+
+    DataSaver(const DataSaver& dataSaver)
+    {
+        *this = dataSaver;
+    }
+
+    DataSaver& operator=(const DataSaver& dataSaver)
+    {
+        if (Ptr != nullptr)
+            free(Ptr);
+
+        if (DataType != nullptr)
+            delete DataType;
+
+        Ptr = malloc(dataSaver.DataTypeSize);
+
+        if (Ptr != nullptr)
+        {
+            memcpy(Ptr, (const void*)dataSaver.Ptr, dataSaver.DataTypeSize);
+            DataType = new DataTypeSaver(*dataSaver.DataType);
+            DataTypeSize = dataSaver.DataTypeSize;
+        }
+
+        return *this;
+    }
 
     template<class T>
     DataSaver(T data)
@@ -33,7 +59,7 @@ public:
     {
         if (Ptr != nullptr)
             free(Ptr);
-        
+
         if (DataType != nullptr)
             delete DataType;
 
@@ -41,8 +67,9 @@ public:
 
         if (Ptr != nullptr)
         {
-            memcpy(Ptr, (const void*)&data, sizeof(data));
+            memcpy(Ptr, (const void*)&data, sizeof(T));
             DataType = new DataTypeSaver(typeid(data));
+            DataTypeSize = sizeof(T);
         }
     }
 
@@ -100,7 +127,12 @@ public:
     template <class T>
     bool GetData(std::string key, T& data)
     {
-        return Data.find(key)->second.GetData(data);
+        auto f = Data.find(key);
+        if (f == Data.end())
+            return false;
+
+        f->second.GetData(data);
+        return true;
     }
 
     bool IsData(std::string key)
@@ -116,40 +148,54 @@ public:
 
 int main()
 {
-    // int a = 24;
-    // std::string b = "avf";
+    std::list<DataContainer> la;
+    la.emplace_back(DataContainer());
+    la.emplace_back(DataContainer());
 
-    // DataSaver d;
+    auto it = la.begin();
+    it->AddData("a", 1);
+    it->AddData("b", std::string("azaz"));
+    it->AddData("c", 12.32);
+    ++it;
+    it->AddData("a", 4);
+    it->AddData("b", std::string("bazaa"));
+    it->AddData("c", 2.44);
 
-    // d.SetData(a);
+    int i;
+    std::string s;
+    double f;
 
-    // if (d.GetData(a))
-    //     std::cout << a << std::endl;
+    it->GetData("b", s);
+    std::cout << s << std::endl;
 
-    // d.SetData(b);
+    for (auto it : s)
+        std::cout << (int)it << " ";
 
-    // if (d.GetData(b))
-    //     std::cout << b << std::endl;
-    
-    // DataSaver c;
-    // if (d.GetData(c))
-    //     std::cout << b << std::endl;
+    for (auto it = la.begin(); it != la.end(); ++it)
+    {
+        it->GetData("a", i);
+        std::cout << "int: " << i << std::endl;
 
-    DataContainer dc;
+        it->GetData("b", s);
+        std::cout << "string: " << s << std::endl;
+        for (auto it : s)
+            std::cout << (int)it << " ";
 
-    dc.AddData("a", 1);
-    dc.AddData("b", 2.2);
-    dc.AddData("c", "string");
+        it->GetData("c", f);
+        std::cout << "float: " << f << std::endl;
+    }
 
-    int a = 0;
-    dc.GetData("a", a);
-    std::cout << "Finding a: " << a << std::endl;
+    std::cout << "---" << std::endl;
 
-    dc.SetData("a", 2);
-    dc.GetData("a", a);
-    std::cout << "New a: " << a << std::endl;
+    for (auto it : la)
+    {
+        it.GetData("a", i);
+        std::cout << "int: " << i << std::endl;
 
-    std::cout << "Is a: " << dc.IsData("a") << std::endl;
-    dc.DeleteData("a");
-    std::cout << "Is a: " << dc.IsData("a") << std::endl;
+        it.GetData("c", f);
+        std::cout << "float: " << f << std::endl;
+
+        it.GetData("b", s);
+        std::cout << "string: " << s << std::endl;
+    }
 }
