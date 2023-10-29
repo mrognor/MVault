@@ -49,13 +49,13 @@ public:
     }
 
     template<class T>
-    DataSaver(T data)
+    DataSaver(const T& data)
     {
         SetData(data);
     }
 
     template <class T>
-    void SetData(T data)
+    void SetData(const T& data)
     {
         if (Ptr != nullptr)
             free(Ptr);
@@ -84,8 +84,9 @@ public:
 
         if (Ptr == nullptr)
             return false;
+        
+        memcpy(&data, Ptr, sizeof(T));
 
-        data = *(T*)Ptr;
         return true;
     }
 
@@ -110,7 +111,7 @@ public:
     template <class T>
     void AddData(std::string key, const T& data)
     {
-        Data.emplace(key, data);
+        Data.emplace(key, DataSaver(data));
     }
 
     template <class T>
@@ -154,11 +155,11 @@ int main()
 
     auto it = la.begin();
     it->AddData("a", 1);
-    it->AddData("b", std::string("azaz"));
+    it->AddData("b", std::string("aza"));
     it->AddData("c", 12.32);
     ++it;
     it->AddData("a", 4);
-    it->AddData("b", std::string("bazaa"));
+    it->AddData("b", std::string("baza"));
     it->AddData("c", 2.44);
 
     int i;
@@ -168,8 +169,7 @@ int main()
     it->GetData("b", s);
     std::cout << s << std::endl;
 
-    for (auto it : s)
-        std::cout << (int)it << " ";
+    std::cout << "---" << std::endl;
 
     for (auto it = la.begin(); it != la.end(); ++it)
     {
@@ -178,8 +178,6 @@ int main()
 
         it->GetData("b", s);
         std::cout << "string: " << s << std::endl;
-        for (auto it : s)
-            std::cout << (int)it << " ";
 
         it->GetData("c", f);
         std::cout << "float: " << f << std::endl;
