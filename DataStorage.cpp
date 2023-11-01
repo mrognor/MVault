@@ -21,7 +21,10 @@ private:
     std::size_t DataTypeSize = 0;
 
 public:
-    DataSaver() {}
+    DataSaver() 
+    {
+        std::cout << "Const" << std::endl;
+    }
 
     DataSaver(const DataSaver& dataSaver)
     {
@@ -36,15 +39,7 @@ public:
         if (DataType != nullptr)
             delete DataType;
 
-        Ptr = malloc(dataSaver.DataTypeSize);
-
-        if (Ptr != nullptr)
-        {
-            memcpy(Ptr, (const void*)dataSaver.Ptr, dataSaver.DataTypeSize);
-            DataType = new DataTypeSaver(*dataSaver.DataType);
-            DataTypeSize = dataSaver.DataTypeSize;
-        }
-
+        std::copy(dataSaver.Ptr, Ptr);
         return *this;
     }
 
@@ -63,20 +58,17 @@ public:
         if (DataType != nullptr)
             delete DataType;
 
-        Ptr = malloc(sizeof(T));
-
-        if (Ptr != nullptr)
-        {
-            memcpy(Ptr, (const void*)&data, sizeof(T));
-            DataType = new DataTypeSaver(typeid(data));
-            DataTypeSize = sizeof(T);
-        }
+        T* tmpPtr = new T(data);
+        
+        Ptr = (void*)tmpPtr;
+        DataType = new DataTypeSaver(typeid(data));
+        DataTypeSize = sizeof(T);
     }
 
     template <class T>
     bool GetData(T& data)
     {
-        if (DataType->GetDataType() != typeid(data))
+        if (DataType != nullptr && DataType->GetDataType() != typeid(data))
         {
             std::cout << "Wrong type! Was: " + std::string(DataType->GetDataType().name()) + " Requested: " + typeid(data).name() << std::endl;
             return false;
@@ -84,22 +76,24 @@ public:
 
         if (Ptr == nullptr)
             return false;
-        
-        memcpy(&data, Ptr, sizeof(T));
 
+        data = *(T*)Ptr;
         return true;
     }
-
+       
     ~DataSaver()
     {
+        std::cout << "Dest " << Ptr << std::endl;
         if (Ptr != nullptr)
             free(Ptr);
 
         if (DataType != nullptr)
-        {
             delete DataType;
-            DataType = nullptr;
-        }
+    }
+
+    void Test()
+    {
+        std::cout << *(int*)Ptr << std::endl;
     }
 };
 
@@ -149,51 +143,6 @@ public:
 
 int main()
 {
-    std::list<DataContainer> la;
-    la.emplace_back(DataContainer());
-    la.emplace_back(DataContainer());
-
-    auto it = la.begin();
-    it->AddData("a", 1);
-    it->AddData("b", std::string("aza"));
-    it->AddData("c", 12.32);
-    ++it;
-    it->AddData("a", 4);
-    it->AddData("b", std::string("baza"));
-    it->AddData("c", 2.44);
-
-    int i;
-    std::string s;
-    double f;
-
-    it->GetData("b", s);
-    std::cout << s << std::endl;
-
-    std::cout << "---" << std::endl;
-
-    for (auto it = la.begin(); it != la.end(); ++it)
-    {
-        it->GetData("a", i);
-        std::cout << "int: " << i << std::endl;
-
-        it->GetData("b", s);
-        std::cout << "string: " << s << std::endl;
-
-        it->GetData("c", f);
-        std::cout << "float: " << f << std::endl;
-    }
-
-    std::cout << "---" << std::endl;
-
-    for (auto it : la)
-    {
-        it.GetData("a", i);
-        std::cout << "int: " << i << std::endl;
-
-        it.GetData("c", f);
-        std::cout << "float: " << f << std::endl;
-
-        it.GetData("b", s);
-        std::cout << "string: " << s << std::endl;
-    }
+    DataContainer dc;
+    dc.AddData("id", 12);
 }
