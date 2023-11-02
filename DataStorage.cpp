@@ -152,13 +152,13 @@ private:
     std::unordered_map<std::string, DataSaver> Data;
 public:
     template <class T>
-    void AddData(std::string key, const T& data)
+    void AddData(const std::string& key, const T& data)
     {
         Data.emplace(key, DataSaver(data));
     }
 
     template <class T>
-    void SetData(std::string key, const T& data)
+    void SetData(const std::string& key, const T& data)
     {
         auto f = Data.find(key);
 
@@ -169,7 +169,7 @@ public:
     }
 
     template <class T>
-    bool GetData(std::string key, T& data)
+    bool GetData(const std::string& key, T& data)
     {
         auto f = Data.find(key);
         if (f == Data.end())
@@ -179,25 +179,120 @@ public:
         return true;
     }
 
-    bool IsData(std::string key)
+    bool IsData(const std::string& key)
     {
         return Data.find(key) != Data.end();
     }
 
-    void DeleteData(std::string key)
+    void DeleteData(const std::string& key)
     {
         Data.erase(key);
     }
 };
 
 
+class DataStorage
+{
+private:
+    DataContainer DataTemplate;
+    DataContainer ParamMaps;
+    std::list<DataContainer> ListOfDataContainers;
+public:
+    template <class T>
+    void AddParam(const std::string& paramName, T defaultParamValue)
+    {
+        DataTemplate.AddData(paramName, defaultParamValue);
+        ParamMaps.AddData(paramName, new std::unordered_map<T, std::list<DataContainer>::iterator>()); // memory leak
+    }
+
+    void AddElement()
+    {
+        ListOfDataContainers.emplace_front(DataTemplate);
+    }
+
+    // Set last element
+    template <class T>
+    void SetElement(const std::string& paramName, const T& paramValue)
+    {
+        auto f = ListOfDataContainers.begin();
+        f->SetData(paramName, paramValue);
+        std::unordered_map<T, std::list<DataContainer>::iterator>* tmpPtr;
+        ParamMaps.GetData(paramName, tmpPtr);
+        auto res = tmpPtr->emplace(paramValue, f);
+        if (!res.second)
+        {
+            tmpPtr->erase(res.first);
+            tmpPtr->emplace(paramValue, f);
+        }
+    }
+
+    template <class T>
+    bool GetElement(const std::string& paramName, const T& paramValue, DataContainer& foundedElemIt)
+    {
+        std::unordered_map<T, std::list<DataContainer>::iterator>* reqMap;
+        ParamMaps.GetData(paramName, reqMap);
+        auto f = reqMap->find(paramValue);
+
+        if (f == reqMap->end()) return false;
+
+        foundedElemIt = *f->second;
+        return true;
+    }
+};
+
 int main()
 {
-    DataSaver ds, ds2;
-    ds.SetData<std::string>("");
-    ds2 = ds;
+    // Known issues: data saver destroying pointers, data saver cannot store arrays
 
-    std::string res;
-    ds2.GetData(res);
-    std::cout << res << std::endl;
+    // DataSaver ds;
+    // int* a = new int(12);
+
+    // ds.SetData(a);
+    // int* b;
+    // ds.GetData(b);
+
+    // std::cout << *b << std::endl;
+    // delete a;
+
+
+    // DataContainer dc;
+    // int* a = new int(10);
+
+    // dc.AddData("a", a);
+    // int* b;
+    // dc.GetData("a", b);
+    // std::cout << *b << std::endl;
+    // delete a;
+
+    DataStorage ds;
+
+    ds.AddParam("id", -1);
+    ds.AddParam<std::string>("name", "");
+
+    ds.AddElement();
+    ds.SetElement("id", 1);
+    ds.SetElement<std::string>("name", "mrognor");
+
+    ds.AddElement();
+    ds.SetElement("id", 2);
+    ds.SetElement<std::string>("name", "moop");
+
+    DataContainer dc;
+    ds.GetElement("id", 1, dc);
+    
+    std::string name;
+    if (dc.GetData("name", name))
+        std::cout << name << std::endl;
+    
+    ds.GetElement("id", 2, dc);
+
+    if (dc.GetData("name", name))
+        std::cout << name << std::endl;
+
+    ds.SetElement<std::string>("name", "ZmoopZ");
+    
+    ds.GetElement("id", 2, dc);
+
+    if (dc.GetData("name", name))
+        std::cout << name << std::endl;
 }
