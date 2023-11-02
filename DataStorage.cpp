@@ -195,14 +195,14 @@ class DataStorage
 {
 private:
     DataContainer DataTemplate;
-    DataContainer ParamMaps;
+    std::unordered_map<std::string, void*> ParamMaps;
     std::list<DataContainer> ListOfDataContainers;
 public:
     template <class T>
     void AddParam(const std::string& paramName, T defaultParamValue)
     {
         DataTemplate.AddData(paramName, defaultParamValue);
-        ParamMaps.AddData(paramName, new std::unordered_map<T, std::list<DataContainer>::iterator>()); // memory leak
+        ParamMaps.emplace(paramName, new std::unordered_map<T, std::list<DataContainer>::iterator>()); // memory leak
     }
 
     void AddElement()
@@ -216,8 +216,9 @@ public:
     {
         auto f = ListOfDataContainers.begin();
         f->SetData(paramName, paramValue);
-        std::unordered_map<T, std::list<DataContainer>::iterator>* tmpPtr;
-        ParamMaps.GetData(paramName, tmpPtr);
+        
+        std::unordered_map<T, std::list<DataContainer>::iterator>* tmpPtr = (std::unordered_map<T, std::list<DataContainer>::iterator>*)ParamMaps.find(paramName)->second;
+
         auto res = tmpPtr->emplace(paramValue, f);
         if (!res.second)
         {
@@ -229,20 +230,29 @@ public:
     template <class T>
     bool GetElement(const std::string& paramName, const T& paramValue, DataContainer& foundedElemIt)
     {
-        std::unordered_map<T, std::list<DataContainer>::iterator>* reqMap;
-        ParamMaps.GetData(paramName, reqMap);
-        auto f = reqMap->find(paramValue);
+        std::unordered_map<T, std::list<DataContainer>::iterator>* tmpPtr = (std::unordered_map<T, std::list<DataContainer>::iterator>*)ParamMaps.find(paramName)->second;
 
-        if (f == reqMap->end()) return false;
+        auto f = tmpPtr->find(paramValue);
+
+        if (f == tmpPtr->end()) return false;
 
         foundedElemIt = *f->second;
         return true;
+    }
+
+    ~DataStorage()
+    {
+        for (auto& it : ParamMaps)
+        {
+            free(it.second);
+        }
     }
 };
 
 int main()
 {
-    // Known issues: data saver destroying pointers, data saver cannot store arrays
+    // Known issues: data saver cannot store arrays
+    // Limitations: save pointers in data saver only on your own risk because it is very hard to properly deallocate memory
 
     // DataSaver ds;
     // int* a = new int(12);
