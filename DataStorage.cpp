@@ -185,17 +185,17 @@ public:
 };
 
 // A container class for storing data of any type. 
-// As the base class of the container, std::unordered_map is used, which is a hash map
+// As the base class of the container, std::unordered_multimap is used, which is a hash map
 // If a pointer is written to one of the elements, then you can set a custom data deletion function. 
 class DataContainer
 {
 private:
     // Hash map to store all DataSaver's
-    std::unordered_map<std::string, DataSaver> Data;
+    std::unordered_multimap<std::string, DataSaver> Data;
     
 public:
-    typedef typename std::unordered_map<std::string, DataSaver>::iterator iterator;
-    typedef typename std::unordered_map<std::string, DataSaver>::const_iterator const_iterator;
+    typedef typename std::unordered_multimap<std::string, DataSaver>::iterator iterator;
+    typedef typename std::unordered_multimap<std::string, DataSaver>::const_iterator const_iterator;
 
     inline iterator begin() noexcept { return Data.begin(); }
     inline const_iterator cbegin() const noexcept { return Data.cbegin(); }
@@ -245,6 +245,13 @@ public:
 
         f->second.GetData(data);
         return true;
+    }
+
+    // Returns a pair of iterators. The first iterator points to the first element with the same key, and the second to the last element
+    // Equals std::unordered_multimap<...>::equal_range
+    std::pair<DataContainer::iterator, DataContainer::iterator> GetAllData(const std::string& key)
+    {
+        return Data.equal_range(key);
     }
 
     // Method for checking the presence of data in the container
@@ -342,44 +349,47 @@ int main()
     // delete a;
 
 
-    // DataContainer dc;
-    // int* a = new int(10);
-
-    // dc.AddData("a", a);
-    // int* b;
-    // dc.GetData("a", b);
-    // std::cout << *b << std::endl;
-    // delete a;
-
-    DataStorage ds;
-
-    ds.AddParam("id", -1);
-    ds.AddParam<std::string>("name", "");
-
-    ds.AddElement();
-    ds.SetElement("id", 1);
-    ds.SetElement<std::string>("name", "mrognor");
-
-    ds.AddElement();
-    ds.SetElement("id", 2);
-    ds.SetElement<std::string>("name", "moop");
-
     DataContainer dc;
-    ds.GetElement("id", 1, dc);
+    dc.AddData("a", 1);
+    dc.AddData("a", 2);
     
-    std::string name;
-    if (dc.GetData("name", name))
-        std::cout << name << std::endl;
+    auto f = dc.GetAllData("a");
+    for (auto it = f.first; it != f.second; ++it)
+    {
+        int res;
+        it->second.GetData(res);
+        std::cout << res << std::endl;
+    }
+
+    // DataStorage ds;
+
+    // ds.AddParam("id", -1);
+    // ds.AddParam<std::string>("name", "");
+
+    // ds.AddElement();
+    // ds.SetElement("id", 1);
+    // ds.SetElement<std::string>("name", "mrognor");
+
+    // ds.AddElement();
+    // ds.SetElement("id", 2);
+    // ds.SetElement<std::string>("name", "moop");
+
+    // DataContainer dc;
+    // ds.GetElement("id", 1, dc);
     
-    ds.GetElement("id", 2, dc);
-
-    if (dc.GetData("name", name))
-        std::cout << name << std::endl;
-
-    ds.SetElement<std::string>("name", "ZmoopZ");
+    // std::string name;
+    // if (dc.GetData("name", name))
+    //     std::cout << name << std::endl;
     
-    ds.GetElement("id", 2, dc);
+    // ds.GetElement("id", 2, dc);
 
-    if (dc.GetData("name", name))
-        std::cout << name << std::endl;
+    // if (dc.GetData("name", name))
+    //     std::cout << name << std::endl;
+
+    // ds.SetElement<std::string>("name", "ZmoopZ");
+    
+    // ds.GetElement("id", 2, dc);
+
+    // if (dc.GetData("name", name))
+    //     std::cout << name << std::endl;
 }
