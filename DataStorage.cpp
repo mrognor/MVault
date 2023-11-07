@@ -10,6 +10,7 @@ class DataTypeSaver
 private:
     // Type info struct to save type
     const std::type_info& TypeInfo;
+
 public:
     // Constructor to set type variable
     DataTypeSaver(const std::type_info& type) : TypeInfo(type) {}
@@ -19,17 +20,24 @@ public:
 };
 
 // Class to store data with any type
+// If pointers are stored in the class object, then you can set a custom data deletion function. 
 class DataSaver
 {
 private:
     // Void pointer to save pointer to any data
     void* Ptr = nullptr;
+    
     // Pointer to data type saver
     DataTypeSaver* DataType = nullptr;
+    
     // Variable to store data type size
     std::size_t DataTypeSize = 0;
+    
     // Pointer to copy function. Required to DataSaver copy
     void (*CopyFunc)(void*& dst, const void* src) = nullptr;
+
+    // Pointer to copy function. Required to delete data if it is pointer
+    void (*DeleteFunc)(const void* ptr) = nullptr;
 
 public:
     // Default constructor
@@ -67,6 +75,8 @@ public:
                 CopyFunc = dataSaver.CopyFunc;
                 // Call new copy func to copy data from dataSaver void pointer to local void pointer. Data to Ptr will be allocated inside function
                 CopyFunc(Ptr, dataSaver.Ptr);
+                // Set delete function from dataSaver
+                DeleteFunc = dataSaver.DeleteFunc;
             }
             else
             {
@@ -86,9 +96,23 @@ public:
         SetData(data);
     }
 
+    // Template constructor to save data and delete function inside DataSaver
+    template<class T, class F>
+    DataSaver(const T& data, F&& deleteFunc)
+    {
+        SetData(data, deleteFunc);
+    }
+
     // Template method to save data inside DataSaver
     template <class T>
     void SetData(const T& data)
+    {
+        SetData(data, nullptr);
+    }
+
+    // Template method to save data and delete function inside DataSaver
+    template <class T, class F>
+    void SetData(const T& data, F&& deleteFunc)
     {
         // Clear Ptr if it was data before
         if (Ptr != nullptr)
@@ -100,6 +124,7 @@ public:
 
         // Create new T type object and save it pointer like void ptr. Data from data will be copying using copy constructor
         Ptr = (void*)new T(data);
+
         // Create new DataType object to save data type
         DataType = new DataTypeSaver(typeid(data));
         // Save T size
@@ -113,6 +138,9 @@ public:
             // Allocate new memory to T type and convert it to void pointer.
             dst = (void*) new T(*(T*)src);
         };
+
+        // Set delete function from dataSaver
+        DeleteFunc = deleteFunc;
     }
 
     // Template method to get data from DataSaver. Return true if it was data inside.
@@ -135,6 +163,16 @@ public:
         return true;
     }
 
+    // Call DeleteFunc to custom data deletion. If the data deletion function has not been installed, then this method will not do anything
+    void DeleteData()
+    {
+        if (DeleteFunc != nullptr)
+        {
+            DeleteFunc(Ptr);
+            DeleteFunc = nullptr;
+        }
+    }
+
     // Destructor
     ~DataSaver()
     {
@@ -146,28 +184,58 @@ public:
     }
 };
 
+// A container class for storing data of any type. 
+// As the base class of the container, std::unordered_map is used, which is a hash map
+// If a pointer is written to one of the elements, then you can set a custom data deletion function. 
 class DataContainer
 {
 private:
+    // Hash map to store all DataSaver's
     std::unordered_map<std::string, DataSaver> Data;
+    
 public:
+    typedef typename std::unordered_map<std::string, DataSaver>::iterator iterator;
+    typedef typename std::unordered_map<std::string, DataSaver>::const_iterator const_iterator;
+
+    inline iterator begin() noexcept { return Data.begin(); }
+    inline const_iterator cbegin() const noexcept { return Data.cbegin(); }
+    inline iterator end() noexcept { return Data.end(); }
+    inline const_iterator cend() const noexcept { return Data.cend(); }
+
+    // Method to add new element with data inside container
     template <class T>
     void AddData(const std::string& key, const T& data)
     {
         Data.emplace(key, DataSaver(data));
     }
 
+    // Method to add new element with data and custom delete function inside container
+    template <class T, class F>
+    void AddData(const std::string& key, const T& data, F&& deleteFunc)
+    {
+        Data.emplace(key, DataSaver(data, deleteFunc));
+    }
+
+    // Method to update element data
     template <class T>
     void SetData(const std::string& key, const T& data)
+    {
+        SetData(key, data, nullptr);
+    }
+
+    // Method to update element data and delete function
+    template <class T, class F>
+    void SetData(const std::string& key, const T& data, F&& deleteFunc)
     {
         auto f = Data.find(key);
 
         if (f == Data.end())
-            AddData(key, data);
+            AddData(key, data, deleteFunc);
         else
-            f->second.SetData(data);
+            f->second.SetData(data, deleteFunc);
     }
 
+    // Method to get data from container using key
     template <class T>
     bool GetData(const std::string& key, T& data)
     {
@@ -179,14 +247,21 @@ public:
         return true;
     }
 
+    // Method for checking the presence of data in the container
     bool IsData(const std::string& key)
     {
         return Data.find(key) != Data.end();
     }
 
+    // Custom data deletion
     void DeleteData(const std::string& key)
     {
-        Data.erase(key);
+        auto f = Data.find(key);
+        if (f != Data.end())
+        {
+            f->second.DeleteData();
+            Data.erase(key);
+        }
     }
 };
 
@@ -195,14 +270,20 @@ class DataStorage
 {
 private:
     DataContainer DataTemplate;
-    std::unordered_map<std::string, void*> ParamMaps;
+    DataContainer ParamMaps;
     std::list<DataContainer> ListOfDataContainers;
 public:
     template <class T>
     void AddParam(const std::string& paramName, T defaultParamValue)
     {
         DataTemplate.AddData(paramName, defaultParamValue);
-        ParamMaps.emplace(paramName, new std::unordered_map<T, std::list<DataContainer>::iterator>()); // memory leak
+
+        std::unordered_map<T, std::list<DataContainer>::iterator>* pointer = new std::unordered_map<T, std::list<DataContainer>::iterator>;
+        ParamMaps.AddData(paramName, pointer, [](const void* ptr)
+            {
+                delete *(std::unordered_map<T, std::list<DataContainer>::iterator>**)ptr;
+            }
+        );
     }
 
     void AddElement()
@@ -216,9 +297,8 @@ public:
     {
         auto f = ListOfDataContainers.begin();
         f->SetData(paramName, paramValue);
-        
-        std::unordered_map<T, std::list<DataContainer>::iterator>* tmpPtr = (std::unordered_map<T, std::list<DataContainer>::iterator>*)ParamMaps.find(paramName)->second;
-
+        std::unordered_map<T, std::list<DataContainer>::iterator>* tmpPtr;
+        ParamMaps.GetData(paramName, tmpPtr);
         auto res = tmpPtr->emplace(paramValue, f);
         if (!res.second)
         {
@@ -230,11 +310,11 @@ public:
     template <class T>
     bool GetElement(const std::string& paramName, const T& paramValue, DataContainer& foundedElemIt)
     {
-        std::unordered_map<T, std::list<DataContainer>::iterator>* tmpPtr = (std::unordered_map<T, std::list<DataContainer>::iterator>*)ParamMaps.find(paramName)->second;
+        std::unordered_map<T, std::list<DataContainer>::iterator>* reqMap;
+        ParamMaps.GetData(paramName, reqMap);
+        auto f = reqMap->find(paramValue);
 
-        auto f = tmpPtr->find(paramValue);
-
-        if (f == tmpPtr->end()) return false;
+        if (f == reqMap->end()) return false;
 
         foundedElemIt = *f->second;
         return true;
@@ -243,16 +323,13 @@ public:
     ~DataStorage()
     {
         for (auto& it : ParamMaps)
-        {
-            free(it.second);
-        }
+            it.second.DeleteData();
     }
 };
 
 int main()
 {
     // Known issues: data saver cannot store arrays
-    // Limitations: save pointers in data saver only on your own risk because it is very hard to properly deallocate memory
 
     // DataSaver ds;
     // int* a = new int(12);
