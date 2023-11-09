@@ -184,19 +184,20 @@ public:
     }
 };
 
-// A container class for storing data of any type. 
-// As the base class of the container, std::unordered_multimap is used, which is a hash map
+// A container class for storing data of any type. Allows to specify required container.
+// Container have to support find(), begin(), end(), emplace(), erase()
 // If a pointer is written to one of the elements, then you can set a custom data deletion function. 
+template <class C>
 class DataContainer
 {
-private:
+protected:
     // Hash map to store all DataSaver's
-    std::unordered_multimap<std::string, DataSaver> Data;
+    C Data;
     
 public:
     // Iterators
-    typedef typename std::unordered_multimap<std::string, DataSaver>::iterator iterator;
-    typedef typename std::unordered_multimap<std::string, DataSaver>::const_iterator const_iterator;
+    typedef typename C::iterator iterator;
+    typedef typename C::const_iterator const_iterator;
 
     // Begin and end functions to work with iterators and foreach loop
     inline iterator begin() noexcept { return Data.begin(); }
@@ -249,13 +250,6 @@ public:
         return true;
     }
 
-    // Returns a pair of iterators. The first iterator points to the first element with the same key, and the second to the last element
-    // Equals std::unordered_multimap<...>::equal_range
-    std::pair<DataContainer::iterator, DataContainer::iterator> GetAllData(const std::string& key)
-    {
-        return Data.equal_range(key);
-    }
-
     // Method for checking the presence of data in the container
     bool IsData(const std::string& key)
     {
@@ -274,24 +268,44 @@ public:
     }
 };
 
+
+// A container class for storing data of any type. 
+// As the base class of the container, std::unordered_map is used, which is a hash map
+// If a pointer is written to one of the elements, then you can set a custom data deletion function. 
+class DataHashMap : public DataContainer<std::unordered_map<std::string, DataSaver>> {};
+
+// A container class for storing data of any type. 
+// As the base class of the container, std::unordered_multimap is used, which is a hash map
+// If a pointer is written to one of the elements, then you can set a custom data deletion function. 
+class DataMultiHashMap : public DataContainer<std::unordered_multimap<std::string, DataSaver>>
+{
+public:
+    // Returns a pair of iterators. The first iterator points to the first element with the same key, and the second to the last element
+    // Equals std::unordered_multimap<...>::equal_range
+    std::pair<DataContainer::iterator, DataContainer::iterator> GetAllData(const std::string& key)
+    {
+        return Data.equal_range(key);
+    }
+};
+
 class DataStorageElement
 {
 private:
-    DataContainer* Data = nullptr;
-    DataContainer* ParamMaps = nullptr;
+    DataHashMap* Data = nullptr;
+    DataHashMap* ParamMaps = nullptr;
 public:
     DataStorageElement() {}
-    DataStorageElement(DataContainer* data, DataContainer* paramMaps) : Data(data), ParamMaps(paramMaps) {}
+    DataStorageElement(DataHashMap* data, DataHashMap* paramMaps) : Data(data), ParamMaps(paramMaps) {}
 
-    void SetDataContainerPtr(DataContainer* data) { Data = data; }
-    void SetParamMapsPtr(DataContainer* paramMaps) { ParamMaps = paramMaps; }
+    void SetDataHashMapPtr(DataHashMap* data) { Data = data; }
+    void SetParamMapsPtr(DataHashMap* paramMaps) { ParamMaps = paramMaps; }
 
     // Method to update element data
     template <class T>
     void SetData(const std::string& key, const T& data)
     {
         std::cout << Data << std::endl;
-        std::unordered_map<T, DataContainer*>* pointer = nullptr;
+        std::unordered_map<T, DataHashMap*>* pointer = nullptr;
         T oldData;
         Data->GetData(key, oldData);
 
@@ -322,9 +336,9 @@ public:
 class DataStorage
 {
 private:
-    DataContainer DataTemplate;
-    DataContainer ParamMaps;
-    std::list<DataContainer*> DataList;
+    DataHashMap DataTemplate;
+    DataHashMap ParamMaps;
+    std::list<DataHashMap*> DataList;
 public:
 
     template <class T>
@@ -332,22 +346,22 @@ public:
     {
         DataTemplate.AddData(paramName, defaultParamValue);
 
-        std::unordered_map<T, DataContainer*>* pointer = new std::unordered_map<T, DataContainer*>;
+        std::unordered_map<T, DataMultiHashMap*>* pointer = new std::unordered_map<T, DataMultiHashMap*>;
         ParamMaps.AddData(paramName, pointer, [](const void* ptr)
             {
-                delete *(std::unordered_map<T, DataContainer*>**)ptr;
+                delete *(std::unordered_map<T, DataMultiHashMap*>**)ptr;
             }
         );
     }
 
     DataStorageElement CreateElement()
     {
-        DataContainer* newData = new DataContainer(DataTemplate);
+        DataHashMap* newData = new DataHashMap(DataTemplate);
         DataList.emplace_back(newData);
 
         for (auto& it : ParamMaps)
         {
-            it.first
+            it.first;
         }
 
         return DataStorageElement(&DataTemplate, &ParamMaps);
@@ -356,7 +370,7 @@ public:
     template <class T>
     bool GetElement(const std::string& paramName, const T& paramValue, DataStorageElement foundedElem)
     {
-        std::unordered_map<T, DataContainer*>* reqMap = nullptr;
+        std::unordered_map<T, DataMultiHashMap*>* reqMap = nullptr;
         
         if (ParamMaps.GetData(paramName, reqMap))
         {
@@ -364,7 +378,7 @@ public:
             std::cout << paramValue << std::endl;
             if (f != reqMap->end())
             {
-                foundedElem.SetDataContainerPtr(f->second);
+                foundedElem.SetDataHashMapPtr(f->second);
                 foundedElem.SetParamMapsPtr(&ParamMaps);
                 return true;
             }
@@ -389,32 +403,26 @@ int main()
 {
     // Known issues: data saver cannot store arrays
 
-    DataStorage ds;
-    ds.AddParam("id", -1);
-    ds.AddParam<std::string>("name", "");
+    DataHashMap dc;
+    dc.AddData("id", 1);
+    dc.AddData("id", 2);
 
-    DataStorageElement dse = ds.CreateElement();
-    dse.SetData("id", 0);
-    dse.SetData<std::string>("name", "mrognor");
+    int res;
+    dc.GetData("id", res);
+    std::cout << res << std::endl;
 
-    if (ds.GetElement<std::string>("name", "mrognor", dse))
+    DataMultiHashMap dmc;
+    dmc.AddData("id", 1);
+    dmc.AddData("id", 2);
+
+    dmc.GetData("id", res);
+    std::cout << res << std::endl;
+
+    std::pair<DataMultiHashMap::iterator, DataMultiHashMap::iterator> respair = dmc.GetAllData("id");
+
+    for (auto& it = respair.first; it != respair.second; ++it)
     {
-        int res;
-        dse.GetData("id", res);
+        it->second.GetData(res);
         std::cout << res << std::endl;
     }
-
-    dse = ds.CreateElement();
-    dse.SetData("id", 5);
-    dse.SetData<std::string>("name", "moop");
-
-    if (ds.GetElement<std::string>("name", "mrognor", dse))
-    {
-        int res;
-        dse.GetData("id", res);
-        std::cout << res << std::endl;
-    }
-
-    std::list<int> a;
-    
 }
