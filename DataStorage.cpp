@@ -3,6 +3,7 @@
 #include <cstring>
 #include <list>
 #include <typeinfo>
+#include <functional>
 
 // Class to make real time type check
 class DataTypeSaver
@@ -304,18 +305,19 @@ public:
     template <class T>
     void SetData(const std::string& key, const T& data)
     {
-        std::cout << Data << std::endl;
         std::unordered_map<T, DataHashMap*>* pointer = nullptr;
         T oldData;
         Data->GetData(key, oldData);
 
         ParamMaps->GetData(key, pointer);
         
-        auto mapresult = pointer->find(data);
+        auto mapresult = pointer->find(oldData);
         if (mapresult != pointer->end())
         {
             mapresult->second->DeleteData(key);
             mapresult->second->AddData(key, data);
+            pointer->erase(oldData);
+            pointer->emplace(data, Data);
         }
         else
         {
@@ -338,6 +340,7 @@ class DataStorage
 private:
     DataHashMap DataTemplate;
     DataHashMap ParamMaps;
+    std::unordered_map<std::string, std::function<void(DataHashMap*)>> AddElementFunctions;
     std::list<DataHashMap*> DataList;
 public:
 
@@ -346,10 +349,16 @@ public:
     {
         DataTemplate.AddData(paramName, defaultParamValue);
 
-        std::unordered_map<T, DataMultiHashMap*>* pointer = new std::unordered_map<T, DataMultiHashMap*>;
+        std::unordered_map<T, DataHashMap*>* pointer = new std::unordered_map<T, DataHashMap*>;
         ParamMaps.AddData(paramName, pointer, [](const void* ptr)
             {
-                delete *(std::unordered_map<T, DataMultiHashMap*>**)ptr;
+                delete *(std::unordered_map<T, DataHashMap*>**)ptr;
+            }
+        );
+
+        AddElementFunctions.emplace(paramName, [=](DataHashMap* newElem)
+            {
+                pointer->emplace(defaultParamValue, newElem);
             }
         );
     }
@@ -359,23 +368,20 @@ public:
         DataHashMap* newData = new DataHashMap(DataTemplate);
         DataList.emplace_back(newData);
 
-        for (auto& it : ParamMaps)
-        {
-            it.first;
-        }
+        for (auto& it : AddElementFunctions)
+            it.second(newData);
 
-        return DataStorageElement(&DataTemplate, &ParamMaps);
+        return DataStorageElement(newData, &ParamMaps);
     }
 
     template <class T>
-    bool GetElement(const std::string& paramName, const T& paramValue, DataStorageElement foundedElem)
+    bool GetElement(const std::string& paramName, const T& paramValue, DataStorageElement& foundedElem)
     {
-        std::unordered_map<T, DataMultiHashMap*>* reqMap = nullptr;
+        std::unordered_map<T, DataHashMap*>* reqMap = nullptr;
         
         if (ParamMaps.GetData(paramName, reqMap))
         {
             auto f = reqMap->find(paramValue);
-            std::cout << paramValue << std::endl;
             if (f != reqMap->end())
             {
                 foundedElem.SetDataHashMapPtr(f->second);
@@ -402,27 +408,66 @@ public:
 int main()
 {
     // Known issues: data saver cannot store arrays
+    DataStorage ds;
+    ds.AddParam("id", -1);
+    ds.AddParam<std::string>("name", "");
 
-    DataHashMap dc;
-    dc.AddData("id", 1);
-    dc.AddData("id", 2);
+    DataStorageElement dse = ds.CreateElement();
 
-    int res;
-    dc.GetData("id", res);
-    std::cout << res << std::endl;
-
-    DataMultiHashMap dmc;
-    dmc.AddData("id", 1);
-    dmc.AddData("id", 2);
-
-    dmc.GetData("id", res);
-    std::cout << res << std::endl;
-
-    std::pair<DataMultiHashMap::iterator, DataMultiHashMap::iterator> respair = dmc.GetAllData("id");
-
-    for (auto& it = respair.first; it != respair.second; ++it)
+    if (ds.GetElement<int>("id", -1, dse))
     {
-        it->second.GetData(res);
-        std::cout << res << std::endl;
+        std::string res;
+        if(dse.GetData("name", res))
+            std::cout << "1: " << res << std::endl;
+    }
+
+    dse.SetData("id", 0);
+    dse.SetData<std::string>("name", "mrognor");
+
+    if (ds.GetElement<int>("id", -1, dse))
+    {
+        std::string res;
+        if(dse.GetData("name", res))
+            std::cout << "2: " << res << std::endl;
+    }
+
+    if (ds.GetElement<int>("id", 0, dse))
+    {
+        std::string res;
+        if(dse.GetData("name", res))
+            std::cout << "3: " << res << std::endl;
+    }
+
+    if (ds.GetElement<std::string>("name", "mrognor", dse))
+    {
+        int res;
+        if (dse.GetData("id", res))
+            std::cout << "4: " << res << std::endl;
+    }
+
+    dse = ds.CreateElement();
+    dse.SetData("id", 1);
+    dse.SetData<std::string>("name", "moop");
+
+    if (ds.GetElement<int>("id", 1, dse))
+    {
+        std::string res;
+        if(dse.GetData("name", res))
+            std::cout << "5: " << res << std::endl;
+    }
+
+    if (ds.GetElement<std::string>("name", "moop", dse))
+    {
+        int res;
+        if (dse.GetData("id", res))
+            std::cout << "6: " << res << std::endl;
+    }
+
+    dse.SetData("id", 2);
+    if (ds.GetElement<std::string>("name", "moop", dse))
+    {
+        int res;
+        if (dse.GetData("id", res))
+            std::cout << "7: " << res << std::endl;
     }
 }
