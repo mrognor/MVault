@@ -289,10 +289,13 @@ public:
     }
 };
 
+// Class for working with DataStorage elements
 class DataStorageElement
 {
 private:
+    // Data storage element
     DataHashMap* Data = nullptr;
+    // Data storage param map
     DataHashMap* ParamMaps = nullptr;
 public:
     DataStorageElement() {}
@@ -305,25 +308,27 @@ public:
     template <class T>
     void SetData(const std::string& key, const T& data)
     {
+        // Pointer to store parametr to DataStorage element map
         std::unordered_map<T, DataHashMap*>* pointer = nullptr;
+        ParamMaps->GetData(key, pointer);
+
+        // Old data to find element in element map
         T oldData;
         Data->GetData(key, oldData);
 
-        ParamMaps->GetData(key, pointer);
+        // Find DataStorage element using oldData as key
+        auto ParamToElementIt = pointer->find(oldData);
+        // Delete data from DataStorage element using key 
+        ParamToElementIt->second->DeleteData(key);
+        // Add new data to DataStorage element
+        ParamToElementIt->second->AddData(key, data);
         
-        auto mapresult = pointer->find(oldData);
-        if (mapresult != pointer->end())
-        {
-            mapresult->second->DeleteData(key);
-            mapresult->second->AddData(key, data);
-            pointer->erase(oldData);
-            pointer->emplace(data, Data);
-        }
-        else
-        {
-            pointer->emplace(data, Data);
-        }
+        // Remove oldData from pointer
+        pointer->erase(oldData);
+        // Add new data to pointer
+        pointer->emplace(data, Data);
         
+        // Update local data
         Data->SetData(key, data);
     }
 
