@@ -269,7 +269,6 @@ public:
     }
 };
 
-
 // A container class for storing data of any type. 
 // As the base class of the container, std::unordered_map is used, which is a hash map
 // If a pointer is written to one of the elements, then you can set a custom data deletion function. 
@@ -289,46 +288,49 @@ public:
     }
 };
 
-// Class for working with DataStorage elements
-class DataStorageElement
+// A class that provides access to data inside DataStorage.
+// This class works as a reference to the data inside the DataStorage, 
+// i.e. when the data inside this class changes, they will also change inside the DataStorage
+class DataStorageRecord
 {
 private:
-    // Data storage element
+    // DataStorage record pointer
     DataHashMap* Data = nullptr;
     // Data storage param map
-    DataHashMap* ParamMaps = nullptr;
+    DataHashMap* KeysMaps = nullptr;
 public:
-    DataStorageElement() {}
-    DataStorageElement(DataHashMap* data, DataHashMap* paramMaps) : Data(data), ParamMaps(paramMaps) {}
+    DataStorageRecord() {}
+    DataStorageRecord(DataHashMap* data, DataHashMap* paramMaps) : Data(data), KeysMaps(paramMaps) {}
 
     void SetDataHashMapPtr(DataHashMap* data) { Data = data; }
-    void SetParamMapsPtr(DataHashMap* paramMaps) { ParamMaps = paramMaps; }
+    void SetParamMapsPtr(DataHashMap* paramMaps) { KeysMaps = paramMaps; }
 
-    // Method to update element data
+    // Method to update data inside DataStorage
     template <class T>
     void SetData(const std::string& key, const T& data)
     {
-        // Pointer to store parametr to DataStorage element map
+        // A pointer for storing a std::unordered_map in which a template data type is used as a key, 
+        // and a pointer to the DataHashMap is used as a value
         std::unordered_map<T, DataHashMap*>* pointer = nullptr;
-        ParamMaps->GetData(key, pointer);
+        KeysMaps->GetData(key, pointer);
 
-        // Old data to find element in element map
+        // Get the current value of the key key inside the DataStorageRecord and save it for further work
         T oldData;
         Data->GetData(key, oldData);
 
-        // Find DataStorage element using oldData as key
-        auto ParamToElementIt = pointer->find(oldData);
-        // Delete data from DataStorage element using key 
-        ParamToElementIt->second->DeleteData(key);
-        // Add new data to DataStorage element
-        ParamToElementIt->second->AddData(key, data);
+        // Finding data by the oldData key and save it to iterator
+        auto KeyToRecordIt = pointer->find(oldData);
+        // Delete data from DataStorage using key
+        KeyToRecordIt->second->DeleteData(key);
+        // Add new data to DataStorage
+        KeyToRecordIt->second->AddData(key, data);
         
-        // Remove oldData from pointer
+        // Remove oldData from pointer to DataStorage KeysMaps
         pointer->erase(oldData);
-        // Add new data to pointer
+        // Add new data to pointer to DataStorage KeysMaps
         pointer->emplace(data, Data);
         
-        // Update local data
+        // Update local DataStorageRecord data
         Data->SetData(key, data);
     }
 
@@ -340,57 +342,60 @@ public:
     }
 };
 
+// A class for storing a set of data of any type using a set of keys of any type
 class DataStorage
 {
 private:
-    DataHashMap DataTemplate;
-    DataHashMap ParamMaps;
-    std::unordered_map<std::string, std::function<void(DataHashMap*)>> AddElementFunctions;
-    std::list<DataHashMap*> DataList;
+    // DataHashMap that stores a template for each new records inside DataStorage
+    DataHashMap RecordTemplate;
+    // 
+    DataHashMap KeysMaps;
+    std::unordered_map<std::string, std::function<void(DataHashMap*)>> DataStorageRecordFillers;
+    std::list<DataHashMap*> RecordsList;
 public:
 
     template <class T>
     void AddParam(const std::string& paramName, T defaultParamValue)
     {
-        DataTemplate.AddData(paramName, defaultParamValue);
+        RecordTemplate.AddData(paramName, defaultParamValue);
 
         std::unordered_map<T, DataHashMap*>* pointer = new std::unordered_map<T, DataHashMap*>;
-        ParamMaps.AddData(paramName, pointer, [](const void* ptr)
+        KeysMaps.AddData(paramName, pointer, [](const void* ptr)
             {
                 delete *(std::unordered_map<T, DataHashMap*>**)ptr;
             }
         );
 
-        AddElementFunctions.emplace(paramName, [=](DataHashMap* newElem)
+        DataStorageRecordFillers.emplace(paramName, [=](DataHashMap* newRecord)
             {
-                pointer->emplace(defaultParamValue, newElem);
+                pointer->emplace(defaultParamValue, newRecord);
             }
         );
     }
 
-    DataStorageElement CreateElement()
+    DataStorageRecord CreateNewRecord()
     {
-        DataHashMap* newData = new DataHashMap(DataTemplate);
-        DataList.emplace_back(newData);
+        DataHashMap* newData = new DataHashMap(RecordTemplate);
+        RecordsList.emplace_back(newData);
 
-        for (auto& it : AddElementFunctions)
+        for (auto& it : DataStorageRecordFillers)
             it.second(newData);
 
-        return DataStorageElement(newData, &ParamMaps);
+        return DataStorageRecord(newData, &KeysMaps);
     }
 
     template <class T>
-    bool GetElement(const std::string& paramName, const T& paramValue, DataStorageElement& foundedElem)
+    bool GetRecord(const std::string& paramName, const T& paramValue, DataStorageRecord& foundedRecord)
     {
         std::unordered_map<T, DataHashMap*>* reqMap = nullptr;
         
-        if (ParamMaps.GetData(paramName, reqMap))
+        if (KeysMaps.GetData(paramName, reqMap))
         {
             auto f = reqMap->find(paramValue);
             if (f != reqMap->end())
             {
-                foundedElem.SetDataHashMapPtr(f->second);
-                foundedElem.SetParamMapsPtr(&ParamMaps);
+                foundedRecord.SetDataHashMapPtr(f->second);
+                foundedRecord.SetParamMapsPtr(&KeysMaps);
                 return true;
             }
             else
@@ -402,10 +407,10 @@ public:
 
     ~DataStorage()
     {
-        for (auto& it : ParamMaps)
+        for (auto& it : KeysMaps)
             it.second.DeleteData();
         
-        for (auto& it : DataList)
+        for (auto& it : RecordsList)
             delete it;
     }
 };
@@ -417,9 +422,9 @@ int main()
     ds.AddParam("id", -1);
     ds.AddParam<std::string>("name", "");
 
-    DataStorageElement dse = ds.CreateElement();
+    DataStorageRecord dse = ds.CreateNewRecord();
 
-    if (ds.GetElement<int>("id", -1, dse))
+    if (ds.GetRecord<int>("id", -1, dse))
     {
         std::string res;
         if(dse.GetData("name", res))
@@ -429,39 +434,39 @@ int main()
     dse.SetData("id", 0);
     dse.SetData<std::string>("name", "mrognor");
 
-    if (ds.GetElement<int>("id", -1, dse))
+    if (ds.GetRecord<int>("id", -1, dse))
     {
         std::string res;
         if(dse.GetData("name", res))
             std::cout << "2: " << res << std::endl;
     }
 
-    if (ds.GetElement<int>("id", 0, dse))
+    if (ds.GetRecord<int>("id", 0, dse))
     {
         std::string res;
         if(dse.GetData("name", res))
             std::cout << "3: " << res << std::endl;
     }
 
-    if (ds.GetElement<std::string>("name", "mrognor", dse))
+    if (ds.GetRecord<std::string>("name", "mrognor", dse))
     {
         int res;
         if (dse.GetData("id", res))
             std::cout << "4: " << res << std::endl;
     }
 
-    dse = ds.CreateElement();
+    dse = ds.CreateNewRecord();
     dse.SetData("id", 1);
     dse.SetData<std::string>("name", "moop");
 
-    if (ds.GetElement<int>("id", 1, dse))
+    if (ds.GetRecord<int>("id", 1, dse))
     {
         std::string res;
         if(dse.GetData("name", res))
             std::cout << "5: " << res << std::endl;
     }
 
-    if (ds.GetElement<std::string>("name", "moop", dse))
+    if (ds.GetRecord<std::string>("name", "moop", dse))
     {
         int res;
         if (dse.GetData("id", res))
@@ -469,7 +474,7 @@ int main()
     }
 
     dse.SetData("id", 2);
-    if (ds.GetElement<std::string>("name", "moop", dse))
+    if (ds.GetRecord<std::string>("name", "moop", dse))
     {
         int res;
         if (dse.GetData("id", res))
