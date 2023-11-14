@@ -1,9 +1,10 @@
 #include <iostream>
 #include <unordered_map>
-#include <cstring>
+#include <unordered_set>
 #include <list>
 #include <typeinfo>
 #include <functional>
+#include <vector>
 
 // Class to make real time type check
 class DataTypeSaver
@@ -288,49 +289,57 @@ public:
     }
 };
 
+// A simple typedef for HashMap. It is necessary for a more understandable separation of types.
+// Represents the data type of each object stored inside the DataStorage
+typedef DataHashMap DataStorageRecord;
+
+/*
+    A simple typedef for HashMap. It is necessary for a more understandable separation of types.
+    Represents the internal structure of the DataStorage.
+    A string with the name of the key is used as the key. All keys are the same as in DataStorage.
+    The value stores a pointer to std::unordered_multimap<T, DataStorageRecord*>.
+    Such a complex structure is needed to quickly search for each key with any type.
+    The key type is same as the DataStorage key value type.
+    The value is a pointer to DataStorageRecord.
+*/
+typedef DataHashMap DataStorageStruct;
+
 // A class that provides access to data inside DataStorage.
 // This class works as a reference to the data inside the DataStorage, 
 // i.e. when the data inside this class changes, they will also change inside the DataStorage
-class DataStorageRecord
+class DataStorageRecordRef
 {
 private:
-    // DataStorage record pointer
-    DataHashMap* Data = nullptr;
-    // Data storage param map
-    DataHashMap* KeysMaps = nullptr;
+    // Pointer to DataStorageRecord inside DataStorage
+    DataStorageRecord* Data = nullptr;
+    // Pointer to DataStorageStruct 
+    DataStorageStruct* DataStorageStructure = nullptr;
 public:
-    DataStorageRecord() {}
-    DataStorageRecord(DataHashMap* data, DataHashMap* paramMaps) : Data(data), KeysMaps(paramMaps) {}
+    DataStorageRecordRef() {}
+    DataStorageRecordRef(DataStorageRecord* data, DataStorageStruct* dataStorageStructure) : Data(data), DataStorageStructure(dataStorageStructure) {}
 
-    void SetDataHashMapPtr(DataHashMap* data) { Data = data; }
-    void SetParamMapsPtr(DataHashMap* paramMaps) { KeysMaps = paramMaps; }
+    void SetDataStorageRecordPtr(DataStorageRecord* data) { Data = data; }
+    void SetDataStorageStructPtr(DataStorageStruct* dataStorageStructure) { DataStorageStructure = dataStorageStructure; }
 
     // Method to update data inside DataStorage
     template <class T>
     void SetData(const std::string& key, const T& data)
     {
-        // A pointer for storing a std::unordered_map in which a template data type is used as a key, 
+        // A pointer for storing a std::unordered_multimap in which a template data type is used as a key, 
         // and a pointer to the DataHashMap is used as a value
-        std::unordered_map<T, DataHashMap*>* pointer = nullptr;
-        KeysMaps->GetData(key, pointer);
+        std::unordered_multimap<T, DataStorageRecord*>* TtoDataStorageRecordMap = nullptr;
+        DataStorageStructure->GetData(key, TtoDataStorageRecordMap);
 
-        // Get the current value of the key key inside the DataStorageRecord and save it for further work
+        // Get the current value of the key key inside the DataStorageRecordRef and save it for further work
         T oldData;
         Data->GetData(key, oldData);
-
-        // Finding data by the oldData key and save it to iterator
-        auto KeyToRecordIt = pointer->find(oldData);
-        // Delete data from DataStorage using key
-        KeyToRecordIt->second->DeleteData(key);
-        // Add new data to DataStorage
-        KeyToRecordIt->second->AddData(key, data);
         
-        // Remove oldData from pointer to DataStorage KeysMaps
-        pointer->erase(oldData);
-        // Add new data to pointer to DataStorage KeysMaps
-        pointer->emplace(data, Data);
+        // Remove oldData from TtoDataStorageRecordMap to DataStorage DataStorageStructure
+        TtoDataStorageRecordMap->erase(oldData);
+        // Add new data to TtoDataStorageRecordMap to DataStorage DataStorageStructure
+        TtoDataStorageRecordMap->emplace(data, Data);
         
-        // Update local DataStorageRecord data
+        // Update data inside DataStorageRecord pointer inside DataStorageRecordRef and DataStorage
         Data->SetData(key, data);
     }
 
@@ -342,75 +351,101 @@ public:
     }
 };
 
-// A class for storing a set of data of any type using a set of keys of any type
+// A class for storing data with the ability to quickly access data using a variety of different keys
 class DataStorage
 {
 private:
-    // DataHashMap that stores a template for each new records inside DataStorage
-    DataHashMap RecordTemplate;
-    // 
-    DataHashMap KeysMaps;
-    std::unordered_map<std::string, std::function<void(DataHashMap*)>> DataStorageRecordFillers;
-    std::list<DataHashMap*> RecordsList;
+
+    // Template of data stored inside DataStorage
+    DataStorageRecord RecordTemplate;
+
+    /*
+        Data storage structure inside DataStorage
+        A string with the name of the key is used as the key. All keys are the same as in DataStorage.
+        The value stores a pointer to std::unordered_multimap<T, DataStorageRecord*>.
+        Such a complex structure is needed to quickly search for each key with any type.
+        The key type is same as the DataStorage key value type.
+        The value is a pointer to DataStorageRecord.
+    */
+    DataStorageStruct DataStorageStructure;
+    
+    // Vector of functions that add a new element to the DataStorageStruct
+    std::vector<std::function<void(DataStorageRecord*)>> DataStorageRecordAdders;
+
+    // Unordered set with all DataStorageRecord pointers
+    std::unordered_set<DataStorageRecord*> RecordsSet;
 public:
 
+    // Template function to add new key with default value to DataStorage
     template <class T>
-    void AddParam(const std::string& paramName, T defaultParamValue)
+    void AddKey(const std::string& keyName, T defaultKeyValue)
     {
-        RecordTemplate.AddData(paramName, defaultParamValue);
+        // Add data to template
+        RecordTemplate.AddData(keyName, defaultKeyValue);
 
-        std::unordered_map<T, DataHashMap*>* pointer = new std::unordered_map<T, DataHashMap*>;
-        KeysMaps.AddData(paramName, pointer, [](const void* ptr)
+        // Create new map to store data with template T key
+        std::unordered_multimap<T, DataStorageRecord*>* TtoDataStorageRecordMap = new std::unordered_multimap<T, DataStorageRecord*>;
+        DataStorageStructure.AddData(keyName, TtoDataStorageRecordMap, [](const void* ptr)
             {
-                delete *(std::unordered_map<T, DataHashMap*>**)ptr;
+                delete *(std::unordered_multimap<T, DataStorageRecord*>**)ptr;
             }
         );
 
-        DataStorageRecordFillers.emplace(paramName, [=](DataHashMap* newRecord)
+        // Add function to DataStorageRecord creation
+        DataStorageRecordAdders.push_back([=](DataStorageRecord* newRecord)
             {
-                pointer->emplace(defaultParamValue, newRecord);
+                TtoDataStorageRecordMap->emplace(defaultKeyValue, newRecord);
             }
         );
     }
 
-    DataStorageRecord CreateNewRecord()
+    // Method to create new DataStorageRecord. A record will be created by copying RecordTemplate
+    DataStorageRecordRef CreateNewRecord()
     {
-        DataHashMap* newData = new DataHashMap(RecordTemplate);
-        RecordsList.emplace_back(newData);
+        // Create new record
+        DataStorageRecord* newData = new DataStorageRecord(RecordTemplate);
+        // Add new record to set
+        RecordsSet.emplace(newData);
 
-        for (auto& it : DataStorageRecordFillers)
-            it.second(newData);
+        // Add new record to every maps inside DataStorageStruct
+        for (auto& it : DataStorageRecordAdders)
+            it(newData);
 
-        return DataStorageRecord(newData, &KeysMaps);
+        return DataStorageRecordRef(newData, &DataStorageStructure);
     }
 
+    // Method to get reference to data inside DataStorage
     template <class T>
-    bool GetRecord(const std::string& paramName, const T& paramValue, DataStorageRecord& foundedRecord)
+    bool GetRecord(const std::string& keyName, const T& keyValue, DataStorageRecordRef& foundedRecord)
     {
-        std::unordered_map<T, DataHashMap*>* reqMap = nullptr;
+        // Pointer to store map inside DataStorageStruct
+        std::unordered_multimap<T, DataStorageRecord*>* TtoDataStorageRecordMap = nullptr;
         
-        if (KeysMaps.GetData(paramName, reqMap))
+        // Checking whether such a key exists
+        if (DataStorageStructure.GetData(keyName, TtoDataStorageRecordMap))
         {
-            auto f = reqMap->find(paramValue);
-            if (f != reqMap->end())
+            // Iterator to element with T type and keyValue value
+            auto TtoDataStorageRecordIt = TtoDataStorageRecordMap->find(keyValue);
+            if (TtoDataStorageRecordIt != TtoDataStorageRecordMap->end())
             {
-                foundedRecord.SetDataHashMapPtr(f->second);
-                foundedRecord.SetParamMapsPtr(&KeysMaps);
+                // Set data to DataStorageRecordRef
+                foundedRecord.SetDataStorageRecordPtr(TtoDataStorageRecordIt->second);
+                foundedRecord.SetDataStorageStructPtr(&DataStorageStructure);
                 return true;
             }
-            else
-                return false;
         }
-        else
-            return false;
+
+        return false;
     }
 
     ~DataStorage()
     {
-        for (auto& it : KeysMaps)
+        // Clear DataStorageStructure
+        for (auto& it : DataStorageStructure)
             it.second.DeleteData();
         
-        for (auto& it : RecordsList)
+        // Clear all records
+        for (auto& it : RecordsSet)
             delete it;
     }
 };
@@ -419,10 +454,10 @@ int main()
 {
     // Known issues: data saver cannot store arrays
     DataStorage ds;
-    ds.AddParam("id", -1);
-    ds.AddParam<std::string>("name", "");
+    ds.AddKey("id", -1);
+    ds.AddKey<std::string>("name", "");
 
-    DataStorageRecord dse = ds.CreateNewRecord();
+    DataStorageRecordRef dse = ds.CreateNewRecord();
 
     if (ds.GetRecord<int>("id", -1, dse))
     {
