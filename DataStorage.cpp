@@ -369,8 +369,8 @@ private:
     */
     DataStorageStruct DataStorageStructure;
     
-    // Vector of functions that add a new element to the DataStorageStruct
-    std::vector<std::function<void(DataStorageRecord*)>> DataStorageRecordAdders;
+    // Unordered_map of functions that add a new element to the DataStorageStruct
+    std::unordered_map<std::string, std::function<void(DataStorageRecord*)>> DataStorageRecordAdders;
 
     // Unordered set with all DataStorageRecord pointers
     std::unordered_set<DataStorageRecord*> RecordsSet;
@@ -378,7 +378,7 @@ public:
 
     // Template function to add new key with default value to DataStorage
     template <class T>
-    void AddKey(const std::string& keyName, T defaultKeyValue)
+    void AddKey(const std::string& keyName, const T& defaultKeyValue)
     {
         // Add data to template
         RecordTemplate.AddData(keyName, defaultKeyValue);
@@ -392,11 +392,27 @@ public:
         );
 
         // Add function to DataStorageRecord creation
-        DataStorageRecordAdders.push_back([=](DataStorageRecord* newRecord)
+        DataStorageRecordAdders.emplace(keyName, [=](DataStorageRecord* newRecord)
             {
                 TtoDataStorageRecordMap->emplace(defaultKeyValue, newRecord);
             }
         );
+
+        for (auto& it : RecordsSet)
+        {
+            it->AddData(keyName, defaultKeyValue);
+            TtoDataStorageRecordMap->emplace(defaultKeyValue, it);
+        }
+    }
+
+    void RemoveKey(const std::string& keyName)
+    {
+        RecordTemplate.DeleteData(keyName);
+        DataStorageStructure.DeleteData(keyName);
+        DataStorageRecordAdders.erase(keyName);
+
+        for (auto& it : RecordsSet)
+            it->DeleteData(keyName);
     }
 
     // Method to create new DataStorageRecord. A record will be created by copying RecordTemplate
@@ -409,7 +425,7 @@ public:
 
         // Add new record to every maps inside DataStorageStruct
         for (auto& it : DataStorageRecordAdders)
-            it(newData);
+            it.second(newData);
 
         return DataStorageRecordRef(newData, &DataStorageStructure);
     }
@@ -453,6 +469,9 @@ public:
 int main()
 {
     // Known issues: data saver cannot store arrays
+
+    std::cout << "Phase 1. Simple demo" << std::endl;
+
     DataStorage ds;
     ds.AddKey("id", -1);
     ds.AddKey<std::string>("name", "");
@@ -515,4 +534,34 @@ int main()
         if (dse.GetData("id", res))
             std::cout << "7: " << res << std::endl;
     }
+    
+    std::cout << "Phase 2. Runtime key addiction" << std::endl;
+
+    ds.AddKey("gender", true);
+
+    if (ds.GetRecord<bool>("gender", true, dse))
+    {
+        bool res;
+        if (dse.GetData("gender", res))
+        {
+            if (res) std::cout << "1: true" << std::endl;
+            else std::cout << "1: false" << std::endl;
+        }
+    }
+
+    std::cout << "Phase 3. Runtime key remove" << std::endl;
+
+    ds.RemoveKey("gender");
+
+    if (ds.GetRecord<bool>("gender", true, dse))
+    {
+        bool res;
+        if (dse.GetData("gender", res))
+        {
+            if (res) std::cout << "1: true" << std::endl;
+            else std::cout << "1: false" << std::endl;
+        }
+    }
+    else
+        std::cout << "1: No data with gender key" << std::endl;
 }
