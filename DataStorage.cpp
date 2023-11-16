@@ -321,6 +321,16 @@ public:
     void SetDataStorageRecordPtr(DataStorageRecord* data) { Data = data; }
     void SetDataStorageStructPtr(DataStorageStruct* dataStorageStructure) { DataStorageStructure = dataStorageStructure; }
 
+    bool operator==(const DataStorageRecordRef &other) const
+    { 
+        return Data == other.Data;
+    }
+
+    DataStorageRecord* GetRawData() const
+    {
+        return Data;
+    }
+
     // Method to update data inside DataStorage
     template <class T>
     void SetData(const std::string& key, const T& data)
@@ -335,7 +345,17 @@ public:
         Data->GetData(key, oldData);
         
         // Remove oldData from TtoDataStorageRecordMap to DataStorage DataStorageStructure
-        TtoDataStorageRecordMap->erase(oldData);
+        auto FirstAndLastIteratorsWithKey = TtoDataStorageRecordMap->equal_range(oldData);
+
+        for (auto& it = FirstAndLastIteratorsWithKey.first; it != FirstAndLastIteratorsWithKey.second; ++it)
+        {
+            if (it->second == Data)
+            {
+                TtoDataStorageRecordMap->erase(it);
+                break;
+            }
+        }
+
         // Add new data to TtoDataStorageRecordMap to DataStorage DataStorageStructure
         TtoDataStorageRecordMap->emplace(data, Data);
         
@@ -350,6 +370,44 @@ public:
         return Data->GetData(key, data);
     }
 };
+
+// Specialize hash function to DataStorageRecordRef using DataStorageRecord pointer as value
+template <>
+struct std::hash<DataStorageRecordRef>
+{
+    std::size_t operator()(const DataStorageRecordRef& k) const
+    {
+        return std::hash<DataStorageRecord*>()(k.GetRawData());
+    }
+};
+
+class DataStorageRecordSet
+{
+private:
+    std::unordered_set<DataStorageRecordRef> RecordsSet;
+public:
+
+    // Iterators
+    typedef typename std::unordered_set<DataStorageRecordRef>::iterator iterator;
+    typedef typename std::unordered_set<DataStorageRecordRef>::const_iterator const_iterator;
+
+    // Begin and end functions to work with iterators and foreach loop
+    inline iterator begin() noexcept { return RecordsSet.begin(); }
+    inline const_iterator cbegin() const noexcept { return RecordsSet.cbegin(); }
+    inline iterator end() noexcept { return RecordsSet.end(); }
+    inline const_iterator cend() const noexcept { return RecordsSet.cend(); }
+
+    void AddNewRecordPtr(const DataStorageRecordRef& newRecordRefPtr)
+    {
+        RecordsSet.emplace(newRecordRefPtr);
+    }
+
+    void AddNewRecordPtr(DataStorageRecord* newRecordPtr, DataStorageStruct *dataStorageStructure)
+    {
+        RecordsSet.emplace(DataStorageRecordRef(newRecordPtr, dataStorageStructure));
+    }
+};
+
 
 // A class for storing data with the ability to quickly access data using a variety of different keys
 class DataStorage
@@ -454,6 +512,29 @@ public:
         return false;
     }
 
+    // Method to get reference to data inside DataStorage
+    template <class T>
+    DataStorageRecordSet GetRecords(const std::string& keyName, const T& keyValue)
+    {
+        DataStorageRecordSet res;
+
+        // Pointer to store map inside DataStorageStruct
+        std::unordered_multimap<T, DataStorageRecord*>* TtoDataStorageRecordMap = nullptr;
+        
+        // Checking whether such a key exists
+        if (DataStorageStructure.GetData(keyName, TtoDataStorageRecordMap))
+        {
+            // Iterator to element with T type and keyValue value
+            auto FirstAndLastIteratorsWithKey = TtoDataStorageRecordMap->equal_range(keyValue);
+            
+            // Fill the result record set
+            for (auto& it = FirstAndLastIteratorsWithKey.first; it != FirstAndLastIteratorsWithKey.second; ++it)
+                res.AddNewRecordPtr(it->second, &DataStorageStructure);
+        }
+
+        return res;
+    }
+
     ~DataStorage()
     {
         // Clear DataStorageStructure
@@ -474,75 +555,76 @@ int main()
 
     DataStorage ds;
     ds.AddKey("id", -1);
-    ds.AddKey<std::string>("name", "");
+    ds.AddKey<std::string>("name", "none");
 
-    DataStorageRecordRef dse = ds.CreateNewRecord();
+    DataStorageRecordRef dsrr = ds.CreateNewRecord();
 
-    if (ds.GetRecord<int>("id", -1, dse))
+    if (ds.GetRecord<int>("id", -1, dsrr))
     {
         std::string res;
-        if(dse.GetData("name", res))
+        if(dsrr.GetData("name", res))
             std::cout << "1: " << res << std::endl;
     }
 
-    dse.SetData("id", 0);
-    dse.SetData<std::string>("name", "mrognor");
+    dsrr.SetData("id", 0);
+    dsrr.SetData<std::string>("name", "mrognor");
 
-    if (ds.GetRecord<int>("id", -1, dse))
+    if (ds.GetRecord<int>("id", -1, dsrr))
     {
         std::string res;
-        if(dse.GetData("name", res))
+        if(dsrr.GetData("name", res))
             std::cout << "2: " << res << std::endl;
     }
 
-    if (ds.GetRecord<int>("id", 0, dse))
+    if (ds.GetRecord<int>("id", 0, dsrr))
     {
         std::string res;
-        if(dse.GetData("name", res))
+        if(dsrr.GetData("name", res))
             std::cout << "3: " << res << std::endl;
     }
 
-    if (ds.GetRecord<std::string>("name", "mrognor", dse))
+    if (ds.GetRecord<std::string>("name", "mrognor", dsrr))
     {
         int res;
-        if (dse.GetData("id", res))
+        if (dsrr.GetData("id", res))
             std::cout << "4: " << res << std::endl;
     }
 
-    dse = ds.CreateNewRecord();
-    dse.SetData("id", 1);
-    dse.SetData<std::string>("name", "moop");
+    dsrr = ds.CreateNewRecord();
+    dsrr.SetData("id", 1);
+    dsrr.SetData<std::string>("name", "moop");
 
-    if (ds.GetRecord<int>("id", 1, dse))
+    if (ds.GetRecord<int>("id", 1, dsrr))
     {
         std::string res;
-        if(dse.GetData("name", res))
+        if(dsrr.GetData("name", res))
             std::cout << "5: " << res << std::endl;
     }
 
-    if (ds.GetRecord<std::string>("name", "moop", dse))
+    if (ds.GetRecord<std::string>("name", "moop", dsrr))
     {
         int res;
-        if (dse.GetData("id", res))
+        if (dsrr.GetData("id", res))
             std::cout << "6: " << res << std::endl;
     }
 
-    dse.SetData("id", 2);
-    if (ds.GetRecord<std::string>("name", "moop", dse))
+    dsrr.SetData("id", 2);
+    if (ds.GetRecord<std::string>("name", "moop", dsrr))
     {
         int res;
-        if (dse.GetData("id", res))
+        if (dsrr.GetData("id", res))
             std::cout << "7: " << res << std::endl;
     }
-    
+    dsrr.SetData("id", 1);
+
     std::cout << "Phase 2. Runtime key addiction" << std::endl;
 
     ds.AddKey("gender", true);
 
-    if (ds.GetRecord<bool>("gender", true, dse))
+    if (ds.GetRecord<bool>("gender", true, dsrr))
     {
         bool res;
-        if (dse.GetData("gender", res))
+        if (dsrr.GetData("gender", res))
         {
             if (res) std::cout << "1: true" << std::endl;
             else std::cout << "1: false" << std::endl;
@@ -551,17 +633,44 @@ int main()
 
     std::cout << "Phase 3. Runtime key remove" << std::endl;
 
-    ds.RemoveKey("gender");
+    ds.RemoveKey("name");
 
-    if (ds.GetRecord<bool>("gender", true, dse))
+    if (ds.GetRecord<std::string>("name", "moop", dsrr))
     {
-        bool res;
-        if (dse.GetData("gender", res))
-        {
-            if (res) std::cout << "1: true" << std::endl;
-            else std::cout << "1: false" << std::endl;
-        }
+        std::string res;
+        if (dsrr.GetData("name", res))
+            std::cout << "1: " << res << std::endl;
     }
     else
-        std::cout << "1: No data with gender key" << std::endl;
+        std::cout << "1: No data with name key" << std::endl;
+
+    std::cout << "Phase 4. Getting set of records using key" << std::endl;
+
+    ds.GetRecord("id", 0, dsrr);
+    dsrr.SetData("gender", false);
+
+    dsrr = ds.CreateNewRecord();
+    dsrr.SetData("id", 2);
+
+    dsrr = ds.CreateNewRecord();
+    dsrr.SetData("id", 3);
+    dsrr.SetData("gender", false);
+    
+    DataStorageRecordSet dsrs = ds.GetRecords("gender", true);
+
+    for (auto it : dsrs)
+    {
+        int res;
+        if(it.GetData("id", res))
+            std::cout << "True gender: " << res << std::endl;
+    }
+
+    dsrs = ds.GetRecords("gender", false);
+
+    for (auto it : dsrs)
+    {
+        int res;
+        if(it.GetData("id", res))
+            std::cout << "False gender: " << res << std::endl;
+    }
 }
