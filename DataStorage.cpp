@@ -28,13 +28,13 @@ class DataSaver
 private:
     // Void pointer to save pointer to any data
     void* Ptr = nullptr;
-    
+
     // Pointer to data type saver
     DataTypeSaver* DataType = nullptr;
-    
+
     // Variable to store data type size
     std::size_t DataTypeSize = 0;
-    
+
     // Pointer to copy function. Required to DataSaver copy
     void (*CopyFunc)(void*& dst, const void* src) = nullptr;
 
@@ -134,12 +134,12 @@ public:
 
         // Set new CopyFunc. It is get to void pointers and convert void pointers to T pointers and copy data.
         CopyFunc = [](void*& dst, const void* src)
-        {
-            // Convert src pointer to T pointer and get data from T pointer.
-            // Use T copy constructor to create T object.
-            // Allocate new memory to T type and convert it to void pointer.
-            dst = (void*) new T(*(T*)src);
-        };
+            {
+                // Convert src pointer to T pointer and get data from T pointer.
+                // Use T copy constructor to create T object.
+                // Allocate new memory to T type and convert it to void pointer.
+                dst = (void*) new T(*(T*)src);
+            };
 
         // Set delete function from dataSaver
         DeleteFunc = deleteFunc;
@@ -195,7 +195,7 @@ class DataContainer
 protected:
     // Hash map to store all DataSaver's
     C Data;
-    
+
 public:
     // Iterators
     typedef typename C::iterator iterator;
@@ -326,8 +326,8 @@ public:
     void SetDataStorageRecordPtr(DataStorageRecord* data) { Data = data; }
     void SetDataStorageStructPtr(DataStorageStruct* dataStorageStructure) { DataStorageStructure = dataStorageStructure; }
 
-    bool operator==(const DataStorageRecordRef &other) const
-    { 
+    bool operator==(const DataStorageRecordRef& other) const
+    {
         return Data == other.Data;
     }
 
@@ -348,7 +348,7 @@ public:
         // Get the current value of the key key inside the DataStorageRecordRef and save it for further work
         T oldData;
         Data->GetData(key, oldData);
-        
+
         // Remove oldData from TtoDataStorageRecordMap to DataStorage DataStorageStructure
         auto FirstAndLastIteratorsWithKey = TtoDataStorageRecordMap->equal_range(oldData);
 
@@ -363,7 +363,7 @@ public:
 
         // Add new data to TtoDataStorageRecordMap to DataStorage DataStorageStructure
         TtoDataStorageRecordMap->emplace(data, Data);
-        
+
         // Update data inside DataStorageRecord pointer inside DataStorageRecordRef and DataStorage
         Data->SetData(key, data);
     }
@@ -397,22 +397,25 @@ public:
     typedef typename std::unordered_set<DataStorageRecordRef>::const_iterator const_iterator;
 
     // Begin and end functions to work with iterators and foreach loop
-    inline iterator begin() noexcept { return RecordsSet.begin(); }
-    inline const_iterator cbegin() const noexcept { return RecordsSet.cbegin(); }
-    inline iterator end() noexcept { return RecordsSet.end(); }
-    inline const_iterator cend() const noexcept { return RecordsSet.cend(); }
+    iterator begin() noexcept { return RecordsSet.begin(); }
+    const_iterator begin() const noexcept { return RecordsSet.begin(); }
+    const_iterator cbegin() const noexcept { return RecordsSet.cbegin(); }
+
+    iterator end() noexcept { return RecordsSet.end(); }
+    const_iterator end() const noexcept { return RecordsSet.end(); }
+    const_iterator cend() const noexcept { return RecordsSet.cend(); }
 
     void AddNewRecordPtr(const DataStorageRecordRef& newRecordRefPtr)
     {
         RecordsSet.emplace(newRecordRefPtr);
     }
 
-    void AddNewRecordPtr(DataStorageRecord* newRecordPtr, DataStorageStruct *dataStorageStructure)
+    void AddNewRecordPtr(DataStorageRecord* newRecordPtr, DataStorageStruct* dataStorageStructure)
     {
         RecordsSet.emplace(DataStorageRecordRef(newRecordPtr, dataStorageStructure));
     }
 
-    std::size_t Size()
+    std::size_t Size() const
     {
         return RecordsSet.size();
     }
@@ -421,6 +424,92 @@ public:
     {
         RecordsSet.clear();
     }
+
+    bool Contain(const DataStorageRecordRef& dataToCheck) const
+    {
+        return RecordsSet.find(dataToCheck) != RecordsSet.end();
+    }
+
+    void Union(const DataStorageRecordSet& other)
+    {
+        for (auto& it : other)
+            RecordsSet.emplace(it);
+    }
+};
+
+DataStorageRecordSet Union(const DataStorageRecordSet& A, const DataStorageRecordSet& B)
+{
+    DataStorageRecordSet res = A;
+
+    for (auto& it : B)
+        res.AddNewRecordPtr(it);
+    return res;
+};
+
+DataStorageRecordSet Except(const DataStorageRecordSet& A, const DataStorageRecordSet& B)
+{
+    DataStorageRecordSet res;
+
+    for (auto& it : A)
+        if (!B.Contain(it))
+            res.AddNewRecordPtr(it);
+    return res;
+};
+
+DataStorageRecordSet Intersection(const DataStorageRecordSet& A, const DataStorageRecordSet& B)
+{
+    DataStorageRecordSet res;
+
+    if (A.Size() < B.Size())
+    {
+        for (auto& it : A)
+            if (B.Contain(it))
+                res.AddNewRecordPtr(it);
+    }
+    else
+    {
+        for (auto& it : B)
+            if (A.Contain(it))
+                res.AddNewRecordPtr(it);
+    }
+
+    return res;
+};
+
+DataStorageRecordSet AlterIntersection(const DataStorageRecordSet& A, const DataStorageRecordSet& B)
+{
+    DataStorageRecordSet res, tmp;
+
+    if (A.Size() < B.Size())
+    {
+        for (auto& it : A)
+        {
+            if (B.Contain(it))
+                tmp.AddNewRecordPtr(it);
+            else
+                res.AddNewRecordPtr(it);
+        }
+
+        for (auto& it : B)
+            if (!tmp.Contain(it))
+                res.AddNewRecordPtr(it);
+    }
+    else
+    {
+        for (auto& it : B)
+        {
+            if (A.Contain(it))
+                tmp.AddNewRecordPtr(it);
+            else
+                res.AddNewRecordPtr(it);
+        }
+
+        for (auto& it : A)
+            if (!tmp.Contain(it))
+                res.AddNewRecordPtr(it);
+    }
+
+    return res;
 };
 
 // A class for storing data with the ability to quickly access data using a variety of different keys
@@ -440,7 +529,7 @@ private:
         The value is a pointer to DataStorageRecord.
     */
     DataStorageStruct DataStorageStructure;
-    
+
     // Unordered_map of functions that add a new element to the DataStorageStruct
     std::unordered_map<std::string, std::function<void(DataStorageRecord*)>> DataStorageRecordAdders;
 
@@ -462,7 +551,7 @@ public:
         std::unordered_multimap<T, DataStorageRecord*>* TtoDataStorageRecordMap = new std::unordered_multimap<T, DataStorageRecord*>;
         DataStorageStructure.AddData(keyName, TtoDataStorageRecordMap, [](const void* ptr)
             {
-                delete *(std::unordered_multimap<T, DataStorageRecord*>**)ptr;
+                delete* (std::unordered_multimap<T, DataStorageRecord*>**)ptr;
             }
         );
 
@@ -518,7 +607,7 @@ public:
     {
         // Pointer to store map inside DataStorageStruct
         std::unordered_multimap<T, DataStorageRecord*>* TtoDataStorageRecordMap = nullptr;
-        
+
         // Checking whether such a key exists
         if (DataStorageStructure.GetData(keyName, TtoDataStorageRecordMap))
         {
@@ -542,19 +631,19 @@ public:
     {
         // Pointer to store map inside DataStorageStruct
         std::unordered_multimap<T, DataStorageRecord*>* TtoDataStorageRecordMap = nullptr;
-        
+
         // Checking whether such a key exists
         if (DataStorageStructure.GetData(keyName, TtoDataStorageRecordMap))
         {
             // Iterator to element with T type and keyValue value
             auto FirstAndLastIteratorsWithKey = TtoDataStorageRecordMap->equal_range(keyValue);
-            
+
             foundedRecords.Clear();
 
             // Fill the result record set
             for (auto& it = FirstAndLastIteratorsWithKey.first; it != FirstAndLastIteratorsWithKey.second; ++it)
                 foundedRecords.AddNewRecordPtr(it->second, &DataStorageStructure);
-            
+
             return true;
         }
 
@@ -565,13 +654,16 @@ public:
     {
         // Clear record template
         RecordTemplate.Clear();
-        
+
         // Delete all unordered maps inside DataStorageStructure
         for (auto& it : DataStorageStructure)
             it.second.DeleteData();
-        
+
         // Clear DataStorageStructure
         DataStorageStructure.Clear();
+
+        DataStorageRecordAdders.clear();
+        DataStorageRecordCleaners.clear();
 
         // Delete all Records
         for (auto& it : RecordsSet)
@@ -580,13 +672,13 @@ public:
         // Clear RecordsSet
         RecordsSet.clear();
     }
-    
+
     void ClearData()
     {
         // Call functions to clear DataStorageStructure without
         for (auto& it : DataStorageRecordCleaners)
             it.second();
-        
+
         // Delete all Records
         for (auto& it : RecordsSet)
             delete it;
@@ -600,7 +692,7 @@ public:
         // Clear DataStorageStructure
         for (auto& it : DataStorageStructure)
             it.second.DeleteData();
-        
+
         // Clear all records
         for (auto& it : RecordsSet)
             delete it;
@@ -622,7 +714,7 @@ int main()
     if (ds.GetRecord<int>("id", -1, dsrr))
     {
         std::string res;
-        if(dsrr.GetData("name", res))
+        if (dsrr.GetData("name", res))
             std::cout << "1: " << res << std::endl;
     }
 
@@ -632,14 +724,14 @@ int main()
     if (ds.GetRecord<int>("id", -1, dsrr))
     {
         std::string res;
-        if(dsrr.GetData("name", res))
+        if (dsrr.GetData("name", res))
             std::cout << "2: " << res << std::endl;
     }
 
     if (ds.GetRecord<int>("id", 0, dsrr))
     {
         std::string res;
-        if(dsrr.GetData("name", res))
+        if (dsrr.GetData("name", res))
             std::cout << "3: " << res << std::endl;
     }
 
@@ -657,7 +749,7 @@ int main()
     if (ds.GetRecord<int>("id", 1, dsrr))
     {
         std::string res;
-        if(dsrr.GetData("name", res))
+        if (dsrr.GetData("name", res))
             std::cout << "5: " << res << std::endl;
     }
 
@@ -715,15 +807,15 @@ int main()
     dsrr = ds.CreateNewRecord();
     dsrr.SetData("id", 3);
     dsrr.SetData("gender", false);
-    
+
     DataStorageRecordSet dsrs;
     ds.GetRecords("gender", true, dsrs);
 
     for (auto it : dsrs)
     {
         int res;
-        if(it.GetData("id", res))
-           std::cout << "True gender: " << res << std::endl;
+        if (it.GetData("id", res))
+            std::cout << "True gender: " << res << std::endl;
     }
 
     ds.GetRecords("gender", false, dsrs);
@@ -731,8 +823,8 @@ int main()
     for (auto it : dsrs)
     {
         int res;
-        if(it.GetData("id", res))
-           std::cout << "False gender: " << res << std::endl;
+        if (it.GetData("id", res))
+            std::cout << "False gender: " << res << std::endl;
     }
 
     std::cout << "Phase 5. Clear data storage" << std::endl;
@@ -741,4 +833,105 @@ int main()
 
     ds.GetRecords("gender", false, dsrs);
     std::cout << "False gender amount: " << dsrs.Size() << std::endl;
+
+    std::cout << "Phase 5. Sets: union, except, intersection, alterintersection" << std::endl;
+
+    ds.Clear();
+
+    DataStorageRecordSet opset, set0, set1, set2, set3;
+
+    ds.AddKey("id", -1);
+    ds.AddKey("type", -1);
+
+    for (int i = 0; i < 20; ++i)
+    {
+        dsrr = ds.CreateNewRecord();
+        dsrr.SetData("id", i);
+        dsrr.SetData("type", i % 4);
+    }
+
+    ds.GetRecords("type", 0, set0);
+    std::cout << "Set0: ";
+    for (auto it : set0)
+    {
+        int id;
+        if (it.GetData("id", id))
+            std::cout << id << " ";
+    }
+    std::cout << std::endl;
+
+    ds.GetRecords("type", 1, set1);
+    std::cout << "Set1: ";
+    for (auto it : set1)
+    {
+        int id;
+        if (it.GetData("id", id))
+            std::cout << id << " ";
+    }
+    std::cout << std::endl;
+
+    ds.GetRecords("type", 2, set2);
+    std::cout << "Set2: ";
+    for (auto it : set2)
+    {
+        int id;
+        if (it.GetData("id", id))
+            std::cout << id << " ";
+    }
+    std::cout << std::endl;
+
+    ds.GetRecords("type", 3, set3);
+    std::cout << "Set3: ";
+    for (auto it : set3)
+    {
+        int id;
+        if (it.GetData("id", id))
+            std::cout << id << " ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "Union02: ";
+    for (auto it : Union(set0, set2))
+    {
+        int id;
+        if (it.GetData("id", id))
+            std::cout << id << " ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "Union03: ";
+    for (auto it : Union(set0, set3))
+    {
+        int id;
+        if (it.GetData("id", id))
+            std::cout << id << " ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "Intersection Union01 Union12: ";
+    for (auto it : Intersection(Union(set0, set1), Union(set1, set2)))
+    {
+        int id;
+        if (it.GetData("id", id))
+            std::cout << id << " ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "AlterIntersection Union01 Union12: ";
+    for (auto it : AlterIntersection(Union(set0, set1), Union(set1, set2)))
+    {
+        int id;
+        if (it.GetData("id", id))
+            std::cout << id << " ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "Except 0 Union01: ";
+    for (auto it : Except(Union(set0, set1), set0))
+    {
+        int id;
+        if (it.GetData("id", id))
+            std::cout << id << " ";
+    }
+    std::cout << std::endl;
 }
