@@ -268,6 +268,11 @@ public:
             Data.erase(key);
         }
     }
+
+    void Clear()
+    {
+        Data.clear();
+    }
 };
 
 // A container class for storing data of any type. 
@@ -406,8 +411,17 @@ public:
     {
         RecordsSet.emplace(DataStorageRecordRef(newRecordPtr, dataStorageStructure));
     }
-};
 
+    std::size_t Size()
+    {
+        return RecordsSet.size();
+    }
+
+    void Clear()
+    {
+        RecordsSet.clear();
+    }
+};
 
 // A class for storing data with the ability to quickly access data using a variety of different keys
 class DataStorage
@@ -429,6 +443,9 @@ private:
     
     // Unordered_map of functions that add a new element to the DataStorageStruct
     std::unordered_map<std::string, std::function<void(DataStorageRecord*)>> DataStorageRecordAdders;
+
+
+    std::unordered_map<std::string, std::function<void()>> DataStorageRecordCleaners;
 
     // Unordered set with all DataStorageRecord pointers
     std::unordered_set<DataStorageRecord*> RecordsSet;
@@ -456,6 +473,12 @@ public:
             }
         );
 
+        DataStorageRecordCleaners.emplace(keyName, [=]()
+            {
+                TtoDataStorageRecordMap->clear();
+            }
+        );
+
         for (auto& it : RecordsSet)
         {
             it->AddData(keyName, defaultKeyValue);
@@ -468,6 +491,7 @@ public:
         RecordTemplate.DeleteData(keyName);
         DataStorageStructure.DeleteData(keyName);
         DataStorageRecordAdders.erase(keyName);
+        DataStorageRecordCleaners.erase(keyName);
 
         for (auto& it : RecordsSet)
             it->DeleteData(keyName);
@@ -514,10 +538,8 @@ public:
 
     // Method to get reference to data inside DataStorage
     template <class T>
-    DataStorageRecordSet GetRecords(const std::string& keyName, const T& keyValue)
+    bool GetRecords(const std::string& keyName, const T& keyValue, DataStorageRecordSet& foundedRecords)
     {
-        DataStorageRecordSet res;
-
         // Pointer to store map inside DataStorageStruct
         std::unordered_multimap<T, DataStorageRecord*>* TtoDataStorageRecordMap = nullptr;
         
@@ -527,12 +549,50 @@ public:
             // Iterator to element with T type and keyValue value
             auto FirstAndLastIteratorsWithKey = TtoDataStorageRecordMap->equal_range(keyValue);
             
+            foundedRecords.Clear();
+
             // Fill the result record set
             for (auto& it = FirstAndLastIteratorsWithKey.first; it != FirstAndLastIteratorsWithKey.second; ++it)
-                res.AddNewRecordPtr(it->second, &DataStorageStructure);
+                foundedRecords.AddNewRecordPtr(it->second, &DataStorageStructure);
+            
+            return true;
         }
 
-        return res;
+        return false;
+    }
+
+    void Clear()
+    {
+        // Clear record template
+        RecordTemplate.Clear();
+        
+        // Delete all unordered maps inside DataStorageStructure
+        for (auto& it : DataStorageStructure)
+            it.second.DeleteData();
+        
+        // Clear DataStorageStructure
+        DataStorageStructure.Clear();
+
+        // Delete all Records
+        for (auto& it : RecordsSet)
+            delete it;
+
+        // Clear RecordsSet
+        RecordsSet.clear();
+    }
+    
+    void ClearData()
+    {
+        // Call functions to clear DataStorageStructure without
+        for (auto& it : DataStorageRecordCleaners)
+            it.second();
+        
+        // Delete all Records
+        for (auto& it : RecordsSet)
+            delete it;
+
+        // Clear RecordsSet
+        RecordsSet.clear();
     }
 
     ~DataStorage()
@@ -656,21 +716,29 @@ int main()
     dsrr.SetData("id", 3);
     dsrr.SetData("gender", false);
     
-    DataStorageRecordSet dsrs = ds.GetRecords("gender", true);
+    DataStorageRecordSet dsrs;
+    ds.GetRecords("gender", true, dsrs);
 
     for (auto it : dsrs)
     {
         int res;
         if(it.GetData("id", res))
-            std::cout << "True gender: " << res << std::endl;
+           std::cout << "True gender: " << res << std::endl;
     }
 
-    dsrs = ds.GetRecords("gender", false);
+    ds.GetRecords("gender", false, dsrs);
 
     for (auto it : dsrs)
     {
         int res;
         if(it.GetData("id", res))
-            std::cout << "False gender: " << res << std::endl;
+           std::cout << "False gender: " << res << std::endl;
     }
+
+    std::cout << "Phase 5. Clear data storage" << std::endl;
+
+    ds.ClearData();
+
+    ds.GetRecords("gender", false, dsrs);
+    std::cout << "False gender amount: " << dsrs.Size() << std::endl;
 }
