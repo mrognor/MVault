@@ -561,6 +561,9 @@ private:
 
     std::unordered_map<std::string, std::function<void()>> DataStorageRecordCleaners;
 
+
+    std::unordered_map<std::string, std::function<void(DataStorageRecord* newRecord)>> DataStorageRecordErasers;
+
     // Unordered set with all DataStorageRecord pointers
     std::unordered_set<DataStorageRecord*> RecordsSet;
 public:
@@ -593,6 +596,23 @@ public:
             }
         );
 
+        DataStorageRecordErasers.emplace(keyName, [=](DataStorageRecord* newRecord)
+            {
+                T recordTData;
+                newRecord->GetData(keyName, recordTData);
+                auto FirstAndLastIteratorsWithKey = TtoDataStorageRecordMap->equal_range(recordTData);
+
+                for (auto& it = FirstAndLastIteratorsWithKey.first; it != FirstAndLastIteratorsWithKey.second; ++it)
+                {
+                    if (it->second == newRecord)
+                    {
+                        TtoDataStorageRecordMap->erase(it);
+                        break;
+                    }
+                }
+            }
+        );
+
         for (auto& it : RecordsSet)
         {
             it->AddData(keyName, defaultKeyValue);
@@ -606,6 +626,7 @@ public:
         DataStorageStructure.EraseData(keyName);
         DataStorageRecordAdders.erase(keyName);
         DataStorageRecordCleaners.erase(keyName);
+        DataStorageRecordErasers.erase(keyName);
 
         for (auto& it : RecordsSet)
             it->EraseData(keyName);
@@ -689,6 +710,7 @@ public:
 
         DataStorageRecordAdders.clear();
         DataStorageRecordCleaners.clear();
+        DataStorageRecordErasers.clear();
 
         // Delete all Records
         for (auto& it : RecordsSet)
@@ -710,6 +732,30 @@ public:
 
         // Clear RecordsSet
         RecordsSet.clear();
+    }
+
+    void EraseRecord(const DataStorageRecordRef& recordRefToErase)
+    {
+        for (auto& erasers : DataStorageRecordErasers)
+            erasers.second(recordRefToErase.GetRawData());
+
+        RecordsSet.erase(recordRefToErase.GetRawData());
+    }
+
+    void EraseRecords(const DataStorageRecordSet& recordsToErase)
+    {
+        for (auto& recordRef : recordsToErase)
+        {
+            for (auto& erasers : DataStorageRecordErasers)
+                erasers.second(recordRef.GetRawData());
+
+            RecordsSet.erase(recordRef.GetRawData());
+        }
+    }
+
+    std::size_t Size()
+    {
+        return RecordsSet.size();
     }
 
     ~DataStorage()
@@ -959,4 +1005,34 @@ int main()
             std::cout << id << " ";
     }
     std::cout << std::endl;
+
+    std::cout << "Phase 6. Data erasing" << std::endl;
+
+    ds.Clear();
+
+    ds.AddKey("id", -1);
+    ds.AddKey("type", -1);
+
+    dsrr = ds.CreateNewRecord();
+    dsrr.SetData("id", 0);
+    dsrr.SetData("type", 0);
+
+    dsrr = ds.CreateNewRecord();
+    dsrr.SetData("id", 1);
+    dsrr.SetData("type", 0);
+
+    dsrr = ds.CreateNewRecord();
+    dsrr.SetData("id", 1);
+    dsrr.SetData("type", 0);
+
+    std::cout << "Size before removing: " << ds.Size() << std::endl;
+
+    ds.EraseRecord(dsrr);
+
+    std::cout << "Size after removing one last element: " << ds.Size() << std::endl;
+
+    ds.GetRecords("type", 0, dsrs);
+    
+    ds.EraseRecords(dsrs);
+    std::cout << "Size after removing set: " << ds.Size() << std::endl;
 }
