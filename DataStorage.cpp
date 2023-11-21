@@ -165,14 +165,37 @@ public:
         return true;
     }
 
-    // Call DeleteFunc to custom data deletion. If the data deletion function has not been installed, then this method will not do anything
-    void DeleteData()
+    // Resets the class. If the deleteFunc function is set, it will be called
+    void ResetData()
     {
         if (DeleteFunc != nullptr)
         {
             DeleteFunc(Ptr);
             DeleteFunc = nullptr;
         }
+
+        if (Ptr != nullptr)
+        {
+            free(Ptr);
+            Ptr = nullptr;
+        }
+
+        if (DataType != nullptr)
+        {
+            delete DataType;
+            DataType = nullptr;
+        }
+
+        DataTypeSize = 0;
+        CopyFunc = nullptr;
+    }
+
+    // Swap data between 2 DataSavers
+    void Swap(DataSaver& dataSaver)
+    {
+        DataSaver tmp = dataSaver;
+        dataSaver = *this;
+        *this = tmp;
     }
 
     // Destructor
@@ -259,16 +282,18 @@ public:
     }
 
     // Custom data deletion
-    void DeleteData(const std::string& key)
+    void EraseData(const std::string& key)
     {
         auto f = Data.find(key);
         if (f != Data.end())
         {
-            f->second.DeleteData();
+            f->second.ResetData();
             Data.erase(key);
         }
     }
 
+    // Method for clear all data inside container
+    // Note that if pointers were stored in the container, they must be cleaned manually
     void Clear()
     {
         Data.clear();
@@ -577,13 +602,13 @@ public:
 
     void RemoveKey(const std::string& keyName)
     {
-        RecordTemplate.DeleteData(keyName);
-        DataStorageStructure.DeleteData(keyName);
+        RecordTemplate.EraseData(keyName);
+        DataStorageStructure.EraseData(keyName);
         DataStorageRecordAdders.erase(keyName);
         DataStorageRecordCleaners.erase(keyName);
 
         for (auto& it : RecordsSet)
-            it->DeleteData(keyName);
+            it->EraseData(keyName);
     }
 
     // Method to create new DataStorageRecord. A record will be created by copying RecordTemplate
@@ -657,7 +682,7 @@ public:
 
         // Delete all unordered maps inside DataStorageStructure
         for (auto& it : DataStorageStructure)
-            it.second.DeleteData();
+            it.second.ResetData();
 
         // Clear DataStorageStructure
         DataStorageStructure.Clear();
@@ -691,7 +716,7 @@ public:
     {
         // Clear DataStorageStructure
         for (auto& it : DataStorageStructure)
-            it.second.DeleteData();
+            it.second.ResetData();
 
         // Clear all records
         for (auto& it : RecordsSet)
@@ -701,7 +726,7 @@ public:
 
 int main()
 {
-    // Known issues: data saver cannot store arrays
+    // Known limitations: data saver cannot store arrays
 
     std::cout << "Phase 1. Simple demo" << std::endl;
 
