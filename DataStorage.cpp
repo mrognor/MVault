@@ -568,6 +568,12 @@ private:
     std::unordered_set<DataStorageRecord*> RecordsSet;
 public:
 
+    DataStorage() {};
+
+    DataStorage& operator= (const DataStorage& other) = delete;
+
+    DataStorage(const DataStorage& other) = delete;
+
     // Template function to add new key with default value to DataStorage
     template <class T>
     void AddKey(const std::string& keyName, const T& defaultKeyValue)
