@@ -745,20 +745,24 @@ public:
 
     void EraseRecord(const DataStorageRecordRef& recordRefToErase)
     {
+        DataStorageRecord* tmpRec = recordRefToErase.GetRawData();
         for (auto& erasers : DataStorageRecordErasers)
-            erasers.second(recordRefToErase.GetRawData());
+            erasers.second(tmpRec);
 
-        RecordsSet.erase(recordRefToErase.GetRawData());
+        RecordsSet.erase(tmpRec);
+        delete tmpRec;
     }
 
     void EraseRecords(const DataStorageRecordSet& recordsToErase)
     {
         for (auto& recordRef : recordsToErase)
         {
+            DataStorageRecord* tmpRec = recordRef.GetRawData();
             for (auto& erasers : DataStorageRecordErasers)
-                erasers.second(recordRef.GetRawData());
+                erasers.second(tmpRec);
 
-            RecordsSet.erase(recordRef.GetRawData());
+            RecordsSet.erase(tmpRec);
+            delete tmpRec;
         }
     }
 
