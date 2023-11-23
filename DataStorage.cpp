@@ -32,14 +32,14 @@ private:
     // Pointer to data type saver
     DataTypeSaver* DataType = nullptr;
 
-    // Variable to store data type size
-    std::size_t DataTypeSize = 0;
-
     // Pointer to copy function. Required to DataSaver copy
     void (*CopyFunc)(void*& dst, const void* src) = nullptr;
 
-    // Pointer to copy function. Required to delete data if it is pointer
-    void (*DeleteFunc)(const void* ptr) = nullptr;
+    // Pointer to delete function. Required to delete pointer since it is not possibly to delete void*
+    void (*DeleteFunc)(void*& ptrToDelete) = nullptr;
+
+    // Pointer to custom delete function. Required to delete data if it is pointer
+    void (*CustomDeleteFunc)(const void* ptr) = nullptr;
 
 public:
     // Default constructor
@@ -60,7 +60,7 @@ public:
         {
             // Clear Ptr if it was data before
             if (Ptr != nullptr)
-                free(Ptr);
+                DeleteFunc(Ptr);
 
             // Clear DataType if it was data before
             if (DataType != nullptr)
@@ -71,14 +71,14 @@ public:
             {
                 // Create new DataType object copying data type from dataSaver
                 DataType = new DataTypeSaver(dataSaver.DataType->GetDataType());
-                // Copying data type size from dataSaver
-                DataTypeSize = dataSaver.DataTypeSize;
                 // Set new CopyFunc from dataSaver
                 CopyFunc = dataSaver.CopyFunc;
                 // Call new copy func to copy data from dataSaver void pointer to local void pointer. Data to Ptr will be allocated inside function
                 CopyFunc(Ptr, dataSaver.Ptr);
                 // Set delete function from dataSaver
                 DeleteFunc = dataSaver.DeleteFunc;
+                // Set custom delete function from dataSaver
+                CustomDeleteFunc = dataSaver.CustomDeleteFunc;
             }
             else
             {
@@ -98,11 +98,11 @@ public:
         SetData(data);
     }
 
-    // Template constructor to save data and delete function inside DataSaver
+    // Template constructor to save data and custom delete function inside DataSaver
     template<class T, class F>
-    DataSaver(const T& data, F&& deleteFunc)
+    DataSaver(const T& data, F&& customDeleteFunc)
     {
-        SetData(data, deleteFunc);
+        SetData(data, customDeleteFunc);
     }
 
     // Template method to save data inside DataSaver
@@ -112,13 +112,13 @@ public:
         SetData(data, nullptr);
     }
 
-    // Template method to save data and delete function inside DataSaver
+    // Template method to save data and custom delete function inside DataSaver
     template <class T, class F>
-    void SetData(const T& data, F&& deleteFunc)
+    void SetData(const T& data, F&& customDeleteFunc)
     {
         // Clear Ptr if it was data before
         if (Ptr != nullptr)
-            free(Ptr);
+            DeleteFunc(Ptr);
 
         // Clear DataType if it was data before
         if (DataType != nullptr)
@@ -129,8 +129,6 @@ public:
 
         // Create new DataType object to save data type
         DataType = new DataTypeSaver(typeid(data));
-        // Save T size
-        DataTypeSize = sizeof(T);
 
         // Set new CopyFunc. It is get to void pointers and convert void pointers to T pointers and copy data.
         CopyFunc = [](void*& dst, const void* src)
@@ -141,8 +139,14 @@ public:
                 dst = (void*) new T(*(T*)src);
             };
 
-        // Set delete function from dataSaver
-        DeleteFunc = deleteFunc;
+        // Set new DeleteFunc
+        DeleteFunc = [](void*& ptrToDelete)
+            {
+                delete (T*)ptrToDelete;
+            };
+
+        // Set custom delete function from dataSaver
+        CustomDeleteFunc = customDeleteFunc;
     }
 
     // Template method to get data from DataSaver. Return true if it was data inside.
@@ -168,15 +172,15 @@ public:
     // Resets the class. If the deleteFunc function is set, it will be called
     void ResetData()
     {
-        if (DeleteFunc != nullptr)
+        if (CustomDeleteFunc != nullptr)
         {
-            DeleteFunc(Ptr);
-            DeleteFunc = nullptr;
+            CustomDeleteFunc(Ptr);
+            CustomDeleteFunc = nullptr;
         }
 
         if (Ptr != nullptr)
         {
-            free(Ptr);
+            DeleteFunc(Ptr);
             Ptr = nullptr;
         }
 
@@ -186,7 +190,6 @@ public:
             DataType = nullptr;
         }
 
-        DataTypeSize = 0;
         CopyFunc = nullptr;
     }
 
@@ -202,7 +205,7 @@ public:
     ~DataSaver()
     {
         if (Ptr != nullptr)
-            free(Ptr);
+            DeleteFunc(Ptr);
 
         if (DataType != nullptr)
             delete DataType;
