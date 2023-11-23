@@ -6,6 +6,8 @@
 #include <functional>
 #include <vector>
 
+class DataStorageRecordRef;
+
 // Class to make real time type check
 class DataTypeSaver
 {
@@ -212,6 +214,108 @@ public:
     }
 };
 
+/*
+    A class for storing pointers. It stores a pointer inside itself, so when copying or assigning objects of this class, 
+    the pointer will be copied, but the contents will be the same. The memory for the pointer will be allocated only when the object is created, 
+    no memory will be allocated when copying or assigning. The deletion of the pointer will occur when the last object of the class storing the pointer is destroyed. 
+    A counter is implemented inside the class, which increases when copying or assigning an object, and decreases when deleting or re-assigning
+*/
+template <class T>
+class SmartPointerWrapper
+{
+private:
+    T* Data = nullptr;
+    std::size_t* RefCounter = nullptr;
+public:
+
+    // Copy constructor
+    SmartPointerWrapper(const SmartPointerWrapper& other)
+    {
+        *this = other;
+    }
+
+    // Copy constructor
+    SmartPointerWrapper(const SmartPointerWrapper&& other)
+    {
+        *this = other;
+    }
+
+    // Copy constructor
+    SmartPointerWrapper(SmartPointerWrapper& other)
+    {
+        *this = other;
+    }
+
+    // Copy constructor
+    SmartPointerWrapper(SmartPointerWrapper&& other)
+    {
+        *this = other;
+    }
+
+    // Default constructor thar creates T type pointer
+    template <class... Args>
+    SmartPointerWrapper(Args&&... args)
+    {
+        Data = new T(args...);
+        RefCounter = new std::size_t(1);
+    }
+
+    // Operator =
+    SmartPointerWrapper& operator=(const SmartPointerWrapper& other)
+    {
+        // Check is other same as this
+        if (&other != this)
+        {
+            // Checking whether the data was previously assigned
+            if (RefCounter != nullptr)
+            {
+                // Destroy previously data if this object was last
+                if (*RefCounter == 1)
+                {
+                    delete RefCounter;
+                    delete Data;
+                }
+                else
+                {
+                    --*RefCounter;
+                }
+            }
+
+            Data = other.Data;
+            RefCounter = other.RefCounter;
+            ++*RefCounter;
+        }
+
+        return *this;
+    }
+
+    void SetData(const T& data)
+    {
+        *Data = data;
+    }
+
+    T GetData()
+    {
+        return *Data;
+    }
+
+    ~SmartPointerWrapper()
+    {
+        if(RefCounter != nullptr)
+        {
+            if (*RefCounter == 1)
+            {
+                delete RefCounter;
+                delete Data;
+            }
+            else
+            {
+                --*RefCounter;
+            }
+        }
+    }
+};
+
 // A container class for storing data of any type. Allows to specify required container.
 // Container have to support find(), begin(), end(), emplace(), erase()
 // If a pointer is written to one of the elements, then you can set a custom data deletion function. 
@@ -322,9 +426,27 @@ public:
     }
 };
 
-// A simple typedef for HashMap. It is necessary for a more understandable separation of types.
-// Represents the data type of each object stored inside the DataStorage
-typedef DataHashMap DataStorageRecord;
+class DataStorageRecord : public DataHashMap
+{
+private:
+    SmartPointerWrapper<bool> IsDataStorageRecordValid;
+public:
+    
+    friend DataStorageRecordRef;
+
+    DataStorageRecord() {}
+
+    DataStorageRecord(const DataStorageRecord& recordTemplate)
+    {
+        *this = recordTemplate;
+        IsDataStorageRecordValid.SetData(true);
+    }
+
+    ~DataStorageRecord()
+    {
+        IsDataStorageRecordValid.SetData(false);
+    }
+};
 
 /*
     A simple typedef for HashMap. It is necessary for a more understandable separation of types.
@@ -344,24 +466,31 @@ class DataStorageRecordRef
 {
 private:
     // Pointer to DataStorageRecord inside DataStorage
-    DataStorageRecord* Data = nullptr;
+    DataStorageRecord* DataRecord = nullptr;
     // Pointer to DataStorageStruct 
     DataStorageStruct* DataStorageStructure = nullptr;
-public:
-    DataStorageRecordRef() {}
-    DataStorageRecordRef(DataStorageRecord* data, DataStorageStruct* dataStorageStructure) : Data(data), DataStorageStructure(dataStorageStructure) {}
 
-    void SetDataStorageRecordPtr(DataStorageRecord* data) { Data = data; }
+    SmartPointerWrapper<bool> IsDataStorageRecordValid;
+public:
+    
+    DataStorageRecordRef() {}
+
+    DataStorageRecordRef(DataStorageRecord* data, DataStorageStruct* dataStorageStructure) : DataRecord(data), DataStorageStructure(dataStorageStructure) 
+    {
+        IsDataStorageRecordValid = data->IsDataStorageRecordValid;
+    }
+
+    void SetDataStorageRecordPtr(DataStorageRecord* data) { DataRecord = data; }
     void SetDataStorageStructPtr(DataStorageStruct* dataStorageStructure) { DataStorageStructure = dataStorageStructure; }
 
     bool operator==(const DataStorageRecordRef& other) const
     {
-        return Data == other.Data;
+        return DataRecord == other.DataRecord;
     }
 
     DataStorageRecord* GetRawData() const
     {
-        return Data;
+        return DataRecord;
     }
 
     // Method to update data inside DataStorage
@@ -375,14 +504,14 @@ public:
 
         // Get the current value of the key key inside the DataStorageRecordRef and save it for further work
         T oldData;
-        Data->GetData(key, oldData);
+        DataRecord->GetData(key, oldData);
 
         // Remove oldData from TtoDataStorageRecordMap to DataStorage DataStorageStructure
         auto FirstAndLastIteratorsWithKey = TtoDataStorageRecordMap->equal_range(oldData);
 
         for (auto& it = FirstAndLastIteratorsWithKey.first; it != FirstAndLastIteratorsWithKey.second; ++it)
         {
-            if (it->second == Data)
+            if (it->second == DataRecord)
             {
                 TtoDataStorageRecordMap->erase(it);
                 break;
@@ -390,17 +519,22 @@ public:
         }
 
         // Add new data to TtoDataStorageRecordMap to DataStorage DataStorageStructure
-        TtoDataStorageRecordMap->emplace(data, Data);
+        TtoDataStorageRecordMap->emplace(data, DataRecord);
 
         // Update data inside DataStorageRecord pointer inside DataStorageRecordRef and DataStorage
-        Data->SetData(key, data);
+        DataRecord->SetData(key, data);
     }
 
     // Method to get data from container using key
     template <class T>
     bool GetData(const std::string& key, T& data)
     {
-        return Data->GetData(key, data);
+        return DataRecord->GetData(key, data);
+    }
+
+    bool IsValid()
+    {
+        return IsDataStorageRecordValid.GetData();
     }
 };
 
@@ -1048,4 +1182,16 @@ int main()
     
     ds.EraseRecords(dsrs);
     std::cout << "Size after removing set: " << ds.Size() << std::endl;
+
+    std::cout << "Phase 7. RecordRef invalidation" << std::endl;
+
+    ds.Clear();
+
+    ds.AddKey("id", -1);
+    
+    dsrr = ds.CreateNewRecord();
+    dsrr.SetData("id", 0);
+    ds.EraseRecord(dsrr);
+
+    std::cout << dsrr.IsValid() << std::endl;
 }
