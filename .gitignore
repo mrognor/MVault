@@ -1,3 +1,5 @@
 *.out
 *.exe
 .vscode
+Docs/Generated
+DataStorage
