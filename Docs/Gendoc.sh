@@ -1,5 +1,5 @@
 # Add main page doxygen command to ReadMe.md
-cd ..
+cd $(dirname "$0")/..
 mv ReadMe.md TmpReadMe.md
 echo '\mainpage' > ReadMe.md
 cat TmpReadMe.md >> ReadMe.md
