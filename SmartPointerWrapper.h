@@ -18,31 +18,73 @@ private:
     std::size_t* RefCounter = nullptr;
 public:
 
-    // Copy constructor
+    /// Copy constructor
+    /// \param [in] other object to be copied
     SmartPointerWrapper(const SmartPointerWrapper& other)
     {
         *this = other;
     }
 
-    // Copy constructor
+    /// Copy constructor
+    /// \param [in] other object to be copied
     SmartPointerWrapper(const SmartPointerWrapper&& other)
     {
         *this = other;
     }
 
-    // Copy constructor
+    /// Copy constructor
+    /// \param [in] other object to be copied
     SmartPointerWrapper(SmartPointerWrapper& other)
     {
         *this = other;
     }
 
-    // Copy constructor
+    /// Copy constructor
+    /// \param [in] other object to be copied
     SmartPointerWrapper(SmartPointerWrapper&& other)
     {
         *this = other;
     }
 
-    // Default constructor thar creates T type pointer
+    /**
+        \brief A template constructor that accepts a parameter package and passes it to a constructor of a specialized type
+
+        \param [in] args A package of parameters to pass to the constructor of the internal type.
+
+        This constructor allows you to pass the parameters necessary to create an object of class T. Inside, the constructor looks like this:
+
+        \code
+            Data = new T(args...);
+        \endcode
+
+        For example, let the SmartPointerWrapper store a int in itself, 
+        and we want to assign it the value when creating an object, 
+        for this we will create an object of the SmartPointerWrapper class with int as a template specialization and 1 in constructor param.
+
+        \code
+            SmartPointerWrapper<int> pointer(1);
+        \endcode
+
+        This constructor will get one int type parameter with a value of 1 and create an int type pointer with a value of 1.
+
+        \code
+            Data = new int(1);
+        \endcode
+
+        If a more complex object is stored inside the SmartPointerWrapper, for example, 
+        a class for storing coordinates, the constructor of which takes 2 int parameters, 
+        then you can create an object of the SmartPointerWrapper class as follows:
+
+        \code
+            SmartPointerWrapper<pointd2d> pointer(1, 1);
+        \endcode
+
+        And inside the constructor it will look like this:
+        
+        \code
+            Data = new pointd2d(1, 1);
+        \endcode
+    */
     template <class... Args>
     SmartPointerWrapper(Args&&... args)
     {

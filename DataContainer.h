@@ -172,3 +172,14 @@ public:
         return Data.equal_range(key);
     }
 };
+
+/**
+    A simple typedef for HashMap. It is necessary for a more understandable separation of types.
+    Represents the internal structure of the DataStorage.
+    A string with the name of the key is used as the key. All keys are the same as in DataStorage.
+    The value stores a pointer to std::unordered_multimap<T, DataStorageRecord*>.
+    Such a complex structure is needed to quickly search for each key with any type.
+    The key type is same as the DataStorage key value type.
+    The value is a pointer to DataStorageRecord.
+*/
+typedef DataHashMap DataStorageStruct;

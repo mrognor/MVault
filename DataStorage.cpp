@@ -34,17 +34,6 @@ public:
     }
 };
 
-/*
-    A simple typedef for HashMap. It is necessary for a more understandable separation of types.
-    Represents the internal structure of the DataStorage.
-    A string with the name of the key is used as the key. All keys are the same as in DataStorage.
-    The value stores a pointer to std::unordered_multimap<T, DataStorageRecord*>.
-    Such a complex structure is needed to quickly search for each key with any type.
-    The key type is same as the DataStorage key value type.
-    The value is a pointer to DataStorageRecord.
-*/
-typedef DataHashMap DataStorageStruct;
-
 // A class that provides access to data inside DataStorage.
 // This class works as a reference to the data inside the DataStorage, 
 // i.e. when the data inside this class changes, they will also change inside the DataStorage
@@ -185,6 +174,21 @@ public:
     }
 };
 
+/*! 
+    \defgroup functions DataStorage functions
+    \brief All functions for working with DataStorage
+
+    @{      
+*/
+
+/**
+    \brief A function for union two DataStorageRecordSet
+
+    \param [in] A The first set to union
+    \param [in] B The second set to union
+
+    \return A new set containing all the elements from A and B. All the elements in it are unique
+*/ 
 DataStorageRecordSet Union(const DataStorageRecordSet& A, const DataStorageRecordSet& B)
 {
     DataStorageRecordSet res = A;
@@ -194,6 +198,14 @@ DataStorageRecordSet Union(const DataStorageRecordSet& A, const DataStorageRecor
     return res;
 };
 
+/**
+    \brief A function for excluding elements of one set if that is inside another set
+
+    \param [in] A The set from which should be excluded
+    \param [in] B A set whose elements must be excluded
+
+    \return A new set that contains all the elements from A that are not in B
+*/ 
 DataStorageRecordSet Except(const DataStorageRecordSet& A, const DataStorageRecordSet& B)
 {
     DataStorageRecordSet res;
@@ -204,6 +216,14 @@ DataStorageRecordSet Except(const DataStorageRecordSet& A, const DataStorageReco
     return res;
 };
 
+/**
+    \brief A function for the intersection of elements from two sets
+
+    \param [in] A The first set to intersection
+    \param [in] B The second set to intersection
+
+    \return A new set that contains only elements that exist in both A and B
+*/ 
 DataStorageRecordSet Intersection(const DataStorageRecordSet& A, const DataStorageRecordSet& B)
 {
     DataStorageRecordSet res;
@@ -224,6 +244,17 @@ DataStorageRecordSet Intersection(const DataStorageRecordSet& A, const DataStora
     return res;
 };
 
+/**
+    \brief A function for the alternative intersection of elements from two sets
+
+    This function works as a reverse intersection, i.e. 
+    it will return only elements from A that are not in B and elements from B that are not in A
+
+    \param [in] A The first set to alter intersection
+    \param [in] B The second set to alter intersection
+
+    \return A new set in which there are all elements from A and B that are not in A and B at the same time
+*/ 
 DataStorageRecordSet AlterIntersection(const DataStorageRecordSet& A, const DataStorageRecordSet& B)
 {
     DataStorageRecordSet res, tmp;
@@ -259,6 +290,8 @@ DataStorageRecordSet AlterIntersection(const DataStorageRecordSet& A, const Data
 
     return res;
 };
+
+/*! @} */
 
 // A class for storing data with the ability to quickly access data using a variety of different keys
 class DataStorage
@@ -425,7 +458,7 @@ public:
         return false;
     }
 
-    void Clear()
+    void DropDataStorage()
     {
         // Clear record template
         RecordTemplate.Clear();
@@ -449,7 +482,7 @@ public:
         RecordsSet.clear();
     }
 
-    void ClearData()
+    void DropData()
     {
         // Call functions to clear DataStorageStructure without
         for (auto& it : DataStorageRecordCleaners)
@@ -633,14 +666,14 @@ int main()
 
     std::cout << "Phase 5. Clear data storage" << std::endl;
 
-    ds.ClearData();
+    ds.DropData();
 
     ds.GetRecords("gender", false, dsrs);
     std::cout << "False gender amount: " << dsrs.Size() << std::endl;
 
     std::cout << "Phase 5. Sets: union, except, intersection, alterintersection" << std::endl;
 
-    ds.Clear();
+    ds.DropDataStorage();
 
     DataStorageRecordSet opset, set0, set1, set2, set3;
 
@@ -741,7 +774,7 @@ int main()
 
     std::cout << "Phase 6. Data erasing" << std::endl;
 
-    ds.Clear();
+    ds.DropDataStorage();
 
     ds.AddKey("id", -1);
     ds.AddKey("type", -1);
@@ -771,7 +804,7 @@ int main()
 
     std::cout << "Phase 7. RecordRef invalidation" << std::endl;
 
-    ds.Clear();
+    ds.DropDataStorage();
 
     ds.AddKey("id", -1);
     
