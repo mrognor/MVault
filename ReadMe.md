@@ -1,5 +1,7 @@
 This is readme
 
+Full documentation available [here](https://mrognor.github.io/DataStorage/index.html)
+
 This project provides a convenient way to work with data.
 
 Be careful when adding a string as a key value. If you do not specialize the function type manually, 
