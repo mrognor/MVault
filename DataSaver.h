@@ -14,11 +14,11 @@ private:
     const std::type_info& TypeInfo;
 
 public:
-    /// A constructor that stores a variable in a class with the type of data stored inside DataSaver
+    /// \brief A constructor that stores a variable in a class with the type of data stored inside DataSaver
     /// \param [in] type variable with type
     DataTypeSaver(const std::type_info& type);
 
-    /// Method for getting the data type stored inside the class
+    /// \brief Method for getting the data type stored inside the class
     /// \return the type of data stored inside the class
     const std::type_info& GetDataType();
 };
@@ -49,14 +49,14 @@ private:
     void (*CustomDeleteFunc)(const void* ptr) = nullptr;
 
 public:
-    // Default constructor
+    /// Default constructor
     DataSaver();
 
-    /// Copy constructor
+    /// \brief Copy constructor
     /// \param [in] dataSaver object to be copied
     DataSaver(const DataSaver& dataSaver);
 
-    /// A template constructor that accepts a variable to store inside DataSaver
+    /// \brief A template constructor that accepts a variable to store inside DataSaver
     /// \param [in] data data to be stored inside DataSaver
     template<class T>
     DataSaver(const T& data)
@@ -87,7 +87,7 @@ public:
     */
     DataSaver& operator=(const DataSaver& dataSaver);
     
-    /// Template method to save data inside DataSaver
+    /// \brief Template method to save data inside DataSaver
     /// \param [in] data data to be stored inside the class
     template <class T>
     void SetData(const T& data)
@@ -95,7 +95,7 @@ public:
         SetData(data, nullptr);
     }
 
-    /// Template method to save data and custom delete function inside DataSaver
+    /// \brief Template method to save data and custom delete function inside DataSaver
     /// \param [in] data data to be stored inside the class
     /// \param [in] customDeleteFunc function to delete data
     template <class T, class F>
@@ -134,7 +134,7 @@ public:
         CustomDeleteFunc = customDeleteFunc;
     }
 
-    /// Template method to get data from DataSaver.
+    /// \brief Template method to get data from DataSaver.
     /// \param [out] data the ref to which the data will be written
     /// \return return the true if it successfully recorded the data. If there was no data or they were of a different type it will return false
     template <class T>
@@ -160,10 +160,10 @@ public:
     /// If deleteFunc was set, it will be called
     void ResetData();
 
-    /// Swap data between 2 DataSavers
+    /// \brief Swap data between 2 DataSavers
     /// \param [in, out] dataSaver dataSaver from where the data will be copied to this and where the data from this will be written
     void Swap(DataSaver& dataSaver);
 
-    // Destructor
+    /// Default destructor
     ~DataSaver();
 };

@@ -15,23 +15,25 @@ template <class C>
 class DataContainer
 {
 protected:
-    // Container to store all DataSaver's
-    C Data;
+    /// Container to store all data inside C container
+    C Container;
 
 public:
-    // Iterators
+    /// Redefine iterator from C container
     typedef typename C::iterator iterator;
+
+    /// Redefine const_iterator from C container
     typedef typename C::const_iterator const_iterator;
 
     /// Begin provides access to the Data iterator
-    inline iterator begin() noexcept { return Data.begin(); }
+    inline iterator begin() noexcept { return Container.begin(); }
     /// Cbegin provides access to the Data const_iterator
-    inline const_iterator cbegin() const noexcept { return Data.cbegin(); }
+    inline const_iterator cbegin() const noexcept { return Container.cbegin(); }
 
     /// End provides access to the Data iterator
-    inline iterator end() noexcept { return Data.end(); }
+    inline iterator end() noexcept { return Container.end(); }
     /// Cend provides access to the Data const_iterator
-    inline const_iterator cend() const noexcept { return Data.cend(); }
+    inline const_iterator cend() const noexcept { return Container.cend(); }
 
     /**
         \brief Template method for adding a new data to the container.
@@ -44,7 +46,7 @@ public:
     template <class T>
     void AddData(const std::string& key, const T& data)
     {
-        Data.emplace(key, DataSaver(data));
+        Container.emplace(key, DataSaver(data));
     }
 
     /**
@@ -59,7 +61,7 @@ public:
     template <class T, class F>
     void AddData(const std::string& key, const T& data, F&& deleteFunc)
     {
-        Data.emplace(key, DataSaver(data, deleteFunc));
+        Container.emplace(key, DataSaver(data, deleteFunc));
     }
 
     /**
@@ -89,17 +91,17 @@ public:
     void SetData(const std::string& key, const T& data, F&& deleteFunc)
     {
         // Find data iterator
-        auto f = Data.find(key);
+        auto f = Container.find(key);
 
         // Checking whether there was such a key in the container
-        if (f == Data.end())
+        if (f == Container.end())
             AddData(key, data, deleteFunc); // Adding data to the container if there was no key
         else
             f->second.SetData(data, deleteFunc); // Setting new data for the key if it was already in the container
     }
 
     /**
-        Method for getting data from a container using a key
+        \brief Method for getting data from a container using a key
 
         \param [in] key key for getting data
         \param [out] data a reference to data of type T to write data from the container there.
@@ -110,20 +112,20 @@ public:
     template <class T>
     bool GetData(const std::string& key, T& data)
     {
-        auto f = Data.find(key);
-        if (f == Data.end())
+        auto f = Container.find(key);
+        if (f == Container.end())
             return false;
 
         f->second.GetData(data);
         return true;
     }
 
-    /// A method for checking whether data with such a key is in the container
+    /// \brief A method for checking whether data with such a key is in the container
     /// \param [in] key key to find in container
     /// \return Returns false if the key was not found, and otherwise returns true.
     bool IsData(const std::string& key)
     {
-        return Data.find(key) != Data.end();
+        return Container.find(key) != Container.end();
     }
 
     /**
@@ -135,19 +137,19 @@ public:
     */
     void EraseData(const std::string& key)
     {
-        auto f = Data.find(key);
-        if (f != Data.end())
+        auto f = Container.find(key);
+        if (f != Container.end())
         {
             f->second.ResetData();
-            Data.erase(f);
+            Container.erase(f);
         }
     }
 
-    /// Method for clear all data inside container
+    /// \brief Method for clear all data inside container
     /// Note that if pointers were stored in the container, they must be cleaned manually
     void Clear()
     {
-        Data.clear();
+        Container.clear();
     }
 };
 
@@ -169,7 +171,7 @@ public:
     */
     std::pair<DataContainer::iterator, DataContainer::iterator> GetAllData(const std::string& key)
     {
-        return Data.equal_range(key);
+        return Container.equal_range(key);
     }
 };
 

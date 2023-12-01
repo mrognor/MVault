@@ -18,28 +18,28 @@ private:
     std::size_t* RefCounter = nullptr;
 public:
 
-    /// Copy constructor
+    /// \brief Copy constructor
     /// \param [in] other object to be copied
     SmartPointerWrapper(const SmartPointerWrapper& other)
     {
         *this = other;
     }
 
-    /// Copy constructor
+    /// \brief Copy constructor
     /// \param [in] other object to be copied
     SmartPointerWrapper(const SmartPointerWrapper&& other)
     {
         *this = other;
     }
 
-    /// Copy constructor
+    /// \brief Copy constructor
     /// \param [in] other object to be copied
     SmartPointerWrapper(SmartPointerWrapper& other)
     {
         *this = other;
     }
 
-    /// Copy constructor
+    /// \brief Copy constructor
     /// \param [in] other object to be copied
     SmartPointerWrapper(SmartPointerWrapper&& other)
     {
@@ -126,20 +126,21 @@ public:
         return *this;
     }
 
-    /// Method for assigning a value to a pointer
+    /// \brief Method for assigning a value to a pointer
     /// \param [in] data Data to copy to the pointer
     void SetData(const T& data)
     {
         *Data = data;
     }
 
-    /// Data getter
+    /// \brief Data getter
     /// \return returns the data stored in the class
     T GetData()
     {
         return *Data;
     }
 
+    /// \brief Default destructor
     ~SmartPointerWrapper()
     {
         // Check if it not empty wrapper
