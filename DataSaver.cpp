@@ -6,14 +6,12 @@ const std::type_info& DataTypeSaver::GetDataType() { return TypeInfo; }
 
 DataSaver::DataSaver() {}
 
-// Copy constructor
 DataSaver::DataSaver(const DataSaver& dataSaver)
 {
     // Call operator= method
     *this = dataSaver;
 }
 
-// Operator= definition to copy data from DataSaver.
 DataSaver& DataSaver::operator=(const DataSaver& dataSaver)
 {
     // We check that there is no self-bonding
@@ -52,7 +50,6 @@ DataSaver& DataSaver::operator=(const DataSaver& dataSaver)
     return *this;
 }
 
-// Resets the class. If the deleteFunc function is set, it will be called
 void DataSaver::ResetData()
 {
     if (CustomDeleteFunc != nullptr)
@@ -76,7 +73,6 @@ void DataSaver::ResetData()
     CopyFunc = nullptr;
 }
 
-// Swap data between 2 DataSavers
 void DataSaver::Swap(DataSaver& dataSaver)
 {
     DataSaver tmp = dataSaver;
@@ -84,7 +80,6 @@ void DataSaver::Swap(DataSaver& dataSaver)
     *this = tmp;
 }
 
-// Destructor
 DataSaver::~DataSaver()
 {
     if (Ptr != nullptr)

@@ -1,7 +1,10 @@
+HEADERS = DataStorage.h DataStorageRecordSet.h DataStorageRecord.h DataContainer.h DataSaver.h SmartPointerWrapper.h
+SOURCES = DataStorage.cpp DataStorageRecordSet.cpp DataStorageRecord.cpp DataSaver.cpp
+
 all: DataStorage
 
-DataStorage: DataSaver.h DataSaver.cpp DataStorage.cpp SmartPointerWrapper.h DataStorageRecord.h DataStorageRecord.cpp DataStorageRecordSet.h DataStorageRecordSet.cpp
-	g++ -g DataSaver.cpp DataStorage.cpp -fsanitize=address -o DataStorage DataStorageRecord.cpp DataStorageRecordSet.cpp
+DataStorage: $(HEADERS) $(SOURCES)
+	g++ -g main.cpp $(SOURCES) -fsanitize=address -o DataStorage
 
 clean:
 	rm DataStorage

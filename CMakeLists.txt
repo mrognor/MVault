@@ -1,6 +1,6 @@
 project(DataStorage)
 
-set (Headers DataSaver.h DataContainer.h DataStorageRecord.h DataStorageRecordSet.h)
-set (Sources DataStorage.cpp DataSaver.cpp DataStorageRecord.cpp DataStorageRecordSet.cpp)
+set (Headers DataStorage.h DataStorageRecordSet.h DataStorageRecord.h DataContainer.h DataSaver.h SmartPointerWrapper.h)
+set (Sources main.cpp DataStorage.cpp DataStorageRecordSet.cpp DataStorageRecord.cpp DataSaver.cpp)
 
 add_executable(DataStorage ${Headers} ${Sources})
