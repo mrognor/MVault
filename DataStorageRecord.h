@@ -138,6 +138,9 @@ public:
     /// An object may no longer be valid if the record it refers to has been deleted
     /// \return returns true if the object is valid, otherwise false
     bool IsValid();
+
+    /// A method for decoupling a class object from record
+    void Unlink();
 };
 
 /// Specialization of the hashing function from std to use the class DataStorageRecordRef inside std containers like std::unordered_map or std::set.

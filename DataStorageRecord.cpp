@@ -29,3 +29,10 @@ bool DataStorageRecordRef::IsValid()
 {
     return IsDataStorageRecordValid.GetData();
 }
+
+void DataStorageRecordRef::Unlink()
+{
+    DataStorageRecord* DataRecord = nullptr;
+    DataStorageStruct* DataStorageStructure = nullptr;
+    IsDataStorageRecordValid.Unlink();
+}

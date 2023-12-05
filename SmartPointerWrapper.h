@@ -140,8 +140,8 @@ public:
         return *Data;
     }
 
-    /// \brief Default destructor
-    ~SmartPointerWrapper()
+    /// A method for decoupling a class object from data. For an internal pointer, it is equivalent to a SmartPointerWrapper destructor
+    void Unlink()
     {
         // Check if it not empty wrapper
         if(RefCounter != nullptr)
@@ -157,5 +157,11 @@ public:
                 --*RefCounter;
             }
         }
+    }
+
+    /// Default destructor
+    ~SmartPointerWrapper()
+    {
+        Unlink();
     }
 };
