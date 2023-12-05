@@ -2,6 +2,7 @@
 
 #include <functional>
 
+#include "DataStorageClasses.h"
 #include "DataSaver.h"
 #include "SmartPointerWrapper.h"
 #include "DataContainer.h"
@@ -150,8 +151,8 @@ public:
             if (TtoDataStorageRecordIt != TtoDataStorageRecordMap->end())
             {
                 // Set data to DataStorageRecordRef
-                foundedRecord.SetDataStorageRecordPtr(TtoDataStorageRecordIt->second);
-                foundedRecord.SetDataStorageStructPtr(&DataStorageStructure);
+                foundedRecord.DataRecord = TtoDataStorageRecordIt->second;
+                foundedRecord.DataStorageStructure = &DataStorageStructure;
                 return true;
             }
         }

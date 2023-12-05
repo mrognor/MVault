@@ -74,7 +74,7 @@ void DataStorage::DropData()
 void DataStorage::EraseRecord(const DataStorageRecordRef& recordRefToErase)
 {
     // Get pointer to record from record ref
-    DataStorageRecord* tmpRec = recordRefToErase.GetRawData();
+    DataStorageRecord* tmpRec = recordRefToErase.DataRecord;
     // Iterate over all DataStorageRecordErasers and call function to erase record from structure
     for (auto& erasers : DataStorageRecordErasers)
         erasers.second(tmpRec);

@@ -13,7 +13,6 @@ DataStorageRecord::~DataStorageRecord()
     IsDataStorageRecordValid.SetData(false);
 }
 
-
 DataStorageRecordRef::DataStorageRecordRef() {}
 
 DataStorageRecordRef::DataStorageRecordRef(DataStorageRecord* data, DataStorageStruct* dataStorageStructure) : DataRecord(data), DataStorageStructure(dataStorageStructure) 
@@ -21,17 +20,9 @@ DataStorageRecordRef::DataStorageRecordRef(DataStorageRecord* data, DataStorageS
     IsDataStorageRecordValid = data->IsDataStorageRecordValid;
 }
 
-void DataStorageRecordRef::SetDataStorageRecordPtr(DataStorageRecord* data) { DataRecord = data; }
-void DataStorageRecordRef::SetDataStorageStructPtr(DataStorageStruct* dataStorageStructure) { DataStorageStructure = dataStorageStructure; }
-
 bool DataStorageRecordRef::operator==(const DataStorageRecordRef& other) const
 {
     return DataRecord == other.DataRecord;
-}
-
-DataStorageRecord* DataStorageRecordRef::GetRawData() const
-{
-    return DataRecord;
 }
 
 bool DataStorageRecordRef::IsValid()

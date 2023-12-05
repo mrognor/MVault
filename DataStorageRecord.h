@@ -1,5 +1,6 @@
 #pragma once
 
+#include "DataStorageClasses.h"
 #include "DataContainer.h"
 #include "SmartPointerWrapper.h"
 
@@ -56,6 +57,12 @@ private:
     SmartPointerWrapper<bool> IsDataStorageRecordValid;
 public:
 
+    /// Making the DataStorage class friendly so that it has access to the internal members of the DataStorageRecordRef class
+    friend DataStorage;
+
+    /// Making the std::hash<DataStorageRecordRef> struct friendly so that it has access to the internal members of the DataStorageRecordRef class
+    friend std::hash<DataStorageRecordRef>;
+
     /// Default constructor 
     DataStorageRecordRef();
 
@@ -64,18 +71,10 @@ public:
     /// \param [in] dataStorageStructure pointer to the DataStorage structure
     DataStorageRecordRef(DataStorageRecord* data, DataStorageStruct* dataStorageStructure);
 
-    /// \todo Method to replace with friend
-    void SetDataStorageRecordPtr(DataStorageRecord* data);
-    /// \todo Method to replace with friend
-    void SetDataStorageStructPtr(DataStorageStruct* dataStorageStructure);
-
     /// \brief Comparison operator
     /// \param [in] other the object to compare with
     /// \return true if the objects are equal, otherwise false
     bool operator==(const DataStorageRecordRef& other) const;
-
-    /// \todo Method to replace with friend
-    DataStorageRecord* GetRawData() const;
 
     /**
         \brief Method for updating data inside DataStorage
@@ -144,6 +143,6 @@ struct std::hash<DataStorageRecordRef>
 {
     std::size_t operator()(const DataStorageRecordRef& k) const
     {
-        return std::hash<DataStorageRecord*>()(k.GetRawData());
+        return std::hash<DataStorageRecord*>()(k.DataRecord);
     }
 };

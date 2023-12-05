@@ -2,6 +2,7 @@
 
 #include <unordered_set>
 
+#include "DataStorageClasses.h"
 #include "DataStorageRecord.h"
 
 /// A class for storing set of DataStorageRecordRef's
