@@ -59,7 +59,9 @@ public:
     /// Default constructor 
     DataStorageRecordRef();
 
-    /// \todo Constructor to replace with friend
+    /// \brief Constructor
+    /// \param [in] data a pointer to the record that will be stored inside DataStorageRecordRef
+    /// \param [in] dataStorageStructure pointer to the DataStorage structure
     DataStorageRecordRef(DataStorageRecord* data, DataStorageStruct* dataStorageStructure);
 
     /// \todo Method to replace with friend
