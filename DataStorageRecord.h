@@ -83,14 +83,16 @@ public:
 
         \param [in] key the key whose value needs to be changed
         \param [in] data new key data value
+
+        \return returns true if the key was found otherwise returns false
     */
     template <class T>
-    void SetData(const std::string& key, const T& data)
+    bool SetData(const std::string& key, const T& data)
     {
         // A pointer for storing a std::unordered_multimap in which a template data type is used as a key, 
         // and a pointer to the DataHashMap is used as a value
         std::unordered_multimap<T, DataStorageRecord*>* TtoDataStorageRecordMap = nullptr;
-        DataStorageStructure->GetData(key, TtoDataStorageRecordMap);
+        if (!DataStorageStructure->GetData(key, TtoDataStorageRecordMap)) return false;
 
         // Get the current value of the key key inside the DataStorageRecordRef and save it for further work
         T oldData;
@@ -115,6 +117,7 @@ public:
 
         // Update data inside DataStorageRecord pointer inside DataStorageRecordRef and DataStorage
         DataRecord->SetData(key, data);
+        return true;
     }
 
     /**

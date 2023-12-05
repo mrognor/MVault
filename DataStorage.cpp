@@ -2,8 +2,15 @@
 
 DataStorage::DataStorage() {}
 
+bool DataStorage::IsKeyExist(const std::string& keyName)
+{
+    return RecordTemplate.IsData(keyName);
+}
+
 void DataStorage::RemoveKey(const std::string& keyName)
 {
+    if (!IsKeyExist(keyName)) return;
+
     // Erase key from record template
     RecordTemplate.EraseData(keyName);
     // Erase key from DataStorageStructure
@@ -73,6 +80,9 @@ void DataStorage::DropData()
 
 void DataStorage::EraseRecord(const DataStorageRecordRef& recordRefToErase)
 {
+    if (RecordsSet.count(recordRefToErase.DataRecord) == 0)
+        return;
+
     // Get pointer to record from record ref
     DataStorageRecord* tmpRec = recordRefToErase.DataRecord;
     // Iterate over all DataStorageRecordErasers and call function to erase record from structure

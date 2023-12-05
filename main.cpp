@@ -7,8 +7,8 @@ int main()
     std::cout << "Phase 1. Simple demo" << std::endl;
 
     DataStorage ds;
-    ds.AddKey("id", -1);
-    ds.AddKey<std::string>("name", "none");
+    ds.SetKey("id", -1);
+    ds.SetKey<std::string>("name", "none");
 
     DataStorageRecordRef dsrr = ds.CreateNewRecord();
 
@@ -72,7 +72,7 @@ int main()
 
     std::cout << "Phase 2. Runtime key addiction" << std::endl;
 
-    ds.AddKey("gender", true);
+    ds.SetKey("gender", true);
 
     if (ds.GetRecord<bool>("gender", true, dsrr))
     {
@@ -141,8 +141,8 @@ int main()
 
     DataStorageRecordSet opset, set0, set1, set2, set3;
 
-    ds.AddKey("id", -1);
-    ds.AddKey("type", -1);
+    ds.SetKey("id", -1);
+    ds.SetKey("type", -1);
 
     for (int i = 0; i < 20; ++i)
     {
@@ -240,8 +240,8 @@ int main()
 
     ds.DropDataStorage();
 
-    ds.AddKey("id", -1);
-    ds.AddKey("type", -1);
+    ds.SetKey("id", -1);
+    ds.SetKey("type", -1);
 
     dsrr = ds.CreateNewRecord();
     dsrr.SetData("id", 0);
@@ -270,7 +270,7 @@ int main()
 
     ds.DropDataStorage();
 
-    ds.AddKey("id", -1);
+    ds.SetKey("id", -1);
     
     dsrr = ds.CreateNewRecord();
     dsrr.SetData("id", 0);

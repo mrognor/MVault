@@ -15,7 +15,7 @@
     The class can be represented as a simple table with the ability to quickly search in O(1) for each field of the table.
     Each row of the table is called a record, and the DataStorageRecord class is used to store it. The column is called the key.
     Further, the keys will mean the columns of the table, and the records will mean the rows of the table.
-    The AddKey function is used to add new keys. There is a template entry inside the class and when adding a 
+    The SetKey function is used to add new keys. There is a template entry inside the class and when adding a 
     key to the DataStorage, data will be added to this template entry. When creating new records, they will be copied from this template record.
     Each record is unique, but the key values can be the same for many records.
     To work with records inside the DataStorage, the DataStorageRecordRef is used. You can use it to change the values of records inside the DataStorage.
@@ -59,18 +59,23 @@ public:
     /// Deleted copy operator
     DataStorage(const DataStorage& other) = delete;
 
-    /// \brief Template function to add new key with default value to DataStorage
-    /// \param [in] keyName new key name
-    /// \param [in] defaultKeyValue default key value
+    /**
+        \brief Template function to add new key with default value to DataStorage
+
+        If the key was added earlier, the default value will be updated when this function is called again
+
+        \param [in] keyName new key name
+        \param [in] defaultKeyValue default key value
+    */
     template <class T>
-    void AddKey(const std::string& keyName, const T& defaultKeyValue)
+    void SetKey(const std::string& keyName, const T& defaultKeyValue)
     {
         // Add data to template
-        RecordTemplate.AddData(keyName, defaultKeyValue);
+        RecordTemplate.SetData(keyName, defaultKeyValue);
 
         // Create new map to store data with template T key
         std::unordered_multimap<T, DataStorageRecord*>* TtoDataStorageRecordMap = new std::unordered_multimap<T, DataStorageRecord*>;
-        DataStorageStructure.AddData(keyName, TtoDataStorageRecordMap, [](const void* ptr)
+        DataStorageStructure.SetData(keyName, TtoDataStorageRecordMap, [](const void* ptr)
             {
                 delete* (std::unordered_multimap<T, DataStorageRecord*>**)ptr;
             }
@@ -115,9 +120,32 @@ public:
         // Add new data to record set
         for (auto& it : RecordsSet)
         {
-            it->AddData(keyName, defaultKeyValue);
+            it->SetData(keyName, defaultKeyValue);
             TtoDataStorageRecordMap->emplace(defaultKeyValue, it);
         }
+    }
+
+    /**
+        \brief The method for getting a default key value
+
+        \param [in] keyName the name of the key to search for
+
+        \return returns true if the key was found otherwise returns false
+    */
+    bool IsKeyExist(const std::string& keyName);
+    
+    /**
+        \brief The method for getting a default key value
+
+        \param [in] keyName the name of the key to search for
+        \param [in] keyValue the value of the key
+
+        \return returns true if the key was found otherwise returns false
+    */
+    template <class T>
+    bool GetKeyValue(const std::string& keyName, T& defaultKeyValue)
+    {
+        return RecordTemplate.GetData(keyName, defaultKeyValue);
     }
 
     /// \brief The method for deleting the key
