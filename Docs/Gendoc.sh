@@ -12,3 +12,6 @@ doxygen Doxyfile
 # Remove main page doxygen command from ReadMe.md 
 cd ..
 sed -i '1d' ReadMe.md
+
+mkdir -p ./Docs/Generated/html/Docs
+cp ./Docs/Scheme.svg ./Docs/Generated/html/Docs
