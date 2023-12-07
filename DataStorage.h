@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <vector>
 
 #include "DataStorageClasses.h"
 #include "DataSaver.h"
@@ -84,7 +85,11 @@ public:
         // Add function to DataStorageRecord creation
         DataStorageRecordAdders.emplace(keyName, [=](DataStorageRecord* newRecord)
             {
-                TtoDataStorageRecordMap->emplace(defaultKeyValue, newRecord);
+                // Make temporary variable to store key value
+                T value = defaultKeyValue;
+                // Try to get key value from new record. If it is not value inside then defaultKeyValue will be used
+                newRecord->GetData(keyName, value);
+                TtoDataStorageRecordMap->emplace(value, newRecord);
             }
         );
 
@@ -152,9 +157,52 @@ public:
     /// \param [in] keyName the key to remove
     void RemoveKey(const std::string& keyName);
 
-    /// Method to create new DataStorageRecord. A record will be created by copying RecordTemplate.
+    /// \brief Method to create new DataStorageRecord. A record will be created by copying RecordTemplate.
     /// \return ref to new record 
     DataStorageRecordRef CreateNewRecord();
+
+    /**
+        \brief Method to create new DataStorageRecord.
+
+        The method accepts a vector of pairs, the first element of the pair is a string with a key, 
+        and the second element of the pair are key values of any type.
+        The order of the pairs is not important, assignment takes place by key. The number of pairs can be any, 
+        for all keys for which no value has been specified, the default value will remain
+
+        The DataStorage in the example has 2 keys. One is the id of the int type, and the second is the name of the std::string type
+        Usage example:
+
+        \code
+            ds.CreateNewRecord({{"id", 0}, {"name", std::string("mrognor")}});
+        \endcode
+
+        or
+
+        \code
+            ds.CreateNewRecord({{"name", std::string("mrognor")}, {"id", 0}});
+        \endcode
+
+        or
+
+        \code
+            std::vector<std::pair<std::string, DataSaver>> params = {{"id", 0}, {"name", std::string("mrognor")}};
+            DataStorageRecordRef dsrr = ds.CreateNewRecord(params);
+        \endcode
+
+        what is equivalent to such a code without passing values to a function
+
+        \code
+            DataStorageRecordRef dsrr = ds.CreateNewRecord();
+
+            dsrr.SetData("id", 0);
+            dsrr.SetData<std::string>("name", "mrognor");
+        \endcode
+
+        \param [in] params a vector of pairs with data to be put in the DataStorage
+
+        \return ref to new record 
+    */
+    DataStorageRecordRef CreateNewRecord(std::vector<std::pair<std::string, DataSaver>> params);
 
     /**
         \brief The method for getting a reference to the data inside DataStorage

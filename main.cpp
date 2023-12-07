@@ -4,13 +4,25 @@ int main()
 {
     // Known limitations: data saver cannot store arrays
 
-    std::cout << "Phase 1. Simple demo" << std::endl;
-
+    std::cout << "Phase 0. Demo" << std::endl;
     DataStorage ds;
     ds.SetKey("id", -1);
     ds.SetKey<std::string>("name", "none");
 
-    DataStorageRecordRef dsrr = ds.CreateNewRecord();
+    DataStorageRecordRef dsrr = ds.CreateNewRecord({{"id", 0}, {"name", std::string("zov")}});
+
+    if (ds.GetRecord<int>("id", 0, dsrr))
+    {
+        std::string res;
+        if (dsrr.GetData("name", res))
+            std::cout << "0: " << res << std::endl;
+    }
+
+    ds.DropData();
+
+    std::cout << "Phase 1. Simple demo" << std::endl;
+
+    dsrr = ds.CreateNewRecord();
 
     if (ds.GetRecord<int>("id", -1, dsrr))
     {

@@ -3,7 +3,7 @@ SOURCES = DataStorage.cpp DataStorageRecordSet.cpp DataStorageRecord.cpp DataSav
 
 all: DataStorage
 
-DataStorage: $(HEADERS) $(SOURCES)
+DataStorage: $(HEADERS) $(SOURCES) main.cpp
 	g++ -g main.cpp $(SOURCES) -fsanitize=address -o DataStorage
 
 clean:

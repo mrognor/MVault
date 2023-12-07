@@ -39,6 +39,26 @@ DataStorageRecordRef DataStorage::CreateNewRecord()
     return DataStorageRecordRef(newData, &DataStorageStructure);
 }
 
+DataStorageRecordRef DataStorage::CreateNewRecord(std::vector<std::pair<std::string, DataSaver>> params)
+{
+    // Create new record
+    DataStorageRecord* newData = new DataStorageRecord(RecordTemplate);
+    
+    // Copy data fro, function parametrs
+    for (auto& it : params)
+        newData->SetDataFromDataSaver(it.first, it.second);
+
+    // Add new record to set
+    RecordsSet.emplace(newData);
+
+
+    // Add new record to every maps inside DataStorageStruct
+    for (auto& it : DataStorageRecordAdders)
+        it.second(newData);
+    
+    return DataStorageRecordRef(newData, &DataStorageStructure);
+}
+
 void DataStorage::DropDataStorage()
 {
     // Clear record template

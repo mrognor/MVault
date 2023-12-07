@@ -65,6 +65,17 @@ public:
     }
 
     /**
+        \brief Method for adding a new data to the container
+
+        \param [in] key the key whose value needs to be changed
+        \param [in] dataSaver dataSaver with any type, the value from which will be copied to the container 
+    */
+    void AddDataFromDataSaver(const std::string& key, const DataSaver& dataSaver)
+    {
+        Container.emplace(key, dataSaver);
+    }
+
+    /**
         \brief Method for changing the value of a data inside a container using a key
 
         If there was no data with such a key, it will be created
@@ -98,6 +109,26 @@ public:
             AddData(key, data, deleteFunc); // Adding data to the container if there was no key
         else
             f->second.SetData(data, deleteFunc); // Setting new data for the key if it was already in the container
+    }
+
+    /**
+        \brief Method for changing the value of a data inside a container using a key
+
+        If there was no data with such a key, it will be created
+
+        \param [in] key the key whose value needs to be changed
+        \param [in] dataSaver dataSaver with any type, the value from which will be copied to the container 
+    */
+    void SetDataFromDataSaver(const std::string& key, const DataSaver& dataSaver)
+    {
+        // Find data iterator
+        auto f = Container.find(key);
+
+        // Checking whether there was such a key in the container
+        if (f == Container.end())
+            AddDataFromDataSaver(key, dataSaver); // Adding data to the container if there was no key
+        else
+            f->second = dataSaver; // Setting new data for the key if it was already in the container
     }
 
     /**
