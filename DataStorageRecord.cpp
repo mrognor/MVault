@@ -25,6 +25,14 @@ bool DataStorageRecordRef::operator==(const DataStorageRecordRef& other) const
     return DataRecord == other.DataRecord;
 }
 
+void DataStorageRecordRef::SetData(std::vector<std::pair<std::string, DataSaver>> params)
+{
+        // Copy data from function parametrs
+    for (auto& it : params)
+        if (DataRecord->IsData(it.first))
+            DataRecord->SetDataFromDataSaver(it.first, it.second);
+}
+
 bool DataStorageRecordRef::IsValid()
 {
     return IsDataStorageRecordValid.GetData();

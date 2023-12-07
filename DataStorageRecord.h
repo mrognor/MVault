@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "DataStorageClasses.h"
 #include "DataContainer.h"
 #include "SmartPointerWrapper.h"
@@ -119,6 +121,16 @@ public:
         DataRecord->SetData(key, data);
         return true;
     }
+
+    /**
+        \brief Method for updating data inside DataStorage
+
+        Using this method, you can change the values inside the DataStorageRecord inside the DataStorage.  
+        See DataStorage::CreateNewRecord(std::vector<std::pair<std::string, DataSaver>> params) for more information
+
+        \param [in] params a vector of pairs with data to be put in the DataStorage
+    */
+    void SetData(std::vector<std::pair<std::string, DataSaver>> params);
 
     /**
         \brief A method for getting data using a key

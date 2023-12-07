@@ -44,9 +44,10 @@ DataStorageRecordRef DataStorage::CreateNewRecord(std::vector<std::pair<std::str
     // Create new record
     DataStorageRecord* newData = new DataStorageRecord(RecordTemplate);
     
-    // Copy data fro, function parametrs
+    // Copy data from function parametrs
     for (auto& it : params)
-        newData->SetDataFromDataSaver(it.first, it.second);
+        if (newData->IsData(it.first))
+            newData->SetDataFromDataSaver(it.first, it.second);
 
     // Add new record to set
     RecordsSet.emplace(newData);

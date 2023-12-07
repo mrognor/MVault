@@ -18,6 +18,15 @@ int main()
             std::cout << "0: " << res << std::endl;
     }
 
+    dsrr.SetData({{"id", 1}, {"name", std::string("moop")}});
+    
+    if (ds.GetRecord<int>("id", 0, dsrr))
+    {
+        std::string res;
+        if (dsrr.GetData("name", res))
+            std::cout << "0: " << res << std::endl;
+    }
+
     ds.DropData();
 
     std::cout << "Phase 1. Simple demo" << std::endl;
