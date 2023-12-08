@@ -27,7 +27,7 @@ void PrintDataStorage(DataStorage& ds)
     }
 
     // Print first line
-    std::cout << "=";
+    std::cout << "\t=";
     for (std::size_t i = 0; i < idLen; ++i)
         std::cout << "=";
     
@@ -42,7 +42,7 @@ void PrintDataStorage(DataStorage& ds)
     std::cout << "=" << std::endl;
 
     // Print keys
-    std::cout << "|id";
+    std::cout << "\t|id";
     for (std::size_t i = 0; i < idLen - 2; ++i)
         std::cout << " ";
     
@@ -54,7 +54,7 @@ void PrintDataStorage(DataStorage& ds)
     std::cout << std::endl;
 
     // Print third line
-    std::cout << "+";
+    std::cout << "\t+";
     for (std::size_t i = 0; i < idLen; ++i)
         std::cout << "-";
     
@@ -77,7 +77,7 @@ void PrintDataStorage(DataStorage& ds)
         it.GetData("name", name);
         it.GetData("gender", gender);
 
-        std::cout << "|" << id;
+        std::cout << "\t|" << id;
         for (std::size_t i = 0; i < idLen - std::to_string(id).size(); ++i)
             std::cout << " ";
 
@@ -102,7 +102,7 @@ void PrintDataStorage(DataStorage& ds)
     }
 
     // Print last line
-    std::cout << "=";
+    std::cout << "\t=";
     for (std::size_t i = 0; i < idLen; ++i)
         std::cout << "=";
     
@@ -115,11 +115,29 @@ void PrintDataStorage(DataStorage& ds)
         std::cout << "=";
 
     std::cout << "=" << std::endl;
-    std::cout << "Number of records: " << ds.Size() << std::endl;
+    std::cout << "\tNumber of records: " << ds.Size() << std::endl;
+}
+
+void PrintDataStorageRecord(const DataStorageRecordRef& recRef)
+{
+    int id;
+    std::string name;
+    bool gender;
+    recRef.GetData("id", id);
+    recRef.GetData("name", name);
+    recRef.GetData("gender", gender);
+    std::cout << "\tRecord unique id: " << recRef.GetRecordUniqueId() << std::endl;
+    std::cout << "\tid: " << id << std::endl;
+    std::cout << "\tname: " << name << std::endl;
+    if (gender)
+        std::cout << "\tgender: man" << std::endl;
+    else
+        std::cout << "\tgender: man" << std::endl;
 }
 
 void Example1(DataStorage& ds)
 {
+    /// \page main \code
     std::cout << "Example 1. Simple addition and deletion of records" << std::endl;
 
     // ================================================================ //
@@ -212,8 +230,24 @@ void Example1(DataStorage& ds)
     std::cout << "Data storage after the last addition" << std::endl;
     PrintDataStorage(ds);
 
+    // ================================================================ //
+
+    // Get record with name mrognor
+    std::cout << "The result of a request for a record with the name mrognor" << std::endl;
+
+    DataStorageRecordRef recordRef = ds.GetRecord("name", std::string("mrognor"));
+    
+    if (recordRef.IsValid())
+        PrintDataStorageRecord(recordRef);
+    
+    // Invalidate ref
+    recordRef.Unlink();
+
+    // ================================================================ //
+
     // Drop table
     ds.DropDataStorage();
+    /// \endcode
 }
 
 int main()

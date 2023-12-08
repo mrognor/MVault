@@ -135,7 +135,7 @@ public:
 
     /// \brief Data getter
     /// \return returns the data stored in the class
-    T GetData()
+    T GetData() const
     {
         return *Data;
     }

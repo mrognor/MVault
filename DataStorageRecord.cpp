@@ -25,6 +25,13 @@ bool DataStorageRecordRef::operator==(const DataStorageRecordRef& other) const
     return DataRecord == other.DataRecord;
 }
 
+std::string DataStorageRecordRef::GetRecordUniqueId() const
+{
+    std::stringstream ss;
+    ss << DataRecord;
+    return ss.str();
+}
+
 void DataStorageRecordRef::SetData(std::vector<std::pair<std::string, DataSaver>> params)
 {
         // Copy data from function parametrs
@@ -33,7 +40,7 @@ void DataStorageRecordRef::SetData(std::vector<std::pair<std::string, DataSaver>
             DataRecord->SetDataFromDataSaver(it.first, it.second);
 }
 
-bool DataStorageRecordRef::IsValid()
+bool DataStorageRecordRef::IsValid() const
 {
     return IsDataStorageRecordValid.GetData();
 }

@@ -37,7 +37,7 @@ bool DataStorageRecordSet::Contain(const DataStorageRecordRef& dataToCheck) cons
     return RecordsSet.find(dataToCheck) != RecordsSet.end();
 }
 
-void DataStorageRecordSet::Union(const DataStorageRecordSet& other)
+void DataStorageRecordSet::Join(const DataStorageRecordSet& other)
 {
     for (auto& it : other)
         RecordsSet.emplace(it);

@@ -65,7 +65,7 @@ public:
 
     /// A method for combining sets
     /// \param [in] other the set that will be added to this
-    void Union(const DataStorageRecordSet& other);
+    void Join(const DataStorageRecordSet& other);
 };
 
 /*! 

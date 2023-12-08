@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <sstream>
 
 #include "DataStorageClasses.h"
 #include "DataContainer.h"
@@ -78,6 +79,11 @@ public:
     /// \return true if the objects are equal, otherwise false
     bool operator==(const DataStorageRecordRef& other) const;
 
+    /// \brief A method for obtaining a unique record identifier
+    ///  Important. Two DataStorageRecordRef objects pointing to the same record will return the same value
+    /// \return the unique identifier of the record
+    std::string GetRecordUniqueId() const;
+
     /**
         \brief Method for updating data inside DataStorage
 
@@ -149,7 +155,7 @@ public:
     /// \brief A function to check the validity of a class object
     /// An object may no longer be valid if the record it refers to has been deleted
     /// \return returns true if the object is valid, otherwise false
-    bool IsValid();
+    bool IsValid() const;
 
     /// A method for decoupling a class object from record
     void Unlink();
