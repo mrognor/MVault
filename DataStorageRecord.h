@@ -126,7 +126,7 @@ public:
         \brief Method for updating data inside DataStorage
 
         Using this method, you can change the values inside the DataStorageRecord inside the DataStorage.  
-        See DataStorage::CreateNewRecord(std::vector<std::pair<std::string, DataSaver>> params) for more information
+        See DataStorage::CreateRecord(std::vector<std::pair<std::string, DataSaver>> params) for more information
 
         \param [in] params a vector of pairs with data to be put in the DataStorage
     */
@@ -141,7 +141,7 @@ public:
         \return returns true if the data was received, otherwise false
     */
     template <class T>
-    bool GetData(const std::string& key, T& data)
+    bool GetData(const std::string& key, T& data) const
     {
         return DataRecord->GetData(key, data);
     }

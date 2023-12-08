@@ -110,7 +110,7 @@ public:
             delete DataType;
 
         // Create new T type object and save it pointer like void ptr. Data from data will be copying using copy constructor
-        Ptr = (void*)new T(data);
+        Ptr = static_cast<void*>(new T(data));
 
         // Create new DataType object to save data type
         DataType = new DataTypeSaver(typeid(data));
@@ -121,13 +121,13 @@ public:
                 // Convert src pointer to T pointer and get data from T pointer.
                 // Use T copy constructor to create T object.
                 // Allocate new memory to T type and convert it to void pointer.
-                dst = (void*) new T(*(T*)src);
+                dst = static_cast<void*>(new T(*(T*)src));
             };
 
         // Set new DeleteFunc
         DeleteFunc = [](void*& ptrToDelete)
             {
-                delete (T*)ptrToDelete;
+                delete static_cast<T*>(ptrToDelete);
             };
 
         // Set custom delete function from dataSaver
@@ -152,7 +152,7 @@ public:
             return false;
 
         // Copy data from Ptr to data
-        data = *(T*)Ptr;
+        data = *static_cast<T*>(Ptr);
         return true;
     }
 

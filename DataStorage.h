@@ -159,7 +159,7 @@ public:
 
     /// \brief Method to create new DataStorageRecord. A record will be created by copying RecordTemplate.
     /// \return ref to new record 
-    DataStorageRecordRef CreateNewRecord();
+    DataStorageRecordRef CreateRecord();
 
     /**
         \brief Method to create new DataStorageRecord.
@@ -173,26 +173,36 @@ public:
         Usage example:
 
         \code
-            ds.CreateNewRecord({{"id", 0}, {"name", std::string("mrognor")}});
+            // A record with id 0 and name mrognor will be created
+            ds.CreateRecord({ {"id", 0}, {"name", std::string("mrognor")} });
         \endcode
 
         or
 
         \code
-            ds.CreateNewRecord({{"name", std::string("mrognor")}, {"id", 0}});
+            // A record with id 0 and name mrognor will be created
+            ds.CreateRecord({ {"name", std::string("mrognor")}, {"id", 0} });
         \endcode
 
         or
 
         \code
-            std::vector<std::pair<std::string, DataSaver>> params = {{"id", 0}, {"name", std::string("mrognor")}};
-            DataStorageRecordRef dsrr = ds.CreateNewRecord(params);
+            // A record with name mrognor will be created. The Id will be set to the default value
+            ds.CreateRecord({ {"name", std::string("mrognor")} });
+        \endcode
+
+        or
+
+        \code
+            // A record with id 0 and name mrognor will be created
+            std::vector<std::pair<std::string, DataSaver>> params = { {"id", 0}, {"name", std::string("mrognor")} };
+            DataStorageRecordRef dsrr = ds.CreateRecord(params);
         \endcode
 
         what is equivalent to such a code without passing values to a function
 
         \code
-            DataStorageRecordRef dsrr = ds.CreateNewRecord();
+            DataStorageRecordRef dsrr = ds.CreateRecord();
 
             dsrr.SetData("id", 0);
             dsrr.SetData<std::string>("name", "mrognor");
@@ -202,7 +212,7 @@ public:
 
         \return ref to new record 
     */
-    DataStorageRecordRef CreateNewRecord(std::vector<std::pair<std::string, DataSaver>> params);
+    DataStorageRecordRef CreateRecord(std::vector<std::pair<std::string, DataSaver>> params);
 
     /**
         \brief The method for getting a reference to the data inside DataStorage
@@ -214,10 +224,12 @@ public:
         \return returns true if the key and value was found otherwise returns false
     */
     template <class T>
-    bool GetRecord(const std::string& keyName, const T& keyValue, DataStorageRecordRef& foundedRecord)
+    DataStorageRecordRef GetRecord(const std::string& keyName, const T& keyValue)
     {
         // Pointer to store map inside DataStorageStruct
         std::unordered_multimap<T, DataStorageRecord*>* TtoDataStorageRecordMap = nullptr;
+
+        DataStorageRecordRef res;
 
         // Checking whether such a key exists
         if (DataStorageStructure.GetData(keyName, TtoDataStorageRecordMap))
@@ -227,13 +239,15 @@ public:
             if (TtoDataStorageRecordIt != TtoDataStorageRecordMap->end())
             {
                 // Set data to DataStorageRecordRef
-                foundedRecord.DataRecord = TtoDataStorageRecordIt->second;
-                foundedRecord.DataStorageStructure = &DataStorageStructure;
-                return true;
+                res.DataRecord = TtoDataStorageRecordIt->second;
+                res.DataStorageStructure = &DataStorageStructure;
+                res.IsDataStorageRecordValid = true;
+                return res;
             }
         }
 
-        return false;
+        res.IsDataStorageRecordValid = false;
+        return res;
     }
 
     /**
@@ -268,6 +282,11 @@ public:
 
         return false;
     }
+
+
+    /// \brief The method for getting a set of all references to the data inside DataStorage
+    /// \return returns a set of all records refs
+    DataStorageRecordSet GetAllRecords();
 
     /// A method for deleting all data and keys
     void DropDataStorage();

@@ -25,7 +25,7 @@ void DataStorage::RemoveKey(const std::string& keyName)
         it->EraseData(keyName);
 }
 
-DataStorageRecordRef DataStorage::CreateNewRecord()
+DataStorageRecordRef DataStorage::CreateRecord()
 {
     // Create new record
     DataStorageRecord* newData = new DataStorageRecord(RecordTemplate);
@@ -39,7 +39,7 @@ DataStorageRecordRef DataStorage::CreateNewRecord()
     return DataStorageRecordRef(newData, &DataStorageStructure);
 }
 
-DataStorageRecordRef DataStorage::CreateNewRecord(std::vector<std::pair<std::string, DataSaver>> params)
+DataStorageRecordRef DataStorage::CreateRecord(std::vector<std::pair<std::string, DataSaver>> params)
 {
     // Create new record
     DataStorageRecord* newData = new DataStorageRecord(RecordTemplate);
@@ -58,6 +58,16 @@ DataStorageRecordRef DataStorage::CreateNewRecord(std::vector<std::pair<std::str
         it.second(newData);
     
     return DataStorageRecordRef(newData, &DataStorageStructure);
+}
+
+DataStorageRecordSet DataStorage::GetAllRecords()
+{
+    DataStorageRecordSet res;
+    // Fill the result record set
+    for (auto it = RecordsSet.begin(); it != RecordsSet.end(); ++it)
+        res.AddNewRecord(*it, &DataStorageStructure);
+
+    return res;
 }
 
 void DataStorage::DropDataStorage()
