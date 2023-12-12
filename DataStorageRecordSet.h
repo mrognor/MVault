@@ -46,10 +46,14 @@ public:
     /// \param [in] newRecordRefPtr the object to be added to the set
     void AddNewRecord(const DataStorageRecordRef& newRecordRefPtr);
 
-    /// \brief A method for adding a new DataStorageRecordRef inside a DataStorageRecordRefSet
-    /// \param [in] newRecordPtr a pointer to an record in DataStorage
-    /// \param [in] dataStorageStructure pointer to the DataStorage structure
-    void AddNewRecord(DataStorageRecord* newRecordPtr, DataStorageStructureHashMap* dataStorageStructure);
+    /**
+        \brief A method for adding a new DataStorageRecordRef inside a DataStorageRecordRefSet
+
+        \param [in] newRecordPtr a pointer to an record in DataStorage
+        \param [in] dataStorageStructureHashMap pointer to the DataStorageHashMap structure
+        \param [in] dataStorageStructureMap pointer to the DataStorageMap structure
+    */
+    void AddNewRecord(DataStorageRecord* newRecordPtr, DataStorageStructureHashMap* dataStorageStructureHashMap, DataStorageStructureMap* dataStorageStructureMap);
 
     /// \brief Returns the size of the DataStorageRecordSet
     /// \return size of the DataStorageRecordSet

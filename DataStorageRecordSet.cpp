@@ -17,9 +17,9 @@ void DataStorageRecordSet::AddNewRecord(const DataStorageRecordRef& newRecordRef
     RecordsSet.emplace(newRecordRefPtr);
 }
 
-void DataStorageRecordSet::AddNewRecord(DataStorageRecord* newRecordPtr, DataStorageStructureHashMap* dataStorageStructure)
+void DataStorageRecordSet::AddNewRecord(DataStorageRecord* newRecordPtr, DataStorageStructureHashMap* dataStorageStructureHashMap, DataStorageStructureMap* dataStorageStructureMap)
 {
-    RecordsSet.emplace(DataStorageRecordRef(newRecordPtr, dataStorageStructure));
+    RecordsSet.emplace(DataStorageRecordRef(newRecordPtr, dataStorageStructureHashMap, dataStorageStructureMap));
 }
 
 std::size_t DataStorageRecordSet::Size() const

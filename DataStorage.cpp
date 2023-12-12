@@ -13,9 +13,14 @@ void DataStorage::RemoveKey(const std::string& keyName)
 
     // Erase key from record template
     RecordTemplate.EraseData(keyName);
-    // Erase key from DataStorageStructure
-    DataStorageStructure.EraseData(keyName);
-    // Erase keyh from all maps
+
+    // Erase key from DataStorageHashMapStructure
+    DataStorageHashMapStructure.EraseData(keyName);
+
+    // Erase key from DataStorageMapStructure
+    DataStorageMapStructure.EraseData(keyName);
+
+    // Erase key from all maps
     DataStorageRecordAdders.erase(keyName);
     DataStorageRecordClearers.erase(keyName);
     DataStorageRecordErasers.erase(keyName);
@@ -36,7 +41,7 @@ DataStorageRecordRef DataStorage::CreateRecord()
     for (auto& it : DataStorageRecordAdders)
         it.second(newData);
 
-    return DataStorageRecordRef(newData, &DataStorageStructure);
+    return DataStorageRecordRef(newData, &DataStorageHashMapStructure, &DataStorageMapStructure);
 }
 
 DataStorageRecordRef DataStorage::CreateRecord(std::vector<std::pair<std::string, DataSaver>> params)
@@ -57,7 +62,7 @@ DataStorageRecordRef DataStorage::CreateRecord(std::vector<std::pair<std::string
     for (auto& it : DataStorageRecordAdders)
         it.second(newData);
     
-    return DataStorageRecordRef(newData, &DataStorageStructure);
+    return DataStorageRecordRef(newData, &DataStorageHashMapStructure, &DataStorageMapStructure);
 }
 
 DataStorageRecordSet DataStorage::GetAllRecords()
@@ -65,7 +70,7 @@ DataStorageRecordSet DataStorage::GetAllRecords()
     DataStorageRecordSet res;
     // Fill the result record set
     for (auto it = RecordsSet.begin(); it != RecordsSet.end(); ++it)
-        res.AddNewRecord(*it, &DataStorageStructure);
+        res.AddNewRecord(*it, &DataStorageHashMapStructure, &DataStorageMapStructure);
 
     return res;
 }
@@ -75,12 +80,20 @@ void DataStorage::DropDataStorage()
     // Clear record template
     RecordTemplate.Clear();
 
-    // Delete all unordered maps inside DataStorageStructure
-    for (auto& it : DataStorageStructure)
+    // Delete all unordered maps inside DataStorageHashMapStructure
+    for (auto& it : DataStorageHashMapStructure)
         it.second.ResetData();
 
-    // Clear DataStorageStructure
-    DataStorageStructure.Clear();
+    // Clear DataStorageHashMapStructure
+    DataStorageHashMapStructure.Clear();
+
+    // Delete all maps inside DataStorageMapStructure
+    for (auto& it : DataStorageMapStructure)
+        it.second.ResetData();
+
+    // Clear DataStorageMapStructure
+    DataStorageMapStructure.Clear();
+
 
     // Clear all maps with functions
     DataStorageRecordAdders.clear();
@@ -97,7 +110,7 @@ void DataStorage::DropDataStorage()
 
 void DataStorage::DropData()
 {
-    // Call functions to clear DataStorageStructure without
+    // Call functions to clear DataStorageHashMapStructure without
     for (auto& it : DataStorageRecordClearers)
         it.second();
 
@@ -137,8 +150,12 @@ std::size_t DataStorage::Size()
 
 DataStorage::~DataStorage()
 {
-    // Clear DataStorageStructure
-    for (auto& it : DataStorageStructure)
+    // Clear DataStorageHashMapStructure
+    for (auto& it : DataStorageHashMapStructure)
+        it.second.ResetData();
+
+    // Clear DataStorageMapStructure
+    for (auto& it : DataStorageMapStructure)
         it.second.ResetData();
 
     // Clear all records

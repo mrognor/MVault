@@ -54,8 +54,13 @@ class DataStorageRecordRef
 private:
     // Pointer to DataStorageRecord inside DataStorage
     DataStorageRecord* DataRecord = nullptr;
+
     // Pointer to DataStorageStructureHashMap 
-    DataStorageStructureHashMap* DataStorageStructure = nullptr;
+    DataStorageStructureHashMap* DataStorageHashMapStructure = nullptr;
+
+    // Pointer to DataStorageStructureMap 
+    DataStorageStructureMap* DataStorageMapStructure = nullptr;
+
     // Smart pointer wrapper to get info about data storage record validity
     SmartPointerWrapper<bool> IsDataStorageRecordValid;
 public:
@@ -69,10 +74,13 @@ public:
     /// Default constructor 
     DataStorageRecordRef();
 
-    /// \brief Constructor
-    /// \param [in] data a pointer to the record that will be stored inside DataStorageRecordRef
-    /// \param [in] dataStorageStructure pointer to the DataStorage structure
-    DataStorageRecordRef(DataStorageRecord* data, DataStorageStructureHashMap* dataStorageStructure);
+    /**
+        \brief Constructor
+        \param [in] data a pointer to the record that will be stored inside DataStorageRecordRef
+        \param [in] dataStorageStructureHashMap pointer to the DataStorageHashMap structure
+        \param [in] dataStorageStructureMap pointer to the DataStorageMap structure
+    */
+    DataStorageRecordRef(DataStorageRecord* data, DataStorageStructureHashMap* dataStorageStructureHashMap, DataStorageStructureMap* dataStorageStructureMap);
 
     /// \brief Comparison operator
     /// \param [in] other the object to compare with
@@ -99,18 +107,45 @@ public:
     {
         // A pointer for storing a std::unordered_multimap in which a template data type is used as a key, 
         // and a pointer to the DataHashMap is used as a value
-        std::unordered_multimap<T, DataStorageRecord*>* TtoDataStorageRecordMap = nullptr;
-        if (!DataStorageStructure->GetData(key, TtoDataStorageRecordMap)) return false;
+        std::unordered_multimap<T, DataStorageRecord*>* TtoDataStorageRecordHashMap = nullptr;
+
+        // A pointer for storing a std::multimap in which a template data type is used as a key, 
+        // and a pointer to the DataHashMap is used as a value
+        std::multimap<T, DataStorageRecord*>* TtoDataStorageRecordMap = nullptr;
+
+        // Get std::unordered_multimap with T key and DataStorageRecord* value
+        if (!DataStorageHashMapStructure->GetData(key, TtoDataStorageRecordHashMap)) return false;
+
+        // Get std::multimap with T key and DataStorageRecord* value
+        if (!DataStorageMapStructure->GetData(key, TtoDataStorageRecordMap)) return false;
 
         // Get the current value of the key key inside the DataStorageRecordRef and save it for further work
         T oldData;
         DataRecord->GetData(key, oldData);
 
-        // Remove oldData from TtoDataStorageRecordMap to DataStorage DataStorageStructure
-        auto FirstAndLastIteratorsWithKey = TtoDataStorageRecordMap->equal_range(oldData);
+        // Remove oldData from TtoDataStorageRecordHashMap from DataStorageHashMapStructure
+        auto FirstAndLastIteratorsWithKeyOnHashMap = TtoDataStorageRecordHashMap->equal_range(oldData);
 
         // Iterate over all data records with oldData key
-        for (auto& it = FirstAndLastIteratorsWithKey.first; it != FirstAndLastIteratorsWithKey.second; ++it)
+        for (auto& it = FirstAndLastIteratorsWithKeyOnHashMap.first; it != FirstAndLastIteratorsWithKeyOnHashMap.second; ++it)
+        {
+            // Find required data record
+            if (it->second == DataRecord)
+            {
+                TtoDataStorageRecordHashMap->erase(it);
+                break;
+            }
+        }
+
+        // Add new data to TtoDataStorageRecordHashMap to DataStorage DataStorageHashMapStructure
+        TtoDataStorageRecordHashMap->emplace(data, DataRecord);
+
+
+        // Remove oldData from TtoDataStorageRecordMap from DataStorageMapStructure
+        auto FirstAndLastIteratorsWithKeyOnMap = TtoDataStorageRecordMap->equal_range(oldData);
+
+        // Iterate over all data records with oldData key
+        for (auto& it = FirstAndLastIteratorsWithKeyOnMap.first; it != FirstAndLastIteratorsWithKeyOnMap.second; ++it)
         {
             // Find required data record
             if (it->second == DataRecord)
@@ -120,7 +155,7 @@ public:
             }
         }
 
-        // Add new data to TtoDataStorageRecordMap to DataStorage DataStorageStructure
+        // Add new data to TtoDataStorageRecordMap to DataStorage DataStorageMapStructure
         TtoDataStorageRecordMap->emplace(data, DataRecord);
 
         // Update data inside DataStorageRecord pointer inside DataStorageRecordRef and DataStorage

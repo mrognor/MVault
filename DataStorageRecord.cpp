@@ -15,7 +15,8 @@ DataStorageRecord::~DataStorageRecord()
 
 DataStorageRecordRef::DataStorageRecordRef() {}
 
-DataStorageRecordRef::DataStorageRecordRef(DataStorageRecord* data, DataStorageStructureHashMap* dataStorageStructure) : DataRecord(data), DataStorageStructure(dataStorageStructure) 
+DataStorageRecordRef::DataStorageRecordRef(DataStorageRecord* data, DataStorageStructureHashMap* dataStorageStructureHashMap, DataStorageStructureMap* dataStorageStructureMap) : 
+    DataRecord(data), DataStorageHashMapStructure(dataStorageStructureHashMap), DataStorageMapStructure(dataStorageStructureMap)
 {
     IsDataStorageRecordValid = data->IsDataStorageRecordValid;
 }
@@ -47,7 +48,9 @@ bool DataStorageRecordRef::IsValid() const
 
 void DataStorageRecordRef::Unlink()
 {
-    DataStorageRecord* DataRecord = nullptr;
-    DataStorageStructureHashMap* DataStorageStructure = nullptr;
+    DataRecord = nullptr;
+    DataStorageHashMapStructure = nullptr;
+    DataStorageMapStructure = nullptr;
+
     IsDataStorageRecordValid.Unlink();
 }

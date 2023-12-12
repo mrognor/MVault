@@ -28,15 +28,30 @@ private:
     // Template of data stored inside DataStorage
     DataStorageRecord RecordTemplate;
 
-    /*
-        Data storage structure inside DataStorage
+    /**
+        A simple typedef for HashMap. It is necessary for a more understandable separation of types.
+        Represents the internal structure of the DataStorage.
         A string with the name of the key is used as the key. All keys are the same as in DataStorage.
         The value stores a pointer to std::unordered_multimap<T, DataStorageRecord*>.
-        Such a complex structure is needed to quickly search for each key with any type.
         The key type is same as the DataStorage key value type.
         The value is a pointer to DataStorageRecord.
+
+        Such a complex structure is needed to quickly, in O(1), search for each key with any type.
     */
-    DataStorageStructureHashMap DataStorageStructure;
+    DataStorageStructureHashMap DataStorageHashMapStructure;
+
+    /**
+        A simple typedef for Map. It is necessary for a more understandable separation of types.
+        Represents the internal structure of the DataStorage.
+        A string with the name of the key is used as the key. All keys are the same as in DataStorage.
+        The value stores a pointer to std::multimap<T, DataStorageRecord*>.
+        The key type is same as the DataStorage key value type.
+        The value is a pointer to DataStorageRecord.
+
+        Such a complex structure is necessary in order to quickly, in O(log n), 
+        find a set of elements that meet a certain requirement, for example, more than a certain value or less than this value
+    */
+    DataStorageStructureMap DataStorageMapStructure;
 
     // unordered_map of functions that add a new element to the DataStorageStructureHashMap
     std::unordered_map<std::string, std::function<void(DataStorageRecord*)>> DataStorageRecordAdders;
@@ -74,11 +89,19 @@ public:
         // Add data to template
         RecordTemplate.SetData(keyName, defaultKeyValue);
 
-        // Create new map to store data with template T key
-        std::unordered_multimap<T, DataStorageRecord*>* TtoDataStorageRecordMap = new std::unordered_multimap<T, DataStorageRecord*>;
-        DataStorageStructure.SetData(keyName, TtoDataStorageRecordMap, [](const void* ptr)
+        // Create new hash map to store data with template T key
+        std::unordered_multimap<T, DataStorageRecord*>* TtoDataStorageRecordHashMap = new std::unordered_multimap<T, DataStorageRecord*>;
+        DataStorageHashMapStructure.SetData(keyName, TtoDataStorageRecordHashMap, [](const void* ptr)
             {
                 delete* (std::unordered_multimap<T, DataStorageRecord*>**)ptr;
+            }
+        );
+
+        // Create new map to store data with template T key
+        std::multimap<T, DataStorageRecord*>* TtoDataStorageRecordMap = new std::multimap<T, DataStorageRecord*>;
+        DataStorageMapStructure.SetData(keyName, TtoDataStorageRecordMap, [](const void* ptr)
+            {
+                delete* (std::multimap<T, DataStorageRecord*>**)ptr;
             }
         );
 
@@ -89,18 +112,20 @@ public:
                 T value = defaultKeyValue;
                 // Try to get key value from new record. If it is not value inside then defaultKeyValue will be used
                 newRecord->GetData(keyName, value);
+                TtoDataStorageRecordHashMap->emplace(value, newRecord);
                 TtoDataStorageRecordMap->emplace(value, newRecord);
             }
         );
 
-        // Add function to TtoDataStorageRecordMap cleareing
+        // Add function to TtoDataStorageRecordHashMap cleareing
         DataStorageRecordClearers.emplace(keyName, [=]()
             {
+                TtoDataStorageRecordHashMap->clear();
                 TtoDataStorageRecordMap->clear();
             }
         );
 
-        // Add function to erase newRecord from TtoDataStorageRecordMap
+        // Add function to erase newRecord from TtoDataStorageRecordHashMap
         DataStorageRecordErasers.emplace(keyName, [=](DataStorageRecord* newRecord)
             {
                 // Get T type data with keyName key
@@ -108,10 +133,22 @@ public:
                 newRecord->GetData(keyName, recordTData);
 
                 // Find all elements on multi_map with recordTData value
-                auto FirstAndLastIteratorsWithKey = TtoDataStorageRecordMap->equal_range(recordTData);
+                auto FirstAndLastIteratorsWithKeyOnHashMap = TtoDataStorageRecordHashMap->equal_range(recordTData);
 
-                // Find newRecord and erase it from TtoDataStorageRecordMap
-                for (auto& it = FirstAndLastIteratorsWithKey.first; it != FirstAndLastIteratorsWithKey.second; ++it)
+                // Find newRecord and erase it from TtoDataStorageRecordHashMap
+                for (auto& it = FirstAndLastIteratorsWithKeyOnHashMap.first; it != FirstAndLastIteratorsWithKeyOnHashMap.second; ++it)
+                {
+                    if (it->second == newRecord)
+                    {
+                        TtoDataStorageRecordHashMap->erase(it);
+                        break;
+                    }
+                }
+
+                // Find all elements on map with recordTData value
+                auto FirstAndLastIteratorsWithKeyOnMap = TtoDataStorageRecordMap->equal_range(recordTData);
+                // Find newRecord and erase it from TtoDataStorageRecordHashMap
+                for (auto& it = FirstAndLastIteratorsWithKeyOnMap.first; it != FirstAndLastIteratorsWithKeyOnMap.second; ++it)
                 {
                     if (it->second == newRecord)
                     {
@@ -126,6 +163,7 @@ public:
         for (auto& it : RecordsSet)
         {
             it->SetData(keyName, defaultKeyValue);
+            TtoDataStorageRecordHashMap->emplace(defaultKeyValue, it);
             TtoDataStorageRecordMap->emplace(defaultKeyValue, it);
         }
     }
@@ -227,20 +265,21 @@ public:
     DataStorageRecordRef GetRecord(const std::string& keyName, const T& keyValue)
     {
         // Pointer to store map inside DataStorageStructureHashMap
-        std::unordered_multimap<T, DataStorageRecord*>* TtoDataStorageRecordMap = nullptr;
+        std::unordered_multimap<T, DataStorageRecord*>* TtoDataStorageRecordHashMap = nullptr;
 
         DataStorageRecordRef res;
 
         // Checking whether such a key exists
-        if (DataStorageStructure.GetData(keyName, TtoDataStorageRecordMap))
+        if (DataStorageHashMapStructure.GetData(keyName, TtoDataStorageRecordHashMap))
         {
             // Iterator to element with T type and keyValue value
-            auto TtoDataStorageRecordIt = TtoDataStorageRecordMap->find(keyValue);
-            if (TtoDataStorageRecordIt != TtoDataStorageRecordMap->end())
+            auto TtoDataStorageRecordIt = TtoDataStorageRecordHashMap->find(keyValue);
+            if (TtoDataStorageRecordIt != TtoDataStorageRecordHashMap->end())
             {
                 // Set data to DataStorageRecordRef
                 res.DataRecord = TtoDataStorageRecordIt->second;
-                res.DataStorageStructure = &DataStorageStructure;
+                res.DataStorageHashMapStructure = &DataStorageHashMapStructure;
+                res.DataStorageMapStructure = &DataStorageMapStructure;
                 res.IsDataStorageRecordValid = true;
                 return res;
             }
@@ -263,19 +302,19 @@ public:
     bool GetRecords(const std::string& keyName, const T& keyValue, DataStorageRecordSet& foundedRecords)
     {
         // Pointer to store map inside DataStorageStructureHashMap
-        std::unordered_multimap<T, DataStorageRecord*>* TtoDataStorageRecordMap = nullptr;
+        std::unordered_multimap<T, DataStorageRecord*>* TtoDataStorageRecordHashMap = nullptr;
 
         // Checking whether such a key exists
-        if (DataStorageStructure.GetData(keyName, TtoDataStorageRecordMap))
+        if (DataStorageHashMapStructure.GetData(keyName, TtoDataStorageRecordHashMap))
         {
             // Iterator to element with T type and keyValue value
-            auto FirstAndLastIteratorsWithKey = TtoDataStorageRecordMap->equal_range(keyValue);
+            auto FirstAndLastIteratorsWithKey = TtoDataStorageRecordHashMap->equal_range(keyValue);
 
             foundedRecords.Clear();
 
             // Fill the result record set
             for (auto& it = FirstAndLastIteratorsWithKey.first; it != FirstAndLastIteratorsWithKey.second; ++it)
-                foundedRecords.AddNewRecord(it->second, &DataStorageStructure);
+                foundedRecords.AddNewRecord(it->second, &DataStorageHashMapStructure, &DataStorageMapStructure);
 
             return true;
         }
