@@ -54,8 +54,8 @@ class DataStorageRecordRef
 private:
     // Pointer to DataStorageRecord inside DataStorage
     DataStorageRecord* DataRecord = nullptr;
-    // Pointer to DataStorageStruct 
-    DataStorageStruct* DataStorageStructure = nullptr;
+    // Pointer to DataStorageStructureHashMap 
+    DataStorageStructureHashMap* DataStorageStructure = nullptr;
     // Smart pointer wrapper to get info about data storage record validity
     SmartPointerWrapper<bool> IsDataStorageRecordValid;
 public:
@@ -72,7 +72,7 @@ public:
     /// \brief Constructor
     /// \param [in] data a pointer to the record that will be stored inside DataStorageRecordRef
     /// \param [in] dataStorageStructure pointer to the DataStorage structure
-    DataStorageRecordRef(DataStorageRecord* data, DataStorageStruct* dataStorageStructure);
+    DataStorageRecordRef(DataStorageRecord* data, DataStorageStructureHashMap* dataStorageStructure);
 
     /// \brief Comparison operator
     /// \param [in] other the object to compare with

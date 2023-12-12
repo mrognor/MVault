@@ -49,7 +49,7 @@ public:
     /// \brief A method for adding a new DataStorageRecordRef inside a DataStorageRecordRefSet
     /// \param [in] newRecordPtr a pointer to an record in DataStorage
     /// \param [in] dataStorageStructure pointer to the DataStorage structure
-    void AddNewRecord(DataStorageRecord* newRecordPtr, DataStorageStruct* dataStorageStructure);
+    void AddNewRecord(DataStorageRecord* newRecordPtr, DataStorageStructureHashMap* dataStorageStructure);
 
     /// \brief Returns the size of the DataStorageRecordSet
     /// \return size of the DataStorageRecordSet

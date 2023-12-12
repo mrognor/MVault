@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <map>
 
 #include "DataSaver.h"
 
@@ -206,13 +207,49 @@ public:
     }
 };
 
+/// Specialization of class DataContainer, used as a type std::map<std::string, DataSaver>
+class DataMap : public DataContainer<std::map<std::string, DataSaver>> {};
+
+/// Specialization of class DataContainer, used as a type std::multimap<std::string, DataSaver>
+class DataMultiMap : public DataContainer<std::multimap<std::string, DataSaver>>
+{
+public:
+    /**
+        \brief A function for searching for multiple elements with the same keys
+
+        Wrapper over std::unordered_multimap<std::string, DataSaver>::equal_range
+
+        \param [in] key key to find in container
+
+        \return pair of iterators. The first iterator points to the first element with the same key, and the second to the last element
+    */
+    std::pair<DataContainer::iterator, DataContainer::iterator> GetAllData(const std::string& key)
+    {
+        return Container.equal_range(key);
+    }
+};
+
 /**
     A simple typedef for HashMap. It is necessary for a more understandable separation of types.
     Represents the internal structure of the DataStorage.
     A string with the name of the key is used as the key. All keys are the same as in DataStorage.
     The value stores a pointer to std::unordered_multimap<T, DataStorageRecord*>.
-    Such a complex structure is needed to quickly search for each key with any type.
     The key type is same as the DataStorage key value type.
     The value is a pointer to DataStorageRecord.
+
+    Such a complex structure is needed to quickly, in O(1), search for each key with any type.
 */
-typedef DataHashMap DataStorageStruct;
+typedef DataHashMap DataStorageStructureHashMap;
+
+/**
+    A simple typedef for Map. It is necessary for a more understandable separation of types.
+    Represents the internal structure of the DataStorage.
+    A string with the name of the key is used as the key. All keys are the same as in DataStorage.
+    The value stores a pointer to std::multimap<T, DataStorageRecord*>.
+    The key type is same as the DataStorage key value type.
+    The value is a pointer to DataStorageRecord.
+
+    Such a complex structure is necessary in order to quickly, in O(log n), 
+    find a set of elements that meet a certain requirement, for example, more than a certain value or less than this value
+*/
+typedef DataMap DataStorageStructureMap;

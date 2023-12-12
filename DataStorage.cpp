@@ -32,7 +32,7 @@ DataStorageRecordRef DataStorage::CreateRecord()
     // Add new record to set
     RecordsSet.emplace(newData);
 
-    // Add new record to every maps inside DataStorageStruct
+    // Add new record to every maps inside DataStorageStructureHashMap
     for (auto& it : DataStorageRecordAdders)
         it.second(newData);
 
@@ -53,7 +53,7 @@ DataStorageRecordRef DataStorage::CreateRecord(std::vector<std::pair<std::string
     RecordsSet.emplace(newData);
 
 
-    // Add new record to every maps inside DataStorageStruct
+    // Add new record to every maps inside DataStorageStructureHashMap
     for (auto& it : DataStorageRecordAdders)
         it.second(newData);
     

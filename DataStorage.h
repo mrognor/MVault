@@ -36,9 +36,9 @@ private:
         The key type is same as the DataStorage key value type.
         The value is a pointer to DataStorageRecord.
     */
-    DataStorageStruct DataStorageStructure;
+    DataStorageStructureHashMap DataStorageStructure;
 
-    // unordered_map of functions that add a new element to the DataStorageStruct
+    // unordered_map of functions that add a new element to the DataStorageStructureHashMap
     std::unordered_map<std::string, std::function<void(DataStorageRecord*)>> DataStorageRecordAdders;
 
     // unordered_map of functions that delete all data from the unordered_map's stored in the DataStorageRecordAdders
@@ -226,7 +226,7 @@ public:
     template <class T>
     DataStorageRecordRef GetRecord(const std::string& keyName, const T& keyValue)
     {
-        // Pointer to store map inside DataStorageStruct
+        // Pointer to store map inside DataStorageStructureHashMap
         std::unordered_multimap<T, DataStorageRecord*>* TtoDataStorageRecordMap = nullptr;
 
         DataStorageRecordRef res;
@@ -262,7 +262,7 @@ public:
     template <class T>
     bool GetRecords(const std::string& keyName, const T& keyValue, DataStorageRecordSet& foundedRecords)
     {
-        // Pointer to store map inside DataStorageStruct
+        // Pointer to store map inside DataStorageStructureHashMap
         std::unordered_multimap<T, DataStorageRecord*>* TtoDataStorageRecordMap = nullptr;
 
         // Checking whether such a key exists

@@ -17,7 +17,7 @@ void DataStorageRecordSet::AddNewRecord(const DataStorageRecordRef& newRecordRef
     RecordsSet.emplace(newRecordRefPtr);
 }
 
-void DataStorageRecordSet::AddNewRecord(DataStorageRecord* newRecordPtr, DataStorageStruct* dataStorageStructure)
+void DataStorageRecordSet::AddNewRecord(DataStorageRecord* newRecordPtr, DataStorageStructureHashMap* dataStorageStructure)
 {
     RecordsSet.emplace(DataStorageRecordRef(newRecordPtr, dataStorageStructure));
 }

@@ -137,7 +137,6 @@ void PrintDataStorageRecord(const DataStorageRecordRef& recRef)
 
 void Example1(DataStorage& ds)
 {
-    /// \page main \code
     std::cout << "Example 1. Simple addition and deletion of records" << std::endl;
 
     // ================================================================ //
@@ -247,7 +246,6 @@ void Example1(DataStorage& ds)
 
     // Drop table
     ds.DropDataStorage();
-    /// \endcode
 }
 
 int main()
