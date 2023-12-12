@@ -150,7 +150,9 @@ public:
             if (*RefCounter == 1)
             {
                 delete RefCounter;
+                RefCounter = nullptr;
                 delete Data;
+                Data = nullptr;
             }
             else
             {

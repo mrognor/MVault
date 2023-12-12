@@ -322,6 +322,37 @@ public:
         return false;
     }
 
+    /**
+        \brief The method for getting a set of references to the data inside DataStorage
+
+        \param [in] keyName the name of the key to search for
+        \param [in] request request for data
+        \param [out] foundedRecords a ref to the DataStorageRecordSet where all found records will be placed
+
+        \return returns true if the key was found otherwise returns false
+    */
+    template <class T>
+    bool RequestRecords(const std::string& keyName, const DataStorageRequest<T>& request, DataStorageRecordSet& foundedRecords)
+    {
+        // Pointer to store map inside DataStorageStructureHashMap
+        std::multimap<T, DataStorageRecord*>* TtoDataStorageRecordMap = nullptr;
+
+
+        // Checking whether such a key exists
+        if (DataStorageMapStructure.GetData(keyName, TtoDataStorageRecordMap))
+        {
+            foundedRecords.Clear();
+
+            auto begAndEndIterators = request.ProcessRequest(TtoDataStorageRecordMap);
+
+            for (auto& it = begAndEndIterators.first; it != begAndEndIterators.second; ++it)
+                foundedRecords.AddNewRecord(DataStorageRecordRef(it->second, &DataStorageHashMapStructure, &DataStorageMapStructure));
+
+            return true;
+        }
+
+        return false;
+    }
 
     /// \brief The method for getting a set of all references to the data inside DataStorage
     /// \return returns a set of all records refs

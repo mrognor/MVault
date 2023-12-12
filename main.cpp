@@ -570,4 +570,72 @@ int main()
     ds.EraseRecord(dsrr);
 
     std::cout << dsrr.IsValid() << std::endl;
+
+    std::cout << "Phase 8. Requests" << std::endl;
+    ds.DropDataStorage();
+
+    ds.SetKey("id", 0);
+
+    for (int i = 0; i < 20; ++i)
+        ds.CreateRecord({ {"id", i} });
+    
+    ds.RequestRecords("id", GreaterOrEqual<int>(10), opset);
+
+    for (auto& it : opset)
+    {
+        int id;
+        it.GetData("id", id);
+        std::cout << id << " ";
+    }
+    std::cout << std::endl;
+
+    ds.RequestRecords("id", Greater<int>(15), opset);
+
+    for (auto& it : opset)
+    {
+        int id;
+        it.GetData("id", id);
+        std::cout << id << " ";
+    }
+    std::cout << std::endl;
+
+    ds.RequestRecords("id", LessOrEqual<int>(10), opset);
+
+    for (auto& it : opset)
+    {
+        int id;
+        it.GetData("id", id);
+        std::cout << id << " ";
+    }
+    std::cout << std::endl;
+
+    ds.RequestRecords("id", Less<int>(3), opset);
+
+    for (auto& it : opset)
+    {
+        int id;
+        it.GetData("id", id);
+        std::cout << id << " ";
+    }
+    std::cout << std::endl;
+
+    ds.RequestRecords("id", Between<int>(15, 5), opset);
+
+    for (auto& it : opset)
+    {
+        int id;
+        it.GetData("id", id);
+        std::cout << id << " ";
+    }
+    std::cout << std::endl;
+
+        ds.RequestRecords("id", Between<int>(5, 15), opset);
+
+    for (auto& it : opset)
+    {
+        int id;
+        it.GetData("id", id);
+        std::cout << id << " ";
+    }
+    std::cout << std::endl;
 }
