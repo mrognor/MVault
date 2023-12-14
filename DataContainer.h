@@ -183,6 +183,13 @@ public:
     {
         Container.clear();
     }
+
+    /// \brief Method for getting the container size
+    /// \return Container size
+    std::size_t Size()
+    {
+        return Container.size();
+    }
 };
 
 /// Specialization of class DataContainer, used as a type std::unordered_map<std::string, DataSaver>

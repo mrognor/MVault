@@ -240,7 +240,7 @@ public:
 };
 
 /*! 
-    \defgroup functions DataStorage functions
+    \defgroup DataStorageFunctions DataStorage functions
     \brief All functions for working with DataStorage
 
     @{      

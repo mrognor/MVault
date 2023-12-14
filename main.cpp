@@ -574,7 +574,7 @@ int main()
     std::cout << "Phase 8. Requests" << std::endl;
     ds.DropDataStorage();
 
-    ds.SetKey("id", 0);
+    ds.SetKey("id", -1);
 
     for (int i = 0; i < 20; ++i)
         ds.CreateRecord({ {"id", i} });
@@ -629,7 +629,7 @@ int main()
     }
     std::cout << std::endl;
 
-        ds.RequestRecords("id", Between<int>(5, 15), opset);
+    ds.RequestRecords("id", Between<int>(5, 15), opset);
 
     for (auto& it : opset)
     {
@@ -638,4 +638,16 @@ int main()
         std::cout << id << " ";
     }
     std::cout << std::endl;
+
+    std::cout << "Phase 10. Save to file" << std::endl;
+
+    ds.SetKey<std::string>("string", "none");
+    ds.CreateRecord({ {"string", std::string("test")} });
+    ds.CreateRecord({ {"string", std::string("ab ob a")} });
+    ds.CreateRecord({ {"string", std::string(",")} });
+    ds.CreateRecord({ {"string", std::string(" , ")} });
+    ds.CreateRecord({ {"string", std::string("\"")} });
+    ds.CreateRecord({ {"string", std::string(",\"\",")} });
+
+    ds.SaveToFile("Test.csv");
 }

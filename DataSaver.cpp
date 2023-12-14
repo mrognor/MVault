@@ -30,12 +30,19 @@ DataSaver& DataSaver::operator=(const DataSaver& dataSaver)
         {
             // Create new DataType object copying data type from dataSaver
             DataType = new DataTypeSaver(dataSaver.DataType->GetDataType());
+            
             // Set new CopyFunc from dataSaver
             CopyFunc = dataSaver.CopyFunc;
+            
             // Call new copy func to copy data from dataSaver void pointer to local void pointer. Data to Ptr will be allocated inside function
             CopyFunc(Ptr, dataSaver.Ptr);
+
+            // Cope to string function
+            ToStringFunc = dataSaver.ToStringFunc;
+
             // Set delete function from dataSaver
             DeleteFunc = dataSaver.DeleteFunc;
+            
             // Set custom delete function from dataSaver
             CustomDeleteFunc = dataSaver.CustomDeleteFunc;
         }
@@ -71,6 +78,7 @@ void DataSaver::ResetData()
     }
 
     CopyFunc = nullptr;
+    ToStringFunc = nullptr;
 }
 
 void DataSaver::Swap(DataSaver& dataSaver)
@@ -78,6 +86,11 @@ void DataSaver::Swap(DataSaver& dataSaver)
     DataSaver tmp = dataSaver;
     dataSaver = *this;
     *this = tmp;
+}
+
+std::string DataSaver::Str() const
+{
+    return ToStringFunc(Ptr);
 }
 
 DataSaver::~DataSaver()

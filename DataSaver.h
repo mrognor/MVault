@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <sstream>
 
 /**
     \brief Class to make real time type check
@@ -44,6 +45,9 @@ private:
 
     // Pointer to delete function. Required to delete pointer since it is not possibly to delete void*
     void (*DeleteFunc)(void*& ptrToDelete) = nullptr;
+
+    // A pointer to a function that will convert the value stored inside to a string
+    std::string (*ToStringFunc)(const void* ptrToPrint) = nullptr;
 
     // Pointer to custom delete function. Required to delete data if it is pointer
     void (*CustomDeleteFunc)(const void* ptr) = nullptr;
@@ -130,6 +134,14 @@ public:
                 delete static_cast<T*>(ptrToDelete);
             };
 
+        // Set new to string function
+        ToStringFunc = [](const void* ptrToPrint)
+            {
+                std::stringstream ss;
+                ss << *((T*)(ptrToPrint));
+                return ss.str();
+            };
+
         // Set custom delete function from dataSaver
         CustomDeleteFunc = customDeleteFunc;
     }
@@ -163,6 +175,10 @@ public:
     /// \brief Swap data between 2 DataSavers
     /// \param [in, out] dataSaver dataSaver from where the data will be copied to this and where the data from this will be written
     void Swap(DataSaver& dataSaver);
+
+    /// \brief A method for getting a string that represents data inside a class object
+    /// \return A string of data
+    std::string Str() const;
 
     /// Default destructor
     ~DataSaver();

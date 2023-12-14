@@ -1,5 +1,5 @@
-HEADERS = DataStorage.h DataStorageRecordSet.h DataStorageRecord.h DataContainer.h DataSaver.h SmartPointerWrapper.h
-SOURCES = DataStorage.cpp DataStorageRecordSet.cpp DataStorageRecord.cpp DataSaver.cpp
+HEADERS = DataStorage.h DataStorageRecordSet.h DataStorageRecord.h DataContainer.h DataSaver.h SmartPointerWrapper.h CsvParser.h
+SOURCES = DataStorage.cpp DataStorageRecordSet.cpp DataStorageRecord.cpp DataSaver.cpp CsvParser.cpp
 
 LDFLAGS =
 FILEXT =

@@ -9,6 +9,7 @@
 #include "DataContainer.h"
 #include "DataStorageRecord.h"
 #include "DataStorageRecordSet.h"
+#include "CsvParser.h"
 
 /**
     \brief A class for storing data with the ability to quickly search for a variety of different keys of any type
@@ -375,6 +376,11 @@ public:
     /// \brief Method for getting the number of records
     /// \return number of records
     std::size_t Size();
+
+    /// \brief A method for saving data to a table file. The file format is csv
+    /// \param fileName The file name to save the data, the extension must be specified manually
+    /// \return It will return true if it was possible to open the file and write the data, otherwise it will return false
+    bool SaveToFile(const std::string& fileName);
 
     /// Default destructor 
     ~DataStorage();

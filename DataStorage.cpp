@@ -148,6 +148,45 @@ std::size_t DataStorage::Size()
     return RecordsSet.size();
 }
 
+bool DataStorage::SaveToFile(const std::string& fileName)
+{
+    std::ofstream csvFile(fileName);
+
+    if (!csvFile.is_open())
+    {
+        std::cout << "Failed to open file!" << std::endl;
+        return false;
+    }
+
+    auto it = DataStorageHashMapStructure.begin();
+    csvFile << it->first;
+    ++it;
+    for (;it != DataStorageHashMapStructure.end(); ++it)
+        csvFile << "," << it->first;
+    csvFile << std::endl;
+
+    for (const auto& record : RecordsSet)
+    {
+        // Getting the number of items in a record 
+        std::size_t counter = record->Size();
+        for (const auto& recordKeyValue : *record)
+        {
+            // Calling the string formatting function for the csv format
+            csvFile << FormatStringToCsv(recordKeyValue.second.Str());
+            
+            // Checking not to write a comma to the end of the line
+            if (counter == 1) break;
+            
+            csvFile << ",";
+            --counter;
+        }
+        csvFile << std::endl;
+    }
+
+    csvFile.close();
+    return true;
+}
+
 DataStorage::~DataStorage()
 {
     // Clear DataStorageHashMapStructure
