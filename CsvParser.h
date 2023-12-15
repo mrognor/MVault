@@ -1,8 +1,10 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <fstream>
 #include <sstream>
+#include <iostream>
 
 /*! 
     \defgroup CsvParserFunctions Csv parser functions
@@ -13,7 +15,7 @@
 
 
 /**
-    \brief A function for converting a string to a csv field format
+    \brief A function for converting a string to a csv field format. Hello
 
     In csv files, the fields of one record are separated by commas. To store commas inside a field, the field is placed in double quotes.  
     To store quotes inside a field, the fields are pla  ced in quotation marks, and all quotes inside the field are duplicated.  
@@ -31,7 +33,8 @@
 
     \return returns a string in csv format
 */
-
 std::string FormatStringToCsv(const std::string& str);
+
+bool ReadCsvFile(const std::string& fileName, std::vector<std::vector<std::string>>& records);
 
 /*! @} */
