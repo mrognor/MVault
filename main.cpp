@@ -650,4 +650,18 @@ int main()
     ds.CreateRecord({ {"string", std::string(",\"\",")} });
 
     ds.SaveToFile("Test.csv");
+
+    std::cout << "Phase 11. Read from file" << std::endl;
+
+    ds.ReadFromFile("TestRead.csv");
+
+    dsrr = ds.GetRecord("name", std::string("mrognor"));
+    if (dsrr.IsValid())
+    {
+        std::string id, gender;
+        dsrr.GetData("id", id);
+        dsrr.GetData("gender", gender);
+
+        std::cout << "Requested record: id:" << id << " name: mrognor gender: " << gender << std::endl;
+    }
 }

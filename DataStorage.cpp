@@ -150,14 +150,17 @@ std::size_t DataStorage::Size()
 
 bool DataStorage::SaveToFile(const std::string& fileName)
 {
+    // Open or create file to save data
     std::ofstream csvFile(fileName);
 
+    // Checking whether the file was opened successfully
     if (!csvFile.is_open())
     {
         std::cout << "Failed to open file!" << std::endl;
         return false;
     }
 
+    // Save keys to file
     auto it = DataStorageHashMapStructure.begin();
     csvFile << it->first;
     ++it;
@@ -187,6 +190,39 @@ bool DataStorage::SaveToFile(const std::string& fileName)
     return true;
 }
 
+bool DataStorage::ReadFromFile(const std::string& fileName)
+{
+    // Clear old data storage structure
+    DropDataStorage();
+
+    // Vector with all records in csv file
+    std::vector<std::vector<std::string>> records;
+    
+    // Try to read csv file
+    if (!ReadCsvFile(fileName, records))
+        return false;
+
+    // Empty check
+    if (records.size() == 0)
+        return true;
+    
+    // Fill keys in data storage
+    for (std::size_t i = 0; i < records[0].size(); ++i)
+        SetKey<std::string>(records[0][i], "");
+    
+    DataStorageRecordRef recordRef;
+
+    // Fill records in data storage
+    for (std::size_t i = 1; i < records.size(); ++i)
+    {
+        recordRef = CreateRecord();
+        for (std::size_t j = 0; j < records[i].size(); ++j)
+            recordRef.SetData(records[0][j], records[i][j]);
+    }
+
+    return true;
+}
+    
 DataStorage::~DataStorage()
 {
     // Clear DataStorageHashMapStructure

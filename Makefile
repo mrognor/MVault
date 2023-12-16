@@ -12,9 +12,9 @@ ifneq ($(OS), Windows_NT)
 	LDFLAGS +=-fsanitize=address
 endif
 
-all: DataStorage
+all: DataStorage$(FILEXT)
 
-DataStorage: $(HEADERS) $(SOURCES) main.cpp
+DataStorage$(FILEXT): $(HEADERS) $(SOURCES) main.cpp
 	g++ -g main.cpp $(SOURCES) $(LDFLAGS) -o DataStorage$(FILEXT)
 
 clean:

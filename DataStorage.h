@@ -382,6 +382,19 @@ public:
     /// \return It will return true if it was possible to open the file and write the data, otherwise it will return false
     bool SaveToFile(const std::string& fileName);
 
+    /**
+        \brief The file name to save the data, the extension must be specified manually
+        
+        This method deletes all old keys and reads new ones from the file. 
+        It treats the first line in the csv file as a list of keys. 
+        The string is used as the key type.
+
+        \param [in] fileName The file name to read the data
+        
+        \return It will return true if it was possible to open the file and read the data, otherwise it will return false
+     */
+    bool ReadFromFile(const std::string& fileName);
+    
     /// Default destructor 
     ~DataStorage();
 };
