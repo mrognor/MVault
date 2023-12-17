@@ -33,7 +33,7 @@ std::string DataStorageRecordRef::GetRecordUniqueId() const
     return ss.str();
 }
 
-void DataStorageRecordRef::SetData(std::vector<std::pair<std::string, DataSaver>> params)
+void DataStorageRecordRef::SetData(const std::vector<std::pair<std::string, DataSaver>>& params)
 {
         // Copy data from function parametrs
     for (auto& it : params)

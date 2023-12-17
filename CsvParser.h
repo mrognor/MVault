@@ -46,4 +46,33 @@ std::string FormatStringToCsv(const std::string& str);
  */
 bool ReadCsvFile(const std::string& fileName, std::vector<std::vector<std::string>>& records);
 
+/// \todo Добавить описание
+template <class T>
+std::string ToString(const T& data) { return ""; }
+ 
+template <class T = std::string>
+std::string ToString(const std::string& data) { return data; }
+
+template <class T = int>
+std::string ToString(const int& data) { return std::to_string(data); }
+
+template <class T = bool>
+std::string ToString(const bool& data) 
+{ 
+    if (data) return "true";
+    else return "false"; 
+}
+
+template <class T>
+void FromString(const std::string& stringToCopyDataFrom, T& data) {}
+
+template <class T = std::string>
+void FromString(const std::string& stringToCopyDataFrom, std::string& data) { data = stringToCopyDataFrom; }
+
+template <class T = int>
+void FromString(const std::string& stringToCopyDataFrom, int& data) { data = std::stoi(stringToCopyDataFrom); }
+
+template <class T = float>
+void FromString(const std::string& stringToCopyDataFrom, float& data) { data = std::stof(stringToCopyDataFrom); }
+
 /*! @} */

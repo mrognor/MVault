@@ -1,7 +1,8 @@
 #pragma once
 
 #include <iostream>
-#include <sstream>
+
+#include "CsvParser.h"
 
 /**
     \brief Class to make real time type check
@@ -47,7 +48,10 @@ private:
     void (*DeleteFunc)(void*& ptrToDelete) = nullptr;
 
     // A pointer to a function that will convert the value stored inside to a string
-    std::string (*ToStringFunc)(const void* ptrToPrint) = nullptr;
+    std::string (*ToStringFunc)(void* ptrToPrint) = nullptr;
+
+    // A pointer to a function that converts a string to the type inside DataSaver and stores the value inside
+    void (*FromStringFunc)(const std::string stringToCopyDataFrom, void* ptrToPutStringInto) = nullptr;
 
     // Pointer to custom delete function. Required to delete data if it is pointer
     void (*CustomDeleteFunc)(const void* ptr) = nullptr;
@@ -135,11 +139,15 @@ public:
             };
 
         // Set new to string function
-        ToStringFunc = [](const void* ptrToPrint)
+        ToStringFunc = [](void* ptrToPrint)
             {
-                std::stringstream ss;
-                ss << *((T*)(ptrToPrint));
-                return ss.str();
+                return ToString(*((T*)(ptrToPrint)));
+            };
+
+        // Set new from string function
+        FromStringFunc = [](const std::string stringToCopyDataFrom, void* ptrToPutStringInto)
+            {
+                FromString(stringToCopyDataFrom, *((T*)(ptrToPutStringInto)));
             };
 
         // Set custom delete function from dataSaver
@@ -179,6 +187,10 @@ public:
     /// \brief A method for getting a string that represents data inside a class object
     /// \return A string of data
     std::string Str() const;
+
+    /// \brief A function to convert a string to a type stored inside DataSaver and save this value
+    /// \param stringToCopyDataFrom the line from where you want to copy the value
+    void SetDataFromString(const std::string stringToCopyDataFrom);
 
     /// Default destructor
     ~DataSaver();

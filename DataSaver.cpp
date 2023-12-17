@@ -37,8 +37,11 @@ DataSaver& DataSaver::operator=(const DataSaver& dataSaver)
             // Call new copy func to copy data from dataSaver void pointer to local void pointer. Data to Ptr will be allocated inside function
             CopyFunc(Ptr, dataSaver.Ptr);
 
-            // Cope to string function
+            // Copy to string function
             ToStringFunc = dataSaver.ToStringFunc;
+
+            // Copy from string function
+            FromStringFunc = dataSaver.FromStringFunc;
 
             // Set delete function from dataSaver
             DeleteFunc = dataSaver.DeleteFunc;
@@ -79,6 +82,7 @@ void DataSaver::ResetData()
 
     CopyFunc = nullptr;
     ToStringFunc = nullptr;
+    FromStringFunc = nullptr;
 }
 
 void DataSaver::Swap(DataSaver& dataSaver)
@@ -91,6 +95,11 @@ void DataSaver::Swap(DataSaver& dataSaver)
 std::string DataSaver::Str() const
 {
     return ToStringFunc(Ptr);
+}
+
+void DataSaver::SetDataFromString(const std::string stringToCopyDataFrom)
+{
+    FromStringFunc(stringToCopyDataFrom, Ptr);
 }
 
 DataSaver::~DataSaver()

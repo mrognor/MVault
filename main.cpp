@@ -653,7 +653,7 @@ int main()
 
     std::cout << "Phase 11. Read from file" << std::endl;
 
-    ds.ReadFromFile("TestRead.csv");
+    ds.ReadStringsFromFile("TestRead.csv");
 
     dsrr = ds.GetRecord("name", std::string("mrognor"));
     if (dsrr.IsValid())

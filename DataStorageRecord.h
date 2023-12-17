@@ -171,7 +171,7 @@ public:
 
         \param [in] params a vector of pairs with data to be put in the DataStorage
     */
-    void SetData(std::vector<std::pair<std::string, DataSaver>> params);
+    void SetData(const std::vector<std::pair<std::string, DataSaver>>& params);
 
     /**
         \brief A method for getting data using a key

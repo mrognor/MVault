@@ -44,7 +44,7 @@ DataStorageRecordRef DataStorage::CreateRecord()
     return DataStorageRecordRef(newData, &DataStorageHashMapStructure, &DataStorageMapStructure);
 }
 
-DataStorageRecordRef DataStorage::CreateRecord(std::vector<std::pair<std::string, DataSaver>> params)
+DataStorageRecordRef DataStorage::CreateRecord(const std::vector<std::pair<std::string, DataSaver>>& params)
 {
     // Create new record
     DataStorageRecord* newData = new DataStorageRecord(RecordTemplate);
@@ -190,7 +190,7 @@ bool DataStorage::SaveToFile(const std::string& fileName)
     return true;
 }
 
-bool DataStorage::ReadFromFile(const std::string& fileName)
+bool DataStorage::ReadStringsFromFile(const std::string& fileName)
 {
     // Clear old data storage structure
     DropDataStorage();
@@ -222,7 +222,7 @@ bool DataStorage::ReadFromFile(const std::string& fileName)
 
     return true;
 }
-    
+
 DataStorage::~DataStorage()
 {
     // Clear DataStorageHashMapStructure
