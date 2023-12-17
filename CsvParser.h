@@ -15,7 +15,7 @@
 
 
 /**
-    \brief A function for converting a string to a csv field format. Hello
+    \brief A function for converting a string to a csv field format.
 
     In csv files, the fields of one record are separated by commas. To store commas inside a field, the field is placed in double quotes.  
     To store quotes inside a field, the fields are pla  ced in quotation marks, and all quotes inside the field are duplicated.  
@@ -35,6 +35,15 @@
 */
 std::string FormatStringToCsv(const std::string& str);
 
+/**
+    \brief A method for reading a csv file and loading data from it into memory
+
+    \param [in] fileName the name of the file to read the data from
+    \param [in] records a reference to the vector of vectors. 
+    The outer vector is a vector of records, the inner vector is a vector of fields of one record
+
+    \return returns true if it was possible to read the file, otherwise it returns false
+ */
 bool ReadCsvFile(const std::string& fileName, std::vector<std::vector<std::string>>& records);
 
 /*! @} */
