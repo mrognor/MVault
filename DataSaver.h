@@ -50,9 +50,6 @@ private:
     // A pointer to a function that will convert the value stored inside to a string
     std::string (*ToStringFunc)(void* ptrToPrint) = nullptr;
 
-    // A pointer to a function that converts a string to the type inside DataSaver and stores the value inside
-    void (*FromStringFunc)(const std::string stringToCopyDataFrom, void* ptrToPutStringInto) = nullptr;
-
     // Pointer to custom delete function. Required to delete data if it is pointer
     void (*CustomDeleteFunc)(const void* ptr) = nullptr;
 
@@ -144,12 +141,6 @@ public:
                 return ToString(*((T*)(ptrToPrint)));
             };
 
-        // Set new from string function
-        FromStringFunc = [](const std::string stringToCopyDataFrom, void* ptrToPutStringInto)
-            {
-                FromString(stringToCopyDataFrom, *((T*)(ptrToPutStringInto)));
-            };
-
         // Set custom delete function from dataSaver
         CustomDeleteFunc = customDeleteFunc;
     }
@@ -187,10 +178,6 @@ public:
     /// \brief A method for getting a string that represents data inside a class object
     /// \return A string of data
     std::string Str() const;
-
-    /// \brief A function to convert a string to a type stored inside DataSaver and save this value
-    /// \param stringToCopyDataFrom the line from where you want to copy the value
-    void SetDataFromString(const std::string stringToCopyDataFrom);
 
     /// Default destructor
     ~DataSaver();

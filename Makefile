@@ -15,7 +15,7 @@ endif
 all: DataStorage$(FILEXT)
 
 DataStorage$(FILEXT): $(HEADERS) $(SOURCES) main.cpp
-	g++ -g main.cpp $(SOURCES) $(LDFLAGS) -o DataStorage$(FILEXT)
+	g++ -g -std=c++11 main.cpp $(SOURCES) $(LDFLAGS) -o DataStorage$(FILEXT)
 
 clean:
 	rm DataStorage$(FILEXT)

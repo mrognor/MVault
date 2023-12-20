@@ -651,9 +651,9 @@ int main()
 
     ds.SaveToFile("Test.csv");
 
-    std::cout << "Phase 11. Read from file" << std::endl;
+    std::cout << "Phase 11. Read strings from file" << std::endl;
 
-    ds.ReadStringsFromFile("TestRead.csv");
+    ds.ReadFromFile("TestRead.csv");
 
     dsrr = ds.GetRecord("name", std::string("mrognor"));
     if (dsrr.IsValid())
@@ -664,4 +664,69 @@ int main()
 
         std::cout << "Requested record: id:" << id << " name: mrognor gender: " << gender << std::endl;
     }
+
+    std::cout << "Phase 12. Read data from file" << std::endl;
+
+    ds.ReadFromFile("TestRead.csv", { {"name", std::string("")}, {"id", int(0)}, {"gender", bool(true)} });
+
+    dsrr = ds.GetRecord("name", std::string("mrognor"));
+    if (dsrr.IsValid())
+    {
+        int id; bool gender;
+        dsrr.GetData("id", id);
+        dsrr.GetData("gender", gender);
+
+        std::cout << "Requested record: id:" << id << " name: mrognor gender: " << gender << std::endl;
+    }
+
+    std::vector<Putter> bench = 
+    {
+        {"cpuName", std::string("")},
+        {"price", float(0.0)},
+        {"cpuMark", int(0)},
+        {"cpuValue", float(0)},
+        {"threadMark", int(0)},
+        {"threadValue", float(0.0)},
+        {"TDP", int(0)},
+        {"powerPerf", float(0.0)},
+        {"cores", int(0)},
+        {"testDate", int(0)},
+        {"socket", std::string("")},
+        {"category", std::string("")},
+    };
+
+    ds.ReadFromFile("CPU_benchmark_v4.csv", bench);
+
+    dsrr = ds.GetRecord("cpuMark", 77);
+    if (dsrr.IsValid())
+    {
+        std::string cpuName;
+        dsrr.GetData("cpuName", cpuName);
+
+        std::cout << cpuName << std::endl;
+    }
+
+    DataStorageRecordSet sset1, sset2;
+    ds.GetRecords("category", std::string("Server"), sset1);
+
+    ds.RequestRecords("testDate", Greater<int>(2019), sset2);
+
+    sset1 = Intersection(sset1, sset2);
+
+    ds.GetRecords("cores", 64, sset2);
+
+    sset1 = Intersection(sset1, sset2);
+
+    ds.RequestRecords("powerPerf", Between<float>(300.0, 400.0), sset2);
+
+    sset1 = Intersection(sset1, sset2);
+
+    for (const auto& it : sset1)
+    {
+        std::string cpuName;
+        it.GetData("cpuName", cpuName);
+
+        std::cout << cpuName << std::endl;
+    }
+
 }

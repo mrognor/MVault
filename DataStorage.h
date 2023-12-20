@@ -392,9 +392,59 @@ public:
         \param [in] fileName The file name to save the data, the extension must be specified manually
         
         \return It will return true if it was possible to open the file and read the data, otherwise it will return false
-     */
-    bool ReadStringsFromFile(const std::string& fileName);
+    */
+    bool ReadFromFile(const std::string& fileName);
     
+    /**
+        \brief A method for reading data from a csv file and saving it to a DataStorage
+        
+        This method deletes all old keys and reads new ones from the file. 
+        It treats the first line in the csv file as a list of keys. 
+
+        \param [in] fileName The file name to save the data, the extension must be specified manually
+        \param [in] keys A vector with the keys and the types they store, which should be obtained from the file.
+        
+        \return It will return true if it was possible to open the file and read the data, otherwise it will return false
+    */
+    bool ReadFromFile(const std::string& fileName, const std::vector<Putter>& keys);
+
     /// Default destructor 
     ~DataStorage();
+};
+
+/// \todo Подумать над названием этого класса
+class Putter
+{
+private:
+
+    std::function<void(DataStorage&)> SetKeyFunc;
+
+    std::function<void(DataStorageRecordRef&, const std::string&)> SetRecordDataFunc;
+
+    std::string Key;
+public:
+
+    template <class T>
+    Putter(const std::string& key, const T& defaultKeyValue) : Key(key)
+    {
+        SetKeyFunc = [=](DataStorage& dataStorage)
+            {
+                dataStorage.SetKey(key, defaultKeyValue);
+            };
+        
+        SetRecordDataFunc = [=](DataStorageRecordRef& dataStorageRecordRef, const std::string& stringWithData)
+            {
+                T t;
+                if (FromString<T>(stringWithData, t))
+                {
+                    dataStorageRecordRef.SetData(key, t);
+                }
+            };
+    }
+
+    void SetKeyToDataStorage(DataStorage& dataStorage) const;
+
+    void SetRecordData(DataStorageRecordRef& dataStorageRecordRef, const std::string& stringWithData) const;
+
+    std::string GetKey() const;
 };

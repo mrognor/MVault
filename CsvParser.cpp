@@ -2,12 +2,10 @@
 
 std::string FormatStringToCsv(const std::string& str)
 {
-    std::stringstream ss;
-    ss << str;
     bool isEscapingRequired = false;
     std::string res;
     
-    for (const char& symbol : ss.str())
+    for (const char& symbol : str)
     {
         if (symbol == '"')
         {
@@ -81,9 +79,9 @@ bool ReadCsvFile(const std::string& fileName, std::vector<std::vector<std::strin
 
             // Check if it is CRLF.
             if (i < fileLen - 1 && fileData[i + 1] == 10)
-                i += 2;
-            else
                 ++i;
+
+            continue;
         }
         
         // Handle " symbol

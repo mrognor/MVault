@@ -151,7 +151,7 @@ std::size_t DataStorage::Size()
 bool DataStorage::SaveToFile(const std::string& fileName)
 {
     // Open or create file to save data
-    std::ofstream csvFile(fileName);
+    std::ofstream csvFile(fileName, std::ios::binary);
 
     // Checking whether the file was opened successfully
     if (!csvFile.is_open())
@@ -160,13 +160,15 @@ bool DataStorage::SaveToFile(const std::string& fileName)
         return false;
     }
 
+    // C array to store correct new line characters. 
+    const char endOfLine[2] = {13, 10}; // 13 - CR or 0d. 10 - LF or 0a.
+
     // Save keys to file
     auto it = DataStorageHashMapStructure.begin();
     csvFile << it->first;
     ++it;
-    for (;it != DataStorageHashMapStructure.end(); ++it)
-        csvFile << "," << it->first;
-    csvFile << std::endl;
+    for (;it != DataStorageHashMapStructure.end(); ++it) csvFile << "," << it->first;
+    csvFile.write(endOfLine, 2);
 
     for (const auto& record : RecordsSet)
     {
@@ -183,14 +185,14 @@ bool DataStorage::SaveToFile(const std::string& fileName)
             csvFile << ",";
             --counter;
         }
-        csvFile << std::endl;
+        csvFile.write(endOfLine, 2);
     }
 
     csvFile.close();
     return true;
 }
 
-bool DataStorage::ReadStringsFromFile(const std::string& fileName)
+bool DataStorage::ReadFromFile(const std::string& fileName)
 {
     // Clear old data storage structure
     DropDataStorage();
@@ -223,6 +225,54 @@ bool DataStorage::ReadStringsFromFile(const std::string& fileName)
     return true;
 }
 
+bool DataStorage::ReadFromFile(const std::string& fileName, const std::vector<Putter>& keys)
+{
+    // Clear old data storage structure
+    DropDataStorage();
+
+    // Fill data storage with keys
+    for (const Putter& key : keys)
+        key.SetKeyToDataStorage(*this);
+    
+    // Vector with all records in csv file
+    std::vector<std::vector<std::string>> records;
+    
+    // Try to read csv file
+    if (!ReadCsvFile(fileName, records))
+        return false;
+
+    // Empty check
+    if (records.size() == 0)
+        return true;
+
+    DataStorageRecordRef recordRef;
+
+    // Fill records in data storage
+    // External loop for passing through all records
+    for (std::size_t i = 1; i < records.size(); ++i)
+    {
+        // Creating a new record
+        recordRef = CreateRecord();
+        // Loop through all the keys that need to be read from the file
+        for (std::size_t j = 0; j < keys.size(); ++j)
+        { 
+            // Loop throw first records element with file key structure
+            for (std::size_t k = 0; k < records[0].size(); ++k)
+            {
+                /// \todo Что делать если такого k нет ?
+                // Compare key from file with key from keys vector
+                if (records[0][k] == keys[j].GetKey())
+                {
+                    keys[j].SetRecordData(recordRef, records[i][k]);
+                    break;
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
 DataStorage::~DataStorage()
 {
     // Clear DataStorageHashMapStructure
@@ -236,4 +286,20 @@ DataStorage::~DataStorage()
     // Clear all records
     for (auto& it : RecordsSet)
         delete it;
+}
+
+
+void Putter::SetKeyToDataStorage(DataStorage& dataStorage) const
+{
+    SetKeyFunc(dataStorage);
+}
+
+void Putter::SetRecordData(DataStorageRecordRef& dataStorageRecordRef, const std::string& stringWithData) const
+{
+    SetRecordDataFunc(dataStorageRecordRef, stringWithData);
+}
+
+std::string Putter::GetKey() const
+{
+    return Key;
 }

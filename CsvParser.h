@@ -3,7 +3,6 @@
 #include <string>
 #include <vector>
 #include <fstream>
-#include <sstream>
 #include <iostream>
 
 /*! 
@@ -46,16 +45,53 @@ std::string FormatStringToCsv(const std::string& str);
  */
 bool ReadCsvFile(const std::string& fileName, std::vector<std::vector<std::string>>& records);
 
-/// \todo Добавить описание
+/**
+    \brief A template method for providing an interface converting any type to a string
+
+    This function allows you to use the same interface inside the DataStorage for any class, 
+    since this function accepts any type. Therefore, if you do not plan to use the functionality of saving to files, 
+    then there will be no problems when using a custom type. At the same time, if you plan to work with files, 
+    you can specialize this function for each required type.
+
+    \tparam <T> - Any type of data
+    \param [in] data the variable to be converted to a string
+
+    \return This function returns an empty string. 
+    The specialization of this function for types will return strings with data from data.
+*/
 template <class T>
 std::string ToString(const T& data) { return ""; }
- 
+
+/**
+    \brief ToString specialization for working with strings
+
+    \tparam <std::string> - string as a type
+    \param [in] data the variable to be converted to a string
+
+    \return Returns data
+*/
 template <class T = std::string>
 std::string ToString(const std::string& data) { return data; }
 
-template <class T = int>
+/**
+    \brief ToString specialization for working with int
+
+    \tparam <int> - int as a type
+    \param [in] data the variable to be converted to a string
+
+    \return Returns data converted to string
+*/
+template <class T = int,long>
 std::string ToString(const int& data) { return std::to_string(data); }
 
+/**
+    \brief ToString specialization for working with bool
+
+    \tparam <bool> - bool as a type
+    \param [in] data the variable to be converted to a string
+
+    \return If data is true, the function returns the string true. Otherwise, it returns the string false
+*/
 template <class T = bool>
 std::string ToString(const bool& data) 
 { 
@@ -63,16 +99,102 @@ std::string ToString(const bool& data)
     else return "false"; 
 }
 
+/**
+    \brief A template method for providing an interface converting string to a any type
+
+    This function allows you to use the same interface inside the DataStorage for any class, 
+    since this function accepts any type. Therefore, if you do not plan to use the functionality of saving to files, 
+    then there will be no problems when using a custom type. At the same time, if you plan to work with files, 
+    you can specialize this function for each required type.
+
+    \tparam <T> - Any type of data
+    \param [in] stringToCopyDataFrom the string to be converted to type T
+    \param [out] data the variable where the converted string will be written
+
+    \return Returns true if the conversion was successful, otherwise it returns false
+*/
 template <class T>
-void FromString(const std::string& stringToCopyDataFrom, T& data) {}
+bool FromString(const std::string& stringToCopyDataFrom, T& data) { return false; }
 
+/**
+    \brief FromString specialization for working with std::string
+
+    \tparam <std::string> - string as a type
+    \param [in] stringToCopyDataFrom the string to be converted to type std::string
+    \param [out] data the variable where the converted string will be written
+
+    \return Returns true if the conversion was successful, otherwise it returns false
+*/
 template <class T = std::string>
-void FromString(const std::string& stringToCopyDataFrom, std::string& data) { data = stringToCopyDataFrom; }
+bool FromString(const std::string& stringToCopyDataFrom, std::string& data) 
+{ 
+    data = stringToCopyDataFrom;
+    return true;
+}
 
+/**
+    \brief FromString specialization for working with bool
+
+    If the string is true, then data will be true and the function will return true.
+    If the string is false, then data will be false and the function will return true.
+    If the string is not true or false, the function returns false.
+
+    \tparam <bool> - bool as a type
+    \param [in] stringToCopyDataFrom the string to be converted to type bool
+    \param [out] data the variable where the converted string will be written
+
+    \return Returns true if the conversion was successful, otherwise it returns false
+*/
+template <class T = bool>
+bool FromString(const std::string& stringToCopyDataFrom, bool& data) 
+{
+    if (stringToCopyDataFrom == "true") 
+    {
+        data = true;
+        return true;
+    }
+    if (stringToCopyDataFrom == "false") 
+    {
+        data = false;
+        return true;
+    }
+    return false;
+}
+
+/**
+    \brief FromString specialization for working with int
+    
+    \tparam <int> - int as a type
+    \param [in] stringToCopyDataFrom the string to be converted to type int
+    \param [out] data the variable where the converted string will be written
+
+    \return Returns true if the conversion was successful, otherwise it returns false
+*/
 template <class T = int>
-void FromString(const std::string& stringToCopyDataFrom, int& data) { data = std::stoi(stringToCopyDataFrom); }
+bool FromString(const std::string& stringToCopyDataFrom, int& data) 
+{
+    /// \todo Сделать нормальную проверку
+    if (stringToCopyDataFrom.empty()) return false;
+    data = std::stoi(stringToCopyDataFrom);
+    return true;
+}
 
+/**
+    \brief FromString specialization for working with float
+    
+    \tparam <float> - float as a type
+    \param [in] stringToCopyDataFrom the string to be converted to type float
+    \param [out] data the variable where the converted string will be written
+
+    \return Returns true if the conversion was successful, otherwise it returns false
+*/
 template <class T = float>
-void FromString(const std::string& stringToCopyDataFrom, float& data) { data = std::stof(stringToCopyDataFrom); }
+bool FromString(const std::string& stringToCopyDataFrom, float& data) 
+{
+    /// \todo Сделать нормальную проверку
+    if (stringToCopyDataFrom.empty()) return false;
+    data = std::stof(stringToCopyDataFrom); 
+    return true;
+}
 
 /*! @} */
