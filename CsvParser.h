@@ -99,6 +99,12 @@ std::string ToString(const bool& data)
     else return "false"; 
 }
 
+/// \todo Перенести в пример
+bool StringToInt(const std::string& str, int& digit);
+
+/// \todo перенести в пример
+bool StringToFloat(const std::string& str, float& digit);
+
 /**
     \brief A template method for providing an interface converting string to a any type
 
@@ -173,10 +179,7 @@ bool FromString(const std::string& stringToCopyDataFrom, bool& data)
 template <class T = int>
 bool FromString(const std::string& stringToCopyDataFrom, int& data) 
 {
-    /// \todo Сделать нормальную проверку
-    if (stringToCopyDataFrom.empty()) return false;
-    data = std::stoi(stringToCopyDataFrom);
-    return true;
+    return StringToInt(stringToCopyDataFrom, data);
 }
 
 /**
@@ -191,10 +194,7 @@ bool FromString(const std::string& stringToCopyDataFrom, int& data)
 template <class T = float>
 bool FromString(const std::string& stringToCopyDataFrom, float& data) 
 {
-    /// \todo Сделать нормальную проверку
-    if (stringToCopyDataFrom.empty()) return false;
-    data = std::stof(stringToCopyDataFrom); 
-    return true;
+    return StringToFloat(stringToCopyDataFrom, data);
 }
 
 /*! @} */

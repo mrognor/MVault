@@ -1,6 +1,7 @@
 HEADERS = DataStorage.h DataStorageRecordSet.h DataStorageRecord.h DataContainer.h DataSaver.h SmartPointerWrapper.h CsvParser.h
 SOURCES = DataStorage.cpp DataStorageRecordSet.cpp DataStorageRecord.cpp DataSaver.cpp CsvParser.cpp
 
+CXXFLAGS =-Wall -std=c++11
 LDFLAGS =
 FILEXT =
 
@@ -15,7 +16,7 @@ endif
 all: DataStorage$(FILEXT)
 
 DataStorage$(FILEXT): $(HEADERS) $(SOURCES) main.cpp
-	g++ -g -std=c++11 main.cpp $(SOURCES) $(LDFLAGS) -o DataStorage$(FILEXT)
+	g++ -g $(CXXFLAGS) main.cpp $(SOURCES) $(LDFLAGS) -o DataStorage$(FILEXT)
 
 clean:
 	rm DataStorage$(FILEXT)

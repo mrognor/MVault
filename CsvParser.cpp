@@ -135,3 +135,75 @@ bool ReadCsvFile(const std::string& fileName, std::vector<std::vector<std::strin
     csvFile.close();
     return true;
 }
+
+bool StringToInt(const std::string& str, int& digit)
+{
+    if (str.length() == 0) return false;
+
+    int res = 0;
+    
+    std::size_t i = 0;
+    bool isNegative = false;
+
+    if (str[0] == '-' && str.length() > 1) 
+    {
+        isNegative = true;
+        i = 1;
+    }
+
+    for (; i < str.length(); ++i)
+    {
+        if (!isdigit(static_cast<int>(str[i]))) return false;
+        res *= 10;
+        res += static_cast<int>(str[i] - '0');
+    }
+
+    if (isNegative) digit = res * -1;
+    else digit = res;
+
+    return true;
+}
+
+bool StringToFloat(const std::string& str, float& digit)
+{
+    if (str.length() == 0) return false;
+
+    int integer = 0, fractional = 0;
+
+    std::size_t i = 0;
+    bool isNegative = false;
+
+    if (str[0] == '-' && str.length() > 1) 
+    {
+        isNegative = true;
+        i = 1;
+    }
+
+    for (; i < str.length(); ++i)
+    {
+        if (str[i] == '.') 
+        {
+            ++i;
+            break;
+        }
+
+        if (!isdigit(static_cast<int>(str[i]))) return false;
+        integer *= 10;
+        integer += static_cast<int>(str[i] - '0');
+    }
+
+    float coeff = 1;
+    for (; i < str.length(); ++i)
+    {
+        if (!isdigit(static_cast<int>(str[i]))) return false;
+        coeff /= 10;
+        fractional *= 10;
+        fractional += static_cast<int>(str[i] - '0');
+    }
+
+    digit = static_cast<float>(integer) + static_cast<float>(fractional) * coeff;
+
+    if (isNegative) digit *= -1;
+
+    return true;
+}
