@@ -2,7 +2,7 @@
 
 DataStorage::DataStorage() {}
 
-bool DataStorage::IsKeyExist(const std::string& keyName)
+bool DataStorage::IsKeyExist(const std::string& keyName) const
 {
     return RecordTemplate.IsData(keyName);
 }
@@ -65,12 +65,12 @@ DataStorageRecordRef DataStorage::CreateRecord(const std::vector<std::pair<std::
     return DataStorageRecordRef(newData, &DataStorageHashMapStructure, &DataStorageMapStructure);
 }
 
-DataStorageRecordSet DataStorage::GetAllRecords()
+DataStorageRecordSet DataStorage::GetAllRecords() const
 {
     DataStorageRecordSet res;
     // Fill the result record set
     for (auto it = RecordsSet.begin(); it != RecordsSet.end(); ++it)
-        res.AddNewRecord(*it, &DataStorageHashMapStructure, &DataStorageMapStructure);
+        const_cast<DataStorageRecordSet*>(&res)->AddNewRecord(*it, const_cast<DataStorageStructureHashMap*>(&DataStorageHashMapStructure), const_cast<DataStorageStructureMap*>(&DataStorageMapStructure));
 
     return res;
 }
@@ -143,12 +143,12 @@ void DataStorage::EraseRecords(const DataStorageRecordSet& recordsToErase)
         EraseRecord(recordRef);
 }
 
-std::size_t DataStorage::Size()
+std::size_t DataStorage::Size() const
 {
     return RecordsSet.size();
 }
 
-bool DataStorage::SaveToFile(const std::string& fileName)
+bool DataStorage::SaveToFile(const std::string& fileName) const
 {
     // Open or create file to save data
     std::ofstream csvFile(fileName, std::ios::binary);
@@ -164,10 +164,10 @@ bool DataStorage::SaveToFile(const std::string& fileName)
     const char endOfLine[2] = {13, 10}; // 13 - CR or 0d. 10 - LF or 0a.
 
     // Save keys to file
-    auto it = DataStorageHashMapStructure.begin();
+    auto it = DataStorageHashMapStructure.cbegin();
     csvFile << it->first;
     ++it;
-    for (;it != DataStorageHashMapStructure.end(); ++it) csvFile << "," << it->first;
+    for (;it != DataStorageHashMapStructure.cend(); ++it) csvFile << "," << it->first;
     csvFile.write(endOfLine, 2);
 
     for (const auto& record : RecordsSet)

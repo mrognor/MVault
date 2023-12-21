@@ -176,7 +176,7 @@ public:
 
         \return returns true if the key was found otherwise returns false
     */
-    bool IsKeyExist(const std::string& keyName);
+    bool IsKeyExist(const std::string& keyName) const;
     
     /**
         \brief The method for getting a default key value
@@ -187,7 +187,7 @@ public:
         \return returns true if the key was found otherwise returns false
     */
     template <class T>
-    bool GetKeyValue(const std::string& keyName, T& defaultKeyValue)
+    bool GetKeyValue(const std::string& keyName, T& defaultKeyValue) const
     {
         return RecordTemplate.GetData(keyName, defaultKeyValue);
     }
@@ -263,7 +263,7 @@ public:
         \return returns true if the key and value was found otherwise returns false
     */
     template <class T>
-    DataStorageRecordRef GetRecord(const std::string& keyName, const T& keyValue)
+    DataStorageRecordRef GetRecord(const std::string& keyName, const T& keyValue) const
     {
         // Pointer to store map inside DataStorageStructureHashMap
         std::unordered_multimap<T, DataStorageRecord*>* TtoDataStorageRecordHashMap = nullptr;
@@ -279,8 +279,8 @@ public:
             {
                 // Set data to DataStorageRecordRef
                 res.DataRecord = TtoDataStorageRecordIt->second;
-                res.DataStorageHashMapStructure = &DataStorageHashMapStructure;
-                res.DataStorageMapStructure = &DataStorageMapStructure;
+                res.DataStorageHashMapStructure = const_cast<DataStorageStructureHashMap*>(&DataStorageHashMapStructure);
+                res.DataStorageMapStructure = const_cast<DataStorageStructureMap*>(&DataStorageMapStructure);
                 res.IsDataStorageRecordValid = true;
                 return res;
             }
@@ -300,7 +300,7 @@ public:
         \return returns true if the key was found otherwise returns false
     */
     template <class T>
-    bool GetRecords(const std::string& keyName, const T& keyValue, DataStorageRecordSet& foundedRecords)
+    bool GetRecords(const std::string& keyName, const T& keyValue, DataStorageRecordSet& foundedRecords) const
     {
         // Pointer to store map inside DataStorageStructureHashMap
         std::unordered_multimap<T, DataStorageRecord*>* TtoDataStorageRecordHashMap = nullptr;
@@ -315,7 +315,7 @@ public:
 
             // Fill the result record set
             for (auto& it = FirstAndLastIteratorsWithKey.first; it != FirstAndLastIteratorsWithKey.second; ++it)
-                foundedRecords.AddNewRecord(it->second, &DataStorageHashMapStructure, &DataStorageMapStructure);
+                foundedRecords.AddNewRecord(it->second, const_cast<DataStorageStructureHashMap*>(&DataStorageHashMapStructure), const_cast<DataStorageStructureMap*>(&DataStorageMapStructure));
 
             return true;
         }
@@ -333,7 +333,7 @@ public:
         \return returns true if the key was found otherwise returns false
     */
     template <class T>
-    bool RequestRecords(const std::string& keyName, const DataStorageRequest<T>& request, DataStorageRecordSet& foundedRecords)
+    bool RequestRecords(const std::string& keyName, const DataStorageRequest<T>& request, DataStorageRecordSet& foundedRecords) const
     {
         // Pointer to store map inside DataStorageStructureHashMap
         std::multimap<T, DataStorageRecord*>* TtoDataStorageRecordMap = nullptr;
@@ -347,7 +347,7 @@ public:
             auto begAndEndIterators = request.ProcessRequest(TtoDataStorageRecordMap);
 
             for (auto& it = begAndEndIterators.first; it != begAndEndIterators.second; ++it)
-                foundedRecords.AddNewRecord(DataStorageRecordRef(it->second, &DataStorageHashMapStructure, &DataStorageMapStructure));
+                foundedRecords.AddNewRecord(DataStorageRecordRef(it->second, const_cast<DataStorageStructureHashMap*>(&DataStorageHashMapStructure), const_cast<DataStorageStructureMap*>(&DataStorageMapStructure)));
 
             return true;
         }
@@ -357,7 +357,7 @@ public:
 
     /// \brief The method for getting a set of all references to the data inside DataStorage
     /// \return returns a set of all records refs
-    DataStorageRecordSet GetAllRecords();
+    DataStorageRecordSet GetAllRecords() const;
 
     /// A method for deleting all data and keys
     void DropDataStorage();
@@ -375,12 +375,12 @@ public:
     
     /// \brief Method for getting the number of records
     /// \return number of records
-    std::size_t Size();
+    std::size_t Size() const;
 
     /// \brief A method for saving data to a table file. The file format is csv
     /// \param fileName The file name to save the data, the extension must be specified manually
     /// \return It will return true if it was possible to open the file and write the data, otherwise it will return false
-    bool SaveToFile(const std::string& fileName);
+    bool SaveToFile(const std::string& fileName) const;
 
     /**
         \brief A method for reading data from a csv file and saving it to a DataStorage

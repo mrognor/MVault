@@ -126,7 +126,7 @@ public:
                 // Convert src pointer to T pointer and get data from T pointer.
                 // Use T copy constructor to create T object.
                 // Allocate new memory to T type and convert it to void pointer.
-                dst = static_cast<void*>(new T(*(T*)src));
+                dst = static_cast<void*>(new T(*static_cast<T*>(const_cast<void*>(src))));
             };
 
         // Set new DeleteFunc
@@ -138,7 +138,7 @@ public:
         // Set new to string function
         ToStringFunc = [](void* ptrToPrint)
             {
-                return ToString(*((T*)(ptrToPrint)));
+                return ToString(*static_cast<T*>(ptrToPrint));
             };
 
         // Set custom delete function from dataSaver
@@ -149,7 +149,7 @@ public:
     /// \param [out] data the ref to which the data will be written
     /// \return return the true if it successfully recorded the data. If there was no data or they were of a different type it will return false
     template <class T>
-    bool GetData(T& data)
+    bool GetData(T& data) const
     {
         // Check data type stored in DataSaver
         if (DataType != nullptr && DataType->GetDataType() != typeid(data))

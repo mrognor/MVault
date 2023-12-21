@@ -80,7 +80,7 @@ public:
     /// \brief Interface function for requests
     /// \param dataStorageMapStructure Map with all records in DataStorage
     /// \return A pair with iterators of the beginning and end of a block of data satisfying the request
-    virtual std::pair<typename std::multimap<T, DataStorageRecord*>::iterator, typename  std::multimap<T, DataStorageRecord*>::iterator> ProcessRequest(std::multimap<T, DataStorageRecord*>* dataStorageMapStructure) const = 0;
+    virtual std::pair<typename std::multimap<T, DataStorageRecord*>::iterator, typename std::multimap<T, DataStorageRecord*>::iterator> ProcessRequest(std::multimap<T, DataStorageRecord*>* dataStorageMapStructure) const = 0;
 };
 
 /// The template class of the request. Used to get all records greater or equal than a certain value

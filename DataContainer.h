@@ -142,7 +142,7 @@ public:
         \return Returns false if the key was not found, and otherwise returns true.
     */ 
     template <class T>
-    bool GetData(const std::string& key, T& data)
+    bool GetData(const std::string& key, T& data) const
     {
         auto f = Container.find(key);
         if (f == Container.end())
@@ -155,7 +155,7 @@ public:
     /// \brief A method for checking whether data with such a key is in the container
     /// \param [in] key key to find in container
     /// \return Returns false if the key was not found, and otherwise returns true.
-    bool IsData(const std::string& key)
+    bool IsData(const std::string& key) const
     {
         return Container.find(key) != Container.end();
     }
@@ -186,7 +186,7 @@ public:
 
     /// \brief Method for getting the container size
     /// \return Container size
-    std::size_t Size()
+    std::size_t Size() const
     {
         return Container.size();
     }
@@ -208,7 +208,7 @@ public:
 
         \return pair of iterators. The first iterator points to the first element with the same key, and the second to the last element
     */
-    std::pair<DataContainer::iterator, DataContainer::iterator> GetAllData(const std::string& key)
+    std::pair<DataContainer::const_iterator, DataContainer::const_iterator> GetAllData(const std::string& key) const
     {
         return Container.equal_range(key);
     }
@@ -230,7 +230,7 @@ public:
 
         \return pair of iterators. The first iterator points to the first element with the same key, and the second to the last element
     */
-    std::pair<DataContainer::iterator, DataContainer::iterator> GetAllData(const std::string& key)
+    std::pair<DataContainer::const_iterator, DataContainer::const_iterator> GetAllData(const std::string& key) const
     {
         return Container.equal_range(key);
     }
