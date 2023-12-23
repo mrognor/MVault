@@ -10,6 +10,7 @@
 #include "DataStorageRecord.h"
 #include "DataStorageRecordSet.h"
 #include "CsvParser.h"
+#include "DataStorageRequests.h"
 
 /**
     \brief A class for storing data with the ability to quickly search for a variety of different keys of any type
@@ -39,7 +40,7 @@ private:
 
         Such a complex structure is needed to quickly, in O(1), search for each key with any type.
     */
-    DataStorageStructureHashMap DataStorageHashMapStructure;
+    mutable DataStorageStructureHashMap DataStorageHashMapStructure;
 
     /**
         A simple typedef for Map. It is necessary for a more understandable separation of types.
@@ -52,7 +53,7 @@ private:
         Such a complex structure is necessary in order to quickly, in O(log n), 
         find a set of elements that meet a certain requirement, for example, more than a certain value or less than this value
     */
-    DataStorageStructureMap DataStorageMapStructure;
+    mutable DataStorageStructureMap DataStorageMapStructure;
 
     // unordered_map of functions that add a new element to the DataStorageStructureHashMap
     std::unordered_map<std::string, std::function<void(DataStorageRecord*)>> DataStorageRecordAdders;
@@ -78,6 +79,8 @@ public:
 
     /**
         \brief Template function to add new key with default value to DataStorage
+
+        \tparam <T> Any type of data except for c arrays
 
         If the key was added earlier, the default value will be updated when this function is called again
 
@@ -181,6 +184,8 @@ public:
     /**
         \brief The method for getting a default key value
 
+        \tparam <T> Any type of data except for c arrays
+
         \param [in] keyName the name of the key to search for
         \param [in] keyValue the value of the key
 
@@ -256,6 +261,8 @@ public:
     /**
         \brief The method for getting a reference to the data inside DataStorage
 
+        \tparam <T> Any type of data except for c arrays
+
         \param [in] keyName the name of the key to search for
         \param [in] keyValue the value of the key to be found
         \param [out] foundedRecord a ref to the DataStorageRecordRef where found record will be placed
@@ -279,8 +286,8 @@ public:
             {
                 // Set data to DataStorageRecordRef
                 res.DataRecord = TtoDataStorageRecordIt->second;
-                res.DataStorageHashMapStructure = const_cast<DataStorageStructureHashMap*>(&DataStorageHashMapStructure);
-                res.DataStorageMapStructure = const_cast<DataStorageStructureMap*>(&DataStorageMapStructure);
+                res.DataStorageHashMapStructure = &DataStorageHashMapStructure;
+                res.DataStorageMapStructure = &DataStorageMapStructure;
                 res.IsDataStorageRecordValid = true;
                 return res;
             }
@@ -292,6 +299,8 @@ public:
 
     /**
         \brief The method for getting a set of references to the data inside DataStorage
+
+        \tparam <T> Any type of data except for c arrays
 
         \param [in] keyName the name of the key to search for
         \param [in] keyValue the value of the key to be found
@@ -315,7 +324,7 @@ public:
 
             // Fill the result record set
             for (auto& it = FirstAndLastIteratorsWithKey.first; it != FirstAndLastIteratorsWithKey.second; ++it)
-                foundedRecords.AddNewRecord(it->second, const_cast<DataStorageStructureHashMap*>(&DataStorageHashMapStructure), const_cast<DataStorageStructureMap*>(&DataStorageMapStructure));
+                foundedRecords.AddNewRecord(it->second, &DataStorageHashMapStructure, &DataStorageMapStructure);
 
             return true;
         }
@@ -325,6 +334,8 @@ public:
 
     /**
         \brief The method for getting a set of references to the data inside DataStorage
+
+        \tparam <T> Any type of data except for c arrays
 
         \param [in] keyName the name of the key to search for
         \param [in] request request for data
@@ -347,7 +358,7 @@ public:
             auto begAndEndIterators = request.ProcessRequest(TtoDataStorageRecordMap);
 
             for (auto& it = begAndEndIterators.first; it != begAndEndIterators.second; ++it)
-                foundedRecords.AddNewRecord(DataStorageRecordRef(it->second, const_cast<DataStorageStructureHashMap*>(&DataStorageHashMapStructure), const_cast<DataStorageStructureMap*>(&DataStorageMapStructure)));
+                foundedRecords.AddNewRecord(DataStorageRecordRef(it->second, &DataStorageHashMapStructure, &DataStorageMapStructure));
 
             return true;
         }

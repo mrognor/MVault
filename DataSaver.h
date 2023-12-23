@@ -42,7 +42,7 @@ private:
     DataTypeSaver* DataType = nullptr;
 
     // Pointer to copy function. Required to DataSaver copy
-    void (*CopyFunc)(void*& dst, const void* src) = nullptr;
+    void (*CopyFunc)(void*& dst, void* src) = nullptr;
 
     // Pointer to delete function. Required to delete pointer since it is not possibly to delete void*
     void (*DeleteFunc)(void*& ptrToDelete) = nullptr;
@@ -62,6 +62,7 @@ public:
     DataSaver(const DataSaver& dataSaver);
 
     /// \brief A template constructor that accepts a variable to store inside DataSaver
+    /// \tparam <T> Any type of data except for c arrays
     /// \param [in] data data to be stored inside DataSaver
     template<class T>
     DataSaver(const T& data)
@@ -71,6 +72,9 @@ public:
 
     /**
         \brief A template constructor that accepts a variable and a function to delete a variable
+
+        \tparam <T> Any type of data except for c arrays
+        \tparam <F> Function pointer or lambda function
 
         The constructor allows you to set a function to delete data, 
         which can be convenient when storing pointers, when the pointer type may be unknown, but it must be deleted.
@@ -93,6 +97,7 @@ public:
     DataSaver& operator=(const DataSaver& dataSaver);
     
     /// \brief Template method to save data inside DataSaver
+    /// \tparam <T> Any type of data except for c arrays
     /// \param [in] data data to be stored inside the class
     template <class T>
     void SetData(const T& data)
@@ -100,9 +105,15 @@ public:
         SetData(data, nullptr);
     }
 
-    /// \brief Template method to save data and custom delete function inside DataSaver
-    /// \param [in] data data to be stored inside the class
-    /// \param [in] customDeleteFunc function to delete data
+    /**
+        \brief Template method to save data and custom delete function inside DataSaver
+
+        \tparam <T> Any type of data except for c arrays
+        \tparam <F> Function pointer or lambda function
+
+        \param [in] data data to be stored inside the class
+        \param [in] customDeleteFunc function to delete data
+    */
     template <class T, class F>
     void SetData(const T& data, F&& customDeleteFunc)
     {
@@ -121,7 +132,7 @@ public:
         DataType = new DataTypeSaver(typeid(data));
 
         // Set new CopyFunc. It is get to void pointers and convert void pointers to T pointers and copy data.
-        CopyFunc = [](void*& dst, const void* src)
+        CopyFunc = [](void*& dst, void* src)
             {
                 // Convert src pointer to T pointer and get data from T pointer.
                 // Use T copy constructor to create T object.
@@ -145,9 +156,16 @@ public:
         CustomDeleteFunc = customDeleteFunc;
     }
 
-    /// \brief Template method to get data from DataSaver.
-    /// \param [out] data the ref to which the data will be written
-    /// \return return the true if it successfully recorded the data. If there was no data or they were of a different type it will return false
+    /**
+        \brief Template method to get data from DataSaver.
+    
+        \tparam <T> Any type of data except for c arrays
+
+        \param [out] data the ref to which the data will be written
+
+        \return return the true if it successfully recorded the data. 
+        If there was no data or they were of a different type it will return false
+    */
     template <class T>
     bool GetData(T& data) const
     {

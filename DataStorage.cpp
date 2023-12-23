@@ -70,7 +70,7 @@ DataStorageRecordSet DataStorage::GetAllRecords() const
     DataStorageRecordSet res;
     // Fill the result record set
     for (auto it = RecordsSet.begin(); it != RecordsSet.end(); ++it)
-        const_cast<DataStorageRecordSet*>(&res)->AddNewRecord(*it, const_cast<DataStorageStructureHashMap*>(&DataStorageHashMapStructure), const_cast<DataStorageStructureMap*>(&DataStorageMapStructure));
+        res.AddNewRecord(*it, &DataStorageHashMapStructure, &DataStorageMapStructure);
 
     return res;
 }

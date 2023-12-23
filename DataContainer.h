@@ -8,8 +8,16 @@
 /**
     \brief Template prototype of a container for storing different types of data.
 
+    \tparam <C> The container class for which this class will be the wrapper. 
+    Container have to support find(), begin(), end(), emplace(), erase().  
+    Types that are used in inheritors:
+    \tparam <std::set> A container built on an avl tree.
+    \tparam <std::map> A container built on an avl tree. Stores a pair of key and value.
+    \tparam <std::unordered_set> A container built on a hash table.
+    \tparam <std::unordered_map> A container built on a hash table. Stores a pair of key and value.
+
     The container should work according to the std::map type, i.e. store a key and value pair in itself.
-    Using class specialization, you can define an internal container. Container have to support find(), begin(), end(), emplace(), erase()
+    Using class specialization, you can define an internal container. 
     If a pointer is written to one of the elements, then you can set a custom data deletion function.
 */
 template <class C>
@@ -39,6 +47,8 @@ public:
     /**
         \brief Template method for adding a new data to the container.
 
+        \tparam <T> Any type of data except for c arrays
+
         Wrapper over emplace std container
 
         \param [in] key key for storing the data
@@ -52,6 +62,9 @@ public:
 
     /**
         \brief Template method for adding a new data to the container and a function to delete this data
+
+        \tparam <T> Any type of data except for c arrays
+        \tparam <F> Function pointer or lambda function
 
         Wrapper over emplace std container
         
@@ -79,6 +92,8 @@ public:
     /**
         \brief Method for changing the value of a data inside a container using a key
 
+        \tparam <T> Any type of data except for c arrays
+
         If there was no data with such a key, it will be created
 
         \param [in] key the key whose value needs to be changed
@@ -92,6 +107,9 @@ public:
 
     /**
         \brief Method for changing the value of a data inside a container using a key
+
+        \tparam <T> Any type of data except for c arrays
+        \tparam <F> Function pointer or lambda function
 
         If there was no data with such a key, it will be created
 
@@ -134,6 +152,8 @@ public:
 
     /**
         \brief Method for getting data from a container using a key
+
+        \tparam <T> Any type of data except for c arrays
 
         \param [in] key key for getting data
         \param [out] data a reference to data of type T to write data from the container there.

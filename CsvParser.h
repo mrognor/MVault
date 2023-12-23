@@ -53,7 +53,7 @@ bool ReadCsvFile(const std::string& fileName, std::vector<std::vector<std::strin
     then there will be no problems when using a custom type. At the same time, if you plan to work with files, 
     you can specialize this function for each required type.
 
-    \tparam <T> - Any type of data
+    \tparam <T> Any type of data
     \param [in] data the variable to be converted to a string
 
     \return This function returns an empty string. 
@@ -65,7 +65,7 @@ std::string ToString(const T& data) { return ""; }
 /**
     \brief ToString specialization for working with strings
 
-    \tparam <std::string> - string as a type
+    \tparam <std::string> string as a type
     \param [in] data the variable to be converted to a string
 
     \return Returns data
@@ -76,7 +76,7 @@ std::string ToString(const std::string& data) { return data; }
 /**
     \brief ToString specialization for working with int
 
-    \tparam <int> - int as a type
+    \tparam <int> int as a type
     \param [in] data the variable to be converted to a string
 
     \return Returns data converted to string
@@ -87,7 +87,7 @@ std::string ToString(const int& data) { return std::to_string(data); }
 /**
     \brief ToString specialization for working with bool
 
-    \tparam <bool> - bool as a type
+    \tparam <bool> bool as a type
     \param [in] data the variable to be converted to a string
 
     \return If data is true, the function returns the string true. Otherwise, it returns the string false
@@ -113,7 +113,7 @@ bool StringToFloat(const std::string& str, float& digit);
     then there will be no problems when using a custom type. At the same time, if you plan to work with files, 
     you can specialize this function for each required type.
 
-    \tparam <T> - Any type of data
+    \tparam <T> Any type of data
     \param [in] stringToCopyDataFrom the string to be converted to type T
     \param [out] data the variable where the converted string will be written
 
@@ -125,7 +125,7 @@ bool FromString(const std::string& stringToCopyDataFrom, T& data) { return false
 /**
     \brief FromString specialization for working with std::string
 
-    \tparam <std::string> - string as a type
+    \tparam <std::string> string as a type
     \param [in] stringToCopyDataFrom the string to be converted to type std::string
     \param [out] data the variable where the converted string will be written
 
@@ -145,7 +145,7 @@ bool FromString(const std::string& stringToCopyDataFrom, std::string& data)
     If the string is false, then data will be false and the function will return true.
     If the string is not true or false, the function returns false.
 
-    \tparam <bool> - bool as a type
+    \tparam <bool> bool as a type
     \param [in] stringToCopyDataFrom the string to be converted to type bool
     \param [out] data the variable where the converted string will be written
 
@@ -170,7 +170,7 @@ bool FromString(const std::string& stringToCopyDataFrom, bool& data)
 /**
     \brief FromString specialization for working with int
     
-    \tparam <int> - int as a type
+    \tparam <int> int as a type
     \param [in] stringToCopyDataFrom the string to be converted to type int
     \param [out] data the variable where the converted string will be written
 
@@ -185,7 +185,7 @@ bool FromString(const std::string& stringToCopyDataFrom, int& data)
 /**
     \brief FromString specialization for working with float
     
-    \tparam <float> - float as a type
+    \tparam <float> float as a type
     \param [in] stringToCopyDataFrom the string to be converted to type float
     \param [out] data the variable where the converted string will be written
 

@@ -2,7 +2,9 @@
 
 /**
     \brief A class for storing pointers.
-    
+
+    \tparam <T> Any type of data except for c arrays
+
     It stores a pointer inside itself, so when copying or assigning objects of this class, 
     the pointer will be copied, but the contents will be the same. The memory for the pointer will be allocated only when the object is created, 
     no memory will be allocated when copying or assigning. The deletion of the pointer will occur when the last object of the class storing the pointer is destroyed. 
@@ -48,6 +50,8 @@ public:
 
     /**
         \brief A template constructor that accepts a parameter package and passes it to a constructor of a specialized type
+
+        \tparam <... Args> A package of parameters that will be passed to the constructor of the T class
 
         \param [in] args A package of parameters to pass to the constructor of the internal type.
 

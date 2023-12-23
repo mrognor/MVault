@@ -95,6 +95,8 @@ public:
     /**
         \brief Method for updating data inside DataStorage
 
+        \tparam <T> Any type of data except for c arrays
+
         Using this method, you can change the values inside the DataStorageRecord inside the DataStorage
 
         \param [in] key the key whose value needs to be changed
@@ -176,6 +178,8 @@ public:
     /**
         \brief A method for getting data using a key
 
+        \tparam <T> Any type of data except for c arrays
+        
         \param [in] key the key whose value should be obtained
         \param [in] data reference to record the received data
 
