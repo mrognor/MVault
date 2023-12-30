@@ -267,7 +267,7 @@ public:
         \param [in] keyValue the value of the key to be found
         \param [out] foundedRecord a ref to the DataStorageRecordRef where found record will be placed
 
-        \return returns true if the key and value was found otherwise returns false
+        \return ref to requested record 
     */
     template <class T>
     DataStorageRecordRef GetRecord(const std::string& keyName, const T& keyValue) const
