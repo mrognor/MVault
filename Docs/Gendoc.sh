@@ -1,17 +1,14 @@
 # Add main page doxygen command to ReadMe.md
-cd $(dirname "$0")/.. 
-mv ReadMe.md TmpReadMe.md
-echo '\mainpage' > ReadMe.md
-cat TmpReadMe.md >> ReadMe.md
-rm TmpReadMe.md
+cd $(dirname "$0")
+echo '\mainpage' > ../Source/ReadMe.md
+cat ../ReadMe.md >> ../Source/ReadMe.md
 
 # Create documentation
-cd Docs
 doxygen Doxyfile
 
-# Remove main page doxygen command from ReadMe.md 
-cd ..
-sed -i '1d' ReadMe.md
+# Remove tmp file
+rm ../Source/ReadMe.md
 
-mkdir -p ./Docs/Generated/html/Docs
-cp ./Docs/Scheme.svg ./Docs/Generated/html/Docs
+# Copy svg scheme to html docs
+mkdir -p ./Generated/html/Docs
+cp ./Scheme.svg ./Generated/html/Docs

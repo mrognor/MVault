@@ -1,3 +1,11 @@
+Full documentation available [here](https://mrognor.github.io/DataStorage/index.html)
+
+# Configure project
+Cmake is used to configure the project. It is called via the **Configure** script. 
+The **Configure** script can accept command-line parameters, which it will pass to the Cmake call.
+
+
+# Old
 This is readme
 
 Full documentation available [here](https://mrognor.github.io/DataStorage/index.html)
