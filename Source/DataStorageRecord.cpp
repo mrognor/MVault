@@ -13,6 +13,7 @@ DataStorageRecord::~DataStorageRecord()
     IsDataStorageRecordValid.SetData(false);
 }
 
+
 DataStorageRecordRef::DataStorageRecordRef() {}
 
 DataStorageRecordRef::DataStorageRecordRef(DataStorageRecord* data, DataStorageStructureHashMap* dataStorageStructureHashMap, DataStorageStructureMap* dataStorageStructureMap) : 

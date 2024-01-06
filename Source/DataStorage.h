@@ -27,7 +27,7 @@ private:
     // Template of data stored inside DataStorage
     DataStorageRecord RecordTemplate;
 
-    /**
+    /*
         A simple typedef for HashMap. It is necessary for a more understandable separation of types.
         Represents the internal structure of the DataStorage.
         A string with the name of the key is used as the key. All keys are the same as in DataStorage.
@@ -39,7 +39,7 @@ private:
     */
     mutable DataStorageStructureHashMap DataStorageHashMapStructure;
 
-    /**
+    /*
         A simple typedef for Map. It is necessary for a more understandable separation of types.
         Represents the internal structure of the DataStorage.
         A string with the name of the key is used as the key. All keys are the same as in DataStorage.
@@ -63,16 +63,17 @@ private:
 
     // Unordered set with all DataStorageRecord pointers
     std::unordered_set<DataStorageRecord*> RecordsSet;
+
 public:
 
     /// Default constructor
     DataStorage();
 
+    /// Deleted copy constructor
+    DataStorage(const DataStorage& other) = delete;
+
     /// Deleted assign operator
     DataStorage& operator= (const DataStorage& other) = delete;
-
-    /// Deleted copy operator
-    DataStorage(const DataStorage& other) = delete;
 
     /**
         \brief Template function to add new key with default value to DataStorage

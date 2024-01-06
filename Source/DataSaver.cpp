@@ -4,6 +4,7 @@ DataTypeSaver::DataTypeSaver(const std::type_info& type) : TypeInfo(type) {}
 
 const std::type_info& DataTypeSaver::GetDataType() { return TypeInfo; }
 
+
 DataSaver::DataSaver() {}
 
 DataSaver::DataSaver(const DataSaver& dataSaver)
