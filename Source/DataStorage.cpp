@@ -4,12 +4,21 @@ DataStorage::DataStorage() {}
 
 bool DataStorage::IsKeyExist(const std::string& keyName) const
 {
-    return RecordTemplate.IsData(keyName);
+    bool res;
+    RecursiveReadWriteMtx.ReadLock();
+    res = RecordTemplate.IsData(keyName);
+    RecursiveReadWriteMtx.ReadUnlock();
+    return res;
 }
 
 void DataStorage::RemoveKey(const std::string& keyName)
 {
-    if (!IsKeyExist(keyName)) return;
+    RecursiveReadWriteMtx.WriteLock();
+    if (!IsKeyExist(keyName)) 
+    {
+        RecursiveReadWriteMtx.WriteUnlock();
+        return;
+    }
 
     // Erase key from record template
     RecordTemplate.EraseData(keyName);
@@ -28,10 +37,14 @@ void DataStorage::RemoveKey(const std::string& keyName)
     // Erase key data from all records
     for (auto& it : RecordsSet)
         it->EraseData(keyName);
+    
+    RecursiveReadWriteMtx.WriteUnlock();
 }
 
 DataStorageRecordRef DataStorage::CreateRecord()
 {
+    RecursiveReadWriteMtx.WriteLock();
+
     // Create new record
     DataStorageRecord* newData = new DataStorageRecord(RecordTemplate);
     // Add new record to set
@@ -41,11 +54,17 @@ DataStorageRecordRef DataStorage::CreateRecord()
     for (auto& it : DataStorageRecordAdders)
         it.second(newData);
 
-    return DataStorageRecordRef(newData, &DataStorageHashMapStructure, &DataStorageMapStructure);
+    DataStorageRecordRef res(newData, &DataStorageHashMapStructure, &DataStorageMapStructure);
+
+    RecursiveReadWriteMtx.WriteUnlock();
+
+    return res;
 }
 
 DataStorageRecordRef DataStorage::CreateRecord(const std::vector<std::pair<std::string, DataSaver>>& params)
 {
+    RecursiveReadWriteMtx.WriteLock();
+
     // Create new record
     DataStorageRecord* newData = new DataStorageRecord(RecordTemplate);
     
@@ -62,11 +81,17 @@ DataStorageRecordRef DataStorage::CreateRecord(const std::vector<std::pair<std::
     for (auto& it : DataStorageRecordAdders)
         it.second(newData);
     
-    return DataStorageRecordRef(newData, &DataStorageHashMapStructure, &DataStorageMapStructure);
+    DataStorageRecordRef res(newData, &DataStorageHashMapStructure, &DataStorageMapStructure);
+
+    RecursiveReadWriteMtx.WriteUnlock();
+
+    return res;
 }
 
 void DataStorage::DropDataStorage()
 {
+    RecursiveReadWriteMtx.WriteLock();
+
     // Clear record template
     RecordTemplate.Clear();
 
@@ -96,10 +121,14 @@ void DataStorage::DropDataStorage()
 
     // Clear RecordsSet
     RecordsSet.clear();
+
+    RecursiveReadWriteMtx.WriteUnlock();
 }
 
 void DataStorage::DropData()
 {
+    RecursiveReadWriteMtx.WriteLock();
+
     // Call functions to clear DataStorageHashMapStructure without
     for (auto& it : DataStorageRecordClearers)
         it.second();
@@ -110,12 +139,19 @@ void DataStorage::DropData()
 
     // Clear RecordsSet
     RecordsSet.clear();
+
+    RecursiveReadWriteMtx.WriteUnlock();
 }
 
 void DataStorage::EraseRecord(const DataStorageRecordRef& recordRefToErase)
 {
+    RecursiveReadWriteMtx.WriteLock();
+
     if (RecordsSet.count(recordRefToErase.DataRecord) == 0)
+    {
+        RecursiveReadWriteMtx.WriteUnlock();
         return;
+    }
 
     // Get pointer to record from record ref
     DataStorageRecord* tmpRec = recordRefToErase.DataRecord;
@@ -125,11 +161,16 @@ void DataStorage::EraseRecord(const DataStorageRecordRef& recordRefToErase)
 
     RecordsSet.erase(tmpRec);
     delete tmpRec;
+    RecursiveReadWriteMtx.WriteUnlock();
 }
 
 std::size_t DataStorage::Size() const
 {
-    return RecordsSet.size();
+    std::size_t res;
+    RecursiveReadWriteMtx.ReadLock();
+    res = RecordsSet.size();
+    RecursiveReadWriteMtx.ReadUnlock();
+    return res;
 }
 
 DataStorage::~DataStorage()

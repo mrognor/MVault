@@ -8,6 +8,7 @@
 #include "SmartPointerWrapper.h"
 #include "DataContainer.h"
 #include "DataStorageRecord.h"
+#include "ReadWriteMutex.h"
 
 /**
     \brief A class for storing data with the ability to quickly search for a variety of different keys of any type
@@ -64,6 +65,9 @@ private:
     // Unordered set with all DataStorageRecord pointers
     std::unordered_set<DataStorageRecord*> RecordsSet;
 
+    // Recursive mutex for thread safety
+    mutable RecursiveReadWriteMutex RecursiveReadWriteMtx;
+
 public:
 
     /// Default constructor
@@ -88,6 +92,8 @@ public:
     template <class T>
     void SetKey(const std::string& keyName, const T& defaultKeyValue)
     {
+        RecursiveReadWriteMtx.WriteLock();
+
         // If the key was added earlier, then it must be deleted
         if (IsKeyExist(keyName))
             RemoveKey(keyName);
@@ -172,6 +178,8 @@ public:
             TtoDataStorageRecordHashMap->emplace(defaultKeyValue, it);
             TtoDataStorageRecordMap->emplace(defaultKeyValue, it);
         }
+
+        RecursiveReadWriteMtx.WriteUnlock();
     }
 
     /**
@@ -196,7 +204,11 @@ public:
     template <class T>
     bool GetKeyValue(const std::string& keyName, T& defaultKeyValue) const
     {
-        return RecordTemplate.GetData(keyName, defaultKeyValue);
+        bool res;
+        RecursiveReadWriteMtx.ReadLock();
+        res = RecordTemplate.GetData(keyName, defaultKeyValue);
+        RecursiveReadWriteMtx.ReadUnlock();
+        return res;
     }
 
     /// \brief The method for deleting the key
@@ -279,6 +291,7 @@ public:
 
         DataStorageRecordRef res;
 
+        RecursiveReadWriteMtx.ReadLock();
         // Checking whether such a key exists
         if (DataStorageHashMapStructure.GetData(keyName, TtoDataStorageRecordHashMap))
         {
@@ -290,12 +303,14 @@ public:
                 res.DataRecord = TtoDataStorageRecordIt->second;
                 res.DataStorageHashMapStructure = &DataStorageHashMapStructure;
                 res.DataStorageMapStructure = &DataStorageMapStructure;
-                res.IsDataStorageRecordValid = true;
+                res.IsDataStorageRecordValid = TtoDataStorageRecordIt->second->IsDataStorageRecordValid;
+                RecursiveReadWriteMtx.ReadUnlock();
                 return res;
             }
         }
 
-        res.IsDataStorageRecordValid = false;
+        res.IsDataStorageRecordValid.SetData(false);
+        RecursiveReadWriteMtx.ReadUnlock();
         return res;
     }
 

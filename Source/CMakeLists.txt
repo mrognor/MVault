@@ -3,12 +3,14 @@ set (DataStorageHeaders
     DataStorageRecord.h 
     DataContainer.h 
     DataSaver.h 
-    SmartPointerWrapper.h)
+    SmartPointerWrapper.h
+    ReadWriteMutex.h)
 
 set (DataStorageSource
     DataStorage.cpp 
     DataStorageRecord.cpp 
-    DataSaver.cpp)
+    DataSaver.cpp
+    ReadWriteMutex.cpp)
 
 project(DataStorage)
 

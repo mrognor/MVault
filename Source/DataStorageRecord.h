@@ -28,6 +28,9 @@ public:
     
     /// Declaring the DataStorageRecordRef class to access its private members
     friend DataStorageRecordRef;
+    
+    /// Declaring the DataStorage class to access its private members
+    friend DataStorage;
 
     /// Default constructor
     DataStorageRecord();

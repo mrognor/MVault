@@ -41,4 +41,7 @@ int main()
     dsrr = ds.GetRecord<std::string>("name", "D");
     if (dsrr.IsValid())
         PrintDataStorageRecord(dsrr);
+    
+    ds.EraseRecord(dsrr);
+    std::cout << dsrr.IsValid() << std::endl;
 }
