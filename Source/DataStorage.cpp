@@ -54,7 +54,7 @@ DataStorageRecordRef DataStorage::CreateRecord()
     for (auto& it : DataStorageRecordAdders)
         it.second(newData);
 
-    DataStorageRecordRef res(newData, &DataStorageHashMapStructure, &DataStorageMapStructure);
+    DataStorageRecordRef res(newData, &DataStorageHashMapStructure, &DataStorageMapStructure, &RecursiveReadWriteMtx);
 
     RecursiveReadWriteMtx.WriteUnlock();
 
@@ -67,7 +67,7 @@ DataStorageRecordRef DataStorage::CreateRecord(const std::vector<std::pair<std::
 
     // Create new record
     DataStorageRecord* newData = new DataStorageRecord(RecordTemplate);
-    
+
     // Copy data from function parametrs
     for (auto& it : params)
         if (newData->IsData(it.first))
@@ -81,8 +81,8 @@ DataStorageRecordRef DataStorage::CreateRecord(const std::vector<std::pair<std::
     for (auto& it : DataStorageRecordAdders)
         it.second(newData);
     
-    DataStorageRecordRef res(newData, &DataStorageHashMapStructure, &DataStorageMapStructure);
-
+    DataStorageRecordRef res(newData, &DataStorageHashMapStructure, &DataStorageMapStructure, &RecursiveReadWriteMtx);
+    
     RecursiveReadWriteMtx.WriteUnlock();
 
     return res;

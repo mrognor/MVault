@@ -5,7 +5,7 @@ DataStorageRecord::DataStorageRecord() {}
 DataStorageRecord::DataStorageRecord(const DataStorageRecord& recordTemplate)
 {
     *this = recordTemplate;
-    IsDataStorageRecordValid.SetData(true);
+    IsDataStorageRecordValid = SmartPointerWrapper<bool> (true);
 }
 
 DataStorageRecord::~DataStorageRecord()
@@ -14,29 +14,53 @@ DataStorageRecord::~DataStorageRecord()
 }
 
 
-DataStorageRecordRef::DataStorageRecordRef() {}
-
-DataStorageRecordRef::DataStorageRecordRef(DataStorageRecord* data, DataStorageStructureHashMap* dataStorageStructureHashMap, DataStorageStructureMap* dataStorageStructureMap) : 
-    DataRecord(data), DataStorageHashMapStructure(dataStorageStructureHashMap), DataStorageMapStructure(dataStorageStructureMap)
+DataStorageRecordRef::DataStorageRecordRef(DataStorageRecord* dataStorageRecord, 
+    DataStorageStructureHashMap* dataStorageStructureHashMap, 
+    DataStorageStructureMap* dataStorageStructureMap,
+    RecursiveReadWriteMutex* dataStorageRecucrsiveReadWriteMtx) :
+    DataRecord(dataStorageRecord),
+    DataStorageHashMapStructure(dataStorageStructureHashMap), 
+    DataStorageMapStructure(dataStorageStructureMap),
+    DataStorageRecucrsiveReadWriteMtx(dataStorageRecucrsiveReadWriteMtx)
 {
-    IsDataStorageRecordValid = data->IsDataStorageRecordValid;
+    if (dataStorageRecord != nullptr)
+    {
+        IsDataStorageRecordValid = dataStorageRecord->IsDataStorageRecordValid;
+        DataStorageRecordRecursiveReadWriteMutex = dataStorageRecord->DataStorageRecordRecursiveReadWriteMutex;
+    }
+    else
+    {
+        IsDataStorageRecordValid.SetData(false);
+    }
 }
 
 bool DataStorageRecordRef::operator==(const DataStorageRecordRef& other) const
 {
-    return DataRecord == other.DataRecord;
+    bool res;
+    DataStorageRecordRecursiveReadWriteMutex.GetData()->ReadLock();
+    other.DataStorageRecordRecursiveReadWriteMutex.GetData()->ReadLock();
+    res = (DataRecord == other.DataRecord);
+    other.DataStorageRecordRecursiveReadWriteMutex.GetData()->ReadUnlock();
+    DataStorageRecordRecursiveReadWriteMutex.GetData()->ReadUnlock();
+    return res;
 }
 
 std::string DataStorageRecordRef::GetRecordUniqueId() const
 {
     std::stringstream ss;
-    ss << DataRecord;
+    DataStorageRecordRecursiveReadWriteMutex.GetData()->ReadLock();
+    if (IsValid())
+        ss << DataRecord;
+    else
+        ss << "null";
+    DataStorageRecordRecursiveReadWriteMutex.GetData()->ReadUnlock();
     return ss.str();
 }
 
 void DataStorageRecordRef::SetData(const std::vector<std::pair<std::string, DataSaver>>& params)
 {
-        // Copy data from function parametrs
+    /// \todo Это вообще не правильно
+    // Copy data from function parametrs
     for (auto& it : params)
         if (DataRecord->IsData(it.first))
             DataRecord->SetDataFromDataSaver(it.first, it.second);
@@ -44,7 +68,11 @@ void DataStorageRecordRef::SetData(const std::vector<std::pair<std::string, Data
 
 bool DataStorageRecordRef::IsValid() const
 {
-    return IsDataStorageRecordValid.GetData();
+    bool res;
+    DataStorageRecordRecursiveReadWriteMutex.GetData()->ReadLock();
+    res = *IsDataStorageRecordValid.GetData();
+    DataStorageRecordRecursiveReadWriteMutex.GetData()->ReadUnlock();
+    return res;
 }
 
 void DataStorageRecordRef::Unlink()

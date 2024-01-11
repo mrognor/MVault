@@ -18,3 +18,5 @@ then the compiler will perceive your string as an array of charms, which may cau
 
 Можно заменить или добавить схему на которой будет таблица
 <img src="Docs/Scheme.svg" alt="scheme" width="100%"/>
+
+Прописать про параметры cmake при вызове Configure.bat

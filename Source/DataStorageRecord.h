@@ -2,10 +2,12 @@
 
 #include <vector>
 #include <sstream>
+#include <mutex>
 
 #include "DataStorageClasses.h"
 #include "DataContainer.h"
 #include "SmartPointerWrapper.h"
+#include "ReadWriteMutex.h"
 
 // Class declaration
 class DataStorageRecordRef;
@@ -24,6 +26,9 @@ class DataStorageRecord : public DataHashMap
 private:
     // A variable for invalidating DataStorageRecordRef's pointing to this object. Before destroying the object, the value will be set to false.
     SmartPointerWrapper<bool> IsDataStorageRecordValid;
+
+    // Smart pointer wrapper to create mutex at DataStorageRecord creation and deletion this mutex only after destroying last reference to this record and record itself
+    SmartPointerWrapper<RecursiveReadWriteMutex> DataStorageRecordRecursiveReadWriteMutex;
 public:
     
     /// Declaring the DataStorageRecordRef class to access its private members
@@ -64,8 +69,14 @@ private:
     // Pointer to DataStorageStructureMap 
     DataStorageStructureMap* DataStorageMapStructure = nullptr;
 
+    // Pointer to recursive read write mutex inside data storage
+    RecursiveReadWriteMutex* DataStorageRecucrsiveReadWriteMtx = nullptr;
+
     // Smart pointer wrapper to get info about data storage record validity
     SmartPointerWrapper<bool> IsDataStorageRecordValid;
+
+    // Smart pointer wrapper to create mutex at DataStorageRecord creation and deletion this mutex only after destroying last reference to this record and record itself
+    SmartPointerWrapper<RecursiveReadWriteMutex> DataStorageRecordRecursiveReadWriteMutex;
 public:
 
     /// Making the DataStorage class friendly so that it has access to the internal members of the DataStorageRecordRef class
@@ -74,16 +85,14 @@ public:
     /// Making the std::hash<DataStorageRecordRef> struct friendly so that it has access to the internal members of the DataStorageRecordRef class
     friend std::hash<DataStorageRecordRef>;
 
-    /// Default constructor 
-    DataStorageRecordRef();
-
     /**
         \brief Constructor
-        \param [in] data a pointer to the record that will be stored inside DataStorageRecordRef
-        \param [in] dataStorageStructureHashMap pointer to the DataStorageHashMap structure
-        \param [in] dataStorageStructureMap pointer to the DataStorageMap structure
+        \todo Добавить описание
     */
-    DataStorageRecordRef(DataStorageRecord* data, DataStorageStructureHashMap* dataStorageStructureHashMap, DataStorageStructureMap* dataStorageStructureMap);
+    DataStorageRecordRef(DataStorageRecord* dataStorageRecord, 
+        DataStorageStructureHashMap* dataStorageStructureHashMap, 
+        DataStorageStructureMap* dataStorageStructureMap,
+        RecursiveReadWriteMutex* dataStorageRecucrsiveReadWriteMtx);
 
     /// \brief Comparison operator
     /// \param [in] other the object to compare with
@@ -118,11 +127,32 @@ public:
         // and a pointer to the DataHashMap is used as a value
         std::multimap<T, DataStorageRecord*>* TtoDataStorageRecordMap = nullptr;
 
+        // Lock DataStorage to write
+        DataStorageRecucrsiveReadWriteMtx->WriteLock();
+
         // Get std::unordered_multimap with T key and DataStorageRecord* value
-        if (!DataStorageHashMapStructure->GetData(key, TtoDataStorageRecordHashMap)) return false;
+        if (!DataStorageHashMapStructure->GetData(key, TtoDataStorageRecordHashMap)) 
+        {
+            DataStorageRecucrsiveReadWriteMtx->WriteUnlock();
+            return false;
+        }
 
         // Get std::multimap with T key and DataStorageRecord* value
-        if (!DataStorageMapStructure->GetData(key, TtoDataStorageRecordMap)) return false;
+        if (!DataStorageMapStructure->GetData(key, TtoDataStorageRecordMap))
+        {
+            DataStorageRecucrsiveReadWriteMtx->WriteUnlock();
+            return false;
+        }
+
+        // Check DataStorageRecordValidity
+        if (!*IsDataStorageRecordValid.GetData())
+        {
+            DataStorageRecucrsiveReadWriteMtx->WriteUnlock();
+            return false;
+        }
+
+        // Lock DataStorageRecord to write
+        DataStorageRecordRecursiveReadWriteMutex.GetData()->WriteLock();
 
         // Get the current value of the key key inside the DataStorageRecordRef and save it for further work
         T oldData;
@@ -145,7 +175,6 @@ public:
         // Add new data to TtoDataStorageRecordHashMap to DataStorage DataStorageHashMapStructure
         TtoDataStorageRecordHashMap->emplace(data, DataRecord);
 
-
         // Remove oldData from TtoDataStorageRecordMap from DataStorageMapStructure
         auto FirstAndLastIteratorsWithKeyOnMap = TtoDataStorageRecordMap->equal_range(oldData);
 
@@ -165,6 +194,11 @@ public:
 
         // Update data inside DataStorageRecord pointer inside DataStorageRecordRef and DataStorage
         DataRecord->SetData(key, data);
+
+        // Unlock DataStorageRecord
+        DataStorageRecordRecursiveReadWriteMutex.GetData()->WriteUnlock();
+        // Unlock DataStorage
+        DataStorageRecucrsiveReadWriteMtx->WriteUnlock();
         return true;
     }
 
@@ -191,7 +225,11 @@ public:
     template <class T>
     bool GetData(const std::string& key, T& data) const
     {
-        return DataRecord->GetData(key, data);
+        bool res;
+        DataStorageRecordRecursiveReadWriteMutex.GetData()->ReadLock();
+        res = DataRecord->GetData(key, data);
+        DataStorageRecordRecursiveReadWriteMutex.GetData()->ReadUnlock();
+        return res;
     }
 
     /// \brief A function to check the validity of a class object
@@ -200,6 +238,7 @@ public:
     bool IsValid() const;
 
     /// A method for decoupling a class object from record
+    /// \todo Нужен ли этот метод
     void Unlink();
 };
 
@@ -209,6 +248,10 @@ struct std::hash<DataStorageRecordRef>
 {
     std::size_t operator()(const DataStorageRecordRef& k) const
     {
-        return std::hash<DataStorageRecord*>()(k.DataRecord);
+        std::size_t res;
+        k.DataStorageRecordRecursiveReadWriteMutex.GetData()->ReadLock();
+        res = std::hash<DataStorageRecord*>()(k.DataRecord);
+        k.DataStorageRecordRecursiveReadWriteMutex.GetData()->ReadUnlock();
+        return res;
     }
 };

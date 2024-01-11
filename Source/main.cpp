@@ -15,6 +15,7 @@ void PrintDataStorageRecord(const DataStorageRecordRef& dsrr)
         std::cout << "Data storage record " << dsrr.GetRecordUniqueId() << " :" << std::endl;
         std::cout << "\tid = " << id << std::endl;
         std::cout << "\tname = " << name << std::endl;
+        /// \todo Remove boolalpha
         std::cout << "\tgender = " << std::boolalpha << gender << std::endl;
     }
     else

@@ -289,8 +289,6 @@ public:
         // Pointer to store map inside DataStorageStructureHashMap
         std::unordered_multimap<T, DataStorageRecord*>* TtoDataStorageRecordHashMap = nullptr;
 
-        DataStorageRecordRef res;
-
         RecursiveReadWriteMtx.ReadLock();
         // Checking whether such a key exists
         if (DataStorageHashMapStructure.GetData(keyName, TtoDataStorageRecordHashMap))
@@ -300,16 +298,13 @@ public:
             if (TtoDataStorageRecordIt != TtoDataStorageRecordHashMap->end())
             {
                 // Set data to DataStorageRecordRef
-                res.DataRecord = TtoDataStorageRecordIt->second;
-                res.DataStorageHashMapStructure = &DataStorageHashMapStructure;
-                res.DataStorageMapStructure = &DataStorageMapStructure;
-                res.IsDataStorageRecordValid = TtoDataStorageRecordIt->second->IsDataStorageRecordValid;
+                DataStorageRecordRef res(TtoDataStorageRecordIt->second, &DataStorageHashMapStructure, &DataStorageMapStructure, &RecursiveReadWriteMtx);
                 RecursiveReadWriteMtx.ReadUnlock();
                 return res;
             }
         }
 
-        res.IsDataStorageRecordValid.SetData(false);
+        DataStorageRecordRef res(nullptr, &DataStorageHashMapStructure, &DataStorageMapStructure, &RecursiveReadWriteMtx);
         RecursiveReadWriteMtx.ReadUnlock();
         return res;
     }

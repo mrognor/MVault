@@ -90,7 +90,7 @@ public:
         \endcode
     */
     template <class... Args>
-    SmartPointerWrapper(Args&&... args)
+    explicit SmartPointerWrapper(Args&&... args)
     {
         Data = new T(args...);
         RefCounter = new std::size_t(1);
@@ -139,9 +139,9 @@ public:
 
     /// \brief Data getter
     /// \return returns the data stored in the class
-    T GetData() const
+    T* GetData() const
     {
-        return *Data;
+        return Data;
     }
 
     /// A method for decoupling a class object from data. For an internal pointer, it is equivalent to a SmartPointerWrapper destructor
