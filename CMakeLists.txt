@@ -1,5 +1,5 @@
-set(CMAKE_CXX_FLAGS_DEBUG "-Wall -g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+set(CMAKE_CXX_FLAGS "-Wall -fsanitize=address  -fsanitize=leak -g")
+
 set(SOURCE_DIR Source)
 
 set (DataStorageHeaders 
