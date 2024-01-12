@@ -5,9 +5,9 @@ void MultithreadingReadTest()
     DataStorage ds;
     std::condition_variable cv;
 
-    std::cout << "\t\tReading test started: ";
+    std::cout << "\t\tReading test started: " << std::flush;
 
-    for (int i = 0; i < 10000; ++i)
+    for (int i = 0; i < 100'000; ++i)
         ds.SetKey(std::to_string(i), i);
 
     auto timeout = std::chrono::steady_clock::now() + std::chrono::milliseconds(500);
@@ -69,7 +69,7 @@ void MultithreadingReadTest()
     th3.join();
     th4.join();
 
-    ColorizedPrint("pass", ConsoleTextColor::Green);
+    ColorizedPrint("\r\t\tReading test started: pass", ConsoleTextColor::Green);
 }
 
 void MultithreadingKeysTest()
@@ -77,7 +77,7 @@ void MultithreadingKeysTest()
     DataStorage ds;
     std::condition_variable cv;
 
-    std::cout << "\t\tKeys test started: ";
+    std::cout << "\t\tKeys test started: " << std::flush;
 
     auto timeout = std::chrono::steady_clock::now() + std::chrono::milliseconds(500);
 
@@ -111,7 +111,7 @@ void MultithreadingKeysTest()
     th1.join();
     th2.join();
 
-    ColorizedPrint("pass", ConsoleTextColor::Green);
+    ColorizedPrint("\r\t\tKeys test started: pass", ConsoleTextColor::Green);
 }
 
 void MultithreadingRecordsTest()
@@ -123,7 +123,7 @@ void MultithreadingRecordsTest()
     ds.SetKey("id", -1);
     ds.SetKey("num", -1);
 
-    std::cout << "\t\tRecords test started: ";
+    std::cout << "\t\tRecords test started: " << std::flush;
 
     auto timeout = std::chrono::steady_clock::now() + std::chrono::milliseconds(5);
 
@@ -164,5 +164,5 @@ void MultithreadingRecordsTest()
     th2.join();
     th3.join();
 
-    ColorizedPrint("pass", ConsoleTextColor::Green);
+    ColorizedPrint("\r\t\tRecords test started: pass", ConsoleTextColor::Green);
 }   

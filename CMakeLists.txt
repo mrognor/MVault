@@ -7,7 +7,6 @@ set (DataStorageHeaders
     ${SOURCE_DIR}/DataStorageRecord.h 
     ${SOURCE_DIR}/DataContainer.h 
     ${SOURCE_DIR}/DataSaver.h 
-    ${SOURCE_DIR}/SmartPointerWrapper.h
     ${SOURCE_DIR}/ReadWriteMutex.h)
 
 set (DataStorageSource
@@ -26,7 +25,7 @@ set(SOURCE_DIR Tests)
 set (TestsSource
     ${SOURCE_DIR}/ColorizedPrint.cpp
     ${SOURCE_DIR}/MultithreadingTest.cpp
-)
+    ${SOURCE_DIR}/Bench.cpp)
 
 project(Test)
 

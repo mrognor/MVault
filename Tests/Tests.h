@@ -10,3 +10,5 @@ void MultithreadingReadTest();
 void MultithreadingKeysTest();
 
 void MultithreadingRecordsTest();
+
+void Bench();
