@@ -1,18 +1,64 @@
 #include "DataStorageRecord.h"
 
-DataStorageRecord::DataStorageRecord() {}
+// DataStorageRecord
 
-DataStorageRecord::DataStorageRecord(const DataStorageRecord& recordTemplate)
+DataStorageRecord::DataStorageRecord()
 {
-    *this = recordTemplate;
-    IsDataStorageRecordValid = SmartPointerWrapper<bool> (true);
+    Mtx = new std::mutex;
+}
+
+DataStorageRecord::DataStorageRecord(const DataStorageRecord& other)
+{
+    IsValid = true;
+    RefCounter = 0;
+    Mtx = new std::mutex;
+}
+
+void DataStorageRecord::AddRef()
+{
+    Mtx->lock();
+    if (IsValid) ++RefCounter;
+    Mtx->unlock();
+}
+
+void DataStorageRecord::RemoveRef()
+{
+    bool isEnd = false;
+    Mtx->lock();
+    --RefCounter;
+    if (!IsValid && RefCounter == 0) isEnd = true;
+    Mtx->unlock();
+
+    if (isEnd) delete this;
+}
+
+void DataStorageRecord::Invalidate()
+{
+    bool isEnd = false;
+    Mtx->lock();
+    IsValid = false;
+    if (RefCounter == 0) isEnd = true;
+    Mtx->unlock();
+
+    if (isEnd) delete this;
+}
+
+bool DataStorageRecord::GetIsValid()
+{
+    bool res;
+    Mtx->lock();
+    res = IsValid;
+    Mtx->unlock();
+    return res;
 }
 
 DataStorageRecord::~DataStorageRecord()
 {
-    IsDataStorageRecordValid.SetData(false);
+    delete Mtx;
 }
 
+
+// DataStorageRecord ref
 
 DataStorageRecordRef::DataStorageRecordRef(DataStorageRecord* dataStorageRecord, 
     DataStorageStructureHashMap* dataStorageStructureHashMap, 
@@ -23,37 +69,23 @@ DataStorageRecordRef::DataStorageRecordRef(DataStorageRecord* dataStorageRecord,
     DataStorageMapStructure(dataStorageStructureMap),
     DataStorageRecucrsiveReadWriteMtx(dataStorageRecucrsiveReadWriteMtx)
 {
-    if (dataStorageRecord != nullptr)
-    {
-        IsDataStorageRecordValid = dataStorageRecord->IsDataStorageRecordValid;
-        DataStorageRecordRecursiveReadWriteMutex = dataStorageRecord->DataStorageRecordRecursiveReadWriteMutex;
-    }
-    else
-    {
-        IsDataStorageRecordValid.SetData(false);
-    }
+    if (DataRecord != nullptr) DataRecord->AddRef();
 }
 
 bool DataStorageRecordRef::operator==(const DataStorageRecordRef& other) const
 {
     bool res;
-    DataStorageRecordRecursiveReadWriteMutex.GetData()->ReadLock();
-    other.DataStorageRecordRecursiveReadWriteMutex.GetData()->ReadLock();
     res = (DataRecord == other.DataRecord);
-    other.DataStorageRecordRecursiveReadWriteMutex.GetData()->ReadUnlock();
-    DataStorageRecordRecursiveReadWriteMutex.GetData()->ReadUnlock();
     return res;
 }
 
 std::string DataStorageRecordRef::GetRecordUniqueId() const
 {
     std::stringstream ss;
-    DataStorageRecordRecursiveReadWriteMutex.GetData()->ReadLock();
     if (IsValid())
         ss << DataRecord;
     else
         ss << "null";
-    DataStorageRecordRecursiveReadWriteMutex.GetData()->ReadUnlock();
     return ss.str();
 }
 
@@ -69,9 +101,6 @@ void DataStorageRecordRef::SetData(const std::vector<std::pair<std::string, Data
 bool DataStorageRecordRef::IsValid() const
 {
     bool res;
-    DataStorageRecordRecursiveReadWriteMutex.GetData()->ReadLock();
-    res = *IsDataStorageRecordValid.GetData();
-    DataStorageRecordRecursiveReadWriteMutex.GetData()->ReadUnlock();
     return res;
 }
 
@@ -80,6 +109,9 @@ void DataStorageRecordRef::Unlink()
     DataRecord = nullptr;
     DataStorageHashMapStructure = nullptr;
     DataStorageMapStructure = nullptr;
+}
 
-    IsDataStorageRecordValid.Unlink();
+DataStorageRecordRef::~DataStorageRecordRef()
+{
+    if (DataRecord != nullptr) DataRecord->RemoveRef();
 }

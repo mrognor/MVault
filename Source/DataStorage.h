@@ -5,7 +5,6 @@
 
 #include "DataStorageClasses.h"
 #include "DataSaver.h"
-#include "SmartPointerWrapper.h"
 #include "DataContainer.h"
 #include "DataStorageRecord.h"
 #include "ReadWriteMutex.h"

@@ -76,7 +76,6 @@ DataStorageRecordRef DataStorage::CreateRecord(const std::vector<std::pair<std::
     // Add new record to set
     RecordsSet.emplace(newData);
 
-
     // Add new record to every maps inside DataStorageStructureHashMap
     for (auto& it : DataStorageRecordAdders)
         it.second(newData);
@@ -117,7 +116,7 @@ void DataStorage::DropDataStorage()
 
     // Delete all Records
     for (auto& it : RecordsSet)
-        delete it;
+        it->Invalidate();
 
     // Clear RecordsSet
     RecordsSet.clear();
@@ -135,7 +134,7 @@ void DataStorage::DropData()
 
     // Delete all Records
     for (auto& it : RecordsSet)
-        delete it;
+        it->Invalidate();
 
     // Clear RecordsSet
     RecordsSet.clear();
@@ -160,7 +159,8 @@ void DataStorage::EraseRecord(const DataStorageRecordRef& recordRefToErase)
         erasers.second(tmpRec);
 
     RecordsSet.erase(tmpRec);
-    delete tmpRec;
+    tmpRec->Invalidate();
+
     RecursiveReadWriteMtx.WriteUnlock();
 }
 
@@ -185,5 +185,5 @@ DataStorage::~DataStorage()
 
     // Clear all records
     for (auto& it : RecordsSet)
-        delete it;
+        it->Invalidate();
 }
