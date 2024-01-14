@@ -1,4 +1,8 @@
-set(CMAKE_CXX_FLAGS "-Wall -fsanitize=address  -fsanitize=leak -g")
+if(WIN32)
+    set(CMAKE_CXX_FLAGS "-Wall -g")
+else()
+    set(CMAKE_CXX_FLAGS "-Wall -fsanitize=address  -fsanitize=leak -g")
+endif()
 
 set(SOURCE_DIR Source)
 

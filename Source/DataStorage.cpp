@@ -175,6 +175,8 @@ std::size_t DataStorage::Size() const
 
 DataStorage::~DataStorage()
 {
+    RecursiveReadWriteMtx.WriteLock();
+    
     // Clear DataStorageHashMapStructure
     for (auto& it : DataStorageHashMapStructure)
         it.second.ResetData();
@@ -186,4 +188,6 @@ DataStorage::~DataStorage()
     // Clear all records
     for (auto& it : RecordsSet)
         it->Invalidate();
+
+    RecursiveReadWriteMtx.WriteUnlock();
 }

@@ -90,6 +90,8 @@ public:
         DataStorageStructureMap* dataStorageStructureMap,
         RecursiveReadWriteMutex* dataStorageRecucrsiveReadWriteMtx);
 
+    DataStorageRecordRef& operator=(const DataStorageRecordRef& other);
+    
     /// \brief Comparison operator
     /// \param [in] other the object to compare with
     /// \return true if the objects are equal, otherwise false

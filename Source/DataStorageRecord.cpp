@@ -12,6 +12,11 @@ DataStorageRecord::DataStorageRecord(const DataStorageRecord& other)
     IsValid = true;
     RefCounter = 0;
     Mtx = new std::mutex;
+
+    other.Mtx->lock();
+    for (const auto& it : other.Container)
+        Container.emplace(it);
+    other.Mtx->unlock();
 }
 
 void DataStorageRecord::AddRef()
@@ -69,23 +74,44 @@ DataStorageRecordRef::DataStorageRecordRef(DataStorageRecord* dataStorageRecord,
     DataStorageMapStructure(dataStorageStructureMap),
     DataStorageRecucrsiveReadWriteMtx(dataStorageRecucrsiveReadWriteMtx)
 {
+    DataStorageRecucrsiveReadWriteMtx->ReadLock();
     if (DataRecord != nullptr) DataRecord->AddRef();
+    DataStorageRecucrsiveReadWriteMtx->ReadUnlock();
+}
+
+DataStorageRecordRef& DataStorageRecordRef::operator=(const DataStorageRecordRef& other)
+{
+    if (&other != this)
+    {
+        other.DataStorageRecucrsiveReadWriteMtx->ReadLock();
+        if (DataRecord != nullptr) other.DataRecord->AddRef();
+        DataStorageHashMapStructure = other.DataStorageHashMapStructure;
+        DataStorageMapStructure = other.DataStorageMapStructure;
+        DataStorageRecucrsiveReadWriteMtx = other.DataStorageRecucrsiveReadWriteMtx;
+        other.DataStorageRecucrsiveReadWriteMtx->ReadUnlock();
+    }
+    
+    return *this;
 }
 
 bool DataStorageRecordRef::operator==(const DataStorageRecordRef& other) const
 {
     bool res;
+    DataStorageRecucrsiveReadWriteMtx->ReadLock();
     res = (DataRecord == other.DataRecord);
+    DataStorageRecucrsiveReadWriteMtx->ReadUnlock();
     return res;
 }
 
 std::string DataStorageRecordRef::GetRecordUniqueId() const
 {
     std::stringstream ss;
+    DataStorageRecucrsiveReadWriteMtx->ReadLock();
     if (IsValid())
         ss << DataRecord;
     else
         ss << "null";
+    DataStorageRecucrsiveReadWriteMtx->ReadUnlock();
     return ss.str();
 }
 
@@ -100,8 +126,11 @@ void DataStorageRecordRef::SetData(const std::vector<std::pair<std::string, Data
 
 bool DataStorageRecordRef::IsValid() const
 {
-    bool res;
-    return res;
+    // Thread saferty
+    if (DataRecord != nullptr)
+        return DataRecord->GetIsValid();
+    else
+        return false;
 }
 
 void DataStorageRecordRef::Unlink()
@@ -113,5 +142,7 @@ void DataStorageRecordRef::Unlink()
 
 DataStorageRecordRef::~DataStorageRecordRef()
 {
+    DataStorageRecucrsiveReadWriteMtx->ReadLock();
     if (DataRecord != nullptr) DataRecord->RemoveRef();
+    DataStorageRecucrsiveReadWriteMtx->ReadUnlock();
 }
