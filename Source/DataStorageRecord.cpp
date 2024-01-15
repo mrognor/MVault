@@ -68,13 +68,15 @@ DataStorageRecord::~DataStorageRecord()
 DataStorageRecordRef::DataStorageRecordRef(DataStorageRecord* dataStorageRecord, 
     DataStorageStructureHashMap* dataStorageStructureHashMap, 
     DataStorageStructureMap* dataStorageStructureMap,
-    RecursiveReadWriteMutex* dataStorageRecucrsiveReadWriteMtx) :
-    DataRecord(dataStorageRecord),
-    DataStorageHashMapStructure(dataStorageStructureHashMap), 
-    DataStorageMapStructure(dataStorageStructureMap),
-    DataStorageRecucrsiveReadWriteMtx(dataStorageRecucrsiveReadWriteMtx)
+    RecursiveReadWriteMutex* dataStorageRecucrsiveReadWriteMtx)
 {
-    if (DataRecord != nullptr) DataRecord->AddRef();
+    dataStorageRecucrsiveReadWriteMtx->ReadLock();
+    if (dataStorageRecord != nullptr) dataStorageRecord->AddRef();
+    DataRecord = dataStorageRecord;
+    DataStorageHashMapStructure = dataStorageStructureHashMap;
+    DataStorageMapStructure = dataStorageStructureMap;
+    DataStorageRecucrsiveReadWriteMtx = dataStorageRecucrsiveReadWriteMtx;
+    dataStorageRecucrsiveReadWriteMtx->ReadUnlock();
 }
 
 DataStorageRecordRef::DataStorageRecordRef(const DataStorageRecordRef& other)
@@ -86,11 +88,13 @@ DataStorageRecordRef& DataStorageRecordRef::operator=(const DataStorageRecordRef
 {
     if (&other != this)
     {
+        other.DataStorageRecucrsiveReadWriteMtx->ReadLock();
         if (other.DataRecord != nullptr) other.DataRecord->AddRef();
         DataRecord = other.DataRecord;
         DataStorageHashMapStructure = other.DataStorageHashMapStructure;
         DataStorageMapStructure = other.DataStorageMapStructure;
         DataStorageRecucrsiveReadWriteMtx = other.DataStorageRecucrsiveReadWriteMtx;
+        other.DataStorageRecucrsiveReadWriteMtx->ReadUnlock();
     }
     
     return *this;
@@ -99,17 +103,21 @@ DataStorageRecordRef& DataStorageRecordRef::operator=(const DataStorageRecordRef
 bool DataStorageRecordRef::operator==(const DataStorageRecordRef& other) const
 {
     bool res;
+    DataStorageRecucrsiveReadWriteMtx->ReadLock();
     res = (DataRecord == other.DataRecord);
+    DataStorageRecucrsiveReadWriteMtx->ReadUnlock();
     return res;
 }
 
 std::string DataStorageRecordRef::GetRecordUniqueId() const
 {
     std::stringstream ss;
+    DataStorageRecucrsiveReadWriteMtx->ReadLock();
     if (IsValid())
         ss << DataRecord;
     else
         ss << "null";
+    DataStorageRecucrsiveReadWriteMtx->ReadUnlock();
     return ss.str();
 }
 

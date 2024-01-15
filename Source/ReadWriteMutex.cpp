@@ -45,6 +45,7 @@ void ReadWriteMutex::WriteUnlock()
     WriteMutex.unlock();
 }
 
+thread_local std::size_t LocalThreadLockCounter = 0;
 
 RecursiveReadWriteMutex::RecursiveReadWriteMutex() 
 { 
@@ -54,22 +55,30 @@ RecursiveReadWriteMutex::RecursiveReadWriteMutex()
 
 void RecursiveReadWriteMutex::ReadLock()
 {
-    WriteMutex.lock();
-    ReadMutex.lock();
-    ReadCounter.fetch_add(1);
-    ReadMutex.unlock();
-    WriteMutex.unlock();
+    if (LocalThreadLockCounter == 0)
+    {
+        WriteMutex.lock();
+        ReadMutex.lock();
+        ReadCounter.fetch_add(1);
+        ReadMutex.unlock();
+        WriteMutex.unlock();
+    }
+    ++LocalThreadLockCounter;
 }
 
 void RecursiveReadWriteMutex::ReadUnlock()
 {
-    ReadMutex.lock();
-    ReadCounter.fetch_sub(1);
+    if (LocalThreadLockCounter == 1)
+    {
+        ReadMutex.lock();
+        ReadCounter.fetch_sub(1);
 
-    if (ReadCounter.load() == 0)
-        while (IsCondVarWaiting.load()) Cv.notify_all();
-    
-    ReadMutex.unlock();
+        if (ReadCounter.load() == 0)
+            while (IsCondVarWaiting.load()) Cv.notify_all();
+
+        ReadMutex.unlock();
+    }
+    --LocalThreadLockCounter;
 }
 
 void RecursiveReadWriteMutex::WriteLock()

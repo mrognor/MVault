@@ -7,7 +7,7 @@ void Bench()
     DataStorage ds;
     ds.SetKey<std::size_t>("id", -1);
 
-    for (std::size_t i = 0; i < 10'000'000; ++i)
+    for (std::size_t i = 0; i < 10000000; ++i)
         ds.CreateRecord({ {"id", i} });
     
     auto start = std::chrono::steady_clock::now();

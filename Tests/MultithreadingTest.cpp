@@ -9,7 +9,7 @@ void MultithreadingReadTest()
 
     ds.SetKey<int>("key", -1);
 
-    for (int i = 0; i < 100'000; ++i)
+    for (int i = 0; i < 100000; ++i)
         ds.CreateRecord({ {"key", i} });
 
     auto timeout = std::chrono::steady_clock::now() + std::chrono::milliseconds(500);
@@ -23,7 +23,7 @@ void MultithreadingReadTest()
         // Wait for start all threads at same time
         cv.wait_until(lk, timeout);
 
-        for (int i = 0; i < 100'000; ++i)
+        for (int i = 0; i < 100000; ++i)
             DataStorageRecordRef dsrr = ds.GetRecord("key", i);
     });
 
@@ -36,7 +36,7 @@ void MultithreadingReadTest()
         // Wait for start all threads at same time
         cv.wait_until(lk, timeout);
 
-        for (int i = 0; i < 100'000; ++i)
+        for (int i = 0; i < 100000; ++i)
             DataStorageRecordRef dsrr = ds.GetRecord("key", i);
     });
 
@@ -49,7 +49,7 @@ void MultithreadingReadTest()
         // Wait for start all threads at same time
         cv.wait_until(lk, timeout);
 
-        for (int i = 99'999; i >= 0; --i)
+        for (int i = 99999; i >= 0; --i)
             DataStorageRecordRef dsrr = ds.GetRecord("key", i);
     });
 
@@ -62,7 +62,7 @@ void MultithreadingReadTest()
         // Wait for start all threads at same time
         cv.wait_until(lk, timeout);
 
-        for (int i = 99'999; i >= 0; --i)
+        for (int i = 99999; i >= 0; --i)
             DataStorageRecordRef dsrr = ds.GetRecord("key", i);
     });
 
@@ -92,7 +92,7 @@ void MultithreadingKeysTest()
         // Wait for start all threads at same time
         cv.wait_until(lk, timeout);
 
-        for (int i = 0; i < 100'000; ++i)
+        for (int i = 0; i < 100000; ++i)
             ds.SetKey(std::to_string(i), i);
         
     });
@@ -106,7 +106,7 @@ void MultithreadingKeysTest()
         // Wait for start all threads at same time
         cv.wait_until(lk, timeout);
 
-        for (int i = 0; i < 100'000; ++i)
+        for (int i = 0; i < 100000; ++i)
             ds.RemoveKey(std::to_string(i));
     });
 
@@ -132,7 +132,7 @@ void MultithreadingRecordsTest()
     // Thread for adding records
     std::thread th1([&]()
     {
-        for (int i = 0; i < 100'000; ++i)
+        for (int i = 0; i < 100000; ++i)
             ds.CreateRecord({ {"id", i} });
         
     });
@@ -140,7 +140,7 @@ void MultithreadingRecordsTest()
     // Thread for changing records
     std::thread th2([&]()
     {
-        for (int i = 0; i < 100'000; ++i)
+        for (int i = 0; i < 100000; ++i)
         {
             DataStorageRecordRef dsrr = ds.GetRecord("id", i);
             dsrr.SetData("num", i);
@@ -156,7 +156,7 @@ void MultithreadingRecordsTest()
         // Wait for start all threads at same time
         cv.wait_until(lk, timeout);
 
-        for (int i = 0; i < 100'000; ++i)
+        for (int i = 0; i < 100000; ++i)
         {
             DataStorageRecordRef dsrr = ds.GetRecord("id", i);
             ds.EraseRecord(dsrr);

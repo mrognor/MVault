@@ -4,6 +4,7 @@ else()
     set(CMAKE_CXX_FLAGS "-Wall -fsanitize=address  -fsanitize=leak -g")
 endif()
 
+set (CMAKE_CXX_STANDARD 11)
 set(SOURCE_DIR Source)
 
 set (DataStorageHeaders 
