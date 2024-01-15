@@ -74,21 +74,23 @@ DataStorageRecordRef::DataStorageRecordRef(DataStorageRecord* dataStorageRecord,
     DataStorageMapStructure(dataStorageStructureMap),
     DataStorageRecucrsiveReadWriteMtx(dataStorageRecucrsiveReadWriteMtx)
 {
-    DataStorageRecucrsiveReadWriteMtx->ReadLock();
     if (DataRecord != nullptr) DataRecord->AddRef();
-    DataStorageRecucrsiveReadWriteMtx->ReadUnlock();
+}
+
+DataStorageRecordRef::DataStorageRecordRef(const DataStorageRecordRef& other)
+{
+    *this = other;
 }
 
 DataStorageRecordRef& DataStorageRecordRef::operator=(const DataStorageRecordRef& other)
 {
     if (&other != this)
     {
-        other.DataStorageRecucrsiveReadWriteMtx->ReadLock();
-        if (DataRecord != nullptr) other.DataRecord->AddRef();
+        if (other.DataRecord != nullptr) other.DataRecord->AddRef();
+        DataRecord = other.DataRecord;
         DataStorageHashMapStructure = other.DataStorageHashMapStructure;
         DataStorageMapStructure = other.DataStorageMapStructure;
         DataStorageRecucrsiveReadWriteMtx = other.DataStorageRecucrsiveReadWriteMtx;
-        other.DataStorageRecucrsiveReadWriteMtx->ReadUnlock();
     }
     
     return *this;
@@ -97,21 +99,17 @@ DataStorageRecordRef& DataStorageRecordRef::operator=(const DataStorageRecordRef
 bool DataStorageRecordRef::operator==(const DataStorageRecordRef& other) const
 {
     bool res;
-    DataStorageRecucrsiveReadWriteMtx->ReadLock();
     res = (DataRecord == other.DataRecord);
-    DataStorageRecucrsiveReadWriteMtx->ReadUnlock();
     return res;
 }
 
 std::string DataStorageRecordRef::GetRecordUniqueId() const
 {
     std::stringstream ss;
-    DataStorageRecucrsiveReadWriteMtx->ReadLock();
     if (IsValid())
         ss << DataRecord;
     else
         ss << "null";
-    DataStorageRecucrsiveReadWriteMtx->ReadUnlock();
     return ss.str();
 }
 
@@ -142,7 +140,5 @@ void DataStorageRecordRef::Unlink()
 
 DataStorageRecordRef::~DataStorageRecordRef()
 {
-    DataStorageRecucrsiveReadWriteMtx->ReadLock();
     if (DataRecord != nullptr) DataRecord->RemoveRef();
-    DataStorageRecucrsiveReadWriteMtx->ReadUnlock();
 }

@@ -83,12 +83,20 @@ public:
 
     /**
         \brief Constructor
-        \todo Добавить описание
+        
+        \param [in] dataStorageRecord A pointer to the DataStorage referenced by the class object DataStorageRecordRef
+        \param [in] dataStorageStructureHashMap The internal structure of the DataStorage, represented by a hash table
+        \param [in] dataStorageStructureMap The internal structure of the DataStorage, represented by a binary tree
+        \param [in] dataStorageRecucrsiveReadWriteMtx Pointer to DataStorage mutex used for thread safety
     */
     DataStorageRecordRef(DataStorageRecord* dataStorageRecord, 
         DataStorageStructureHashMap* dataStorageStructureHashMap, 
         DataStorageStructureMap* dataStorageStructureMap,
         RecursiveReadWriteMutex* dataStorageRecucrsiveReadWriteMtx);
+
+    /// \brief Copy constructor
+    /// \param [in] other other DataStorageRecordRef object
+    DataStorageRecordRef(const DataStorageRecordRef& other);
 
     DataStorageRecordRef& operator=(const DataStorageRecordRef& other);
     
