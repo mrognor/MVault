@@ -89,6 +89,7 @@ DataStorageRecordRef& DataStorageRecordRef::operator=(const DataStorageRecordRef
     if (&other != this)
     {
         other.DataStorageRecucrsiveReadWriteMtx->ReadLock();
+        if (DataRecord != nullptr) DataRecord->RemoveRef();
         if (other.DataRecord != nullptr) other.DataRecord->AddRef();
         DataRecord = other.DataRecord;
         DataStorageHashMapStructure = other.DataStorageHashMapStructure;
