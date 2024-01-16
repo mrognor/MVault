@@ -21,6 +21,22 @@
 template <class T>
 std::string ToString(const T& data) { return ""; }
 
+/// \todo Добавить описание этой функции в доки
+template <class T = int>
+std::string ToString(const int& data) { return std::to_string(data); }
+
+/// \todo Добавить описание этой функции в доки
+template <class T = bool>
+std::string ToString(const bool& data) { if(data) return "true"; else return "false"; }
+
+/// \todo Добавить описание этой функции в доки
+template <class T = std::string>
+std::string ToString(const std::string& data) { return data; }
+
+/// \todo Добавить описание этой функции в доки
+template <class T = float>
+std::string ToString(const float& data) { return std::to_string(data); }
+
 /**
     \brief Class to make real time type check
 
@@ -211,6 +227,7 @@ public:
     void Swap(DataSaver& dataSaver);
 
     /// \brief A method for getting a string that represents data inside a class object
+    /// Used ToString function. 
     /// \return A string of data
     std::string Str() const;
 

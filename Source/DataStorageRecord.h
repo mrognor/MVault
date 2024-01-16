@@ -237,6 +237,9 @@ public:
     /// \return returns true if the object is valid, otherwise false
     bool IsValid() const;
 
+    /// \brief A method for displaying DataStorageRecordRef content on the screen
+    void PrintRecord() const;
+    
     /// A method for decoupling a class object from record
     /// \todo Нужен ли этот метод
     void Unlink();

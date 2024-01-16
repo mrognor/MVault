@@ -140,6 +140,23 @@ bool DataStorageRecordRef::IsValid() const
         return false;
 }
 
+void DataStorageRecordRef::PrintRecord() const
+{
+    DataStorageRecucrsiveReadWriteMtx->ReadLock();
+    
+    std::cout << "Data storage record " << DataRecord << ":" << std::endl;
+
+    for (const auto& keyPair : *DataStorageHashMapStructure)
+    {
+        DataSaver dataSaver;
+        DataRecord->GetDataSaver(keyPair.first, dataSaver);
+    
+        std::cout << "\t" << keyPair.first << " = " << dataSaver.Str() << std::endl;
+    }
+
+    DataStorageRecucrsiveReadWriteMtx->ReadUnlock();
+}
+
 void DataStorageRecordRef::Unlink()
 {
     DataRecord = nullptr;

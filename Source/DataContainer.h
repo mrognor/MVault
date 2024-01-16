@@ -174,6 +174,25 @@ public:
         return true;
     }
 
+    /**
+        \brief Method for getting dataSaver from a container using a key
+
+        \param [in] key key for getting data
+        \param [out] dataSaver a reference to dataSaver to write data from the container there.
+        If the data was not found, then nothing will be written to the dataSaver
+
+        \return Returns false if the key was not found, and otherwise returns true.
+    */ 
+    bool GetDataSaver(const std::string& key, DataSaver& dataSaver) const
+    {
+        auto f = Container.find(key);
+        if (f == Container.end())
+            return false;
+
+        dataSaver = f->second;
+        return true;
+    }
+    
     /// \brief A method for checking whether data with such a key is in the container
     /// \param [in] key key to find in container
     /// \return Returns false if the key was not found, and otherwise returns true.

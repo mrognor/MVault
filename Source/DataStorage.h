@@ -69,13 +69,13 @@ private:
 
 public:
 
-    /// Default constructor
+    /// \brief Default constructor
     DataStorage();
 
-    /// Deleted copy constructor
+    /// \brief Deleted copy constructor
     DataStorage(const DataStorage& other) = delete;
 
-    /// Deleted assign operator
+    /// \brief Deleted assign operator
     DataStorage& operator= (const DataStorage& other) = delete;
 
     /**
@@ -308,10 +308,10 @@ public:
         return res;
     }
 
-    /// A method for deleting all data and keys
+    /// \brief A method for deleting all data and keys
     void DropDataStorage();
 
-    /// A method for deleting all data, but keeping all keys
+    /// \brief A method for deleting all data, but keeping all keys
     void DropData();
 
     /// \brief Method for deleting a record from a DataStorage
@@ -322,6 +322,16 @@ public:
     /// \return number of records
     std::size_t Size() const;
 
-    /// Default destructor 
+    /// \brief The method for getting all the keys
+    /// \return vector with keys
+    std::vector<std::string> GetKeys() const;
+
+    /// \brief A method for displaying the contents of a DataStorage on the screen
+    void PrintDataStorage(const std::size_t amountOfRecords = 0) const;
+    
+    /// \brief A method for displaying the contents of a DataStorage as a table on the screen
+    void PrintAsTable(const std::size_t amountOfRecords = 0) const;
+
+    /// \brief Default destructor
     ~DataStorage();
 };
