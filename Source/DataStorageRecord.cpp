@@ -164,6 +164,17 @@ void DataStorageRecordRef::Unlink()
     DataStorageMapStructure = nullptr;
 }
 
+
+void DataStorageRecordRef::WriteLock()
+{
+    DataStorageRecucrsiveReadWriteMtx->WriteLock();
+}
+
+void DataStorageRecordRef::WriteUnlock()
+{
+    DataStorageRecucrsiveReadWriteMtx->WriteUnlock();
+}
+    
 DataStorageRecordRef::~DataStorageRecordRef()
 {
     if (DataRecord != nullptr) DataRecord->RemoveRef();

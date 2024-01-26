@@ -244,6 +244,35 @@ public:
     /// \todo Нужен ли этот метод
     void Unlink();
 
+    /**
+        \brief A method for locking record for writing
+
+        Usage example:
+        \code
+        DataStorage ds;
+        ds.SetKey<std::size_t>("Id", 0);
+		ds.SetKey<std::vector<int>>("Slaves", std::vector<int>());
+
+        ...
+
+        std::vector<int> slaves;
+        DataStorageRecordRef dsrr = DS.GetRecord("Slaves", slaves);
+
+        // Lock so that another thread cannot change the vector
+        dsrr.WriteLock();
+
+        for (const int& i : slaves)
+            std::cout << slaves << std::endl;
+
+        dsrr.WriteUnlock();
+        
+        \endcode
+    */
+    void WriteLock();
+
+    /// \brief A method for unlocking record for writing
+    void WriteUnlock();
+
     /// \brief Default destructor
     ~DataStorageRecordRef();
 };
