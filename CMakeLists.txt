@@ -12,7 +12,8 @@ set (DataStorageHeaders
     ${SOURCE_DIR}/DataStorageRecord.h 
     ${SOURCE_DIR}/DataContainer.h 
     ${SOURCE_DIR}/DataSaver.h 
-    ${SOURCE_DIR}/ReadWriteMutex.h)
+    ${SOURCE_DIR}/ReadWriteMutex.h
+    ${SOURCE_DIR}/ToString.h)
 
 set (DataStorageSource
     ${SOURCE_DIR}/DataStorage.cpp 
