@@ -153,7 +153,7 @@ bool StringToInt(const std::string& str, int& digit)
 
     for (; i < str.length(); ++i)
     {
-        if (!isdigit(static_cast<int>(str[i]))) return false;
+        if (str[i] < '0' || str[i] > '9') return false;
         res *= 10;
         res += static_cast<int>(str[i] - '0');
     }
@@ -187,7 +187,7 @@ bool StringToFloat(const std::string& str, float& digit)
             break;
         }
 
-        if (!isdigit(static_cast<int>(str[i]))) return false;
+        if (str[i] < '0' || str[i] > '9') return false;
         integer *= 10;
         integer += static_cast<int>(str[i] - '0');
     }
@@ -195,7 +195,7 @@ bool StringToFloat(const std::string& str, float& digit)
     float coeff = 1;
     for (; i < str.length(); ++i)
     {
-        if (!isdigit(static_cast<int>(str[i]))) return false;
+        if (str[i] < '0' || str[i] > '9') return false;
         coeff /= 10;
         fractional *= 10;
         fractional += static_cast<int>(str[i] - '0');
