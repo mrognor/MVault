@@ -9,16 +9,16 @@ endif()
 set(CMAKE_CXX_STANDARD 11)
 
 set(MVaultHeaders 
-    DataStorage.h 
-    DataStorageRecord.h 
+    Vault.h 
+    VaultRecord.h 
     DataContainer.h 
     DataSaver.h 
     ReadWriteMutex.h
     ToString.h)
 
 set(MVaultSource
-    DataStorage.cpp 
-    DataStorageRecord.cpp 
+    Vault.cpp 
+    VaultRecord.cpp 
     DataSaver.cpp
     ReadWriteMutex.cpp)
 

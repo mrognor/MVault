@@ -1,4 +1,4 @@
-Full documentation available [here](https://mrognor.github.io/DataStorage/index.html)
+Full documentation available [here](https://mrognor.github.io/MVault/index.html)
 
 # Configure project
 Cmake is used to configure the project. It is called via the **Configure** script. 
@@ -8,7 +8,7 @@ The **Configure** script can accept command-line parameters, which it will pass 
 # Old
 This is readme
 
-Full documentation available [here](https://mrognor.github.io/DataStorage/index.html)
+Full documentation available [here](https://mrognor.github.io/MVault/index.html)
 
 This project provides a convenient way to work with data.
 

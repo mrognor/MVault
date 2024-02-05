@@ -1,8 +1,3 @@
-*.out
-*.exe
 .vscode
 Docs/Generated
-DataStorage
 Build
-*.csv
-!CPU_benchmark_v4.csv

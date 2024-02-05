@@ -96,13 +96,8 @@ public:
 class RecursiveReadWriteMutex
 {
 private:
-    std::recursive_mutex WriteMutex, ReadMutex;
-    std::atomic_int ReadCounter;
-    std::atomic_bool IsCondVarWaiting;
-    std::condition_variable Cv;
+    ReadWriteMutex Rwmx;
 public:
-    /// \brief Default constructor
-    RecursiveReadWriteMutex();
 
     /**
         \brief A method for locking a section of code for reading

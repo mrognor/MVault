@@ -45,57 +45,52 @@ void ReadWriteMutex::WriteUnlock()
     WriteMutex.unlock();
 }
 
-thread_local std::size_t LocalThreadLockCounter = 0;
-
-RecursiveReadWriteMutex::RecursiveReadWriteMutex() 
-{ 
-    ReadCounter.store(0);
-    IsCondVarWaiting.store(false);
-}
+thread_local std::size_t LocalThreadReadLockCounter = 0;
+thread_local std::size_t LocalThreadWriteLockCounter = 0;
 
 void RecursiveReadWriteMutex::ReadLock()
 {
-    if (LocalThreadLockCounter == 0)
+    if (LocalThreadWriteLockCounter == 0)
     {
-        WriteMutex.lock();
-        ReadMutex.lock();
-        ReadCounter.fetch_add(1);
-        ReadMutex.unlock();
-        WriteMutex.unlock();
+        if (LocalThreadReadLockCounter == 0)
+            Rwmx.ReadLock();
+
+        ++LocalThreadReadLockCounter;
     }
-    ++LocalThreadLockCounter;
 }
 
 void RecursiveReadWriteMutex::ReadUnlock()
 {
-    if (LocalThreadLockCounter == 1)
+    if (LocalThreadWriteLockCounter == 0)
     {
-        ReadMutex.lock();
-        ReadCounter.fetch_sub(1);
-
-        if (ReadCounter.load() == 0)
-            while (IsCondVarWaiting.load()) Cv.notify_all();
-
-        ReadMutex.unlock();
+        if (LocalThreadReadLockCounter == 1)
+            Rwmx.ReadUnlock();
+        
+        --LocalThreadReadLockCounter;
     }
-    --LocalThreadLockCounter;
 }
 
 void RecursiveReadWriteMutex::WriteLock()
 {
-    std::mutex mtx;
-    std::unique_lock<std::mutex> lk(mtx);
+    if (LocalThreadWriteLockCounter == 0)
+    {
+        if (LocalThreadReadLockCounter > 0)
+            Rwmx.ReadUnlock();
+        
+        Rwmx.WriteLock();
+    }
 
-    WriteMutex.lock();
-    
-    IsCondVarWaiting.store(true);
-
-    if (ReadCounter > 0) Cv.wait(lk);
-    
-    IsCondVarWaiting.store(false);
+    ++LocalThreadWriteLockCounter;
 }
+
 
 void RecursiveReadWriteMutex::WriteUnlock()
 {
-    WriteMutex.unlock();
+    if (LocalThreadWriteLockCounter == 1)
+    {
+        Rwmx.WriteUnlock();
+        if (LocalThreadReadLockCounter > 0)
+            Rwmx.ReadLock();
+    }
+    --LocalThreadWriteLockCounter;
 }

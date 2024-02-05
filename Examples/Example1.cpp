@@ -1,4 +1,4 @@
-#include "../Source/DataStorage.h"
+#include "../Source/Vault.h"
 
 template <>
 struct std::hash<std::vector<int>>
@@ -14,7 +14,7 @@ struct std::hash<std::vector<int>>
 
 /// \todo Добавить описание этой функции в доки
 template <>
-std::string ToString(const std::vector<int>& data) 
+std::string mvlt::ToString(const std::vector<int>& data) 
 {
     if (data.size() == 0) return "{}";
     std::string res = "{";
@@ -32,26 +32,26 @@ std::string ToString(const std::vector<int>& data)
 
 int main()
 {
-    DataStorage ds;
+    mvlt::Vault vlt;
 
-    ds.SetKey("id", -1);
-    ds.SetKey<std::string>("name", "");
-    ds.SetKey("gender", true);
-    ds.SetKey("slaves", std::vector<int>());
+    vlt.SetKey("id", -1);
+    vlt.SetKey<std::string>("name", "");
+    vlt.SetKey("gender", true);
+    vlt.SetKey("slaves", std::vector<int>());
 
-    ds.CreateRecord({ {"id", 0}, {"name", std::string("A")}, {"gender", true} });
-    ds.CreateRecord({ {"id", 1}, {"name", std::string("B")}, {"gender", false} });
-    ds.CreateRecord({ {"id", 2}, {"name", std::string("C")}, {"gender", true} });
-    ds.CreateRecord({ {"id", 3}, {"name", std::string("D")}, {"gender", false}, {"slaves", std::vector<int>{1, 2, 3}} });
-    ds.PrintAsTable();
+    vlt.CreateRecord({ {"id", 0}, {"name", std::string("A")}, {"gender", true} });
+    vlt.CreateRecord({ {"id", 1}, {"name", std::string("B")}, {"gender", false} });
+    vlt.CreateRecord({ {"id", 2}, {"name", std::string("C")}, {"gender", true} });
+    vlt.CreateRecord({ {"id", 3}, {"name", std::string("D")}, {"gender", false}, {"slaves", std::vector<int>{1, 2, 3}} });
+    vlt.PrintAsTable();
 
-    DataStorageRecordRef dsrr = ds.GetRecord("id", 2);
-    if (dsrr.IsValid()) dsrr.PrintRecord();
+    mvlt::VaultRecordRef vltrr = vlt.GetRecord("id", 2);
+    if (vltrr.IsValid()) vltrr.PrintRecord();
 
-    dsrr = ds.GetRecord<std::string>("name", "D");
-    if (dsrr.IsValid()) dsrr.PrintRecord();
+    vltrr = vlt.GetRecord<std::string>("name", "D");
+    if (vltrr.IsValid()) vltrr.PrintRecord();
         
-    std::cout << dsrr.IsValid() << std::endl; 
-    ds.EraseRecord(dsrr);
-    std::cout << dsrr.IsValid() << std::endl;
+    std::cout << vltrr.IsValid() << std::endl; 
+    vlt.EraseRecord(vltrr);
+    std::cout << vltrr.IsValid() << std::endl;
 }

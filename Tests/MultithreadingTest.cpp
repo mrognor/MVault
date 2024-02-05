@@ -2,15 +2,15 @@
 
 void MultithreadingReadTest()
 {
-    DataStorage ds;
+    mvlt::Vault vlt;
     std::condition_variable cv;
 
     std::cout << "\t\tReading test started: " << std::flush;
 
-    ds.SetKey<int>("key", -1);
+    vlt.SetKey<int>("key", -1);
 
     for (int i = 0; i < 100000; ++i)
-        ds.CreateRecord({ {"key", i} });
+        vlt.CreateRecord({ {"key", i} });
 
     auto timeout = std::chrono::steady_clock::now() + std::chrono::milliseconds(500);
 
@@ -24,7 +24,7 @@ void MultithreadingReadTest()
         cv.wait_until(lk, timeout);
 
         for (int i = 0; i < 100000; ++i)
-            DataStorageRecordRef dsrr = ds.GetRecord("key", i);
+            mvlt::VaultRecordRef vltrr = vlt.GetRecord("key", i);
     });
 
     // Thread for forward records reading
@@ -37,7 +37,7 @@ void MultithreadingReadTest()
         cv.wait_until(lk, timeout);
 
         for (int i = 0; i < 100000; ++i)
-            DataStorageRecordRef dsrr = ds.GetRecord("key", i);
+            mvlt::VaultRecordRef vltrr = vlt.GetRecord("key", i);
     });
 
     // Thread for backward records reading
@@ -50,7 +50,7 @@ void MultithreadingReadTest()
         cv.wait_until(lk, timeout);
 
         for (int i = 99999; i >= 0; --i)
-            DataStorageRecordRef dsrr = ds.GetRecord("key", i);
+            mvlt::VaultRecordRef vltrr = vlt.GetRecord("key", i);
     });
 
         // Thread for backward records reading
@@ -63,7 +63,7 @@ void MultithreadingReadTest()
         cv.wait_until(lk, timeout);
 
         for (int i = 99999; i >= 0; --i)
-            DataStorageRecordRef dsrr = ds.GetRecord("key", i);
+            mvlt::VaultRecordRef vltrr = vlt.GetRecord("key", i);
     });
 
     th1.join();
@@ -76,7 +76,7 @@ void MultithreadingReadTest()
 
 void MultithreadingKeysTest()
 {
-    DataStorage ds;
+    mvlt::Vault vlt;
     std::condition_variable cv;
 
     std::cout << "\t\tKeys test started: " << std::flush;
@@ -93,7 +93,7 @@ void MultithreadingKeysTest()
         cv.wait_until(lk, timeout);
 
         for (int i = 0; i < 100000; ++i)
-            ds.SetKey(std::to_string(i), i);
+            vlt.SetKey(std::to_string(i), i);
         
     });
 
@@ -107,7 +107,7 @@ void MultithreadingKeysTest()
         cv.wait_until(lk, timeout);
 
         for (int i = 0; i < 100000; ++i)
-            ds.RemoveKey(std::to_string(i));
+            vlt.RemoveKey(std::to_string(i));
     });
 
     th1.join();
@@ -118,12 +118,12 @@ void MultithreadingKeysTest()
 
 void MultithreadingRecordsTest()
 {
-    DataStorage ds;
+    mvlt::Vault vlt;
 
     std::condition_variable cv;
 
-    ds.SetKey("id", -1);
-    ds.SetKey("num", -1);
+    vlt.SetKey("id", -1);
+    vlt.SetKey("num", -1);
 
     std::cout << "\t\tRecords test started: " << std::flush;
 
@@ -133,7 +133,7 @@ void MultithreadingRecordsTest()
     std::thread th1([&]()
     {
         for (int i = 0; i < 100000; ++i)
-            ds.CreateRecord({ {"id", i} });
+            vlt.CreateRecord({ {"id", i} });
         
     });
 
@@ -142,8 +142,8 @@ void MultithreadingRecordsTest()
     {
         for (int i = 0; i < 100000; ++i)
         {
-            DataStorageRecordRef dsrr = ds.GetRecord("id", i);
-            dsrr.SetData("num", i);
+            mvlt::VaultRecordRef vltrr = vlt.GetRecord("id", i);
+            vltrr.SetData("num", i);
         }
     });
 
@@ -158,8 +158,8 @@ void MultithreadingRecordsTest()
 
         for (int i = 0; i < 100000; ++i)
         {
-            DataStorageRecordRef dsrr = ds.GetRecord("id", i);
-            ds.EraseRecord(dsrr);
+            mvlt::VaultRecordRef vltrr = vlt.GetRecord("id", i);
+            vlt.EraseRecord(vltrr);
         }
     });
 
