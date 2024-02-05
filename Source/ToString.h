@@ -4,9 +4,59 @@
 
 namespace mvlt
 {
-    /**
-        \todo Добавить описание этой функции в доки
-        
+    /*! 
+        \defgroup ToString ToStringFunctions
+        \brief Functions for printing custom classes
+
+        @{
+
+        Since the repository supports any type, including custom classes, these functions for converting objects of custom classes must be defined by users. 
+        This is implemented using the specialization of a partial function. The library defines a template function **ToString**, 
+        which accepts an object of any type and returns an empty string. 
+        This is necessary in order for the code to work with any types, even if conversion to a string is not defined for them. 
+        However, if you want to add to your type the ability to convert to a string, then you must define the **ToString** function for your type. 
+
+        For example, like this
+
+        \code
+        template <>
+        std::string mvlt::ToString(const std::vector<int>& data) 
+        {
+            if (data.size() == 0) return "{}";
+            std::string res = "{}";
+            for (const int& it : data)
+            {
+                res += std::to_string(it) + ", ";
+            }
+
+            res.pop_back();
+            res.pop_back();
+
+            res += "}";
+            return res; 
+        }
+        \endcode
+
+        This code defines the **ToString** function for a vector of integers.
+
+        By calling this function:
+
+        \code
+        std::vector<int> vec = {1, 2, 3, 4, 5};
+        std::cout << ToString(vec) << std::endl;
+        \endcode
+
+        The output will be as follows:  
+        > {1, 2, 3, 4, 5}
+
+        By default, the function is defined for the following types:  
+        \* int  
+        \* bool  
+        \* float  
+        \* std::string  
+    */
+
+    /**       
         \brief A template method for providing an interface converting any type to a string
 
         This function allows you to use the same interface inside the Vault for any class, 
@@ -23,19 +73,49 @@ namespace mvlt
     template <class T>
     std::string ToString(const T& data) { return ""; }
 
-    /// \todo Добавить описание этой функции в доки
+    /**       
+        \brief Specialization of the ToString method for the int type
+
+        \tparam <int> integer variable
+        \param [in] data the variable to be converted to a string
+
+        \return result of std::to_string function
+    */
     template <>
     inline std::string ToString(const int& data) { return std::to_string(data); }
 
-    /// \todo Добавить описание этой функции в доки
+    /**       
+        \brief Specialization of the ToString method for the bool type
+
+        \tparam <bool> boolean variable
+        \param [in] data the variable to be converted to a string
+
+        \return string with true if data true, otherwise retutn string with false
+    */
     template <>
     inline std::string ToString(const bool& data) { if(data) return "true"; else return "false"; }
 
-    /// \todo Добавить описание этой функции в доки
+    /**       
+        \brief Specialization of the ToString method for the std::string type
+
+        \tparam <std::string> string variable
+        \param [in] data the variable to be converted to a string
+
+        \return data
+    */
     template <>
     inline std::string ToString(const std::string& data) { return data; }
 
-    /// \todo Добавить описание этой функции в доки
+    /**       
+        \brief Specialization of the ToString method for the float type
+
+        \tparam <float> float variable
+        \param [in] data the variable to be converted to a string
+
+        \return result of std::to_string function
+    */
     template <>
     inline std::string ToString(const float& data) { return std::to_string(data); }
+
+    /*! @} */
 }
