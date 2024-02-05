@@ -10,7 +10,8 @@ set(CMAKE_CXX_STANDARD 11)
 
 set(MVaultHeaders 
     Vault.h 
-    VaultRecord.h 
+    VaultRecord.h
+    VaultRecordRef.h
     DataContainer.h 
     DataSaver.h 
     ReadWriteMutex.h
@@ -18,7 +19,8 @@ set(MVaultHeaders
 
 set(MVaultSource
     Vault.cpp 
-    VaultRecord.cpp 
+    VaultRecord.cpp
+    VaultRecordRef.cpp
     DataSaver.cpp
     ReadWriteMutex.cpp)
 

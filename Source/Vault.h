@@ -7,6 +7,7 @@
 #include "DataSaver.h"
 #include "DataContainer.h"
 #include "VaultRecord.h"
+#include "VaultRecordRef.h"
 #include "ReadWriteMutex.h"
 
 namespace mvlt
