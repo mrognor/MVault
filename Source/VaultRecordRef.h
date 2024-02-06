@@ -55,6 +55,8 @@ namespace mvlt
         /// \param [in] other other VaultRecordRef object
         VaultRecordRef(const VaultRecordRef& other);
 
+        /// \brief Assignment operator
+        /// \param [in] other other VaultRecordRef object
         VaultRecordRef& operator=(const VaultRecordRef& other);
         
         /// \brief Comparison operator
@@ -202,33 +204,33 @@ namespace mvlt
         void Unlink();
 
         /**
-            \brief A method for locking record for writing
+            \brief A method for locking record
 
             Usage example:
-            \code
-            Vault ds;
-            ds.SetKey<std::size_t>("Id", 0);
-            ds.SetKey<std::vector<int>>("Slaves", std::vector<int>());
+            \code{.cpp}
+            Vault vlt;
+            vlt.SetKey<std::size_t>("Id", 0);
+            vlt.SetKey<std::vector<int>>("Friends", std::vector<int>());
 
             ...
 
-            std::vector<int> slaves;
-            VaultRecordRef dsrr = DS.GetRecord("Slaves", slaves);
+            std::vector<int> friends;
+            VaultRecordRef vltrr = vlt.GetRecord("Friends", friends);
 
             // Lock so that another thread cannot change the vector
-            dsrr.WriteLock();
+            vltrr.ReadLock();
 
-            for (const int& i : slaves)
-                std::cout << slaves << std::endl;
+            for (const int& friend : friends)
+                std::cout << friend << std::endl;
 
-            dsrr.WriteUnlock();
+            vltrr.ReadUnlock();
             
             \endcode
         */
-        void WriteLock();
+        void ReadLock() const;
 
-        /// \brief A method for unlocking record for writing
-        void WriteUnlock();
+        /// \brief A method for unlocking record
+        void ReadUnlock() const;
 
         /// \brief Default destructor
         ~VaultRecordRef();

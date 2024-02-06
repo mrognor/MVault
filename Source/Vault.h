@@ -55,14 +55,22 @@ namespace mvlt
         */
         mutable VaultStructureMap VaultMapStructure;
 
-        // unordered_map of functions that add a new element to the VaultStructureHashMap
+        // Unordered_map of functions that add a new element to the VaultStructureHashMap
         std::unordered_map<std::string, std::function<void(VaultRecord*)>> VaultRecordAdders;
 
-        // unordered_map of functions that delete all data from the unordered_map's stored in the VaultRecordAdders
+        // Unordered_map of functions that delete all data from the unordered_map's
         std::unordered_map<std::string, std::function<void()>> VaultRecordClearers;
 
-        // unordered_map of functions that erase record from the unordered_map's stored in the VaultRecordAdders
+        // Unordered_map of functions that erase record from the unordered_map's
         std::unordered_map<std::string, std::function<void(VaultRecord* newRecord)>> VaultRecordErasers;
+
+        // Unordered_map of functions for getting sorted data.
+        // The key is a string with the name of the key from the Vault.
+        // The std::function is used as the value, in which the lambda function is written at the time of adding the key.
+        // Lambda accepts a function that is called for each entry inside. VaultRecordRef is passed to her. 
+        // By default, iteration by records occurs in ascending order. 
+        // isReverse parameter is used for the reverse order.
+        std::unordered_map<std::string, std::function<void( std::function<bool(const VaultRecordRef&)> functionToSortedData, bool isReverse )>> VaultRecordSorters;
 
         // Unordered set with all VaultRecord pointers
         std::unordered_set<VaultRecord*> RecordsSet;
@@ -173,6 +181,22 @@ namespace mvlt
                 }
             );
 
+            VaultRecordSorters.emplace(keyName, [=](std::function<bool(const VaultRecordRef&)> functionToSortedData, bool isReverse)
+            {
+                if (!isReverse)
+                {
+                    for (const auto& it : *TtoVaultRecordMap)
+                        if(!functionToSortedData(VaultRecordRef(it.second, &VaultHashMapStructure, &VaultMapStructure, &RecursiveReadWriteMtx)))
+                            break;
+                }
+                else
+                {
+                    for (auto it = TtoVaultRecordMap->rbegin(); it != TtoVaultRecordMap->rend(); ++it)
+                        if(!functionToSortedData(VaultRecordRef(it->second, &VaultHashMapStructure, &VaultMapStructure, &RecursiveReadWriteMtx)))
+                            break;
+                }
+            });
+            
             // Add new data to record set
             for (auto& it : RecordsSet)
             {
@@ -199,7 +223,7 @@ namespace mvlt
             \tparam <T> Any type of data except for c arrays
 
             \param [in] keyName the name of the key to search for
-            \param [in] keyValue the value of the key
+            \param [in] defaultKeyValue the value of the key
 
             \return returns true if the key was found otherwise returns false
         */
@@ -232,28 +256,28 @@ namespace mvlt
             The Vault in the example has 2 keys. One is the id of the int type, and the second is the name of the std::string type
             Usage example:
 
-            \code
+            \code{.cpp}
                 // A record with id 0 and name mrognor will be created
                 vlt.CreateRecord({ {"id", 0}, {"name", std::string("mrognor")} });
             \endcode
 
             or
 
-            \code
+            \code{.cpp}
                 // A record with id 0 and name mrognor will be created
                 vlt.CreateRecord({ {"name", std::string("mrognor")}, {"id", 0} });
             \endcode
 
             or
 
-            \code
+            \code{.cpp}
                 // A record with name mrognor will be created. The Id will be set to the default value
                 vlt.CreateRecord({ {"name", std::string("mrognor")} });
             \endcode
 
             or
 
-            \code
+            \code{.cpp}
                 // A record with id 0 and name mrognor will be created
                 std::vector<std::pair<std::string, DataSaver>> params = { {"id", 0}, {"name", std::string("mrognor")} };
                 VaultRecordRef vltrr = vlt.CreateRecord(params);
@@ -261,7 +285,7 @@ namespace mvlt
 
             what is equivalent to such a code without passing values to a function
 
-            \code
+            \code{.cpp}
                 VaultRecordRef vltrr = vlt.CreateRecord();
 
                 vltrr.SetData("id", 0);
@@ -281,7 +305,6 @@ namespace mvlt
 
             \param [in] keyName the name of the key to search for
             \param [in] keyValue the value of the key to be found
-            \param [out] foundedRecord a ref to the VaultRecordRef where found record will be placed
 
             \return ref to requested record 
         */
@@ -328,6 +351,17 @@ namespace mvlt
         /// \brief The method for getting all the keys
         /// \return vector with keys
         std::vector<std::string> GetKeys() const;
+
+        /**
+            \brief Method for getting sorted records
+
+            \param[in] keyName The key by which the data should be sorted
+            \param[in] isReverse Sort in descending order or descending order. By default, ascending
+            \param[in] amountOfRecords The number of records. By default, everything is
+
+            \return A vector with links to records. The order of entries in the vector is determined by the amountOfRecords parameter
+        */
+        std::vector<VaultRecordRef> GetSortedRecords(const std::string& keyName, const bool& isReverse = false, const std::size_t& amountOfRecords = -1) const;
 
         /// \brief A method for displaying the contents of a Vault on the screen
         void PrintVault(const std::size_t amountOfRecords = 0) const;

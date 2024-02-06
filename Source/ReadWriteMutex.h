@@ -57,41 +57,6 @@ public:
     The read lock will ensure that no thread using the write lock gets into the code section until all threads using the read lock are unblocked.
     At the same time, after the write lock, no new threads with a read lock will enter the code section until all threads using the write lock are unblocked.
     Recursiveness allows you to call blocking methods in the same thread multiple times without self-locking.
-    At the same time, it is important to follow the blocking procedure. 3 situations are allowed:
-    1. ReadLock -> ReadLock -> ReadUnlock -> ReadUnlock
-    \code
-    RecursiveReadWriteMutex rrwx;
-    rrwx.ReadLock();
-    rrwx.ReadLock();
-    rrwx.ReadUnlock();
-    rrwx.ReadUnlock();
-    \endcode
-    2. WriteLock -> WriteLock -> WriteUnlock -> WriteUnlock
-    \code
-    RecursiveReadWriteMutex rrwx;
-    rrwx.WriteLock();
-    rrwx.WriteLock();
-    rrwx.WriteUnlock();
-    rrwx.WriteUnlock();
-    \endcode
-    3. WriteLock -> ReadLock -> ReadUnlock -> WriteUnlock
-    \code
-    RecursiveReadWriteMutex rrwx;
-    rrwx.WriteLock();
-    rrwx.ReadLock();
-    rrwx.ReadUnlock();
-    rrwx.WriteUnlock();
-    \endcode
-
-    Situation: ReadLock -> WriteLock -> WriteUnlock -> ReadUnlock
-    \code
-    RecursiveReadWriteMutex rrwx;
-    rrwx.ReadLock();
-    rrwx.WriteLock();
-    rrwx.WriteUnlock();
-    rrwx.ReadUnlock();
-    \endcode
-    It is prohibited because it violates the logic of read and write operations and leads to deadlocking
 */
 class RecursiveReadWriteMutex
 {
@@ -104,6 +69,8 @@ public:
 
         Using this method, you can lock the code section for reading, which means that all threads using the read lock will have access to data inside the code section
         but threads using the write lock will wait until all read operations are completed.
+        Note that, in fact, blocking for reading inside writing does not make sense, 
+        since the code section is already locked and therefore nothing will happen inside the function in such a situation.
     */
     void ReadLock();
 
@@ -116,9 +83,11 @@ public:
         This method provides exclusive access to a section of code for a single thread.
         All write operations will be performed sequentially.
         This method takes precedence over the read lock, which means that after calling this method, no new read operations will be started.
+        Note that if the write lock is called inside the read lock, then this will be equivalent to unlocking for reading and then locking for writing.
     */
     void WriteLock();
 
     /// \brief A method for unlocking a section of code for writing
+    /// Note that if the write unlock is called inside the read lock, then this will be equivalent to unlocking for writing and then locking for reading.
     void WriteUnlock();
 };

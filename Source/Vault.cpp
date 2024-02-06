@@ -35,6 +35,7 @@ namespace mvlt
         VaultRecordAdders.erase(keyName);
         VaultRecordClearers.erase(keyName);
         VaultRecordErasers.erase(keyName);
+        VaultRecordSorters.erase(keyName);
 
         // Erase key data from all records
         for (auto& it : RecordsSet)
@@ -115,6 +116,7 @@ namespace mvlt
         VaultRecordAdders.clear();
         VaultRecordClearers.clear();
         VaultRecordErasers.clear();
+        VaultRecordSorters.clear();
 
         // Delete all Records
         for (auto& it : RecordsSet)
@@ -186,6 +188,28 @@ namespace mvlt
         return res;
     }
 
+    std::vector<VaultRecordRef> Vault::GetSortedRecords(const std::string& keyName, const bool& isReverse, const std::size_t& amountOfRecords) const
+    {
+        std::vector<VaultRecordRef> res;
+        std::size_t counter = 0;
+
+        RecursiveReadWriteMtx.ReadLock();
+        
+        /// \todo Проверка
+        VaultRecordSorters.find(keyName)->second([&](const VaultRecordRef& vaultRecordRef)
+            {
+                if (counter >= amountOfRecords)  return false;
+                
+                res.emplace_back(vaultRecordRef);
+                ++counter;
+                return true;
+            }, isReverse);
+
+        RecursiveReadWriteMtx.ReadUnlock();
+        
+        return res;
+    }
+
     void Vault::PrintVault(const std::size_t amountOfRecords) const
     {
         RecursiveReadWriteMtx.ReadLock();
@@ -195,7 +219,7 @@ namespace mvlt
 
         for (const auto& record : RecordsSet)
         {
-            std::cout << "Data storage record " << record << ":" << std::endl;
+            std::cout << "Vault record " << record << ":" << std::endl;
 
             for (const std::string& key : keys)
             {

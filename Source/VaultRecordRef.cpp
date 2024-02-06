@@ -101,14 +101,14 @@ namespace mvlt
         VaultMapStructure = nullptr;
     }
 
-    void VaultRecordRef::WriteLock()
+    void VaultRecordRef::ReadLock() const
     {
-        VaultRecucrsiveReadWriteMtx->WriteLock();
+        VaultRecucrsiveReadWriteMtx->ReadLock();
     }
 
-    void VaultRecordRef::WriteUnlock()
+    void VaultRecordRef::ReadUnlock() const
     {
-        VaultRecucrsiveReadWriteMtx->WriteUnlock();
+        VaultRecucrsiveReadWriteMtx->ReadUnlock();
     }
         
     VaultRecordRef::~VaultRecordRef()

@@ -18,7 +18,7 @@ namespace mvlt
 
         For example, like this
 
-        \code
+        \code{.cpp}
         template <>
         std::string mvlt::ToString(const std::vector<int>& data) 
         {
@@ -41,7 +41,7 @@ namespace mvlt
 
         By calling this function:
 
-        \code
+        \code{.cpp}
         std::vector<int> vec = {1, 2, 3, 4, 5};
         std::cout << ToString(vec) << std::endl;
         \endcode

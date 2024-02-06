@@ -8,9 +8,12 @@ endif()
 
 set(CMAKE_CXX_STANDARD 11)
 
-project(Example1)
+project(Examples)
 
 include_directories(../Source)	
 
 add_executable(Example1 Example1.cpp)
 target_link_libraries(Example1 MVault)
+
+add_executable(SortExample SortExample.cpp)
+target_link_libraries(SortExample MVault)
