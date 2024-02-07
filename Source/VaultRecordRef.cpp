@@ -77,6 +77,17 @@ namespace mvlt
             return false;
     }
 
+    std::vector<std::string> VaultRecordRef::GetKeys() const
+    {
+        std::vector<std::string> res;
+
+        VaultRecucrsiveReadWriteMtx->ReadLock();
+        for (const auto& it : *VaultMapStructure) res.emplace_back(it.first);
+        VaultRecucrsiveReadWriteMtx->ReadUnlock();
+
+        return res;
+    }
+
     void VaultRecordRef::PrintRecord() const
     {
         VaultRecucrsiveReadWriteMtx->ReadLock();

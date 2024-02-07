@@ -196,6 +196,10 @@ namespace mvlt
         /// \return returns true if the object is valid, otherwise false
         bool IsValid() const;
 
+        /// \brief The method for getting all the keys
+        /// \return vector with keys
+        std::vector<std::string> GetKeys() const;
+        
         /// \brief A method for displaying VaultRecordRef content on the screen
         void PrintRecord() const;
         
