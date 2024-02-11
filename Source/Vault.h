@@ -9,6 +9,7 @@
 #include "VaultRecord.h"
 #include "VaultRecordRef.h"
 #include "ReadWriteMutex.h"
+#include "VaultFunctions.h"
 
 namespace mvlt
 {
@@ -364,10 +365,13 @@ namespace mvlt
         std::vector<VaultRecordRef> GetSortedRecords(const std::string& keyName, const bool& isReverse = false, const std::size_t& amountOfRecords = -1) const;
 
         /// \brief A method for displaying the contents of a Vault on the screen
-        void PrintVault(const std::size_t amountOfRecords = 0) const;
+        // \param [in] amountOfRecords The number of records to be printed. The default value is -1, which means that all entries will be output
+        void PrintVault(const std::size_t& amountOfRecords = -1) const;
         
         /// \brief A method for displaying the contents of a Vault as a table on the screen
-        void PrintAsTable(const std::size_t amountOfRecords = 0) const;
+        /// \param [in] amountOfRecords The number of records to be printed. The default value is -1, which means that all entries will be output
+        /// \param [in] keys vector of keys to be printed. By default, the vector is empty, which means that all keys will be output
+        void PrintAsTable(const std::size_t& amountOfRecords = -1, const std::vector<std::string> keys = {}) const;
 
         /// \brief Default destructor
         ~Vault();

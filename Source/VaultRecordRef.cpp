@@ -68,6 +68,15 @@ namespace mvlt
                 DataRecord->SetDataFromDataSaver(it.first, it.second);
     }
 
+    bool VaultRecordRef::GetDataAsString(const std::string& key, std::string& str) const
+    {
+        bool res;
+        VaultRecucrsiveReadWriteMtx->ReadLock();
+        if (DataRecord->GetIsValid()) res = DataRecord->GetDataAsString(key, str);
+        VaultRecucrsiveReadWriteMtx->ReadUnlock();
+        return res;
+    }
+
     bool VaultRecordRef::IsValid() const
     {
         // Thread saferty

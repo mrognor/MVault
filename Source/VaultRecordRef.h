@@ -190,6 +190,17 @@ namespace mvlt
             VaultRecucrsiveReadWriteMtx->ReadUnlock();
             return res;
         }
+        
+        /**
+            \brief Method for getting data converted to string from a container using a key
+
+            \param [in] key key for getting data
+            \param [out] str a reference to string to write data from the container there.
+            If the data was not found, then nothing will be written to the str
+
+            \return Returns false if the key was not found, and otherwise returns true.
+        */ 
+        bool GetDataAsString(const std::string& key, std::string& str) const;
 
         /// \brief A function to check the validity of a class object
         /// An object may no longer be valid if the record it refers to has been deleted

@@ -60,8 +60,8 @@ namespace mvlt
         \brief A template method for providing an interface converting any type to a string
 
         This function allows you to use the same interface inside the Vault for any class, 
-        since this function accepts any type. Therefore, if you do not plan to use the functionality of saving to files, 
-        then there will be no problems when using a custom type. At the same time, if you plan to work with files, 
+        since this function accepts any type. Therefore, if you do not plan to use the functionality of saving to files or printing data, 
+        then there will be no problems when using a custom type. At the same time, if you plan to work with files or printing data, 
         you can specialize this function for each required type.
 
         \tparam <T> Any type of data

@@ -210,7 +210,7 @@ namespace mvlt
         return res;
     }
 
-    void Vault::PrintVault(const std::size_t amountOfRecords) const
+    void Vault::PrintVault(const std::size_t& amountOfRecords) const
     {
         RecursiveReadWriteMtx.ReadLock();
 
@@ -236,89 +236,13 @@ namespace mvlt
         RecursiveReadWriteMtx.ReadUnlock();
     }
 
-    void Vault::PrintAsTable(const std::size_t amountOfRecords) const
+    void Vault::PrintAsTable(const std::size_t& amountOfRecords, const std::vector<std::string> keys) const
     {
         RecursiveReadWriteMtx.ReadLock();
-        
-        std::vector<std::string> keys = GetKeys();
-        std::vector<std::size_t> maxLengths(keys.size());
-
-        // Fill each max length using key length
-        for (std::size_t i = 0; i < keys.size(); ++i)
-            maxLengths[i] = keys[i].length();
-        
-        // Find each real max length
-        for (std::size_t i = 0; i < keys.size(); ++i)
-        {
-            for (const auto& record : RecordsSet)
-            {
-                DataSaver dataSaver;
-                record->GetDataSaver(keys[i], dataSaver);
-                if (dataSaver.Str().length() > maxLengths[i]) maxLengths[i] = dataSaver.Str().length();
-            }
-        }
-
-        // Print splitter
-        std::cout << "+";
-        for (std::size_t i = 0; i < keys.size(); ++i)
-        {
-            std::cout << "-";
-            for (std::size_t j = 0; j < maxLengths[i]; ++j) std::cout << "-";
-            std::cout << "-+";
-        }
-        std::cout << std::endl;
-
-        // Print header
-        std::cout << "|";
-        for (std::size_t i = 0; i < keys.size(); ++i)
-        {
-            std::cout << " " << keys[i];
-            for (std::size_t j = keys[i].length(); j < maxLengths[i]; ++j) std::cout << " ";
-            std::cout << " |";
-        }
-        std::cout << std::endl;
-
-        // Print splitter
-        std::cout << "+";
-        for (std::size_t i = 0; i < keys.size(); ++i)
-        {
-            std::cout << "-";
-            for (std::size_t j = 0; j < maxLengths[i]; ++j) std::cout << "-";
-            std::cout << "-+";
-        }
-        std::cout << std::endl;
-
-        // Print records
-        std::size_t counter = 0;
-        for (const auto& record : RecordsSet)
-        {
-            std::cout << "|";
-            for (std::size_t i = 0; i < keys.size(); ++i)
-            {
-                DataSaver dataSaver;
-                record->GetDataSaver(keys[i], dataSaver);
-                std::cout << " " << dataSaver.Str();
-                for (std::size_t j = dataSaver.Str().length(); j < maxLengths[i]; ++j) std::cout << " ";
-                std::cout << " |";
-            }
-            std::cout << std::endl;
-            
-            ++counter;
-            if (counter == amountOfRecords) break;
-        }
-
-        // Print splitter
-        std::cout << "+";
-        for (std::size_t i = 0; i < keys.size(); ++i)
-        {
-            std::cout << "-";
-            for (std::size_t j = 0; j < maxLengths[i]; ++j) std::cout << "-";
-            std::cout << "-+";
-        }
-        std::cout << std::endl;
-
-        std::cout << " (" << Size() << " records)" << std::endl;
-
+        if (keys.empty())
+            PrintContainerAsTable(RecordsSet, amountOfRecords, GetKeys());
+        else
+            PrintContainerAsTable(RecordsSet, amountOfRecords, keys);
         RecursiveReadWriteMtx.ReadUnlock();
     }
 

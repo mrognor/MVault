@@ -12,10 +12,12 @@ set(MVaultHeaders
     Vault.h 
     VaultRecord.h
     VaultRecordRef.h
+    VaultFunctions.h
     DataContainer.h 
     DataSaver.h 
     ReadWriteMutex.h
-    ToString.h)
+    Functions/ToString.h
+    Functions/PrintAsTable.h)
 
 set(MVaultSource
     Vault.cpp 

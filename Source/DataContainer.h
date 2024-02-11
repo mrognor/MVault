@@ -195,6 +195,25 @@ namespace mvlt
             return true;
         }
         
+        /**
+            \brief Method for getting data converted to string from a container using a key
+
+            \param [in] key key for getting data
+            \param [out] str a reference to string to write data from the container there.
+            If the data was not found, then nothing will be written to the str
+
+            \return Returns false if the key was not found, and otherwise returns true.
+        */ 
+        bool GetDataAsString(const std::string& key, std::string& str) const
+        {
+            auto f = Container.find(key);
+            if (f == Container.end())
+                return false;
+
+            str = f->second.Str();
+            return true;
+        }
+
         /// \brief A method for checking whether data with such a key is in the container
         /// \param [in] key key to find in container
         /// \return Returns false if the key was not found, and otherwise returns true.
