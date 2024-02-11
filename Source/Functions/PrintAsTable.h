@@ -153,14 +153,28 @@ namespace mvlt
         }
 
         // Print splitter
-        std::cout << "+";
-        for (std::size_t i = 0; i < keys.size(); ++i)
+        if (amountOfRecords >= container.size())
         {
-            std::cout << "-";
-            for (std::size_t j = 0; j < maxLengths[i]; ++j) std::cout << "-";
-            std::cout << "-+";
+            std::cout << "+";
+            for (std::size_t i = 0; i < keys.size(); ++i)
+            {
+                std::cout << "-";
+                for (std::size_t j = 0; j < maxLengths[i]; ++j) std::cout << "-";
+                std::cout << "-+";
+            }
+            std::cout << std::endl;
         }
-        std::cout << std::endl;
+        else
+        {
+            std::cout << "$";
+            for (std::size_t i = 0; i < keys.size(); ++i)
+            {
+                std::cout << "~";
+                for (std::size_t j = 0; j < maxLengths[i]; ++j) std::cout << "~";
+                std::cout << "~$";
+            }
+            std::cout << std::endl;
+        }
 
         std::cout << " (" << container.size() << " records)" << std::endl;
     }
