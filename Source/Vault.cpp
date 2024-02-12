@@ -198,7 +198,7 @@ namespace mvlt
         /// \todo Проверка
         VaultRecordSorters.find(keyName)->second([&](const VaultRecordRef& vaultRecordRef)
             {
-                if (counter >= amountOfRecords)  return false;
+                if (counter >= amountOfRecords) return false;
                 
                 res.emplace_back(vaultRecordRef);
                 ++counter;

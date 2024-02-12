@@ -356,16 +356,54 @@ namespace mvlt
         /**
             \brief Method for getting sorted records
 
-            \param[in] keyName The key by which the data should be sorted
-            \param[in] isReverse Sort in descending order or descending order. By default, ascending
-            \param[in] amountOfRecords The number of records. By default, everything is
+            \param [in] keyName The key by which the data should be sorted
+            \param [in] isReverse Sort in descending order or descending order. By default, ascending
+            \param [in] amountOfRecords The number of records. By default, everything is
 
             \return A vector with links to records. The order of entries in the vector is determined by the amountOfRecords parameter
         */
         std::vector<VaultRecordRef> GetSortedRecords(const std::string& keyName, const bool& isReverse = false, const std::size_t& amountOfRecords = -1) const;
 
+        /**
+            \brief Method for handle sorted records
+
+            \tparam <T> A function that takes const VaultRecordRef& as a parameter and returns bool.
+            
+            \param [in] keyName The key by which the data should be sorted
+            \param [in] func A function takes const VaultRecordRef& as a parameter. If you need the function to be called again for the next record, 
+            then this function call should return true. To stop the loop and interrupt the processing of sorted data, the function must return false. 
+            To get values from a function, use lambdas and context capture
+            \param [in] isReverse Sort in descending order or descending order. By default, ascending
+            \param [in] amountOfRecords The number of records. By default, everything is
+
+            The function iterate over all records sorted by the keyName parameter, in the order specified by the isReverse parameter. 
+            For each record, the function passed in the func parameter is called.
+            This function does not sort the data when it is called, the sorted data is already stored inside the Vault.
+
+            \return A vector with links to records. The order of entries in the vector is determined by the amountOfRecords parameter
+        */
+        template<class F>
+        void SortBy(const std::string& keyName, const F&& func, const bool& isReverse = false, const std::size_t& amountOfRecords = -1) const
+        {
+            std::size_t counter = 0;
+
+            RecursiveReadWriteMtx.ReadLock();
+            
+            /// \todo Проверка
+            VaultRecordSorters.find(keyName)->second([&](const VaultRecordRef& vaultRecordRef)
+                {
+                    if (counter >= amountOfRecords) return false;
+                    
+                    func(vaultRecordRef);
+                    ++counter;
+                    return true;
+                }, isReverse);
+
+            RecursiveReadWriteMtx.ReadUnlock();
+        }
+
         /// \brief A method for displaying the contents of a Vault on the screen
-        // \param [in] amountOfRecords The number of records to be printed. The default value is -1, which means that all entries will be output
+        /// \param [in] amountOfRecords The number of records to be printed. The default value is -1, which means that all entries will be output
         void PrintVault(const std::size_t& amountOfRecords = -1) const;
         
         /// \brief A method for displaying the contents of a Vault as a table on the screen
