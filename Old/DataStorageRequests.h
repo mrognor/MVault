@@ -175,7 +175,7 @@ public:
     }
 };
 
-/*! 
+/**
     \defgroup DataStorageFunctions DataStorage functions
     \brief All functions for working with DataStorage
 
@@ -225,4 +225,4 @@ DataStorageRecordSet Intersection(const DataStorageRecordSet& A, const DataStora
 */ 
 DataStorageRecordSet AlterIntersection(const DataStorageRecordSet& A, const DataStorageRecordSet& B);
 
-/*! @} */
+/**@} */

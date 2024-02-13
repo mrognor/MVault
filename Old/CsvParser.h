@@ -5,7 +5,7 @@
 #include <fstream>
 #include <iostream>
 
-/*! 
+/**
     \defgroup CsvParserFunctions Csv parser functions
     \brief All functions for working with DataStorage and csv
 
@@ -197,4 +197,4 @@ bool FromString(const std::string& stringToCopyDataFrom, float& data)
     return StringToFloat(stringToCopyDataFrom, data);
 }
 
-/*! @} */
+/**@} */

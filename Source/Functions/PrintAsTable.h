@@ -179,7 +179,7 @@ namespace mvlt
         std::cout << " (" << container.size() << " records)" << std::endl;
     }
 
-    /*! 
+    /**
         \addtogroup VaultFunctions VaultFunctions
         \brief Functions that are available in the library
 
@@ -216,5 +216,5 @@ namespace mvlt
         containerWithRefs.begin()->ReadUnlock();        
     }
 
-    /*! @} */
+    /**@} */
 }

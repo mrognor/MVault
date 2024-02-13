@@ -4,7 +4,7 @@
 
 namespace mvlt
 {
-    /*! 
+    /**
         \defgroup ToString ToStringFunctions
         \brief Functions for printing custom classes
 
@@ -47,7 +47,7 @@ namespace mvlt
         \endcode
 
         The output will be as follows:  
-        > {1, 2, 3, 4, 5}
+        ``` {1, 2, 3, 4, 5} ```
 
         By default, the function is defined for the following types:  
         \* int  
@@ -117,5 +117,5 @@ namespace mvlt
     template <>
     inline std::string ToString(const float& data) { return std::to_string(data); }
 
-    /*! @} */
+    /**@} */
 }
