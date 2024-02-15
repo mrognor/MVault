@@ -22,34 +22,23 @@ int main()
         1. int id - the unique identifier of the record inside the Vault
         2. std::string name - the name of the user record
         3. bool gender - the user's gender
-        
-        \snippet this SortingExample1
     */
 
-    /// \internal
-    /// [SortingExample0]
-    /// [SortingExample1]
-    /// \endinternal
+    // startcode{.cpp}
     mvlt::Vault vlt;
     
     vlt.SetKey("id", -1);
     vlt.SetKey<std::string>("name", "");
     vlt.SetKey<bool>("gender", true);
-    /// \internal
-    /// [SortingExample1]
-    /// \endinternal
+    // endcode
 
     /**
         \page SortingExample
 
         Let's fill the Vault with 10 records
-
-        \snippet this SortingExample2
     */
 
-    /// \internal
-    /// [SortingExample2]
-    /// \endinternal
+    // startcode{.cpp}
     vlt.CreateRecord({ {"id", 1}, {"name", std::string("Marfa")}, {"gender", false} });
     vlt.CreateRecord({ {"id", 2}, {"name", std::string("Alexander")}, {"gender", true} });
     vlt.CreateRecord({ {"id", 3}, {"name", std::string("John")}, {"gender", true} });
@@ -60,26 +49,18 @@ int main()
     vlt.CreateRecord({ {"id", 8}, {"name", std::string("Jayson")}, {"gender", true} });
     vlt.CreateRecord({ {"id", 9}, {"name", std::string("Alexander")}, {"gender", true} });
     vlt.CreateRecord({ {"id", 10}, {"name", std::string("Varvara")}, {"gender", false} });
-    /// \internal
-    /// [SortingExample2]
-    /// \endinternal
+    // endcode
 
     /**
         \page SortingExample
 
         Let's print Vault:
-
-        \snippet this SortingExample3
     */
 
-    /// \internal
-    /// [SortingExample3]
-    /// \endinternal
+    // startcode{.cpp}
     std::cout << "Vault: " << std::endl;
     vlt.PrintAsTable();
-    /// \internal
-    /// [SortingExample3]
-    /// \endinternal
+    // endcode
 
     /**
         \page SortingExample
@@ -111,20 +92,14 @@ int main()
         ### First example
 
         Getting a vector with three records. The vector will contain 3 records with the smallest ids.
-        At the beginning of the vector there will be an entry with the smallest id
-
-        \snippet this SortingExample4
+        At the beginning of the vector there will be an record with the smallest id
     */
 
     std::cout << "The first 3 records after sorting in ascending order by id: " << std::endl;
-    /// \internal
-    /// [SortingExample4]
-    /// \endinternal
+    // startcode{.cpp}
     std::vector<mvlt::VaultRecordRef> sorted = vlt.GetSortedRecords("id", false, 3);
     mvlt::PrintAsTable(sorted);
-    /// \internal
-    /// [SortingExample4]
-    /// \endinternal
+    // endcode
 
     /**
         \page SortingExample
@@ -144,19 +119,13 @@ int main()
         ### Second example
         In this example, 5 records are requested, sorted in reverse order.
         The array will be printed without the gender column.
-
-        \snippet this SortingExample5
     */
 
     std::cout << "The first 5 records without gender after sorting in descending order by name:" << std::endl;
-    /// \internal
-    /// [SortingExample5]
-    /// \endinternal
+    // startcode{.cpp}
     sorted = vlt.GetSortedRecords("name", true, 5);
     mvlt::PrintAsTable(sorted, -1, {"id", "name"});
-    /// \internal
-    /// [SortingExample5]
-    /// \endinternal
+    // endcode
 
     /**
         \page SortingExample
@@ -167,7 +136,7 @@ int main()
         | id | name     |
         +----+----------+
         | 10 | Varvara  |
-        | 4  | Patricia |
+        | 4  | Patricia |   
         | 7  | Natasha  |
         | 5  | Mikhail  |
         | 1  | Marfa    |
@@ -182,13 +151,10 @@ int main()
         ### Example
 
         In this example, we are looking for an record with the name Alexander and the largest id
-        \snippet this SortingExample6
     */
 
     std::cout << "The record with the largest id with name Alexander: ";
-    /// \internal
-    /// [SortingExample6]
-    /// \endinternal
+    // startcode{.cpp}
     int greatestAlexanderId = -1;
     vlt.SortBy("id", [&](const mvlt::VaultRecordRef& recordRef)
         {
@@ -203,10 +169,7 @@ int main()
                 return true;
         });
     std::cout << greatestAlexanderId << std::endl;
-    /// \internal
-    /// [SortingExample0]
-    /// [SortingExample6]
-    /// \endinternal
+    // endcode
 
     
     /**
@@ -218,8 +181,30 @@ int main()
         The record with the largest id with name Alexander: 9
         ```
 
-        # Full example
-        \snippet this SortingExample0
+        Let's check it out. We will request all entries with the name Alexander and print them.
     */
 
+    std::cout << "Alexanders: " << std::endl;
+    // startcode{.cpp}
+    std::vector<mvlt::VaultRecordRef> alexanders = vlt.GetRecords("name", std::string("Alexander"));
+    mvlt::PrintAsTable(alexanders);
+    // endcode
+
+    /**
+        \page SortingExample
+        
+        As a result, the function will print the following:
+
+        ```bash
+        +--------+----+-----------+
+        | gender | id | name      |
+        +--------+----+-----------+
+        | true   | 2  | Alexander |
+        | true   | 9  | Alexander |
+        +--------+----+-----------+
+        (2 records)
+        ```
+
+        As you can easily see, the largest id of an entry with the name Alexander is 9.
+    */
 }

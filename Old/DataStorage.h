@@ -18,8 +18,8 @@
     The class can be represented as a simple table with the ability to quickly search in O(1) for each field of the table.
     Each row of the table is called a record, and the DataStorageRecord class is used to store it. The column is called the key.
     Further, the keys will mean the columns of the table, and the records will mean the rows of the table.
-    The SetKey function is used to add new keys. There is a template entry inside the class and when adding a 
-    key to the DataStorage, data will be added to this template entry. When creating new records, they will be copied from this template record.
+    The SetKey function is used to add new keys. There is a template record inside the class and when adding a 
+    key to the DataStorage, data will be added to this template record. When creating new records, they will be copied from this template record.
     Each record is unique, but the key values can be the same for many records.
     To work with records inside the DataStorage, the DataStorageRecordRef is used. You can use it to change the values of records inside the DataStorage.
 */

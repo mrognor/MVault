@@ -19,8 +19,8 @@ namespace mvlt
         The class can be represented as a simple table with the ability to quickly search in O(1) for each field of the table.
         Each row of the table is called a record, and the VaultRecord class is used to store it. The column is called the key.
         Further, the keys will mean the columns of the table, and the records will mean the rows of the table.
-        The SetKey function is used to add new keys. There is a template entry inside the class and when adding a 
-        key to the Vault, data will be added to this template entry. When creating new records, they will be copied from this template record.
+        The SetKey function is used to add new keys. There is a template record inside the class and when adding a 
+        key to the Vault, data will be added to this template record. When creating new records, they will be copied from this template record.
         Each record is unique, but the key values can be the same for many records.
         To work with records inside the Vault, the VaultRecordRef is used. You can use it to change the values of records inside the Vault.
     */
@@ -68,7 +68,7 @@ namespace mvlt
         // Unordered_map of functions for getting sorted data.
         // The key is a string with the name of the key from the Vault.
         // The std::function is used as the value, in which the lambda function is written at the time of adding the key.
-        // Lambda accepts a function that is called for each entry inside. VaultRecordRef is passed to her. 
+        // Lambda accepts a function that is called for each record inside. VaultRecordRef is passed to her. 
         // By default, iteration by records occurs in ascending order. 
         // isReverse parameter is used for the reverse order.
         std::unordered_map<std::string, std::function<void( std::function<bool(const VaultRecordRef&)> functionToSortedData, bool isReverse )>> VaultRecordSorters;
@@ -335,6 +335,36 @@ namespace mvlt
             return res;
         }
 
+        /**
+            \brief The method for getting a vector of references to the data inside Vault
+
+            \tparam <T> Any type of data except for c arrays
+
+            \param [in] keyName the name of the key to search for
+            \param [in] keyValue the value of the key to be found
+
+            \return vector with records refs
+        */
+        template <class T>
+        std::vector<VaultRecordRef> GetRecords(const std::string& keyName, const T& keyValue) const
+        {
+            std::vector<VaultRecordRef> res;
+            // Pointer to store map inside VaultStructureHashMap
+            std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
+
+            RecursiveReadWriteMtx.ReadLock();
+            // Checking whether such a key exists
+            if (VaultHashMapStructure.GetData(keyName, TtoVaultRecordHashMap))
+            {
+                auto begAndEndPair = TtoVaultRecordHashMap->equal_range(keyValue);
+                for (auto it = begAndEndPair.first; it != begAndEndPair.second; ++it)
+                    res.emplace_back(VaultRecordRef(it->second, &VaultHashMapStructure, &VaultMapStructure, &RecursiveReadWriteMtx));
+            }
+
+            RecursiveReadWriteMtx.ReadUnlock();
+            return res;
+        }
+
         /// \brief A method for deleting all data and keys
         void DropVault();
 
@@ -379,8 +409,6 @@ namespace mvlt
             The function iterate over all records sorted by the keyName parameter, in the order specified by the isReverse parameter. 
             For each record, the function passed in the func parameter is called.
             This function does not sort the data when it is called, the sorted data is already stored inside the Vault.
-
-            \return A vector with links to records. The order of entries in the vector is determined by the amountOfRecords parameter
         */
         template<class F>
         void SortBy(const std::string& keyName, const F&& func, const bool& isReverse = false, const std::size_t& amountOfRecords = -1) const
