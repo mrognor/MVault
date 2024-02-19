@@ -240,7 +240,15 @@ namespace mvlt
     {
         RecursiveReadWriteMtx.ReadLock();
         if (keys.empty())
-            PrintContainerAsTable(RecordsSet, amountOfRecords, GetKeys());
+        {
+            if (VaultMapStructure.Size() == 0)
+            {
+                std::cout << "Vault does not contain keys!" << std::endl;
+                std::cout << " (" << RecordsSet.size() << " records)" << std::endl;
+            }
+            else
+                PrintContainerAsTable(RecordsSet, amountOfRecords, GetKeys());
+        }
         else
             PrintContainerAsTable(RecordsSet, amountOfRecords, keys);
         RecursiveReadWriteMtx.ReadUnlock();
