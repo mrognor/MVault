@@ -54,4 +54,5 @@ int main()
     std::cout << vltrr.IsValid() << std::endl; 
     vlt.EraseRecord(vltrr);
     std::cout << vltrr.IsValid() << std::endl;
+    std::cout << vltrr.GetRecordUniqueId() << std::endl;
 }

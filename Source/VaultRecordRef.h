@@ -65,7 +65,7 @@ namespace mvlt
         bool operator==(const VaultRecordRef& other) const;
 
         /// \brief A method for obtaining a unique record identifier
-        ///  Important. Two VaultRecordRef objects pointing to the same record will return the same value
+        ///  Important. Two VaultRecordRef objects pointing to the same record will return the same value. Invalid record will return null
         /// \return the unique identifier of the record
         std::string GetRecordUniqueId() const;
 
@@ -80,6 +80,7 @@ namespace mvlt
             \param [in] data new key data value
 
             \return returns true if the key was found otherwise returns false
+            \todo Handle errors
         */
         template <class T>
         bool SetData(const std::string& key, const T& data)
@@ -168,6 +169,7 @@ namespace mvlt
             See Vault::CreateRecord(std::vector<std::pair<std::string, DataSaver>> params) for more information
 
             \param [in] params a vector of pairs with data to be put in the Vault
+            \todo Handle errors
         */
         void SetData(const std::vector<std::pair<std::string, DataSaver>>& params);
 
@@ -180,6 +182,7 @@ namespace mvlt
             \param [in] data reference to record the received data
 
             \return returns true if the data was received, otherwise false
+            \todo Handle errors
         */
         template <class T>
         bool GetData(const std::string& key, T& data) const
@@ -199,6 +202,7 @@ namespace mvlt
             If the data was not found, then nothing will be written to the str
 
             \return Returns false if the key was not found, and otherwise returns true.
+            \todo Handle errors
         */ 
         bool GetDataAsString(const std::string& key, std::string& str) const;
 

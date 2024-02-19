@@ -13,13 +13,13 @@ namespace mvlt
         return res;
     }
 
-    void Vault::RemoveKey(const std::string& keyName)
+    bool Vault::RemoveKey(const std::string& keyName)
     {
         RecursiveReadWriteMtx.WriteLock();
         if (!IsKeyExist(keyName)) 
         {
             RecursiveReadWriteMtx.WriteUnlock();
-            return;
+            return false;
         }
 
         // Erase key from record template
@@ -42,6 +42,7 @@ namespace mvlt
             it->EraseData(keyName);
         
         RecursiveReadWriteMtx.WriteUnlock();
+        return true;
     }
 
     VaultRecordRef Vault::CreateRecord()

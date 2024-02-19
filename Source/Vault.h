@@ -240,7 +240,8 @@ namespace mvlt
 
         /// \brief The method for deleting the key
         /// \param [in] keyName the key to remove
-        void RemoveKey(const std::string& keyName);
+        /// \return Returns true if the key existed, otherwise returns false
+        bool RemoveKey(const std::string& keyName);
 
         /// \brief Method to create new VaultRecord. A record will be created by copying RecordTemplate.
         /// \return ref to new record 
@@ -296,6 +297,8 @@ namespace mvlt
             \param [in] params a vector of pairs with data to be put in the Vault
 
             \return ref to new record 
+
+            \todo Handle errors
         */
         VaultRecordRef CreateRecord(const std::vector<std::pair<std::string, DataSaver>>& params);
 
@@ -307,7 +310,8 @@ namespace mvlt
             \param [in] keyName the name of the key to search for
             \param [in] keyValue the value of the key to be found
 
-            \return ref to requested record 
+            \return ref to requested record
+            \todo Handle errors
         */
         template <class T>
         VaultRecordRef GetRecord(const std::string& keyName, const T& keyValue) const
@@ -344,6 +348,7 @@ namespace mvlt
             \param [in] keyValue the value of the key to be found
 
             \return vector with records refs
+            \todo Handle errors
         */
         template <class T>
         std::vector<VaultRecordRef> GetRecords(const std::string& keyName, const T& keyValue) const
@@ -373,6 +378,7 @@ namespace mvlt
 
         /// \brief Method for deleting a record from a Vault
         /// \param recordRefToErase the reference to the record that needs to be deleted
+        /// \todo Handle errors
         void EraseRecord(const VaultRecordRef& recordRefToErase);
 
         /// \brief Method for getting the number of records
@@ -391,6 +397,7 @@ namespace mvlt
             \param [in] amountOfRecords The number of records. By default, everything is
 
             \return A vector with links to records. The order of entries in the vector is determined by the amountOfRecords parameter
+            \todo Handle errors
         */
         std::vector<VaultRecordRef> GetSortedRecords(const std::string& keyName, const bool& isReverse = false, const std::size_t& amountOfRecords = -1) const;
 
@@ -409,6 +416,7 @@ namespace mvlt
             The function iterate over all records sorted by the keyName parameter, in the order specified by the isReverse parameter. 
             For each record, the function passed in the func parameter is called.
             This function does not sort the data when it is called, the sorted data is already stored inside the Vault.
+            \todo Handle errors
         */
         template<class F>
         void SortBy(const std::string& keyName, const F&& func, const bool& isReverse = false, const std::size_t& amountOfRecords = -1) const
