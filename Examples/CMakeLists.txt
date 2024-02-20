@@ -17,3 +17,6 @@ target_link_libraries(Example1 MVault)
 
 add_executable(SortExample SortExample.cpp)
 target_link_libraries(SortExample MVault)
+
+add_executable(CustomTypeExample CustomTypeExample.cpp)
+target_link_libraries(CustomTypeExample MVault)

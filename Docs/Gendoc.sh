@@ -4,7 +4,12 @@ cd $(dirname "$0")
 # Create directory with examples
 cp -rf ../Examples/ ./
 sed -i 's!// startcode!/** @code!' Examples/SortExample.cpp
-sed -i 's!// endcode!@endcode */!' Examples/SortExample.cpp
+sed -i 's!// endcode! @endcode */!' Examples/SortExample.cpp
+sed -i 's!// startcode!/** @code!' Examples/CustomTypeExample.cpp
+sed -i 's!// endcode! @endcode */!' Examples/CustomTypeExample.cpp
+sed -i 's!// ignorecode!/*!' Examples/CustomTypeExample.cpp
+sed -i 's!// endignore!*/!' Examples/CustomTypeExample.cpp
+sed -i 's!// insertcode!!' Examples/CustomTypeExample.cpp
 
 # Create documentation
 doxygen Doxyfile
