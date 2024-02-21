@@ -2,36 +2,17 @@
 
 #include <iostream>
 #include <string>
+#include <typeindex>
 
 #include "Functions/ToString.h"
 
 namespace mvlt
 {
     /**
-        \brief Class to make real time type check
-
-        Auxiliary class for Data Saver. Required for storing and comparing types inside Data Saver.
-    */
-    class DataTypeSaver
-    {
-    private:
-        // Type info struct to save type
-        const std::type_info& TypeInfo;
-
-    public:
-        /// \brief A constructor that stores a variable in a class with the type of data stored inside DataSaver
-        /// \param [in] type variable with type
-        DataTypeSaver(const std::type_info& type);
-
-        /// \brief Method for getting the data type stored inside the class
-        /// \return the type of data stored inside the class
-        const std::type_info& GetDataType();
-    };
-
-    /**
     \brief A class for storing any type of data
 
         If a pointer is stored in a class, then you can set a function to automatically clear this pointer when an object of the class is destroyed.
+        By default, it stores the void type.
 
         \warning The class cannot store с-arrays
     */
@@ -42,7 +23,7 @@ namespace mvlt
         void* Ptr = nullptr;
 
         // Pointer to data type saver
-        DataTypeSaver* DataType = nullptr;
+        std::type_index DataType;
 
         // Pointer to copy function. Required to DataSaver copy
         void (*CopyFunc)(void*& dst, void* src) = nullptr;
@@ -68,7 +49,7 @@ namespace mvlt
         /// \tparam <T> Any type of data except for c arrays
         /// \param [in] data data to be stored inside DataSaver
         template<class T>
-        DataSaver(const T& data)
+        DataSaver(const T& data) : DataType(typeid(void))
         {
             SetData(data);
         }
@@ -86,7 +67,7 @@ namespace mvlt
             \param [in] customDeleteFunc function to delete data
         */ 
         template<class T, class F>
-        DataSaver(const T& data, F&& customDeleteFunc)
+        DataSaver(const T& data, F&& customDeleteFunc) : DataType(typeid(void))
         {
             SetData(data, customDeleteFunc);
         }
@@ -124,15 +105,11 @@ namespace mvlt
             if (Ptr != nullptr)
                 DeleteFunc(Ptr);
 
-            // Clear DataType if it was data before
-            if (DataType != nullptr)
-                delete DataType;
-
             // Create new T type object and save it pointer like void ptr. Data from data will be copying using copy constructor
             Ptr = static_cast<void*>(new T(data));
 
-            // Create new DataType object to save data type
-            DataType = new DataTypeSaver(typeid(data));
+            // Save data type to DataType
+            DataType = typeid(data);
 
             // Set new CopyFunc. It is get to void pointers and convert void pointers to T pointers and copy data.
             CopyFunc = [](void*& dst, void* src)
@@ -173,9 +150,9 @@ namespace mvlt
         bool GetData(T& data) const
         {
             // Check data type stored in DataSaver
-            if (DataType != nullptr && DataType->GetDataType() != typeid(data))
+            if (DataType != typeid(data))
             {
-                std::cerr << "Wrong type! Was: " + std::string(DataType->GetDataType().name()) + " Requested: " + typeid(data).name() << std::endl;
+                std::cerr << "Wrong type! Was: " + std::string(DataType.name()) + " Requested: " + typeid(data).name() << std::endl;
                 return false;
             }
 
@@ -201,6 +178,8 @@ namespace mvlt
         /// \return A string of data
         std::string Str() const;
 
+        std::type_index GetDataType() const;
+        
         /// Default destructor
         ~DataSaver();
     };

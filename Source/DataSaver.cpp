@@ -2,17 +2,9 @@
 
 namespace mvlt
 {
-    // DataTypeSaver
+    DataSaver::DataSaver() : DataType(typeid(void)) {}
 
-    DataTypeSaver::DataTypeSaver(const std::type_info& type) : TypeInfo(type) {}
-
-    const std::type_info& DataTypeSaver::GetDataType() { return TypeInfo; }
-
-    // DataSaver
-
-    DataSaver::DataSaver() {}
-
-    DataSaver::DataSaver(const DataSaver& dataSaver)
+    DataSaver::DataSaver(const DataSaver& dataSaver) : DataType(typeid(void))
     {
         // Call operator= method
         *this = dataSaver;
@@ -27,15 +19,11 @@ namespace mvlt
             if (Ptr != nullptr)
                 DeleteFunc(Ptr);
 
-            // Clear DataType if it was data before
-            if (DataType != nullptr)
-                delete DataType;
-
             // Check that dataSaver is not empty
             if (dataSaver.Ptr != nullptr)
             {
                 // Create new DataType object copying data type from dataSaver
-                DataType = new DataTypeSaver(dataSaver.DataType->GetDataType());
+                DataType = dataSaver.DataType;
                 
                 // Set new CopyFunc from dataSaver
                 CopyFunc = dataSaver.CopyFunc;
@@ -56,7 +44,6 @@ namespace mvlt
             {
                 // If dataSaver is empty clear the variables
                 Ptr = nullptr;
-                DataType = nullptr;
             }
         }
 
@@ -77,12 +64,7 @@ namespace mvlt
             Ptr = nullptr;
         }
 
-        if (DataType != nullptr)
-        {
-            delete DataType;
-            DataType = nullptr;
-        }
-
+        DataType = typeid(void);
         CopyFunc = nullptr;
         ToStringFunc = nullptr;
     }
@@ -99,12 +81,14 @@ namespace mvlt
         return ToStringFunc(Ptr);
     }
 
+    std::type_index DataSaver::GetDataType() const
+    {
+        return DataType;
+    }
+
     DataSaver::~DataSaver()
     {
         if (Ptr != nullptr)
             DeleteFunc(Ptr);
-
-        if (DataType != nullptr)
-            delete DataType;
     }
 }
