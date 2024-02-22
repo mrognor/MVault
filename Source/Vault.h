@@ -56,6 +56,9 @@ namespace mvlt
         */
         mutable VaultStructureMap VaultMapStructure;
 
+        // Unordered map with keys names and their types
+        std::unordered_map<std::string, std::type_index> KeysTypes;
+
         // Unordered_map of functions that add a new element to the VaultStructureHashMap
         std::unordered_map<std::string, std::function<void(VaultRecord*)>> VaultRecordAdders;
 
@@ -106,8 +109,11 @@ namespace mvlt
             RecursiveReadWriteMtx.WriteLock();
 
             // If the key was added earlier, then it must be deleted
-            if (IsKeyExist(keyName))
+            if (KeysTypes.find(keyName) != KeysTypes.end())
                 RemoveKey(keyName);
+
+            // Add key type to hash map with keys types
+            KeysTypes.emplace(keyName, typeid(T)); 
 
             // Add data to template
             RecordTemplate.SetData(keyName, defaultKeyValue);
@@ -237,6 +243,17 @@ namespace mvlt
             RecursiveReadWriteMtx.ReadUnlock();
             return res;
         }
+
+        /**
+            \brief The method for getting a key type
+
+
+            \param [in] keyName the name of the key to search for
+            \param [in] keyType the ref to std::type_index
+
+            \return returns true if the key was found otherwise returns false
+        */
+        bool GetKeyType(const std::string& keyName, std::type_index& keyType) const;
 
         /// \brief The method for deleting the key
         /// \param [in] keyName the key to remove

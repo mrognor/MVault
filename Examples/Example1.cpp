@@ -55,4 +55,8 @@ int main()
     vlt.EraseRecord(vltrr);
     std::cout << vltrr.IsValid() << std::endl;
     std::cout << vltrr.GetRecordUniqueId() << std::endl;
+
+    std::type_index ti = typeid(void);
+    vlt.GetKeyType("slaves", ti);
+    std::cout << ti.name() << std::endl;
 }

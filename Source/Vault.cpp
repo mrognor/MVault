@@ -13,14 +13,31 @@ namespace mvlt
         return res;
     }
 
+    bool Vault::GetKeyType(const std::string& keyName, std::type_index& keyType) const
+    {
+        bool res = true;
+        RecursiveReadWriteMtx.ReadLock();
+        auto f = KeysTypes.find(keyName);
+        if (f != KeysTypes.end())
+            keyType = f->second;
+        else
+            res = false;
+
+        RecursiveReadWriteMtx.ReadUnlock();
+        return res;
+    }
+
     bool Vault::RemoveKey(const std::string& keyName)
     {
         RecursiveReadWriteMtx.WriteLock();
-        if (!IsKeyExist(keyName)) 
+        if (KeysTypes.find(keyName) == KeysTypes.end()) 
         {
             RecursiveReadWriteMtx.WriteUnlock();
             return false;
         }
+
+        // Remove key from hash map with keys types
+        KeysTypes.erase(keyName);
 
         // Erase key from record template
         RecordTemplate.EraseData(keyName);
@@ -109,9 +126,11 @@ namespace mvlt
         for (auto& it : VaultMapStructure)
             it.second.ResetData();
 
+        // Clear hash map with keys types
+        KeysTypes.clear();
+
         // Clear VaultMapStructure
         VaultMapStructure.Clear();
-
 
         // Clear all maps with functions
         VaultRecordAdders.clear();
