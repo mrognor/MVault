@@ -13,6 +13,7 @@ set(MVaultHeaders
     VaultRecord.h
     VaultRecordRef.h
     VaultFunctions.h
+    VaultOperationResult.h
     DataContainer.h 
     DataSaver.h 
     ReadWriteMutex.h
@@ -23,6 +24,7 @@ set(MVaultSource
     Vault.cpp 
     VaultRecord.cpp
     VaultRecordRef.cpp
+    VaultOperationResult.cpp
     DataSaver.cpp
     ReadWriteMutex.cpp)
 

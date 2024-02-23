@@ -4,7 +4,8 @@ void MultithreadingReadTest()
 {
     mvlt::Vault vlt;
     std::condition_variable cv;
-
+    mvlt::VaultRecordRef vrr;
+    
     std::cout << "\t\tReading test started: " << std::flush;
 
     vlt.SetKey<int>("key", -1);
@@ -24,7 +25,7 @@ void MultithreadingReadTest()
         cv.wait_until(lk, timeout);
 
         for (int i = 0; i < 100000; ++i)
-            mvlt::VaultRecordRef vltrr = vlt.GetRecord("key", i);
+            vlt.GetRecord("key", i, vrr);
     });
 
     // Thread for forward records reading
@@ -37,7 +38,7 @@ void MultithreadingReadTest()
         cv.wait_until(lk, timeout);
 
         for (int i = 0; i < 100000; ++i)
-            mvlt::VaultRecordRef vltrr = vlt.GetRecord("key", i);
+            vlt.GetRecord("key", i, vrr);
     });
 
     // Thread for backward records reading
@@ -50,7 +51,7 @@ void MultithreadingReadTest()
         cv.wait_until(lk, timeout);
 
         for (int i = 99999; i >= 0; --i)
-            mvlt::VaultRecordRef vltrr = vlt.GetRecord("key", i);
+            vlt.GetRecord("key", i, vrr);
     });
 
         // Thread for backward records reading
@@ -63,7 +64,7 @@ void MultithreadingReadTest()
         cv.wait_until(lk, timeout);
 
         for (int i = 99999; i >= 0; --i)
-            mvlt::VaultRecordRef vltrr = vlt.GetRecord("key", i);
+            vlt.GetRecord("key", i, vrr);
     });
 
     th1.join();
@@ -119,8 +120,8 @@ void MultithreadingKeysTest()
 void MultithreadingRecordsTest()
 {
     mvlt::Vault vlt;
-
     std::condition_variable cv;
+    mvlt::VaultRecordRef vrr;
 
     vlt.SetKey("id", -1);
     vlt.SetKey("num", -1);
@@ -142,8 +143,8 @@ void MultithreadingRecordsTest()
     {
         for (int i = 0; i < 100000; ++i)
         {
-            mvlt::VaultRecordRef vltrr = vlt.GetRecord("id", i);
-            vltrr.SetData("num", i);
+            vlt.GetRecord("id", i, vrr);
+            vrr.SetData("num", i);
         }
     });
 
@@ -158,8 +159,8 @@ void MultithreadingRecordsTest()
 
         for (int i = 0; i < 100000; ++i)
         {
-            mvlt::VaultRecordRef vltrr = vlt.GetRecord("id", i);
-            vlt.EraseRecord(vltrr);
+            vlt.GetRecord("id", i, vrr);
+            vlt.EraseRecord(vrr);
         }
     });
 

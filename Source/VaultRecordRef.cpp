@@ -2,7 +2,17 @@
 
 namespace mvlt 
 {
+    VaultRecordRef::VaultRecordRef() {}
+
     VaultRecordRef::VaultRecordRef(VaultRecord* vaultRecord, 
+        VaultStructureHashMap* vaultStructureHashMap, 
+        VaultStructureMap* vaultStructureMap,
+        RecursiveReadWriteMutex* vaultRecucrsiveReadWriteMtx)
+    {
+        SetRecord(vaultRecord, vaultStructureHashMap, vaultStructureMap, vaultRecucrsiveReadWriteMtx);
+    }
+
+    void VaultRecordRef::SetRecord(VaultRecord* vaultRecord, 
         VaultStructureHashMap* vaultStructureHashMap, 
         VaultStructureMap* vaultStructureMap,
         RecursiveReadWriteMutex* vaultRecucrsiveReadWriteMtx)

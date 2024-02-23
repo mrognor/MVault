@@ -45,10 +45,11 @@ int main()
     vlt.CreateRecord({ {"id", 3}, {"name", std::string("D")}, {"gender", false}, {"slaves", std::vector<int>{1, 2, 3}} });
     vlt.PrintAsTable();
 
-    mvlt::VaultRecordRef vltrr = vlt.GetRecord("id", 2);
+    mvlt::VaultRecordRef vltrr;
+    vlt.GetRecord("id", 2, vltrr);
     if (vltrr.IsValid()) vltrr.PrintRecord();
 
-    vltrr = vlt.GetRecord<std::string>("name", "D");
+    vlt.GetRecord<std::string>("name", "D", vltrr);
     if (vltrr.IsValid()) vltrr.PrintRecord();
         
     std::cout << vltrr.IsValid() << std::endl; 

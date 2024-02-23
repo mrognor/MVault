@@ -10,6 +10,7 @@
 #include "VaultRecordRef.h"
 #include "ReadWriteMutex.h"
 #include "VaultFunctions.h"
+#include "VaultOperationResult.h"
 
 namespace mvlt
 {
@@ -326,32 +327,73 @@ namespace mvlt
 
             \param [in] keyName the name of the key to search for
             \param [in] keyValue the value of the key to be found
+            \param [in] vaultRecordRef A link to VaultRecordRef, where information about the requested record will be recorded.
+            If the key is not found, or the saved type does not match the type T, the parameter will not change.
+            If the key was found and the types matched, but the value was not found, 
+            a nullptr record will be saved to the ref and the vaultRecordRef.isValid() method returns false.
 
-            \return ref to requested record
-            \todo Handle errors
+            \return VaultOperationResult object with GetData result
         */
         template <class T>
-        VaultRecordRef GetRecord(const std::string& keyName, const T& keyValue) const
+        VaultOperationResult GetRecord(const std::string& keyName, const T& keyValue, VaultRecordRef& vaultRecordRef) const
         {
             // Pointer to store map inside VaultStructureHashMap
             std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
 
+            // Create GetRecord result and fill all known data
+            VaultOperationResult res;
+            res.Key = keyName;
+            res.RequestedType = typeid(T);
+
+            // Read lock vault
             RecursiveReadWriteMtx.ReadLock();
-            // Checking whether such a key exists
-            if (VaultHashMapStructure.GetData(keyName, TtoVaultRecordHashMap))
-            {
-                // Iterator to element with T type and keyValue value
-                auto TtoVaultRecordIt = TtoVaultRecordHashMap->find(keyValue);
-                if (TtoVaultRecordIt != TtoVaultRecordHashMap->end())
+
+            // DataSaver to store hash map
+            DataSaver recordHashMapSaver;
+
+            // Checking for the key in the Vault
+            if (VaultHashMapStructure.GetDataSaver(keyName, recordHashMapSaver))
+            {                
+                // Set saved type to res
+                res.SavedType = KeysTypes.find(keyName)->second;
+
+                // Checking whether the requested type matches the type inside the Vault
+                if(recordHashMapSaver.GetDataType() == typeid(TtoVaultRecordHashMap))
                 {
-                    // Set data to VaultRecordRef
-                    VaultRecordRef res(TtoVaultRecordIt->second, &VaultHashMapStructure, &VaultMapStructure, &RecursiveReadWriteMtx);
-                    RecursiveReadWriteMtx.ReadUnlock();
-                    return res;
+                    // Get hash map from DataSaver
+                    recordHashMapSaver.GetData(TtoVaultRecordHashMap);
+
+                    // Iterator to element with T type and keyValue value
+                    auto TtoVaultRecordIt = TtoVaultRecordHashMap->find(keyValue);
+                    
+                    // If requested value was founded
+                    if (TtoVaultRecordIt != TtoVaultRecordHashMap->end()) 
+                    {
+                        vaultRecordRef.SetRecord(TtoVaultRecordIt->second, &VaultHashMapStructure, &VaultMapStructure, &RecursiveReadWriteMtx);
+                        vaultRecordRef.DataRecord = TtoVaultRecordIt->second;
+                        res.IsOperationSuccess = true;
+                        res.ResultCode = VaultOperationResultCode::Success;
+                    }
+                    else
+                    {   // If requested vaiue was not found
+                        vaultRecordRef.SetRecord(nullptr, &VaultHashMapStructure, &VaultMapStructure, &RecursiveReadWriteMtx);
+                        res.IsOperationSuccess = false;
+                        res.ResultCode = VaultOperationResultCode::WrongValue;
+                    }
+                }
+                else 
+                {   // Check requested and saved data type
+                    res.IsOperationSuccess = false;
+                    res.ResultCode = VaultOperationResultCode::WrongType;
                 }
             }
+            else
+            {   // If requested key dont exist then make operation result false and set correct error code
+                res.IsOperationSuccess = false;
+                res.ResultCode = VaultOperationResultCode::WrongKey;
+            }
 
-            VaultRecordRef res(nullptr, &VaultHashMapStructure, &VaultMapStructure, &RecursiveReadWriteMtx);
+            // Read unlock vault
             RecursiveReadWriteMtx.ReadUnlock();
             return res;
         }

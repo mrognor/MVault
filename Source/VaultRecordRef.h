@@ -38,15 +38,32 @@ namespace mvlt
         /// Making the std::hash<VaultRecordRef> struct friendly so that it has access to the internal members of the VaultRecordRef class
         friend std::hash<VaultRecordRef>;
 
+        /// \todo Конструктор по умолчанию
+        VaultRecordRef();
+        
         /**
             \brief Constructor
             
+            Simply call SetRecord method
             \param [in] vaultRecord A pointer to the Vault referenced by the class object VaultRecordRef
             \param [in] vaultStructureHashMap The internal structure of the Vault, represented by a hash table
             \param [in] vaultStructureMap The internal structure of the Vault, represented by a binary tree
             \param [in] vaultRecucrsiveReadWriteMtx Pointer to Vault mutex used for thread safety
         */
         VaultRecordRef(VaultRecord* vaultRecord, 
+            VaultStructureHashMap* vaultStructureHashMap, 
+            VaultStructureMap* vaultStructureMap,
+            RecursiveReadWriteMutex* vaultRecucrsiveReadWriteMtx);
+
+        /**
+            \brief The method for binding RecordRef to Record 
+            
+            \param [in] vaultRecord A pointer to the Vault referenced by the class object VaultRecordRef
+            \param [in] vaultStructureHashMap The internal structure of the Vault, represented by a hash table
+            \param [in] vaultStructureMap The internal structure of the Vault, represented by a binary tree
+            \param [in] vaultRecucrsiveReadWriteMtx Pointer to Vault mutex used for thread safety
+        */
+        void SetRecord(VaultRecord* vaultRecord, 
             VaultStructureHashMap* vaultStructureHashMap, 
             VaultStructureMap* vaultStructureMap,
             RecursiveReadWriteMutex* vaultRecucrsiveReadWriteMtx);
