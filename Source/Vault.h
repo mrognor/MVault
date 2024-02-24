@@ -314,11 +314,11 @@ namespace mvlt
 
             \param [in] params a vector of pairs with data to be put in the Vault
 
-            \return ref to new record 
+            \return VaultOperationResult object with GetData result
 
-            \todo Handle errors
+            \todo Функция должна давать пользователю VaultRecordRef
         */
-        VaultRecordRef CreateRecord(const std::vector<std::pair<std::string, DataSaver>>& params);
+        VaultOperationResult CreateRecord(const std::vector<std::pair<std::string, DataSaver>>& params);
 
         /**
             \brief The method for getting a reference to the data inside Vault

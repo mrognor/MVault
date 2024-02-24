@@ -82,17 +82,52 @@ namespace mvlt
         return res;
     }
 
-    VaultRecordRef Vault::CreateRecord(const std::vector<std::pair<std::string, DataSaver>>& params)
+    VaultOperationResult Vault::CreateRecord(const std::vector<std::pair<std::string, DataSaver>>& params)
     {
+        VaultOperationResult res;
+
         RecursiveReadWriteMtx.WriteLock();
 
         // Create new record
         VaultRecord* newData = new VaultRecord(RecordTemplate);
 
-        // Copy data from function parametrs
         for (auto& it : params)
-            if (newData->IsData(it.first))
-                newData->SetDataFromDataSaver(it.first, it.second);
+        {
+            DataSaver ds;
+            
+            res.Key = it.first;
+            res.RequestedType = it.second.GetDataType();
+
+            // Check if key exist in record template
+            if(newData->GetDataSaver(it.first, ds))
+            {                
+                res.RequestedType = KeysTypes.find(it.first)->second;
+
+                // Check if type in params match type in record template
+                if (ds.GetDataType() == it.second.GetDataType())
+                {
+                    newData->SetDataFromDataSaver(it.first, it.second);
+
+                    // If key in record template and key tipy match type in param
+                    res.IsOperationSuccess = true;
+                    res.SavedType = it.second.GetDataType();
+                    res.ResultCode = VaultOperationResultCode::Success;
+                }
+                else 
+                {   // If the type in param not match type in record template
+                    res.IsOperationSuccess = false;
+                    res.SavedType = it.second.GetDataType();
+                    res.ResultCode = VaultOperationResultCode::WrongType;
+                }
+            }
+            else 
+            {   // If key not exist then stop set data from params
+                res.IsOperationSuccess = false;
+                res.SavedType = typeid(void);
+                res.RequestedType = typeid(void);
+                res.ResultCode = VaultOperationResultCode::WrongKey;
+            }
+        }
 
         // Add new record to set
         RecordsSet.emplace(newData);
@@ -101,7 +136,7 @@ namespace mvlt
         for (auto& it : VaultRecordAdders)
             it.second(newData);
         
-        VaultRecordRef res(newData, &VaultHashMapStructure, &VaultMapStructure, &RecursiveReadWriteMtx);
+        // vaultRecordRef.SetRecord(newData, &VaultHashMapStructure, &VaultMapStructure, &RecursiveReadWriteMtx);
         
         RecursiveReadWriteMtx.WriteUnlock();
 
