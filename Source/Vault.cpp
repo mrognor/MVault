@@ -201,14 +201,14 @@ namespace mvlt
         RecursiveReadWriteMtx.WriteUnlock();
     }
 
-    void Vault::EraseRecord(const VaultRecordRef& recordRefToErase)
+    bool Vault::EraseRecord(const VaultRecordRef& recordRefToErase)
     {
         RecursiveReadWriteMtx.WriteLock();
 
-        if (RecordsSet.count(recordRefToErase.DataRecord) == 0)
+        if (RecordsSet.find(recordRefToErase.DataRecord) == RecordsSet.end())
         {
             RecursiveReadWriteMtx.WriteUnlock();
-            return;
+            return false;
         }
 
         // Get pointer to record from record ref
@@ -221,6 +221,7 @@ namespace mvlt
         tmpRec->Invalidate();
 
         RecursiveReadWriteMtx.WriteUnlock();
+        return true;
     }
 
     std::size_t Vault::Size() const

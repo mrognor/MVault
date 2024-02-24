@@ -437,8 +437,8 @@ namespace mvlt
 
         /// \brief Method for deleting a record from a Vault
         /// \param recordRefToErase the reference to the record that needs to be deleted
-        /// \todo Handle errors
-        void EraseRecord(const VaultRecordRef& recordRefToErase);
+        /// \return Returns true if the record existed and was successfully deleted, otherwise it returns false
+        bool EraseRecord(const VaultRecordRef& recordRefToErase);
 
         /// \brief Method for getting the number of records
         /// \return number of records
