@@ -48,12 +48,12 @@ namespace mvlt
             \param [in] vaultRecord A pointer to the Vault referenced by the class object VaultRecordRef
             \param [in] vaultStructureHashMap The internal structure of the Vault, represented by a hash table
             \param [in] vaultStructureMap The internal structure of the Vault, represented by a binary tree
-            \param [in] vaultRecucrsiveReadWriteMtx Pointer to Vault mutex used for thread safety
+            \param [in] vaultRecursiveReadWriteMtx Pointer to Vault mutex used for thread safety
         */
         VaultRecordRef(VaultRecord* vaultRecord, 
             VaultStructureHashMap* vaultStructureHashMap, 
             VaultStructureMap* vaultStructureMap,
-            RecursiveReadWriteMutex* vaultRecucrsiveReadWriteMtx);
+            RecursiveReadWriteMutex* vaultRecursiveReadWriteMtx);
 
         /**
             \brief The method for binding RecordRef to Record 
@@ -61,12 +61,12 @@ namespace mvlt
             \param [in] vaultRecord A pointer to the Vault referenced by the class object VaultRecordRef
             \param [in] vaultStructureHashMap The internal structure of the Vault, represented by a hash table
             \param [in] vaultStructureMap The internal structure of the Vault, represented by a binary tree
-            \param [in] vaultRecucrsiveReadWriteMtx Pointer to Vault mutex used for thread safety
+            \param [in] vaultRecursiveReadWriteMtx Pointer to Vault mutex used for thread safety
         */
         void SetRecord(VaultRecord* vaultRecord, 
             VaultStructureHashMap* vaultStructureHashMap, 
             VaultStructureMap* vaultStructureMap,
-            RecursiveReadWriteMutex* vaultRecucrsiveReadWriteMtx);
+            RecursiveReadWriteMutex* vaultRecursiveReadWriteMtx);
 
         /// \brief Copy constructor
         /// \param [in] other other VaultRecordRef object

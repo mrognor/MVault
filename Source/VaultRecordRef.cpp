@@ -7,23 +7,24 @@ namespace mvlt
     VaultRecordRef::VaultRecordRef(VaultRecord* vaultRecord, 
         VaultStructureHashMap* vaultStructureHashMap, 
         VaultStructureMap* vaultStructureMap,
-        RecursiveReadWriteMutex* vaultRecucrsiveReadWriteMtx)
+        RecursiveReadWriteMutex* vaultRecursiveReadWriteMtx)
     {
-        SetRecord(vaultRecord, vaultStructureHashMap, vaultStructureMap, vaultRecucrsiveReadWriteMtx);
+        SetRecord(vaultRecord, vaultStructureHashMap, vaultStructureMap, vaultRecursiveReadWriteMtx);
     }
 
     void VaultRecordRef::SetRecord(VaultRecord* vaultRecord, 
         VaultStructureHashMap* vaultStructureHashMap, 
         VaultStructureMap* vaultStructureMap,
-        RecursiveReadWriteMutex* vaultRecucrsiveReadWriteMtx)
+        RecursiveReadWriteMutex* vaultRecursiveReadWriteMtx)
     {
-        vaultRecucrsiveReadWriteMtx->ReadLock();
+        vaultRecursiveReadWriteMtx->ReadLock();
+        if (DataRecord != nullptr) DataRecord->RemoveRef();
         if (vaultRecord != nullptr) vaultRecord->AddRef();
         DataRecord = vaultRecord;
         VaultHashMapStructure = vaultStructureHashMap;
         VaultMapStructure = vaultStructureMap;
-        VaultRecucrsiveReadWriteMtx = vaultRecucrsiveReadWriteMtx;
-        vaultRecucrsiveReadWriteMtx->ReadUnlock();
+        VaultRecucrsiveReadWriteMtx = vaultRecursiveReadWriteMtx;
+        vaultRecursiveReadWriteMtx->ReadUnlock();
     }
 
     VaultRecordRef::VaultRecordRef(const VaultRecordRef& other)

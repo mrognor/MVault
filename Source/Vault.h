@@ -370,7 +370,6 @@ namespace mvlt
                     if (TtoVaultRecordIt != TtoVaultRecordHashMap->end()) 
                     {
                         vaultRecordRef.SetRecord(TtoVaultRecordIt->second, &VaultHashMapStructure, &VaultMapStructure, &RecursiveReadWriteMtx);
-                        vaultRecordRef.DataRecord = TtoVaultRecordIt->second;
                         res.IsOperationSuccess = true;
                         res.ResultCode = VaultOperationResultCode::Success;
                     }
