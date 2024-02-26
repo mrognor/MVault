@@ -1,5 +1,4 @@
 #include "../Source/Vault.h"
-#include <string>
 
 /**
     \page CustomTypeExample

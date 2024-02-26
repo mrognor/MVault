@@ -30,6 +30,11 @@ namespace mvlt
 
         // Pointer to recursive read write mutex inside data storage
         RecursiveReadWriteMutex* VaultRecucrsiveReadWriteMtx = nullptr;
+
+        // This mutex is necessary because VaultRecucrsiveReadWriteMtx provides thread safety for Vault, but not for a specific VaultRecordRef object. 
+        // For example, the GetRecord method or the comparison operator change the contents of VaultRecordRef, 
+        // but there is no point in calling them to block Vault for writing
+        mutable std::mutex Mtx;
     public:
 
         /// Making the Vault class friendly so that it has access to the internal members of the VaultRecordRef class
@@ -55,19 +60,6 @@ namespace mvlt
             VaultStructureMap* vaultStructureMap,
             RecursiveReadWriteMutex* vaultRecursiveReadWriteMtx);
 
-        /**
-            \brief The method for binding RecordRef to Record 
-            
-            \param [in] vaultRecord A pointer to the Vault referenced by the class object VaultRecordRef
-            \param [in] vaultStructureHashMap The internal structure of the Vault, represented by a hash table
-            \param [in] vaultStructureMap The internal structure of the Vault, represented by a binary tree
-            \param [in] vaultRecursiveReadWriteMtx Pointer to Vault mutex used for thread safety
-        */
-        void SetRecord(VaultRecord* vaultRecord, 
-            VaultStructureHashMap* vaultStructureHashMap, 
-            VaultStructureMap* vaultStructureMap,
-            RecursiveReadWriteMutex* vaultRecursiveReadWriteMtx);
-
         /// \brief Copy constructor
         /// \param [in] other other VaultRecordRef object
         VaultRecordRef(const VaultRecordRef& other);
@@ -80,6 +72,19 @@ namespace mvlt
         /// \param [in] other the object to compare with
         /// \return true if the objects are equal, otherwise false
         bool operator==(const VaultRecordRef& other) const;
+
+        /**
+            \brief The method for binding RecordRef to Record 
+            
+            \param [in] vaultRecord A pointer to the Vault referenced by the class object VaultRecordRef
+            \param [in] vaultStructureHashMap The internal structure of the Vault, represented by a hash table
+            \param [in] vaultStructureMap The internal structure of the Vault, represented by a binary tree
+            \param [in] vaultRecursiveReadWriteMtx Pointer to Vault mutex used for thread safety
+        */
+        void SetRecord(VaultRecord* vaultRecord, 
+            VaultStructureHashMap* vaultStructureHashMap, 
+            VaultStructureMap* vaultStructureMap,
+            RecursiveReadWriteMutex* vaultRecursiveReadWriteMtx);
 
         /// \brief A method for obtaining a unique record identifier
         ///  Important. Two VaultRecordRef objects pointing to the same record will return the same value. Invalid record will return null
@@ -205,9 +210,11 @@ namespace mvlt
         bool GetData(const std::string& key, T& data) const
         {
             bool res;
+            Mtx.lock();
             VaultRecucrsiveReadWriteMtx->ReadLock();
             if (DataRecord->GetIsValid()) res = DataRecord->GetData(key, data);
             VaultRecucrsiveReadWriteMtx->ReadUnlock();
+            Mtx.unlock();
             return res;
         }
         

@@ -11,7 +11,7 @@ int main()
 
     MultithreadingKeysTest();
 
-    // MultithreadingRecordsTest();
+    MultithreadingRecordsTest();
 
     std::cout << "\tThe multithreaded tests are finished!" << std::endl;
 
