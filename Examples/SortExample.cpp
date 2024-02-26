@@ -186,7 +186,8 @@ int main()
 
     std::cout << "Alexanders: " << std::endl;
     // startcode{.cpp}
-    std::vector<mvlt::VaultRecordRef> alexanders = vlt.GetRecords("name", std::string("Alexander"));
+    std::vector<mvlt::VaultRecordRef> alexanders;
+    vlt.GetRecords("name", std::string("Alexander"), alexanders);
     mvlt::PrintAsTable(alexanders);
     // endcode
 
