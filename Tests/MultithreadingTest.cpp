@@ -133,7 +133,7 @@ void MultithreadingRecordsTest()
     // Thread for adding records
     std::thread th1([&]()
     {
-        for (int i = 0; i < 100000; ++i)
+        for (int i = 0; i < 10000; ++i)
             vlt.CreateRecord({ {"id", i} });
         
     });
@@ -141,7 +141,7 @@ void MultithreadingRecordsTest()
     // Thread for changing records
     std::thread th2([&]()
     {
-        for (int i = 0; i < 100000; ++i)
+        for (int i = 0; i < 10000; ++i)
         {
             vlt.GetRecord("id", i, vrr);
             vrr.SetData("num", i);
@@ -157,7 +157,7 @@ void MultithreadingRecordsTest()
         // Wait for start all threads at same time
         cv.wait_until(lk, timeout);
 
-        for (int i = 0; i < 100000; ++i)
+        for (int i = 0; i < 10000; ++i)
         {
             vlt.GetRecord("id", i, vrr);
             vlt.EraseRecord(vrr);

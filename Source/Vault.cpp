@@ -84,6 +84,12 @@ namespace mvlt
 
     VaultOperationResult Vault::CreateRecord(const std::vector<std::pair<std::string, DataSaver>>& params)
     {
+        VaultRecordRef tmp;
+        return CreateRecord(tmp, params);
+    }
+
+    VaultOperationResult Vault::CreateRecord(VaultRecordRef& vaultRecordRef, const std::vector<std::pair<std::string, DataSaver>>& params)
+    {
         VaultOperationResult res;
 
         RecursiveReadWriteMtx.WriteLock();
@@ -136,7 +142,7 @@ namespace mvlt
         for (auto& it : VaultRecordAdders)
             it.second(newData);
         
-        // vaultRecordRef.SetRecord(newData, &VaultHashMapStructure, &VaultMapStructure, &RecursiveReadWriteMtx);
+        vaultRecordRef.SetRecord(newData, &VaultHashMapStructure, &VaultMapStructure, &RecursiveReadWriteMtx);
         
         RecursiveReadWriteMtx.WriteUnlock();
 
@@ -251,15 +257,18 @@ namespace mvlt
 
         RecursiveReadWriteMtx.ReadLock();
         
-        /// \todo Проверка
-        VaultRecordSorters.find(keyName)->second([&](const VaultRecordRef& vaultRecordRef)
-            {
-                if (counter >= amountOfRecords) return false;
-                
-                res.emplace_back(vaultRecordRef);
-                ++counter;
-                return true;
-            }, isReverse);
+        auto f = VaultRecordSorters.find(keyName);
+        if (f != VaultRecordSorters.end())
+        {
+            f->second([&](const VaultRecordRef& vaultRecordRef)
+                {
+                    if (counter >= amountOfRecords) return false;
+                    
+                    res.emplace_back(vaultRecordRef);
+                    ++counter;
+                    return true;
+                }, isReverse);
+        }
 
         RecursiveReadWriteMtx.ReadUnlock();
         

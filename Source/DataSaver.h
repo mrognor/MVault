@@ -178,9 +178,11 @@ namespace mvlt
         /// \return A string of data
         std::string Str() const;
 
+        /// \brief A method for getting the type of saved data.
+        /// \return std::type_index object with saved data type
         std::type_index GetDataType() const;
         
-        /// Default destructor
+        /// \brief Default destructor
         ~DataSaver();
     };
 }

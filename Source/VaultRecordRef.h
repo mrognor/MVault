@@ -225,8 +225,10 @@ namespace mvlt
             \param [out] str a reference to string to write data from the container there.
             If the data was not found, then nothing will be written to the str
 
+            It uses the ToString function inside. If it is not defined for the type, 
+            then the str will be an empty string.
+
             \return Returns false if the key was not found, and otherwise returns true.
-            \todo Handle errors
         */ 
         bool GetDataAsString(const std::string& key, std::string& str) const;
 

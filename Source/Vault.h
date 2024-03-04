@@ -315,10 +315,19 @@ namespace mvlt
             \param [in] params a vector of pairs with data to be put in the Vault
 
             \return VaultOperationResult object with GetData result
-
-            \todo Функция должна давать пользователю VaultRecordRef
         */
         VaultOperationResult CreateRecord(const std::vector<std::pair<std::string, DataSaver>>& params);
+
+        /**
+            \overload
+            \brief Method to create new VaultRecord.
+
+            \param [in] vaultRecordRef The reference to the VaultRecordRef to which the new entry will be assigned
+            \param [in] params a vector of pairs with data to be put in the Vault
+
+            \return VaultOperationResult object with GetData result
+        */
+        VaultOperationResult CreateRecord(VaultRecordRef& vaultRecordRef, const std::vector<std::pair<std::string, DataSaver>>& params);
 
         /**
             \brief The method for getting a reference to the data inside Vault
@@ -484,8 +493,8 @@ namespace mvlt
             \param [in] isReverse Sort in descending order or descending order. By default, ascending
             \param [in] amountOfRecords The number of records. By default, everything is
 
+            If the key is missing in the vault, the result vector will be empty
             \return A vector with links to records. The order of entries in the vector is determined by the amountOfRecords parameter
-            \todo Handle errors
         */
         std::vector<VaultRecordRef> GetSortedRecords(const std::string& keyName, const bool& isReverse = false, const std::size_t& amountOfRecords = -1) const;
 
@@ -504,7 +513,7 @@ namespace mvlt
             The function iterate over all records sorted by the keyName parameter, in the order specified by the isReverse parameter. 
             For each record, the function passed in the func parameter is called.
             This function does not sort the data when it is called, the sorted data is already stored inside the Vault.
-            \todo Handle errors
+            If the key is missing in the vault, the function will be called 0 times
         */
         template<class F>
         void SortBy(const std::string& keyName, const F&& func, const bool& isReverse = false, const std::size_t& amountOfRecords = -1) const
@@ -513,16 +522,18 @@ namespace mvlt
 
             RecursiveReadWriteMtx.ReadLock();
             
-            /// \todo Проверка
-            VaultRecordSorters.find(keyName)->second([&](const VaultRecordRef& vaultRecordRef)
-                {
-                    if (counter >= amountOfRecords) return false;
-                    
-                    func(vaultRecordRef);
-                    ++counter;
-                    return true;
-                }, isReverse);
-
+            auto f = VaultRecordSorters.find(keyName);
+            if (f != VaultRecordSorters.end())
+            {
+                VaultRecordSorters.find(keyName)->second([&](const VaultRecordRef& vaultRecordRef)
+                    {
+                        if (counter >= amountOfRecords) return false;
+                        
+                        func(vaultRecordRef);
+                        ++counter;
+                        return true;
+                    }, isReverse);
+            }
             RecursiveReadWriteMtx.ReadUnlock();
         }
 
