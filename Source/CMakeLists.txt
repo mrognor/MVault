@@ -9,6 +9,7 @@ endif()
 set(CMAKE_CXX_STANDARD 11)
 
 set(MVaultHeaders 
+    MVault.h
     Vault.h 
     VaultRecord.h
     VaultRecordRef.h
@@ -18,7 +19,9 @@ set(MVaultHeaders
     DataSaver.h 
     ReadWriteMutex.h
     Functions/ToString.h
-    Functions/PrintAsTable.h)
+    Functions/PrintAsTable.h
+    Vault.hpp
+    VaultRecordRef.hpp)
 
 set(MVaultSource
     Vault.cpp 
@@ -26,7 +29,8 @@ set(MVaultSource
     VaultRecordRef.cpp
     VaultOperationResult.cpp
     DataSaver.cpp
-    ReadWriteMutex.cpp)
+    ReadWriteMutex.cpp
+    Functions/PrintAsTable.cpp)
 
 project(MVault)
 

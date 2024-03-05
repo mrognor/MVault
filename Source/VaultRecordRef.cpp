@@ -1,4 +1,6 @@
 #include "VaultRecordRef.h"
+#include "Vault.hpp"
+#include "VaultRecordRef.hpp"
 
 namespace mvlt 
 {

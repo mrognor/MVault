@@ -14,12 +14,7 @@ namespace mvlt
 
         \return the value of the key in the string
     */
-    inline std::string GetDataAsString(VaultRecord* record, const std::string& key)
-    {
-        std::string res;
-        record->GetDataAsString(key, res);
-        return res;
-    }
+    std::string GetDataAsString(VaultRecord* record, const std::string& key);
 
     /**
         \brief Function for PrintContainerAsTable
@@ -31,12 +26,7 @@ namespace mvlt
 
         \return the value of the key in the string
     */
-    inline std::string GetDataAsString(const VaultRecord& record, const std::string& key)
-    {
-        std::string res;
-        record.GetDataAsString(key, res);
-        return res;
-    }
+    std::string GetDataAsString(const VaultRecord& record, const std::string& key);
 
     /**
         \brief Function for PrintContainerAsTable
@@ -48,12 +38,7 @@ namespace mvlt
 
         \return the value of the key in the string
     */
-    inline std::string GetDataAsString(VaultRecordRef* recordRef, const std::string& key)
-    {
-        std::string res;
-        recordRef->GetDataAsString(key, res);
-        return res;
-    }
+    std::string GetDataAsString(VaultRecordRef* recordRef, const std::string& key);
 
     /**
         \brief Function for PrintContainerAsTable
@@ -65,12 +50,7 @@ namespace mvlt
 
         \return the value of the key in the string
     */
-    inline std::string GetDataAsString(const VaultRecordRef& recordRef, const std::string& key)
-    {
-        std::string res;
-        recordRef.GetDataAsString(key, res);
-        return res;
-    }
+    std::string GetDataAsString(const VaultRecordRef& recordRef, const std::string& key);
 
     /**
         \brief A method for printing data as tables
