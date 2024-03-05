@@ -6,6 +6,13 @@
 
 namespace mvlt
 {
+    /**
+        \defgroup VaultOperationResultCode VaultOperationResultCode
+        \brief Enum with all possible vault operation results
+
+        @{
+    */
+    
     /// \brief Enum with all error handling codes
     enum class VaultOperationResultCode
     {
@@ -15,6 +22,8 @@ namespace mvlt
         WrongValue = 1, ///< This value is returned when the key was found, the requested type and the saved type are equal, but the requested value was not found
         Success = 2,    ///< This value is returned when the request was completely successful
     };
+    
+    /**@} */
 
     /// \brief Structure for storing the results of MVault operations
     struct VaultOperationResult
