@@ -6,12 +6,9 @@ namespace mvlt
 {
     VaultRecordRef::VaultRecordRef() {}
 
-    VaultRecordRef::VaultRecordRef(VaultRecord* vaultRecord, 
-        VaultStructureHashMap* vaultStructureHashMap, 
-        VaultStructureMap* vaultStructureMap,
-        RecursiveReadWriteMutex* vaultRecursiveReadWriteMtx)
+    VaultRecordRef::VaultRecordRef(VaultRecord* vaultRecord, Vault* vlt)
     {
-        SetRecord(vaultRecord, vaultStructureHashMap, vaultStructureMap, vaultRecursiveReadWriteMtx);
+        SetRecord(vaultRecord, vlt);
     }
 
     VaultRecordRef::VaultRecordRef(const VaultRecordRef& other)
@@ -26,14 +23,12 @@ namespace mvlt
             Mtx.lock();
             other.Mtx.lock();
             /// \todo Надо ли тут блокировать other
-            other.VaultRecucrsiveReadWriteMtx->ReadLock();
+            other.Vlt->RecursiveReadWriteMtx.ReadLock();
             if (DataRecord != nullptr) DataRecord->RemoveRef();
             if (other.DataRecord != nullptr) other.DataRecord->AddRef();
             DataRecord = other.DataRecord;
-            VaultHashMapStructure = other.VaultHashMapStructure;
-            VaultMapStructure = other.VaultMapStructure;
-            VaultRecucrsiveReadWriteMtx = other.VaultRecucrsiveReadWriteMtx;
-            other.VaultRecucrsiveReadWriteMtx->ReadUnlock();
+            Vlt = other.Vlt;
+            other.Vlt->RecursiveReadWriteMtx.ReadUnlock();
             other.Mtx.unlock();
             Mtx.unlock();
         }
@@ -47,28 +42,23 @@ namespace mvlt
         Mtx.lock();
         other.Mtx.lock();
         /// \todo Надо ли тут блокировать other
-        VaultRecucrsiveReadWriteMtx->ReadLock();
+        Vlt->RecursiveReadWriteMtx.ReadLock();
         res = (DataRecord == other.DataRecord);
-        VaultRecucrsiveReadWriteMtx->ReadUnlock();
+        Vlt->RecursiveReadWriteMtx.ReadUnlock();
         other.Mtx.unlock();
         Mtx.unlock();
         return res;
     }
 
-    void VaultRecordRef::SetRecord(VaultRecord* vaultRecord, 
-        VaultStructureHashMap* vaultStructureHashMap, 
-        VaultStructureMap* vaultStructureMap,
-        RecursiveReadWriteMutex* vaultRecursiveReadWriteMtx)
+    void VaultRecordRef::SetRecord(VaultRecord* vaultRecord, Vault* vlt)
     {
         Mtx.lock();
-        vaultRecursiveReadWriteMtx->ReadLock();
+        vlt->RecursiveReadWriteMtx.ReadLock();
         if (DataRecord != nullptr) DataRecord->RemoveRef();
         if (vaultRecord != nullptr) vaultRecord->AddRef();
         DataRecord = vaultRecord;
-        VaultHashMapStructure = vaultStructureHashMap;
-        VaultMapStructure = vaultStructureMap;
-        VaultRecucrsiveReadWriteMtx = vaultRecursiveReadWriteMtx;
-        vaultRecursiveReadWriteMtx->ReadUnlock();
+        Vlt = vlt;
+        vlt->RecursiveReadWriteMtx.ReadUnlock();
         Mtx.unlock();
     }
 
@@ -76,12 +66,12 @@ namespace mvlt
     {
         std::stringstream ss;
         Mtx.lock();
-        VaultRecucrsiveReadWriteMtx->ReadLock();
+        Vlt->RecursiveReadWriteMtx.ReadLock();
         if (IsValid())
             ss << DataRecord;
         else
             ss << "null";
-        VaultRecucrsiveReadWriteMtx->ReadUnlock();
+        Vlt->RecursiveReadWriteMtx.ReadUnlock();
         Mtx.unlock();
         return ss.str();
     }
@@ -101,9 +91,9 @@ namespace mvlt
     {
         bool res;
         Mtx.lock();
-        VaultRecucrsiveReadWriteMtx->ReadLock();
+        Vlt->RecursiveReadWriteMtx.ReadLock();
         if (DataRecord->GetIsValid()) res = DataRecord->GetDataAsString(key, str);
-        VaultRecucrsiveReadWriteMtx->ReadUnlock();
+        Vlt->RecursiveReadWriteMtx.ReadUnlock();
         Mtx.unlock();
         return res;
     }
@@ -123,9 +113,9 @@ namespace mvlt
         std::vector<std::string> res;
 
         Mtx.lock();
-        VaultRecucrsiveReadWriteMtx->ReadLock();
-        for (const auto& it : *VaultMapStructure) res.emplace_back(it.first);
-        VaultRecucrsiveReadWriteMtx->ReadUnlock();
+        Vlt->RecursiveReadWriteMtx.ReadLock();
+        for (const auto& it : Vlt->VaultMapStructure) res.emplace_back(it.first);
+        Vlt->RecursiveReadWriteMtx.ReadUnlock();
         Mtx.unlock();
 
         return res;
@@ -134,11 +124,11 @@ namespace mvlt
     void VaultRecordRef::PrintRecord() const
     {
         Mtx.lock();
-        VaultRecucrsiveReadWriteMtx->ReadLock();
+        Vlt->RecursiveReadWriteMtx.ReadLock();
         
         std::cout << "Vault record " << DataRecord << ":" << std::endl;
 
-        for (const auto& keyPair : *VaultHashMapStructure)
+        for (const auto& keyPair : Vlt->VaultHashMapStructure)
         {
             DataSaver dataSaver;
             DataRecord->GetDataSaver(keyPair.first, dataSaver);
@@ -146,7 +136,7 @@ namespace mvlt
             std::cout << "\t" << keyPair.first << " = " << dataSaver.Str() << std::endl;
         }
 
-        VaultRecucrsiveReadWriteMtx->ReadUnlock();
+        Vlt->RecursiveReadWriteMtx.ReadUnlock();
         Mtx.unlock();
     }
 
@@ -154,19 +144,18 @@ namespace mvlt
     {
         Mtx.lock();
         DataRecord = nullptr;
-        VaultHashMapStructure = nullptr;
-        VaultMapStructure = nullptr;
+        Vlt = nullptr;
         Mtx.unlock();
     }
 
     void VaultRecordRef::ReadLock() const
     {
-        VaultRecucrsiveReadWriteMtx->ReadLock();
+        Vlt->RecursiveReadWriteMtx.ReadLock();
     }
 
     void VaultRecordRef::ReadUnlock() const
     {
-        VaultRecucrsiveReadWriteMtx->ReadUnlock();
+        Vlt->RecursiveReadWriteMtx.ReadUnlock();
     }
         
     VaultRecordRef::~VaultRecordRef()

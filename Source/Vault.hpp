@@ -95,13 +95,13 @@ namespace mvlt
             if (!isReverse)
             {
                 for (const auto& it : *TtoVaultRecordMap)
-                    if(!functionToSortedData(VaultRecordRef(it.second, &VaultHashMapStructure, &VaultMapStructure, &RecursiveReadWriteMtx)))
+                    if(!functionToSortedData(VaultRecordRef(it.second, this)))
                         break;
             }
             else
             {
                 for (auto it = TtoVaultRecordMap->rbegin(); it != TtoVaultRecordMap->rend(); ++it)
-                    if(!functionToSortedData(VaultRecordRef(it->second, &VaultHashMapStructure, &VaultMapStructure, &RecursiveReadWriteMtx)))
+                    if(!functionToSortedData(VaultRecordRef(it->second, this)))
                         break;
             }
         });
@@ -165,13 +165,13 @@ namespace mvlt
             auto TtoVaultRecordIt = TtoVaultRecordHashMap->find(keyValue);
             if (TtoVaultRecordIt != TtoVaultRecordHashMap->end())
             {
-                vaultRecordRef.SetRecord(TtoVaultRecordIt->second, &VaultHashMapStructure, &VaultMapStructure, &RecursiveReadWriteMtx);
+                vaultRecordRef.SetRecord(TtoVaultRecordIt->second, const_cast<Vault*>(this));
                 res.IsOperationSuccess = true;
                 res.ResultCode = VaultOperationResultCode::Success;
             }
             else
             {
-                vaultRecordRef.SetRecord(nullptr, &VaultHashMapStructure, &VaultMapStructure, &RecursiveReadWriteMtx);
+                vaultRecordRef.SetRecord(nullptr, const_cast<Vault*>(this));
                 res.IsOperationSuccess = false;
                 res.ResultCode = VaultOperationResultCode::WrongValue;
             }
@@ -223,7 +223,7 @@ namespace mvlt
                 for (auto it = equalRange.first; it != equalRange.second; ++it)
                 {
                     ++counter;
-                    recordsRefs.emplace_back(VaultRecordRef(it->second, &VaultHashMapStructure, &VaultMapStructure, &RecursiveReadWriteMtx));
+                    recordsRefs.emplace_back(VaultRecordRef(it->second, const_cast<Vault*>(this)));
                     if (counter >= amountOfRecords) break;
                 }
             }

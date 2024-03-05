@@ -17,25 +17,25 @@ namespace mvlt
         std::multimap<T, VaultRecord*>* TtoVaultRecordMap = nullptr;
 
         // Lock Vault to write
-        VaultRecucrsiveReadWriteMtx->WriteLock();
+        Vlt->RecursiveReadWriteMtx.WriteLock();
 
         // Get std::unordered_multimap with T key and VaultRecord* value
-        if (!VaultHashMapStructure->GetData(key, TtoVaultRecordHashMap)) 
+        if (!Vlt->VaultHashMapStructure.GetData(key, TtoVaultRecordHashMap)) 
         {
-            VaultRecucrsiveReadWriteMtx->WriteUnlock();
+            Vlt->RecursiveReadWriteMtx.WriteUnlock();
             return false;
         }
 
         // Get std::multimap with T key and VaultRecord* value
-        if (!VaultMapStructure->GetData(key, TtoVaultRecordMap))
+        if (!Vlt->VaultMapStructure.GetData(key, TtoVaultRecordMap))
         {
-            VaultRecucrsiveReadWriteMtx->WriteUnlock();
+            Vlt->RecursiveReadWriteMtx.WriteUnlock();
             return false;
         }
 
         if (DataRecord == nullptr || !DataRecord->GetIsValid())
         {
-            VaultRecucrsiveReadWriteMtx->WriteUnlock();
+            Vlt->RecursiveReadWriteMtx.WriteUnlock();
             return false;
         }
 
@@ -81,7 +81,7 @@ namespace mvlt
         DataRecord->SetData(key, data);
 
         // Unlock Vault
-        VaultRecucrsiveReadWriteMtx->WriteUnlock();
+        Vlt->RecursiveReadWriteMtx.WriteUnlock();
         return true;
     }
 
@@ -90,9 +90,9 @@ namespace mvlt
     {
         bool res;
         Mtx.lock();
-        VaultRecucrsiveReadWriteMtx->ReadLock();
+        Vlt->RecursiveReadWriteMtx.ReadLock();
         if (DataRecord->GetIsValid()) res = DataRecord->GetData(key, data);
-        VaultRecucrsiveReadWriteMtx->ReadUnlock();
+        Vlt->RecursiveReadWriteMtx.ReadUnlock();
         Mtx.unlock();
         return res;
     }

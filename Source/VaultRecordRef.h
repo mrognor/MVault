@@ -20,19 +20,11 @@ namespace mvlt
     class VaultRecordRef
     {
     private:
-        Vault* vlt;
+        // Pointer to Vault
+        Vault* Vlt;
 
         // Pointer to VaultRecord inside Vault
         VaultRecord* DataRecord = nullptr;
-
-        // Pointer to VaultStructureHashMap 
-        VaultStructureHashMap* VaultHashMapStructure = nullptr;
-
-        // Pointer to VaultStructureMap 
-        VaultStructureMap* VaultMapStructure = nullptr;
-
-        // Pointer to recursive read write mutex inside data storage
-        RecursiveReadWriteMutex* VaultRecucrsiveReadWriteMtx = nullptr;
 
         // This mutex is necessary because VaultRecucrsiveReadWriteMtx provides thread safety for Vault, but not for a specific VaultRecordRef object. 
         // For example, the GetRecord method or the comparison operator change the contents of VaultRecordRef, 
@@ -53,15 +45,10 @@ namespace mvlt
             \brief Constructor
             
             Simply call SetRecord method
-            \param [in] vaultRecord A pointer to the Vault referenced by the class object VaultRecordRef
-            \param [in] vaultStructureHashMap The internal structure of the Vault, represented by a hash table
-            \param [in] vaultStructureMap The internal structure of the Vault, represented by a binary tree
-            \param [in] vaultRecursiveReadWriteMtx Pointer to Vault mutex used for thread safety
+            \param [in] vaultRecord A pointer to the VaultRecord referenced by the class object VaultRecordRef
+            \param [in] vlt A pointer to Vault
         */
-        VaultRecordRef(VaultRecord* vaultRecord, 
-            VaultStructureHashMap* vaultStructureHashMap, 
-            VaultStructureMap* vaultStructureMap,
-            RecursiveReadWriteMutex* vaultRecursiveReadWriteMtx);
+        VaultRecordRef(VaultRecord* vaultRecord, Vault* vlt);
 
         /// \brief Copy constructor
         /// \param [in] other other VaultRecordRef object
@@ -80,14 +67,9 @@ namespace mvlt
             \brief The method for binding RecordRef to Record 
             
             \param [in] vaultRecord A pointer to the Vault referenced by the class object VaultRecordRef
-            \param [in] vaultStructureHashMap The internal structure of the Vault, represented by a hash table
-            \param [in] vaultStructureMap The internal structure of the Vault, represented by a binary tree
-            \param [in] vaultRecursiveReadWriteMtx Pointer to Vault mutex used for thread safety
+            \param [in] vlt             \param [in] vlt A pointer to Vault
         */
-        void SetRecord(VaultRecord* vaultRecord, 
-            VaultStructureHashMap* vaultStructureHashMap, 
-            VaultStructureMap* vaultStructureMap,
-            RecursiveReadWriteMutex* vaultRecursiveReadWriteMtx);
+        void SetRecord(VaultRecord* vaultRecord, Vault* vlt);
 
         /// \brief A method for obtaining a unique record identifier
         ///  Important. Two VaultRecordRef objects pointing to the same record will return the same value. Invalid record will return null

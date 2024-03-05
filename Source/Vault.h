@@ -85,6 +85,9 @@ namespace mvlt
 
     public:
 
+        /// Making the VaultRecordRef class friendly so that it has access to the internal members of the Vault class
+        friend VaultRecordRef;
+        
         /// \brief Default constructor
         Vault();
 

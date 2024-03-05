@@ -77,7 +77,7 @@ namespace mvlt
         for (auto& it : VaultRecordAdders)
             it.second(newData);
 
-        VaultRecordRef res(newData, &VaultHashMapStructure, &VaultMapStructure, &RecursiveReadWriteMtx);
+        VaultRecordRef res(newData, this);
 
         RecursiveReadWriteMtx.WriteUnlock();
 
@@ -144,7 +144,7 @@ namespace mvlt
         for (auto& it : VaultRecordAdders)
             it.second(newData);
         
-        vaultRecordRef.SetRecord(newData, &VaultHashMapStructure, &VaultMapStructure, &RecursiveReadWriteMtx);
+        vaultRecordRef.SetRecord(newData, this);
         
         RecursiveReadWriteMtx.WriteUnlock();
 
