@@ -6,6 +6,87 @@
 namespace mvlt
 {
     template <class T>
+    bool Vault::SetDataToRecord(VaultRecord* dataRecord, const std::string& key, const T& data)
+    {
+        // A pointer for storing a std::unordered_multimap in which a template data type is used as a key, 
+        // and a pointer to the DataHashMap is used as a value
+        std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
+
+        // A pointer for storing a std::multimap in which a template data type is used as a key, 
+        // and a pointer to the DataHashMap is used as a value
+        std::multimap<T, VaultRecord*>* TtoVaultRecordMap = nullptr;
+
+        // Lock Vault to write
+        RecursiveReadWriteMtx.WriteLock();
+
+        // Get std::unordered_multimap with T key and VaultRecord* value
+        if (!VaultHashMapStructure.GetData(key, TtoVaultRecordHashMap)) 
+        {
+            RecursiveReadWriteMtx.WriteUnlock();
+            return false;
+        }
+
+        // Get std::multimap with T key and VaultRecord* value
+        if (!VaultMapStructure.GetData(key, TtoVaultRecordMap))
+        {
+            RecursiveReadWriteMtx.WriteUnlock();
+            return false;
+        }
+
+        // Check if dataRecord valid
+        if (dataRecord == nullptr || !dataRecord->GetIsValid())
+        {
+            RecursiveReadWriteMtx.WriteUnlock();
+            return false;
+        }
+
+        // Get the current value of the key key inside the VaultRecordRef and save it for further work
+        T oldData;
+        dataRecord->GetData(key, oldData);
+
+        // Remove oldData from TtoVaultRecordHashMap from VaultHashMapStructure
+        auto FirstAndLastIteratorsWithKeyOnHashMap = TtoVaultRecordHashMap->equal_range(oldData);
+
+        // Iterate over all data records with oldData key
+        for (auto& it = FirstAndLastIteratorsWithKeyOnHashMap.first; it != FirstAndLastIteratorsWithKeyOnHashMap.second; ++it)
+        {
+            // Find required data record
+            if (it->second == dataRecord)
+            {
+                TtoVaultRecordHashMap->erase(it);
+                break;
+            }
+        }
+
+        // Add new data to TtoVaultRecordHashMap to Vault VaultHashMapStructure
+        TtoVaultRecordHashMap->emplace(data, dataRecord);
+
+        // Remove oldData from TtoVaultRecordMap from VaultMapStructure
+        auto FirstAndLastIteratorsWithKeyOnMap = TtoVaultRecordMap->equal_range(oldData);
+
+        // Iterate over all data records with oldData key
+        for (auto& it = FirstAndLastIteratorsWithKeyOnMap.first; it != FirstAndLastIteratorsWithKeyOnMap.second; ++it)
+        {
+            // Find required data record
+            if (it->second == dataRecord)
+            {
+                TtoVaultRecordMap->erase(it);
+                break;
+            }
+        }
+
+        // Add new data to TtoVaultRecordMap to Vault VaultMapStructure
+        TtoVaultRecordMap->emplace(data, dataRecord);
+
+        // Update data inside VaultRecord pointer inside VaultRecordRef and Vault
+        dataRecord->SetData(key, data);
+
+        // Unlock Vault
+        RecursiveReadWriteMtx.WriteUnlock();
+        return true;
+    }
+
+    template <class T>
     void Vault::SetKey(const std::string& keyName, const T& defaultKeyValue)
     {
         RecursiveReadWriteMtx.WriteLock();

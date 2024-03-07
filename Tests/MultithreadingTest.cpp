@@ -128,7 +128,7 @@ void MultithreadingRecordsTest()
 
     std::cout << "\t\tRecords test started: " << std::flush;
 
-    auto timeout = std::chrono::steady_clock::now() + std::chrono::milliseconds(5);
+    auto timeout = std::chrono::steady_clock::now() + std::chrono::milliseconds(10);
 
     // Thread for adding records
     std::thread th1([&]()

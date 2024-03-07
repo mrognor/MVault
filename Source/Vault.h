@@ -83,6 +83,18 @@ namespace mvlt
         // Recursive mutex for thread safety
         mutable RecursiveReadWriteMutex RecursiveReadWriteMtx;
 
+        /**
+            Method for setting a new value in VaultRecord and Vault
+            
+            \tparam T - any type except c arrays
+
+            \param [in] dataRecord pointer to VaultRecord inside Vault
+            \param [in] key key to set data
+            \param [in] data new data
+        */
+        template <class T>
+        bool SetDataToRecord(VaultRecord* dataRecord, const std::string& key, const T& data);
+        
     public:
 
         /// Making the VaultRecordRef class friendly so that it has access to the internal members of the Vault class
@@ -256,9 +268,9 @@ namespace mvlt
         void DropData();
 
         /// \brief Method for deleting a record from a Vault
-        /// \param recordRefToErase the reference to the record that needs to be deleted
+        /// \param [in] recordRefToErase the reference to the record that needs to be deleted
         /// \return Returns true if the record existed and was successfully deleted, otherwise it returns false
-        bool EraseRecord(const VaultRecordRef& recordRefToErase);
+        bool EraseRecord(VaultRecordRef& recordRefToErase);
 
         /// \brief Method for getting the number of records
         /// \return number of records

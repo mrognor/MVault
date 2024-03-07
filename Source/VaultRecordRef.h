@@ -30,6 +30,9 @@ namespace mvlt
         // For example, the GetRecord method or the comparison operator change the contents of VaultRecordRef, 
         // but there is no point in calling them to block Vault for writing
         mutable std::mutex Mtx;
+
+        // Variable for tracking the validity status
+        bool IsRefValid = false;
     public:
 
         /// Making the Vault class friendly so that it has access to the internal members of the VaultRecordRef class

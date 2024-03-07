@@ -99,7 +99,7 @@ namespace mvlt
         // Create new record
         VaultRecord* newData = new VaultRecord(RecordTemplate);
 
-        for (auto& it : params)
+        for (const auto& it : params)
         {
             DataSaver ds;
             
@@ -209,13 +209,18 @@ namespace mvlt
         RecursiveReadWriteMtx.WriteUnlock();
     }
 
-    bool Vault::EraseRecord(const VaultRecordRef& recordRefToErase)
+    bool Vault::EraseRecord(VaultRecordRef& recordRefToErase)
     {
         RecursiveReadWriteMtx.WriteLock();
+
+        recordRefToErase.Mtx.lock();
+        recordRefToErase.IsRefValid = false;
+        recordRefToErase.Mtx.unlock();
 
         if (RecordsSet.find(recordRefToErase.DataRecord) == RecordsSet.end())
         {
             RecursiveReadWriteMtx.WriteUnlock();
+            recordRefToErase.Mtx.unlock();
             return false;
         }
 
@@ -227,6 +232,7 @@ namespace mvlt
 
         RecordsSet.erase(tmpRec);
         tmpRec->Invalidate();
+        
 
         RecursiveReadWriteMtx.WriteUnlock();
         return true;
