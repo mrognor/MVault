@@ -6,8 +6,13 @@
 namespace mvlt
 {
     template <class T>
-    bool Vault::SetDataToRecord(VaultRecord* dataRecord, const std::string& key, const T& data)
+    VaultOperationResult Vault::SetDataToRecord(VaultRecord* dataRecord, const std::string& key, const T& data)
     {
+        // Fill res info known at start
+        VaultOperationResult res;
+        res.Key = key;
+        res.RequestedType = typeid(T);
+
         // A pointer for storing a std::unordered_multimap in which a template data type is used as a key, 
         // and a pointer to the DataHashMap is used as a value
         std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
@@ -19,26 +24,38 @@ namespace mvlt
         // Lock Vault to write
         RecursiveReadWriteMtx.WriteLock();
 
-        // Get std::unordered_multimap with T key and VaultRecord* value
-        if (!VaultHashMapStructure.GetData(key, TtoVaultRecordHashMap)) 
-        {
-            RecursiveReadWriteMtx.WriteUnlock();
-            return false;
-        }
-
-        // Get std::multimap with T key and VaultRecord* value
-        if (!VaultMapStructure.GetData(key, TtoVaultRecordMap))
-        {
-            RecursiveReadWriteMtx.WriteUnlock();
-            return false;
-        }
-
         // Check if dataRecord valid
         if (dataRecord == nullptr || !dataRecord->GetIsValid())
         {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::Error;
             RecursiveReadWriteMtx.WriteUnlock();
-            return false;
+            return res;
         }
+
+        // If key not exist
+        if(!GetKeyType(key, res.SavedType))
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::WrongKey;
+            RecursiveReadWriteMtx.ReadUnlock();
+            return res;
+        }
+
+        // Check types
+        if (res.SavedType != res.RequestedType)
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::WrongType;
+            RecursiveReadWriteMtx.ReadUnlock();
+            return res;
+        }
+
+        // Get std::unordered_multimap with T key and VaultRecord* value
+        VaultHashMapStructure.GetData(key, TtoVaultRecordHashMap);
+
+        // Get std::multimap with T key and VaultRecord* value
+        VaultMapStructure.GetData(key, TtoVaultRecordMap);
 
         // Get the current value of the key key inside the VaultRecordRef and save it for further work
         T oldData;
@@ -80,10 +97,12 @@ namespace mvlt
 
         // Update data inside VaultRecord pointer inside VaultRecordRef and Vault
         dataRecord->SetData(key, data);
+        res.IsOperationSuccess = true;
+        res.ResultCode = VaultOperationResultCode::Success;
 
         // Unlock Vault
         RecursiveReadWriteMtx.WriteUnlock();
-        return true;
+        return res;
     }
 
     template <class T>

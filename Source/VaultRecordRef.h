@@ -5,6 +5,7 @@
 #include "ReadWriteMutex.h"
 #include "VaultRecord.h"
 #include "Vault.h"
+#include "VaultOperationResult.h"
 
 namespace mvlt 
 {
@@ -93,7 +94,7 @@ namespace mvlt
             \todo Handle errors
         */
         template <class T>
-        bool SetData(const std::string& key, const T& data);
+        VaultOperationResult SetData(const std::string& key, const T& data);
 
         /**
             \brief Method for updating data inside Vault

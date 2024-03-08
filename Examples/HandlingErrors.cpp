@@ -136,5 +136,44 @@ int main()
     else
         std::cout << "\t\tSuccess! Requested record: " << vrr.GetRecordUniqueId() << std::endl;
 
-    std::cout << "Z" << std::endl;
+    // ============================================================================== //
+    // ============================================================================== //
+
+    std::cout << "VaultRecordRef::SetData:" << std::endl;
+
+    vlt.CreateRecord(vrr, { {"Key", 333} });
+    vlt.PrintAsTable();
+
+    std::cout << vrr.GetRecordUniqueId() << std::endl;
+
+    // ============================================================================== //
+
+    std::cout << "\tWrong key name" << std::endl;
+
+    opr = vrr.SetData("WrongKey", 121);
+
+    if (!opr.IsOperationSuccess)
+        std::cout << "\t\t" << opr.ResultCodeString() << " Requested key: " << opr.Key << std::endl;
+    
+    // ============================================================================== //
+
+    std::cout << "\tWrong key type" << std::endl;
+
+    opr = vrr.SetData("Key", std::string("121"));
+
+    if (!opr.IsOperationSuccess)
+        std::cout << "\t\t" << opr.ResultCodeString() << " Requested type: " << opr.RequestedType.name() << ". Saved type: " << opr.SavedType.name() << std::endl;
+
+    // ============================================================================== //
+
+    std::cout << "\tCorrect request" << std::endl;
+
+    opr = vrr.SetData("Key", 121);
+
+    if (!opr.IsOperationSuccess)
+        std::cout << "\t\t" << opr.ResultCodeString() << " Requested type: " << opr.RequestedType.name() << ". Saved type: " << opr.SavedType.name() << std::endl;
+    else
+        std::cout << "\t\tSuccess! Requested record: " << vrr.GetRecordUniqueId() << std::endl;
+
+    vlt.PrintAsTable();
 }

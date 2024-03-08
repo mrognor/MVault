@@ -16,6 +16,7 @@ namespace mvlt
     /// \brief Enum with all error handling codes
     enum class VaultOperationResultCode
     {
+        Error = -3,     ///< This code is returned when any error has occurred that is not described
         WrongKey = -2,  ///< This code is returned when the requested key has not been found.
         WrongType = -1, ///< This code is returned when the requested type does not match the saved type.
         Idle = 0,       ///< The default state.

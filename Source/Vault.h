@@ -91,9 +91,11 @@ namespace mvlt
             \param [in] dataRecord pointer to VaultRecord inside Vault
             \param [in] key key to set data
             \param [in] data new data
+
+            \return VaultOperationResult object with GetData result. If the dataRecord is not valid, then the VaultOperationResult::ResultCode will be equal to Error.
         */
         template <class T>
-        bool SetDataToRecord(VaultRecord* dataRecord, const std::string& key, const T& data);
+        VaultOperationResult SetDataToRecord(VaultRecord* dataRecord, const std::string& key, const T& data);
         
     public:
 

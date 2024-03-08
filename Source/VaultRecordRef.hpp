@@ -6,17 +6,14 @@
 namespace mvlt 
 {
     template <class T>
-    bool VaultRecordRef::SetData(const std::string& key, const T& data)
+    VaultOperationResult VaultRecordRef::SetData(const std::string& key, const T& data)
     {
-        bool res;
-        
+        VaultOperationResult res;
+
         Vlt->RecursiveReadWriteMtx.WriteLock();
         Mtx.lock();
 
-        if (DataRecord == nullptr || !IsRefValid)
-            res = false;
-        else
-            res = Vlt->SetDataToRecord(DataRecord, key, data);
+        res = Vlt->SetDataToRecord(DataRecord, key, data);
 
         Mtx.unlock();
         Vlt->RecursiveReadWriteMtx.WriteUnlock();
