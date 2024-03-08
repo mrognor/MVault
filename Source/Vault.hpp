@@ -240,22 +240,21 @@ namespace mvlt
         std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
 
         // Checking whether such a key exists
-        if (VaultHashMapStructure.GetData(keyName, TtoVaultRecordHashMap))
+        VaultHashMapStructure.GetData(keyName, TtoVaultRecordHashMap);
+        
+        // Iterator to element with T type and keyValue value
+        auto TtoVaultRecordIt = TtoVaultRecordHashMap->find(keyValue);
+        if (TtoVaultRecordIt != TtoVaultRecordHashMap->end())
         {
-            // Iterator to element with T type and keyValue value
-            auto TtoVaultRecordIt = TtoVaultRecordHashMap->find(keyValue);
-            if (TtoVaultRecordIt != TtoVaultRecordHashMap->end())
-            {
-                vaultRecordRef.SetRecord(TtoVaultRecordIt->second, const_cast<Vault*>(this));
-                res.IsOperationSuccess = true;
-                res.ResultCode = VaultOperationResultCode::Success;
-            }
-            else
-            {
-                vaultRecordRef.SetRecord(nullptr, const_cast<Vault*>(this));
-                res.IsOperationSuccess = false;
-                res.ResultCode = VaultOperationResultCode::WrongValue;
-            }
+            vaultRecordRef.SetRecord(TtoVaultRecordIt->second, const_cast<Vault*>(this));
+            res.IsOperationSuccess = true;
+            res.ResultCode = VaultOperationResultCode::Success;
+        }
+        else
+        {
+            vaultRecordRef.SetRecord(nullptr, const_cast<Vault*>(this));
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::WrongValue;
         }
 
         RecursiveReadWriteMtx.ReadUnlock();
@@ -294,25 +293,141 @@ namespace mvlt
         std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
 
         // Checking whether such a key exists
-        if (VaultHashMapStructure.GetData(keyName, TtoVaultRecordHashMap))
+        VaultHashMapStructure.GetData(keyName, TtoVaultRecordHashMap);
+        
+        // Pair with begin and end iterator with T type and keyValue value
+        auto equalRange = TtoVaultRecordHashMap->equal_range(keyValue);
+        if (equalRange.first != TtoVaultRecordHashMap->end())
         {
-            // Pair with begin and end iterator with T type and keyValue value
-            auto equalRange = TtoVaultRecordHashMap->equal_range(keyValue);
-            if (equalRange.first != TtoVaultRecordHashMap->end())
+            std::size_t counter = 0;
+            for (auto it = equalRange.first; it != equalRange.second; ++it)
             {
-                std::size_t counter = 0;
-                for (auto it = equalRange.first; it != equalRange.second; ++it)
-                {
-                    ++counter;
-                    recordsRefs.emplace_back(VaultRecordRef(it->second, const_cast<Vault*>(this)));
-                    if (counter >= amountOfRecords) break;
-                }
+                ++counter;
+                recordsRefs.emplace_back(VaultRecordRef(it->second, const_cast<Vault*>(this)));
+                if (counter >= amountOfRecords) break;
             }
-            else
+        }
+        else
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::WrongValue;
+        }
+
+        RecursiveReadWriteMtx.ReadUnlock();
+        return res;
+    }
+
+    template <class T>
+    VaultOperationResult Vault::EraseRecord(const std::string& keyName, const T& keyValue)
+    {
+        // Fill res info known at start
+        VaultOperationResult res;
+        res.Key = keyName;
+        res.RequestedType = typeid(T);
+
+        RecursiveReadWriteMtx.ReadLock();
+
+        // If key not exist
+        if(!GetKeyType(keyName, res.SavedType))
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::WrongKey;
+            RecursiveReadWriteMtx.ReadUnlock();
+            return res;
+        }
+
+        // Check types
+        if (res.SavedType != res.RequestedType)
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::WrongType;
+            RecursiveReadWriteMtx.ReadUnlock();
+            return res;
+        }
+
+        // Pointer to store map inside VaultStructureHashMap
+        std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
+
+        // Checking whether such a key exists
+        VaultHashMapStructure.GetData(keyName, TtoVaultRecordHashMap);
+        
+        // Iterator to element with T type and keyValue value
+        auto TtoVaultRecordIt = TtoVaultRecordHashMap->find(keyValue);
+        if (TtoVaultRecordIt != TtoVaultRecordHashMap->end())
+        {
+            for (auto& eraser : VaultRecordErasers)
+                eraser.second(TtoVaultRecordIt->second);
+
+            RecordsSet.erase(TtoVaultRecordIt->second);
+
+            res.IsOperationSuccess = true;
+            res.ResultCode = VaultOperationResultCode::Success;
+        }
+        else
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::WrongValue;
+        }
+
+        RecursiveReadWriteMtx.ReadUnlock();
+        return res;
+    }
+
+    template <class T>
+    VaultOperationResult Vault::EraseRecords(const std::string& keyName, const T& keyValue, const std::size_t& amountOfRecords)
+    {
+        // Fill res info known at start
+        VaultOperationResult res;
+        res.Key = keyName;
+        res.RequestedType = typeid(T);
+
+        RecursiveReadWriteMtx.ReadLock();
+
+        // If key not exist
+        if(!GetKeyType(keyName, res.SavedType))
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::WrongKey;
+            RecursiveReadWriteMtx.ReadUnlock();
+            return res;
+        }
+
+        // Check types
+        if (res.SavedType != res.RequestedType)
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::WrongType;
+            RecursiveReadWriteMtx.ReadUnlock();
+            return res;
+        }
+
+        // Pointer to store map inside VaultStructureHashMap
+        std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
+
+        // Checking whether such a key exists
+        VaultHashMapStructure.GetData(keyName, TtoVaultRecordHashMap);
+        
+        // Pair with begin and end iterator with T type and keyValue value
+        auto equalRange = TtoVaultRecordHashMap->equal_range(keyValue);
+        if (equalRange.first != TtoVaultRecordHashMap->end())
+        {
+            std::size_t counter = 0;
+            for (auto it = equalRange.first; it != equalRange.second; ++it)
             {
-                res.IsOperationSuccess = false;
-                res.ResultCode = VaultOperationResultCode::WrongValue;
+                ++counter;
+
+                for (auto& eraser : VaultRecordErasers)
+                    eraser.second(it->second);
+
+                RecordsSet.erase(it->second);
+
+                if (counter >= amountOfRecords) break;
             }
+        }
+        else
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::WrongValue;
         }
 
         RecursiveReadWriteMtx.ReadUnlock();

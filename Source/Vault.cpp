@@ -227,8 +227,8 @@ namespace mvlt
         // Get pointer to record from record ref
         VaultRecord* tmpRec = recordRefToErase.DataRecord;
         // Iterate over all VaultRecordErasers and call function to erase record from structure
-        for (auto& erasers : VaultRecordErasers)
-            erasers.second(tmpRec);
+        for (auto& eraser : VaultRecordErasers)
+            eraser.second(tmpRec);
 
         RecordsSet.erase(tmpRec);
         tmpRec->Invalidate();

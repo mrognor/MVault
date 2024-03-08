@@ -272,6 +272,35 @@ namespace mvlt
         /// \return Returns true if the record existed and was successfully deleted, otherwise it returns false
         bool EraseRecord(VaultRecordRef& recordRefToErase);
 
+        /**
+            \brief The method for erase record using key and value
+
+            \tparam <T> Any type of data except for c arrays
+
+            \param [in] keyName the name of the key to search for
+            \param [in] keyValue the value of the key to be found
+            
+            \return VaultOperationResult object with GetRecords result
+        */
+        template <class T>
+        VaultOperationResult EraseRecord(const std::string& keyName, const T& keyValue);
+
+        /**
+            \brief The method for erase records using key and value
+
+            \tparam <T> Any type of data except for c arrays
+
+            \param [in] keyName the name of the key to search for
+            \param [in] keyValue the value of the key to be found
+            \param [in] amountOfRecords The number of records to delete. By default set to minus one or all records.
+            
+            If the amountOfRecords is greater than the number of records stored inside the Vault, then all records with this key and value will be deleted.
+
+            \return VaultOperationResult object with GetRecords result
+        */
+        template <class T>
+        VaultOperationResult EraseRecords(const std::string& keyName, const T& keyValue, const std::size_t& amountOfRecords = -1);
+
         /// \brief Method for getting the number of records
         /// \return number of records
         std::size_t Size() const;

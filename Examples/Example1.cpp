@@ -60,4 +60,10 @@ int main()
     std::type_index ti = typeid(void);
     vlt.GetKeyType("slaves", ti);
     std::cout << ti.name() << std::endl;
+
+    vlt.PrintAsTable();
+    vlt.EraseRecord("id", 1);
+    vlt.PrintAsTable();
+    vlt.EraseRecords("slaves", std::vector<int>());
+    vlt.PrintAsTable();
 }
