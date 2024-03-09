@@ -374,10 +374,13 @@ namespace mvlt
         auto TtoVaultRecordIt = TtoVaultRecordHashMap->find(keyValue);
         if (TtoVaultRecordIt != TtoVaultRecordHashMap->end())
         {
-            for (auto& eraser : VaultRecordErasers)
-                eraser.second(TtoVaultRecordIt->second);
+            VaultRecord* tmpRec = TtoVaultRecordIt->second;
 
-            RecordsSet.erase(TtoVaultRecordIt->second);
+            for (auto& eraser : VaultRecordErasers)
+                eraser.second(tmpRec);
+
+            RecordsSet.erase(tmpRec);
+            tmpRec->Invalidate();
 
             res.IsOperationSuccess = true;
             res.ResultCode = VaultOperationResultCode::Success;

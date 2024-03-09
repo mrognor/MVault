@@ -63,7 +63,7 @@ int main()
 
     vlt.PrintAsTable();
     vlt.EraseRecord("id", 1);
-    vlt.PrintAsTable();
-    vlt.EraseRecords("slaves", std::vector<int>());
-    vlt.PrintAsTable();
+    // vlt.PrintAsTable();
+    // vlt.EraseRecords("slaves", std::vector<int>());
+    // vlt.PrintAsTable();
 }

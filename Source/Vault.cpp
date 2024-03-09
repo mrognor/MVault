@@ -233,7 +233,6 @@ namespace mvlt
         RecordsSet.erase(tmpRec);
         tmpRec->Invalidate();
         
-
         RecursiveReadWriteMtx.WriteUnlock();
         return true;
     }
