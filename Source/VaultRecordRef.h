@@ -34,6 +34,15 @@ namespace mvlt
 
         // Variable for tracking the validity status
         bool IsRefValid = false;
+
+        /**
+            \brief The method for binding RecordRef to Record 
+            
+            \param [in] vaultRecord A pointer to the Vault referenced by the class object VaultRecordRef
+            \param [in] vlt A pointer to Vault
+        */
+        void SetRecord(VaultRecord* vaultRecord, Vault* vlt);
+
     public:
 
         /// Making the Vault class friendly so that it has access to the internal members of the VaultRecordRef class
@@ -67,14 +76,6 @@ namespace mvlt
         /// \return true if the objects are equal, otherwise false
         bool operator==(const VaultRecordRef& other) const;
 
-        /**
-            \brief The method for binding RecordRef to Record 
-            
-            \param [in] vaultRecord A pointer to the Vault referenced by the class object VaultRecordRef
-            \param [in] vlt             \param [in] vlt A pointer to Vault
-        */
-        void SetRecord(VaultRecord* vaultRecord, Vault* vlt);
-
         /// \brief A method for obtaining a unique record identifier
         ///  Important. Two VaultRecordRef objects pointing to the same record will return the same value. Invalid record will return null
         /// \return the unique identifier of the record
@@ -102,7 +103,7 @@ namespace mvlt
             See Vault::CreateRecord(std::vector<std::pair<std::string, DataSaver>> params) for more information
 
             \param [in] params a vector of pairs with data to be put in the Vault
-            \todo Handle errors
+            \todo Исправить
         */
         void SetData(const std::vector<std::pair<std::string, DataSaver>>& params);
 
