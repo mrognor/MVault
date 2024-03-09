@@ -215,6 +215,8 @@ namespace mvlt
 
             \param [in] params a vector of pairs with data to be put in the Vault
 
+            If there was an error in one of the parameters, the function will stop at this parameter and return an error for this parameter.
+            
             \return VaultOperationResult object with GetData result
         */
         VaultOperationResult CreateRecord(const std::vector<std::pair<std::string, DataSaver>>& params);

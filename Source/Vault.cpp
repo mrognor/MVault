@@ -126,6 +126,7 @@ namespace mvlt
                     res.IsOperationSuccess = false;
                     res.SavedType = it.second.GetDataType();
                     res.ResultCode = VaultOperationResultCode::WrongType;
+                    break;
                 }
             }
             else 
@@ -134,6 +135,7 @@ namespace mvlt
                 res.SavedType = typeid(void);
                 res.RequestedType = typeid(void);
                 res.ResultCode = VaultOperationResultCode::WrongKey;
+                break;
             }
         }
 
