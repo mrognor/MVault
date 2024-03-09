@@ -176,4 +176,56 @@ int main()
         std::cout << "\t\tSuccess! Requested record: " << vrr.GetRecordUniqueId() << std::endl;
 
     vlt.PrintAsTable();
+
+    // ============================================================================== //
+    // ============================================================================== //
+
+    std::cout << "VaultRecordRef::GetData:" << std::endl;
+
+    // ============================================================================== //
+
+    std::cout << "\tWrong key name" << std::endl;
+
+    int i;
+    opr = vrr.GetData("WrongKey", i);
+
+    if (!opr.IsOperationSuccess)
+        std::cout << "\t\t" << opr.ResultCodeString() << " Requested key: " << opr.Key << std::endl;
+    
+    // ============================================================================== //
+
+    std::cout << "\tWrong key type" << std::endl;
+
+    std::string s;
+    opr = vrr.GetData("Key", s);
+
+    if (!opr.IsOperationSuccess)
+        std::cout << "\t\t" << opr.ResultCodeString() << " Requested type: " << opr.RequestedType.name() << ". Saved type: " << opr.SavedType.name() << std::endl;
+
+    // ============================================================================== //
+
+    std::cout << "\tCorrect request" << std::endl;
+
+    opr = vrr.GetData("Key", i);
+
+    if (!opr.IsOperationSuccess)
+        std::cout << "\t\t" << opr.ResultCodeString() << " Requested type: " << opr.RequestedType.name() << ". Saved type: " << opr.SavedType.name() << std::endl;
+    else
+    {
+        std::cout << "\t\tSuccess! Requested record: " << vrr.GetRecordUniqueId() << std::endl;
+        std::cout << "\t\tRequested data: " << i << std::endl;
+    }
+
+    // ============================================================================== //
+
+    std::cout << "\tInvalid record" << std::endl;
+
+    vlt.EraseRecord(vrr);
+
+    opr = vrr.GetData("Key", i);
+
+    if (!opr.IsOperationSuccess)
+        std::cout << "\t\t" << opr.ResultCodeString() << " Requested type: " << opr.RequestedType.name() << ". Saved type: " << opr.SavedType.name() << std::endl;
+    else
+        std::cout << "\t\tSuccess! Requested record: " << vrr.GetRecordUniqueId() << std::endl;
 }

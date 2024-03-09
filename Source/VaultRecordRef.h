@@ -90,8 +90,7 @@ namespace mvlt
             \param [in] key the key whose value needs to be changed
             \param [in] data new key data value
 
-            \return returns true if the key was found otherwise returns false
-            \todo Handle errors
+            \return VaultOperationResult object with GetData result.
         */
         template <class T>
         VaultOperationResult SetData(const std::string& key, const T& data);
@@ -115,11 +114,10 @@ namespace mvlt
             \param [in] key the key whose value should be obtained
             \param [in] data reference to record the received data
 
-            \return returns true if the data was received, otherwise false
-            \todo Handle errors
+            \return VaultOperationResult object with GetData result.
         */
         template <class T>
-        bool GetData(const std::string& key, T& data) const;
+        VaultOperationResult GetData(const std::string& keyName, T& data) const;
         
         /**
             \brief Method for getting data converted to string from a container using a key

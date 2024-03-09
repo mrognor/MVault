@@ -16,12 +16,12 @@ namespace mvlt
     /// \brief Enum with all error handling codes
     enum class VaultOperationResultCode
     {
-        Error = -3,     ///< This code is returned when any error has occurred that is not described
-        WrongKey = -2,  ///< This code is returned when the requested key has not been found.
-        WrongType = -1, ///< This code is returned when the requested type does not match the saved type.
-        Idle = 0,       ///< The default state.
-        WrongValue = 1, ///< This value is returned when the key was found, the requested type and the saved type are equal, but the requested value was not found
-        Success = 2,    ///< This value is returned when the request was completely successful
+        DataRecordNotValid = -3, ///< This code is returned when data is requested from the VaultRecordRef and the record it refers to is not valid
+        WrongKey = -2,           ///< This code is returned when the requested key has not been found.
+        WrongType = -1,          ///< This code is returned when the requested type does not match the saved type.
+        Idle = 0,                ///< The default state.
+        WrongValue = 1,          ///< This value is returned when the key was found, the requested type and the saved type are equal, but the requested value was not found
+        Success = 2,             ///< This value is returned when the request was completely successful
     };
     
     /**@} */

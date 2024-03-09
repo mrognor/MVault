@@ -28,7 +28,7 @@ namespace mvlt
         if (dataRecord == nullptr || !dataRecord->GetIsValid())
         {
             res.IsOperationSuccess = false;
-            res.ResultCode = VaultOperationResultCode::Error;
+            res.ResultCode = VaultOperationResultCode::DataRecordNotValid;
             RecursiveReadWriteMtx.WriteUnlock();
             return res;
         }

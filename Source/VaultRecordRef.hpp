@@ -22,15 +22,48 @@ namespace mvlt
     }
 
     template <class T>
-    bool VaultRecordRef::GetData(const std::string& key, T& data) const
+    VaultOperationResult VaultRecordRef::GetData(const std::string& keyName, T& data) const
     {
-        bool res = false;
+        // Fill res info known at start
+        VaultOperationResult res;
+        res.Key = keyName;
+        res.RequestedType = typeid(T);
         
         Vlt->RecursiveReadWriteMtx.ReadLock();
         Mtx.lock();
 
-        if (DataRecord != nullptr && DataRecord->GetIsValid()) res = DataRecord->GetData(key, data);
-        
+        if (DataRecord == nullptr || !DataRecord->GetIsValid()) 
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::DataRecordNotValid;
+            Mtx.unlock();
+            Vlt->RecursiveReadWriteMtx.ReadUnlock();
+            return res;
+        }
+
+        // If key not exist
+        if(!Vlt->GetKeyType(keyName, res.SavedType))
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::WrongKey;
+            Mtx.unlock();
+            Vlt->RecursiveReadWriteMtx.ReadUnlock();
+            return res;
+        }
+
+        // Check types
+        if (res.SavedType != res.RequestedType)
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::WrongType;
+            Mtx.unlock();
+            Vlt->RecursiveReadWriteMtx.ReadUnlock();
+            return res;
+        }
+
+        DataRecord->GetData(keyName, data);
+        res.IsOperationSuccess = true;
+        res.ResultCode = VaultOperationResultCode::Success;
         Mtx.unlock();
         Vlt->RecursiveReadWriteMtx.ReadUnlock();
 
