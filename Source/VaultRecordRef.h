@@ -117,7 +117,7 @@ namespace mvlt
             \return VaultOperationResult object with GetData result.
         */
         template <class T>
-        VaultOperationResult GetData(const std::string& keyName, T& data) const;
+        VaultOperationResult GetData(const std::string& key, T& data) const;
         
         /**
             \brief Method for getting data converted to string from a container using a key

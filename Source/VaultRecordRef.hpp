@@ -22,11 +22,11 @@ namespace mvlt
     }
 
     template <class T>
-    VaultOperationResult VaultRecordRef::GetData(const std::string& keyName, T& data) const
+    VaultOperationResult VaultRecordRef::GetData(const std::string& key, T& data) const
     {
         // Fill res info known at start
         VaultOperationResult res;
-        res.Key = keyName;
+        res.Key = key;
         res.RequestedType = typeid(T);
         
         Vlt->RecursiveReadWriteMtx.ReadLock();
@@ -42,7 +42,7 @@ namespace mvlt
         }
 
         // If key not exist
-        if(!Vlt->GetKeyType(keyName, res.SavedType))
+        if(!Vlt->GetKeyType(key, res.SavedType))
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongKey;
@@ -61,7 +61,7 @@ namespace mvlt
             return res;
         }
 
-        DataRecord->GetData(keyName, data);
+        DataRecord->GetData(key, data);
         res.IsOperationSuccess = true;
         res.ResultCode = VaultOperationResultCode::Success;
         Mtx.unlock();

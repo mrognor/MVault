@@ -106,23 +106,23 @@ namespace mvlt
     }
 
     template <class T>
-    void Vault::SetKey(const std::string& keyName, const T& defaultKeyValue)
+    void Vault::SetKey(const std::string& key, const T& defaultKeyValue)
     {
         RecursiveReadWriteMtx.WriteLock();
 
         // If the key was added earlier, then it must be deleted
-        if (KeysTypes.find(keyName) != KeysTypes.end())
-            RemoveKey(keyName);
+        if (KeysTypes.find(key) != KeysTypes.end())
+            RemoveKey(key);
 
         // Add key type to hash map with keys types
-        KeysTypes.emplace(keyName, typeid(T)); 
+        KeysTypes.emplace(key, typeid(T)); 
 
         // Add data to template
-        RecordTemplate.SetData(keyName, defaultKeyValue);
+        RecordTemplate.SetData(key, defaultKeyValue);
 
         // Create new hash map to store data with template T key
         std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = new std::unordered_multimap<T, VaultRecord*>;
-        VaultHashMapStructure.SetData(keyName, TtoVaultRecordHashMap, [](const void* ptr)
+        VaultHashMapStructure.SetData(key, TtoVaultRecordHashMap, [](const void* ptr)
             {
                 delete* (std::unordered_multimap<T, VaultRecord*>**)ptr;
             }
@@ -130,26 +130,26 @@ namespace mvlt
 
         // Create new map to store data with template T key
         std::multimap<T, VaultRecord*>* TtoVaultRecordMap = new std::multimap<T, VaultRecord*>;
-        VaultMapStructure.SetData(keyName, TtoVaultRecordMap, [](const void* ptr)
+        VaultMapStructure.SetData(key, TtoVaultRecordMap, [](const void* ptr)
             {
                 delete* (std::multimap<T, VaultRecord*>**)ptr;
             }
         );
 
         // Add function to VaultRecord creation
-        VaultRecordAdders.emplace(keyName, [=](VaultRecord* newRecord)
+        VaultRecordAdders.emplace(key, [=](VaultRecord* newRecord)
             {
                 // Make temporary variable to store key value
                 T value = defaultKeyValue;
                 // Try to get key value from new record. If it is not value inside then defaultKeyValue will be used
-                newRecord->GetData(keyName, value);
+                newRecord->GetData(key, value);
                 TtoVaultRecordHashMap->emplace(value, newRecord);
                 TtoVaultRecordMap->emplace(value, newRecord);
             }
         );
 
         // Add function to TtoVaultRecordHashMap cleareing
-        VaultRecordClearers.emplace(keyName, [=]()
+        VaultRecordClearers.emplace(key, [=]()
             {
                 TtoVaultRecordHashMap->clear();
                 TtoVaultRecordMap->clear();
@@ -157,11 +157,11 @@ namespace mvlt
         );
 
         // Add function to erase newRecord from TtoVaultRecordHashMap
-        VaultRecordErasers.emplace(keyName, [=](VaultRecord* newRecord)
+        VaultRecordErasers.emplace(key, [=](VaultRecord* newRecord)
             {
-                // Get T type data with keyName key
+                // Get T type data with key key
                 T recordTData;
-                newRecord->GetData(keyName, recordTData);
+                newRecord->GetData(key, recordTData);
 
                 // Find all elements on multi_map with recordTData value
                 auto FirstAndLastIteratorsWithKeyOnHashMap = TtoVaultRecordHashMap->equal_range(recordTData);
@@ -190,7 +190,7 @@ namespace mvlt
             }
         );
 
-        VaultRecordSorters.emplace(keyName, [=](std::function<bool(const VaultRecordRef&)> functionToSortedData, bool isReverse)
+        VaultRecordSorters.emplace(key, [=](std::function<bool(const VaultRecordRef&)> functionToSortedData, bool isReverse)
         {
             if (!isReverse)
             {
@@ -209,7 +209,7 @@ namespace mvlt
         // Add new data to record set
         for (auto& it : RecordsSet)
         {
-            it->SetData(keyName, defaultKeyValue);
+            it->SetData(key, defaultKeyValue);
             TtoVaultRecordHashMap->emplace(defaultKeyValue, it);
             TtoVaultRecordMap->emplace(defaultKeyValue, it);
         }
@@ -218,27 +218,27 @@ namespace mvlt
     }
 
     template <class T>
-    bool Vault::GetKeyValue(const std::string& keyName, T& defaultKeyValue) const
+    bool Vault::GetKeyValue(const std::string& key, T& defaultKeyValue) const
     {
         bool res;
         RecursiveReadWriteMtx.ReadLock();
-        res = RecordTemplate.GetData(keyName, defaultKeyValue);
+        res = RecordTemplate.GetData(key, defaultKeyValue);
         RecursiveReadWriteMtx.ReadUnlock();
         return res;
     }
 
     template <class T>
-    VaultOperationResult Vault::GetRecord(const std::string& keyName, const T& keyValue, VaultRecordRef& vaultRecordRef) const
+    VaultOperationResult Vault::GetRecord(const std::string& key, const T& keyValue, VaultRecordRef& vaultRecordRef) const
     {
         // Fill res info known at start
         VaultOperationResult res;
-        res.Key = keyName;
+        res.Key = key;
         res.RequestedType = typeid(T);
 
         RecursiveReadWriteMtx.ReadLock();
 
         // If key not exist
-        if(!GetKeyType(keyName, res.SavedType))
+        if(!GetKeyType(key, res.SavedType))
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongKey;
@@ -259,7 +259,7 @@ namespace mvlt
         std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
 
         // Checking whether such a key exists
-        VaultHashMapStructure.GetData(keyName, TtoVaultRecordHashMap);
+        VaultHashMapStructure.GetData(key, TtoVaultRecordHashMap);
         
         // Iterator to element with T type and keyValue value
         auto TtoVaultRecordIt = TtoVaultRecordHashMap->find(keyValue);
@@ -281,17 +281,17 @@ namespace mvlt
     }
 
     template <class T>
-    VaultOperationResult Vault::GetRecords(const std::string& keyName, const T& keyValue, std::vector<VaultRecordRef>& recordsRefs, const std::size_t& amountOfRecords) const
+    VaultOperationResult Vault::GetRecords(const std::string& key, const T& keyValue, std::vector<VaultRecordRef>& recordsRefs, const std::size_t& amountOfRecords) const
     {
         // Fill res info known at start
         VaultOperationResult res;
-        res.Key = keyName;
+        res.Key = key;
         res.RequestedType = typeid(T);
 
         RecursiveReadWriteMtx.ReadLock();
 
         // If key not exist
-        if(!GetKeyType(keyName, res.SavedType))
+        if(!GetKeyType(key, res.SavedType))
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongKey;
@@ -312,7 +312,7 @@ namespace mvlt
         std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
 
         // Checking whether such a key exists
-        VaultHashMapStructure.GetData(keyName, TtoVaultRecordHashMap);
+        VaultHashMapStructure.GetData(key, TtoVaultRecordHashMap);
         
         // Pair with begin and end iterator with T type and keyValue value
         auto equalRange = TtoVaultRecordHashMap->equal_range(keyValue);
@@ -337,17 +337,17 @@ namespace mvlt
     }
 
     template <class T>
-    VaultOperationResult Vault::EraseRecord(const std::string& keyName, const T& keyValue)
+    VaultOperationResult Vault::EraseRecord(const std::string& key, const T& keyValue)
     {
         // Fill res info known at start
         VaultOperationResult res;
-        res.Key = keyName;
+        res.Key = key;
         res.RequestedType = typeid(T);
 
         RecursiveReadWriteMtx.ReadLock();
 
         // If key not exist
-        if(!GetKeyType(keyName, res.SavedType))
+        if(!GetKeyType(key, res.SavedType))
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongKey;
@@ -368,7 +368,7 @@ namespace mvlt
         std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
 
         // Checking whether such a key exists
-        VaultHashMapStructure.GetData(keyName, TtoVaultRecordHashMap);
+        VaultHashMapStructure.GetData(key, TtoVaultRecordHashMap);
         
         // Iterator to element with T type and keyValue value
         auto TtoVaultRecordIt = TtoVaultRecordHashMap->find(keyValue);
@@ -396,17 +396,17 @@ namespace mvlt
     }
 
     template <class T>
-    VaultOperationResult Vault::EraseRecords(const std::string& keyName, const T& keyValue, const std::size_t& amountOfRecords)
+    VaultOperationResult Vault::EraseRecords(const std::string& key, const T& keyValue, const std::size_t& amountOfRecords)
     {
         // Fill res info known at start
         VaultOperationResult res;
-        res.Key = keyName;
+        res.Key = key;
         res.RequestedType = typeid(T);
 
         RecursiveReadWriteMtx.ReadLock();
 
         // If key not exist
-        if(!GetKeyType(keyName, res.SavedType))
+        if(!GetKeyType(key, res.SavedType))
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongKey;
@@ -427,7 +427,7 @@ namespace mvlt
         std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
 
         // Checking whether such a key exists
-        VaultHashMapStructure.GetData(keyName, TtoVaultRecordHashMap);
+        VaultHashMapStructure.GetData(key, TtoVaultRecordHashMap);
         
         // Pair with begin and end iterator with T type and keyValue value
         auto equalRange = TtoVaultRecordHashMap->equal_range(keyValue);
@@ -457,16 +457,16 @@ namespace mvlt
     }
 
     template<class F>
-    void Vault::SortBy(const std::string& keyName, const F&& func, const bool& isReverse, const std::size_t& amountOfRecords) const
+    void Vault::SortBy(const std::string& key, const F&& func, const bool& isReverse, const std::size_t& amountOfRecords) const
     {
         std::size_t counter = 0;
 
         RecursiveReadWriteMtx.ReadLock();
         
-        auto f = VaultRecordSorters.find(keyName);
+        auto f = VaultRecordSorters.find(key);
         if (f != VaultRecordSorters.end())
         {
-            VaultRecordSorters.find(keyName)->second([&](const VaultRecordRef& vaultRecordRef)
+            VaultRecordSorters.find(key)->second([&](const VaultRecordRef& vaultRecordRef)
                 {
                     if (counter >= amountOfRecords) return false;
                     

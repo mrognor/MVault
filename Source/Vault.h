@@ -118,49 +118,49 @@ namespace mvlt
 
             If the key was added earlier, the default value will be updated when this function is called again
 
-            \param [in] keyName new key name
+            \param [in] key new key name
             \param [in] defaultKeyValue default key value
         */
         template <class T>
-        void SetKey(const std::string& keyName, const T& defaultKeyValue);
+        void SetKey(const std::string& key, const T& defaultKeyValue);
 
         /**
             \brief The method for getting a default key value
 
-            \param [in] keyName the name of the key to search for
+            \param [in] key the name of the key to search for
 
             \return returns true if the key was found otherwise returns false
         */
-        bool IsKeyExist(const std::string& keyName) const;
+        bool IsKeyExist(const std::string& key) const;
         
         /**
             \brief The method for getting a default key value
 
             \tparam <T> Any type of data except for c arrays
 
-            \param [in] keyName the name of the key to search for
+            \param [in] key the name of the key to search for
             \param [in] defaultKeyValue the value of the key
 
             \return returns true if the key was found otherwise returns false
         */
         template <class T>
-        bool GetKeyValue(const std::string& keyName, T& defaultKeyValue) const;
+        bool GetKeyValue(const std::string& key, T& defaultKeyValue) const;
 
         /**
             \brief The method for getting a key type
 
 
-            \param [in] keyName the name of the key to search for
+            \param [in] key the name of the key to search for
             \param [in] keyType the ref to std::type_index
 
             \return returns true if the key was found otherwise returns false
         */
-        bool GetKeyType(const std::string& keyName, std::type_index& keyType) const;
+        bool GetKeyType(const std::string& key, std::type_index& keyType) const;
 
         /// \brief The method for deleting the key
-        /// \param [in] keyName the key to remove
+        /// \param [in] key the key to remove
         /// \return Returns true if the key existed, otherwise returns false
-        bool RemoveKey(const std::string& keyName);
+        bool RemoveKey(const std::string& key);
 
         /// \brief Method to create new VaultRecord. A record will be created by copying RecordTemplate.
         /// \return ref to new record 
@@ -235,7 +235,7 @@ namespace mvlt
 
             \tparam <T> Any type of data except for c arrays
 
-            \param [in] keyName the name of the key to search for
+            \param [in] key the name of the key to search for
             \param [in] keyValue the value of the key to be found
             \param [in] vaultRecordRef A reference to VaultRecordRef, where information about the requested record will be recorded.
             If the key is not found, or the saved type does not match the type T, the parameter will not change.
@@ -245,14 +245,14 @@ namespace mvlt
             \return VaultOperationResult object with GetRecord result
         */
         template <class T>
-        VaultOperationResult GetRecord(const std::string& keyName, const T& keyValue, VaultRecordRef& vaultRecordRef) const;
+        VaultOperationResult GetRecord(const std::string& key, const T& keyValue, VaultRecordRef& vaultRecordRef) const;
 
         /**
             \brief The method for getting a vector of references to the data inside Vault
 
             \tparam <T> Any type of data except for c arrays
 
-            \param [in] keyName the name of the key to search for
+            \param [in] key the name of the key to search for
             \param [in] keyValue the value of the key to be found
             \param [in] recordsRefs A reference to std::vector<VaultRecordRef?, where information about the requested records will be recorded.
             In case of errors, the vector will not change
@@ -261,7 +261,7 @@ namespace mvlt
             \return VaultOperationResult object with GetRecords result
         */
         template <class T>
-        VaultOperationResult GetRecords(const std::string& keyName, const T& keyValue, std::vector<VaultRecordRef>& recordsRefs, const std::size_t& amountOfRecords = -1) const;
+        VaultOperationResult GetRecords(const std::string& key, const T& keyValue, std::vector<VaultRecordRef>& recordsRefs, const std::size_t& amountOfRecords = -1) const;
 
         /// \brief A method for deleting all data and keys
         void DropVault();
@@ -279,20 +279,20 @@ namespace mvlt
 
             \tparam <T> Any type of data except for c arrays
 
-            \param [in] keyName the name of the key to search for
+            \param [in] key the name of the key to search for
             \param [in] keyValue the value of the key to be found
             
             \return VaultOperationResult object with GetRecords result
         */
         template <class T>
-        VaultOperationResult EraseRecord(const std::string& keyName, const T& keyValue);
+        VaultOperationResult EraseRecord(const std::string& key, const T& keyValue);
 
         /**
             \brief The method for erase records using key and value
 
             \tparam <T> Any type of data except for c arrays
 
-            \param [in] keyName the name of the key to search for
+            \param [in] key the name of the key to search for
             \param [in] keyValue the value of the key to be found
             \param [in] amountOfRecords The number of records to delete. By default set to minus one or all records.
             
@@ -301,7 +301,7 @@ namespace mvlt
             \return VaultOperationResult object with GetRecords result
         */
         template <class T>
-        VaultOperationResult EraseRecords(const std::string& keyName, const T& keyValue, const std::size_t& amountOfRecords = -1);
+        VaultOperationResult EraseRecords(const std::string& key, const T& keyValue, const std::size_t& amountOfRecords = -1);
 
         /// \brief Method for getting the number of records
         /// \return number of records
@@ -314,34 +314,34 @@ namespace mvlt
         /**
             \brief Method for getting sorted records
 
-            \param [in] keyName The key by which the data should be sorted
+            \param [in] key The key by which the data should be sorted
             \param [in] isReverse Sort in descending order or descending order. By default, ascending
             \param [in] amountOfRecords The number of records. By default, everything is
 
             If the key is missing in the vault, the result vector will be empty
             \return A vector with links to records. The order of entries in the vector is determined by the amountOfRecords parameter
         */
-        std::vector<VaultRecordRef> GetSortedRecords(const std::string& keyName, const bool& isReverse = false, const std::size_t& amountOfRecords = -1) const;
+        std::vector<VaultRecordRef> GetSortedRecords(const std::string& key, const bool& isReverse = false, const std::size_t& amountOfRecords = -1) const;
 
         /**
             \brief Method for handle sorted records
 
             \tparam <T> A function that takes const VaultRecordRef& as a parameter and returns bool.
             
-            \param [in] keyName The key by which the data should be sorted
+            \param [in] key The key by which the data should be sorted
             \param [in] func A function takes const VaultRecordRef& as a parameter. If you need the function to be called again for the next record, 
             then this function call should return true. To stop the loop and interrupt the processing of sorted data, the function must return false. 
             To get values from a function, use lambdas and context capture
             \param [in] isReverse Sort in descending order or descending order. By default, ascending
             \param [in] amountOfRecords The number of records. By default, everything is
 
-            The function iterate over all records sorted by the keyName parameter, in the order specified by the isReverse parameter. 
+            The function iterate over all records sorted by the key parameter, in the order specified by the isReverse parameter. 
             For each record, the function passed in the func parameter is called.
             This function does not sort the data when it is called, the sorted data is already stored inside the Vault.
             If the key is missing in the vault, the function will be called 0 times
         */
         template<class F>
-        void SortBy(const std::string& keyName, const F&& func, const bool& isReverse = false, const std::size_t& amountOfRecords = -1) const;
+        void SortBy(const std::string& key, const F&& func, const bool& isReverse = false, const std::size_t& amountOfRecords = -1) const;
 
         /// \brief A method for displaying the contents of a Vault on the screen
         /// \param [in] amountOfRecords The number of records to be printed. The default value is -1, which means that all entries will be output

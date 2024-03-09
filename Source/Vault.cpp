@@ -6,20 +6,20 @@ namespace mvlt
 {
     Vault::Vault() {}
 
-    bool Vault::IsKeyExist(const std::string& keyName) const
+    bool Vault::IsKeyExist(const std::string& key) const
     {
         bool res;
         RecursiveReadWriteMtx.ReadLock();
-        res = RecordTemplate.IsData(keyName);
+        res = RecordTemplate.IsData(key);
         RecursiveReadWriteMtx.ReadUnlock();
         return res;
     }
 
-    bool Vault::GetKeyType(const std::string& keyName, std::type_index& keyType) const
+    bool Vault::GetKeyType(const std::string& key, std::type_index& keyType) const
     {
         bool res = true;
         RecursiveReadWriteMtx.ReadLock();
-        auto f = KeysTypes.find(keyName);
+        auto f = KeysTypes.find(key);
         if (f != KeysTypes.end())
             keyType = f->second;
         else
@@ -29,36 +29,36 @@ namespace mvlt
         return res;
     }
 
-    bool Vault::RemoveKey(const std::string& keyName)
+    bool Vault::RemoveKey(const std::string& key)
     {
         RecursiveReadWriteMtx.WriteLock();
-        if (KeysTypes.find(keyName) == KeysTypes.end()) 
+        if (KeysTypes.find(key) == KeysTypes.end()) 
         {
             RecursiveReadWriteMtx.WriteUnlock();
             return false;
         }
 
         // Remove key from hash map with keys types
-        KeysTypes.erase(keyName);
+        KeysTypes.erase(key);
 
         // Erase key from record template
-        RecordTemplate.EraseData(keyName);
+        RecordTemplate.EraseData(key);
 
         // Erase key from VaultHashMapStructure
-        VaultHashMapStructure.EraseData(keyName);
+        VaultHashMapStructure.EraseData(key);
 
         // Erase key from VaultMapStructure
-        VaultMapStructure.EraseData(keyName);
+        VaultMapStructure.EraseData(key);
 
         // Erase key from all maps
-        VaultRecordAdders.erase(keyName);
-        VaultRecordClearers.erase(keyName);
-        VaultRecordErasers.erase(keyName);
-        VaultRecordSorters.erase(keyName);
+        VaultRecordAdders.erase(key);
+        VaultRecordClearers.erase(key);
+        VaultRecordErasers.erase(key);
+        VaultRecordSorters.erase(key);
 
         // Erase key data from all records
         for (auto& it : RecordsSet)
-            it->EraseData(keyName);
+            it->EraseData(key);
         
         RecursiveReadWriteMtx.WriteUnlock();
         return true;
@@ -257,14 +257,14 @@ namespace mvlt
         return res;
     }
 
-    std::vector<VaultRecordRef> Vault::GetSortedRecords(const std::string& keyName, const bool& isReverse, const std::size_t& amountOfRecords) const
+    std::vector<VaultRecordRef> Vault::GetSortedRecords(const std::string& key, const bool& isReverse, const std::size_t& amountOfRecords) const
     {
         std::vector<VaultRecordRef> res;
         std::size_t counter = 0;
 
         RecursiveReadWriteMtx.ReadLock();
         
-        auto f = VaultRecordSorters.find(keyName);
+        auto f = VaultRecordSorters.find(key);
         if (f != VaultRecordSorters.end())
         {
             f->second([&](const VaultRecordRef& vaultRecordRef)
