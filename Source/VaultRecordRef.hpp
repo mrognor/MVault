@@ -10,13 +10,13 @@ namespace mvlt
     {
         VaultOperationResult res;
 
-        Vlt->RecursiveReadWriteMtx.WriteLock();
         Mtx.lock();
+        Vlt->RecursiveReadWriteMtx.WriteLock();
 
         res = Vlt->SetDataToRecord(DataRecord, key, data);
 
-        Mtx.unlock();
         Vlt->RecursiveReadWriteMtx.WriteUnlock();
+        Mtx.unlock();
 
         return res;
     }
@@ -28,16 +28,17 @@ namespace mvlt
         VaultOperationResult res;
         res.Key = key;
         res.RequestedType = typeid(T);
-        
+
+        Mtx.lock();        
         Vlt->RecursiveReadWriteMtx.ReadLock();
-        Mtx.lock();
 
         if (DataRecord == nullptr || !DataRecord->GetIsValid()) 
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::DataRecordNotValid;
-            Mtx.unlock();
+
             Vlt->RecursiveReadWriteMtx.ReadUnlock();
+            Mtx.unlock();
             return res;
         }
 
@@ -46,8 +47,9 @@ namespace mvlt
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongKey;
-            Mtx.unlock();
+
             Vlt->RecursiveReadWriteMtx.ReadUnlock();
+            Mtx.unlock();
             return res;
         }
 
@@ -56,16 +58,18 @@ namespace mvlt
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongType;
-            Mtx.unlock();
+
             Vlt->RecursiveReadWriteMtx.ReadUnlock();
+            Mtx.unlock();
             return res;
         }
 
         DataRecord->GetData(key, data);
         res.IsOperationSuccess = true;
         res.ResultCode = VaultOperationResultCode::Success;
-        Mtx.unlock();
+
         Vlt->RecursiveReadWriteMtx.ReadUnlock();
+        Mtx.unlock();
 
         return res;
     }

@@ -213,11 +213,10 @@ namespace mvlt
 
     bool Vault::EraseRecord(VaultRecordRef& recordRefToErase)
     {
+        recordRefToErase.Mtx.lock();
         RecursiveReadWriteMtx.WriteLock();
 
-        recordRefToErase.Mtx.lock();
         recordRefToErase.IsRefValid = false;
-        recordRefToErase.Mtx.unlock();
 
         if (RecordsSet.find(recordRefToErase.DataRecord) == RecordsSet.end())
         {
@@ -236,6 +235,7 @@ namespace mvlt
         tmpRec->Invalidate();
         
         RecursiveReadWriteMtx.WriteUnlock();
+        recordRefToErase.Mtx.unlock();
         return true;
     }
 
