@@ -77,6 +77,12 @@ namespace mvlt
         // isReverse parameter is used for the reverse order.
         std::unordered_map<std::string, std::function<void( std::function<bool(const VaultRecordRef&)> functionToSortedData, bool isReverse )>> VaultRecordSorters;
 
+        // Unordered_map of functions that copy keys from this to vlt
+        std::unordered_map<std::string, std::function<void(Vault& vlt)>> VsultKeyCopiers;
+
+        // Unordered_map of functions that copy required records from this to vlt
+        std::unordered_map<std::string, std::function<void(VaultRecord* sourceRecord, VaultRecordRef& destinationRecordRef)>> VsultRecordCopiers;
+
         // Unordered set with all VaultRecord pointers
         std::unordered_set<VaultRecord*> RecordsSet;
 
@@ -264,6 +270,10 @@ namespace mvlt
         */
         template <class T>
         VaultOperationResult GetRecords(const std::string& key, const T& keyValue, std::vector<VaultRecordRef>& recordsRefs, const std::size_t& amountOfRecords = -1) const;
+
+        /// \todo Handle errors
+        template <class T>
+        void RequestRecords(const std::string& key, const T& keyValue, Vault& vlt);
 
         /// \brief A method for deleting all data and keys
         void DropVault();

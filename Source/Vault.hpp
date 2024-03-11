@@ -51,11 +51,9 @@ namespace mvlt
             return res;
         }
 
+
         // Get std::unordered_multimap with T key and VaultRecord* value
         VaultHashMapStructure.GetData(key, TtoVaultRecordHashMap);
-
-        // Get std::multimap with T key and VaultRecord* value
-        VaultMapStructure.GetData(key, TtoVaultRecordMap);
 
         // Get the current value of the key key inside the VaultRecordRef and save it for further work
         T oldData;
@@ -78,6 +76,10 @@ namespace mvlt
         // Add new data to TtoVaultRecordHashMap to Vault VaultHashMapStructure
         TtoVaultRecordHashMap->emplace(data, dataRecord);
 
+
+        // Get std::multimap with T key and VaultRecord* value
+        VaultMapStructure.GetData(key, TtoVaultRecordMap);
+
         // Remove oldData from TtoVaultRecordMap from VaultMapStructure
         auto FirstAndLastIteratorsWithKeyOnMap = TtoVaultRecordMap->equal_range(oldData);
 
@@ -94,6 +96,7 @@ namespace mvlt
 
         // Add new data to TtoVaultRecordMap to Vault VaultMapStructure
         TtoVaultRecordMap->emplace(data, dataRecord);
+
 
         // Update data inside VaultRecord pointer inside VaultRecordRef and Vault
         dataRecord->SetData(key, data);
@@ -206,6 +209,19 @@ namespace mvlt
             }
         });
         
+        VsultKeyCopiers.emplace(key, [=](Vault& vlt)
+        {
+            vlt.SetKey(key, defaultKeyValue);
+        });  
+
+        VsultRecordCopiers.emplace(key, [=](VaultRecord* sourceRecord, VaultRecordRef& destinationRecordRef)
+        {
+            // Get T type data with key key
+            T recordTData;
+            sourceRecord->GetData(key, recordTData);
+            destinationRecordRef.SetData(key, recordTData);
+        });
+
         // Add new data to record set
         for (auto& it : RecordsSet)
         {
@@ -338,6 +354,38 @@ namespace mvlt
 
         RecursiveReadWriteMtx.ReadUnlock();
         return res;
+    }
+
+    template <class T>
+    void Vault::RequestRecords(const std::string& key, const T& keyValue, Vault& vlt)
+    {
+        vlt.RecursiveReadWriteMtx.WriteLock();
+        RecursiveReadWriteMtx.ReadLock();
+
+        for (auto& keyCopierIt : VsultKeyCopiers)
+            keyCopierIt.second(vlt);
+        
+        // Pointer to store map inside VaultStructureHashMap
+        std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
+
+        // Checking whether such a key exists
+        VaultHashMapStructure.GetData(key, TtoVaultRecordHashMap);
+        
+        // Pair with begin and end iterator with T type and keyValue value
+        auto equalRange = TtoVaultRecordHashMap->equal_range(keyValue);
+        if (equalRange.first != TtoVaultRecordHashMap->end())
+        {
+            VaultRecordRef vrr;
+            for (auto it = equalRange.first; it != equalRange.second; ++it)
+            {
+                vrr = vlt.CreateRecord();
+                for (auto& recordCopierIt : VsultRecordCopiers)
+                    recordCopierIt.second(it->second, vrr);
+            }
+        }
+
+        RecursiveReadWriteMtx.ReadUnlock();
+        vlt.RecursiveReadWriteMtx.WriteUnlock();
     }
 
     template <class T>
