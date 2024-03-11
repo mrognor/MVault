@@ -11,6 +11,18 @@ namespace mvlt
         VaultOperationResult res;
 
         Mtx.lock();
+
+        /// \todo Добавить проверку на то не был ли удален Vlt
+        if (Vlt == nullptr)
+        {
+            res.Key = key;
+            res.RequestedType = typeid(T);
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::VaultNoValid;
+            Mtx.unlock();
+            return res;
+        }
+
         Vlt->RecursiveReadWriteMtx.WriteLock();
 
         res = Vlt->SetDataToRecord(DataRecord, key, data);
@@ -30,6 +42,18 @@ namespace mvlt
         res.RequestedType = typeid(T);
 
         Mtx.lock();        
+
+        /// \todo Добавить проверку на то не был ли удален Vlt
+        if (Vlt == nullptr)
+        {
+            res.Key = key;
+            res.RequestedType = typeid(T);
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::VaultNoValid;
+            Mtx.unlock();
+            return res;
+        }
+
         Vlt->RecursiveReadWriteMtx.ReadLock();
 
         if (DataRecord == nullptr || !DataRecord->GetIsValid()) 

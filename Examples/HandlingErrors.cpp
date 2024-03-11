@@ -228,4 +228,22 @@ int main()
         std::cout << "\t\t" << opr.ResultCodeString() << " Requested type: " << opr.RequestedType.name() << ". Saved type: " << opr.SavedType.name() << std::endl;
     else
         std::cout << "\t\tSuccess! Requested record: " << vrr.GetRecordUniqueId() << std::endl;
+
+    // ============================================================================== //
+
+    std::cout << "\tInvalid vault" << std::endl;
+
+    mvlt::VaultRecordRef vrr2;
+
+    opr = vrr2.GetData("key", i);
+
+    if (!opr.IsOperationSuccess)
+        std::cout << "\t\t" << opr.ResultCodeString() << std::endl;
+    
+    opr = vrr2.SetData("key", 777);
+
+    if (!opr.IsOperationSuccess)
+        std::cout << "\t\t" << opr.ResultCodeString() << std::endl;
+
+    std::cout << "Test ended" << std::endl;
 }

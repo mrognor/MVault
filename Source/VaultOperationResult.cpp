@@ -7,8 +7,11 @@ namespace mvlt
         switch (ResultCode)
         {
         default:
+        case VaultOperationResultCode::VaultNoValid:
+            return "The vault referenced by VaultRecordRef is not valid.";
+
         case VaultOperationResultCode::DataRecordNotValid:
-            return "The record referenced by VaultRecordRef is not valid";
+            return "The record referenced by VaultRecordRef is not valid.";
 
         case VaultOperationResultCode::WrongType:
             return "The mismatch between the types of the requested key and the saved one.";
@@ -23,7 +26,7 @@ namespace mvlt
             return "The operation was completed successfully.";
 
         case VaultOperationResultCode::WrongValue:
-            return "A record with this key value was not found";
+            return "A record with this key value was not found.";
         }
     }
 }

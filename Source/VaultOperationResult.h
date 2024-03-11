@@ -16,6 +16,7 @@ namespace mvlt
     /// \brief Enum with all error handling codes
     enum class VaultOperationResultCode
     {
+        VaultNoValid = -4,       ///< This code is returned when the Vault to which VaultRecordRef is linked is not valid
         DataRecordNotValid = -3, ///< This code is returned when data is requested from the VaultRecordRef and the record it refers to is not valid
         WrongKey = -2,           ///< This code is returned when the requested key has not been found.
         WrongType = -1,          ///< This code is returned when the requested type does not match the saved type.

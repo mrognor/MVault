@@ -22,7 +22,7 @@ namespace mvlt
     {
     private:
         // Pointer to Vault
-        Vault* Vlt;
+        Vault* Vlt = nullptr;
 
         // Pointer to VaultRecord inside Vault
         VaultRecord* DataRecord = nullptr;

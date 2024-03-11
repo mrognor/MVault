@@ -25,7 +25,6 @@ namespace mvlt
             /// \todo Надо ли тут блокировать other
             other.Vlt->RecursiveReadWriteMtx.ReadLock();
 
-
             if (DataRecord != nullptr) DataRecord->RemoveRef();
             if (other.DataRecord != nullptr) other.DataRecord->AddRef();
 
@@ -63,7 +62,6 @@ namespace mvlt
     {
         Mtx.lock();
         vlt->RecursiveReadWriteMtx.ReadLock();
-
 
         if (DataRecord != nullptr) DataRecord->RemoveRef();
         if (vaultRecord != nullptr) 
