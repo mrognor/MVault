@@ -17,4 +17,16 @@ int main()
     vlt.RequestRecords("A", 0, requestedVlt);
     std::cout << "Requested vault: " << std::endl;
     requestedVlt.PrintAsTable();
+
+    std::cout << "Chanhing value in requested vault" << std::endl;
+
+    mvlt::VaultRecordRef vrr;
+    requestedVlt.GetRecord("B", 1, vrr);
+    vrr.SetData("A", 2);
+
+    std::cout << "Origin vault: " << std::endl;
+    vlt.PrintAsTable();
+
+    std::cout << "Requested vault: " << std::endl;
+    requestedVlt.PrintAsTable();
 }

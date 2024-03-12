@@ -25,6 +25,17 @@ namespace mvlt
         std::size_t RefCounter = 0;
         // Mutex for thread safety
         std::mutex* Mtx = nullptr;
+
+        /// \todo
+        Vault* ParentVault = nullptr;
+
+        /// \todo
+        VaultRecord* ParentVaultRecord = nullptr;
+
+        /// \todo
+        friend Vault;
+        friend VaultRecordRef;
+
     public:
         /// \brief Default constructor
         VaultRecord();

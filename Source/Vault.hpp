@@ -381,6 +381,9 @@ namespace mvlt
                 vrr = vlt.CreateRecord();
                 for (auto& recordCopierIt : VsultRecordCopiers)
                     recordCopierIt.second(it->second, vrr);
+
+                vrr.DataRecord->ParentVault = this;
+                vrr.DataRecord->ParentVaultRecord = it->second;
             }
         }
 
