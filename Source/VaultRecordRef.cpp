@@ -151,15 +151,19 @@ namespace mvlt
         Mtx.lock();
         Vlt->RecursiveReadWriteMtx.ReadLock();
 
-        std::cout << "Vault record " << DataRecord << ":" << std::endl;
-
-        for (const auto& keyPair : Vlt->VaultHashMapStructure)
+        if (IsValid())
         {
-            DataSaver dataSaver;
-            DataRecord->GetDataSaver(keyPair.first, dataSaver);
-        
-            std::cout << "\t" << keyPair.first << " = " << dataSaver.Str() << std::endl;
+            std::cout << "Vault record " << DataRecord << ":" << std::endl;
+
+            for (const auto& keyPair : Vlt->VaultHashMapStructure)
+            {
+                DataSaver dataSaver;
+                DataRecord->GetDataSaver(keyPair.first, dataSaver);
+            
+                std::cout << "\t" << keyPair.first << " = " << dataSaver.Str() << std::endl;
+            }
         }
+        else std::cout << "VaultRecordRef not valid!" << std::endl;
 
         Vlt->RecursiveReadWriteMtx.ReadUnlock();
         Mtx.unlock();
