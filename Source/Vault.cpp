@@ -55,7 +55,7 @@ namespace mvlt
         VaultRecordClearers.erase(key);
         VaultRecordErasers.erase(key);
         VaultRecordSorters.erase(key);
-        VsultKeyCopiers.erase(key);
+        VaultKeyCopiers.erase(key);
 
         // Erase key data from all records
         for (auto& it : RecordsSet)
@@ -183,8 +183,7 @@ namespace mvlt
         VaultRecordClearers.clear();
         VaultRecordErasers.clear();
         VaultRecordSorters.clear();
-        VsultKeyCopiers.clear();
-        VsultRecordCopiers.clear();
+        VaultKeyCopiers.clear();
         
         // Delete all Records
         for (auto& it : RecordsSet)

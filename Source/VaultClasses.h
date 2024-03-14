@@ -7,7 +7,8 @@ namespace mvlt
     class Vault;
     class VaultRecord;
     class VaultRecordRef;
-
+    class VaultRequestResult;
+    
     /**
         A simple typedef for HashMap. It is necessary for a more understandable separation of types.
         Represents the internal structure of the Vault.

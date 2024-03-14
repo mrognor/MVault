@@ -26,9 +26,6 @@ namespace mvlt
         Vlt->RecursiveReadWriteMtx.WriteLock();
 
         res = Vlt->SetDataToRecord(DataRecord, key, data);
-
-        if (DataRecord->ParentVault != nullptr) 
-            DataRecord->ParentVault->SetDataToRecord(DataRecord->ParentVaultRecord, key, data);
         
         Vlt->RecursiveReadWriteMtx.WriteUnlock();
         Mtx.unlock();

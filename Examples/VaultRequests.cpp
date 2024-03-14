@@ -2,7 +2,7 @@
 
 int main()
 {
-    mvlt::Vault vlt, requestedVlt;
+    mvlt::Vault vlt;
     
     vlt.SetKey("A", 0);
     vlt.SetKey("B", 0);
@@ -12,21 +12,38 @@ int main()
     vlt.CreateRecord({ {"B", 1} });
 
     std::cout << "Origin vault: " << std::endl;
-    vlt.PrintAsTable();
+    vlt.PrintVault();
 
-    vlt.RequestRecords("A", 0, requestedVlt);
+
+    mvlt::VaultRequestResult vrer;
+    vlt.RequestRecords("A", 0, vrer);
     std::cout << "Requested vault: " << std::endl;
-    requestedVlt.PrintAsTable();
+    vrer.PrintVault();
+
+    std::cout << "Get record: " << std::endl;
+
+    mvlt::VaultRecordRef vaultRecordRef;
+    vrer.GetRecord("B", 1, vaultRecordRef);
+    vaultRecordRef.PrintRecord();
 
     std::cout << "Chanhing value in requested vault" << std::endl;
-
-    mvlt::VaultRecordRef vrr;
-    requestedVlt.GetRecord("B", 1, vrr);
-    vrr.SetData("A", 2);
+    vaultRecordRef.SetData("A", 2);
 
     std::cout << "Origin vault: " << std::endl;
-    vlt.PrintAsTable();
+    vlt.PrintVault();
 
     std::cout << "Requested vault: " << std::endl;
-    requestedVlt.PrintAsTable();
+    vrer.PrintVault();
+
+    std::cout << "Get record from VaultRequestResult: " << std::endl;
+
+    vrer.GetRecord("A", 2, vaultRecordRef);
+    vaultRecordRef.PrintRecord();
+
+    std::cout << "Get record from Vault: " << std::endl;
+
+    vlt.GetRecord("A", 2, vaultRecordRef);
+    vaultRecordRef.PrintRecord();
+
+    std::cout << "Z" << std::endl;
 }

@@ -1,12 +1,13 @@
 #pragma once
 
 #include "Vault.h"
+#include "VaultRequestResult.h"
 
 // This file contains an implementation of the Vault template methods
 namespace mvlt
 {
     template <class T>
-    VaultOperationResult Vault::SetDataToRecord(VaultRecord* dataRecord, const std::string& key, const T& data)
+    VaultOperationResult Vault::SetDataToRecord(VaultRecord* dataRecord, const std::string& key, const T& data, bool isCalledFromVault)
     {
         // Fill res info known at start
         VaultOperationResult res;
@@ -98,8 +99,18 @@ namespace mvlt
         TtoVaultRecordMap->emplace(data, dataRecord);
 
 
-        // Update data inside VaultRecord pointer inside VaultRecordRef and Vault
-        dataRecord->SetData(key, data);
+        // Check if this method was original called. That mean that this method called not from next if statement.
+        // It is required since VaultRequestResult child of Vault and may also call this method
+        if (isCalledFromVault)
+        {
+            // Update data inside VaultRecord pointer inside VaultRecordRef and Vault
+            dataRecord->SetData(key, data);
+        
+            // Update all dependent VaulRequestResults structures
+            for (VaultRequestResult* vaultRequestResult : dataRecord->dependentVaultRequestResults)
+                vaultRequestResult->SetDataToRecord(dataRecord, key, data, false);
+        }
+
         res.IsOperationSuccess = true;
         res.ResultCode = VaultOperationResultCode::Success;
 
@@ -209,18 +220,11 @@ namespace mvlt
             }
         });
         
-        VsultKeyCopiers.emplace(key, [=](Vault& vlt)
+        VaultKeyCopiers.emplace(key, [=](VaultRequestResult& vaultRequestResult)
         {
-            vlt.SetKey(key, defaultKeyValue);
+            vaultRequestResult.SetKey(key, defaultKeyValue);
         });  
 
-        VsultRecordCopiers.emplace(key, [=](VaultRecord* sourceRecord, VaultRecordRef& destinationRecordRef)
-        {
-            // Get T type data with key key
-            T recordTData;
-            sourceRecord->GetData(key, recordTData);
-            destinationRecordRef.SetData(key, recordTData);
-        });
 
         // Add new data to record set
         for (auto& it : RecordsSet)
@@ -357,13 +361,14 @@ namespace mvlt
     }
 
     template <class T>
-    void Vault::RequestRecords(const std::string& key, const T& keyValue, Vault& vlt)
+    void Vault::RequestRecords(const std::string& key, const T& keyValue, VaultRequestResult& vaultRequestResult)
     {
-        vlt.RecursiveReadWriteMtx.WriteLock();
+        vaultRequestResult.RecursiveReadWriteMtx.WriteLock();
         RecursiveReadWriteMtx.ReadLock();
 
-        for (auto& keyCopierIt : VsultKeyCopiers)
-            keyCopierIt.second(vlt);
+        // Copy keys from this to vaultRequestResult
+        for (auto& keyCopierIt : VaultKeyCopiers)
+            keyCopierIt.second(vaultRequestResult);
         
         // Pointer to store map inside VaultStructureHashMap
         std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
@@ -375,20 +380,25 @@ namespace mvlt
         auto equalRange = TtoVaultRecordHashMap->equal_range(keyValue);
         if (equalRange.first != TtoVaultRecordHashMap->end())
         {
-            VaultRecordRef vrr;
+            vaultRequestResult.ParentVault = this;
+            
             for (auto it = equalRange.first; it != equalRange.second; ++it)
             {
-                vrr = vlt.CreateRecord();
-                for (auto& recordCopierIt : VsultRecordCopiers)
-                    recordCopierIt.second(it->second, vrr);
+                // Add pointer to record from this to vaultRequestResult
+                vaultRequestResult.RecordsSet.emplace(it->second);
+                
+                // Add pointer to record from this to vaultRequestResult structure
+                for (auto& adder : vaultRequestResult.VaultRecordAdders)
+                    adder.second(it->second);
 
-                vrr.DataRecord->ParentVault = this;
-                vrr.DataRecord->ParentVaultRecord = it->second;
+                it->second->Mtx->lock();
+                it->second->dependentVaultRequestResults.emplace(&vaultRequestResult);
+                it->second->Mtx->unlock();
             }
         }
 
         RecursiveReadWriteMtx.ReadUnlock();
-        vlt.RecursiveReadWriteMtx.WriteUnlock();
+        vaultRequestResult.RecursiveReadWriteMtx.WriteUnlock();
     }
 
     template <class T>

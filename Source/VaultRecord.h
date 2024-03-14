@@ -21,22 +21,27 @@ namespace mvlt
     private:
         // Variable to store object validity
         bool IsValid = true;
+
         // Validity counter
         std::size_t RefCounter = 0;
+
         // Mutex for thread safety
         std::mutex* Mtx = nullptr;
 
-        /// \todo
-        Vault* ParentVault = nullptr;
-
-        /// \todo
-        VaultRecord* ParentVaultRecord = nullptr;
-
-        /// \todo
-        friend Vault;
-        friend VaultRecordRef;
+        // Set with all dependent VaultRequestResults
+        std::unordered_set<VaultRequestResult*> dependentVaultRequestResults;
 
     public:
+
+        /// Making the Vault class friendly so that it has access to the internal members of the VaultRecord class
+        friend Vault;
+        
+        /// Making the VaultRecordRef class friendly so that it has access to the internal members of the VaultRecord class
+        friend VaultRecordRef;
+
+        /// Making the VaultRequestResult class friendly so that it has access to the internal members of the VaultRecord class
+        friend VaultRequestResult;
+        
         /// \brief Default constructor
         VaultRecord();
 
