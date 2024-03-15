@@ -45,3 +45,5 @@ enum ConsoleTextColor
 };
 
 #endif
+
+void ColorizedPrint(const std::string text, const ConsoleTextColor& color = ConsoleTextColor::Default);

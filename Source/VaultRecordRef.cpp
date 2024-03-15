@@ -115,7 +115,7 @@ namespace mvlt
 
     bool VaultRecordRef::GetDataAsString(const std::string& key, std::string& str) const
     {
-        bool res;
+        bool res = false;
 
         Mtx.lock();
         
@@ -187,11 +187,16 @@ namespace mvlt
         Mtx.unlock();
     }
 
-    void VaultRecordRef::Unlink()
+    void VaultRecordRef::Reset()
     {
         Mtx.lock();
+
+        if (DataRecord != nullptr)
+            DataRecord->RemoveRef();
+        
         DataRecord = nullptr;
         Vlt = nullptr;
+
         Mtx.unlock();
     }
 

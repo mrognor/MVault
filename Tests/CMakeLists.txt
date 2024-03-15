@@ -15,12 +15,11 @@ set(TestsHeaders
 set(TestsSource
     ColorizedPrint.cpp 
     MultithreadingTest.cpp 
-    Tests.cpp
     Bench.cpp)
 
 project(Tests)
 
 include_directories(../Source)	
 
-add_executable(Tests ${TestsHeaders} ${TestsSource})
+add_executable(Tests ${TestsHeaders} ${TestsSource} Tests.cpp)
 target_link_libraries(Tests MVault)

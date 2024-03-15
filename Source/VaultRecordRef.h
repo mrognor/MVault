@@ -147,9 +147,8 @@ namespace mvlt
         /// \brief A method for displaying VaultRecordRef content on the screen
         void PrintRecord() const;
         
-        /// A method for decoupling a class object from record
-        /// \todo Нужен ли этот метод
-        void Unlink();
+        /// \brief A method for decoupling a class object from record. Reset class object to default state
+        void Reset();
 
         /**
             \brief A method for locking record
