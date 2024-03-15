@@ -218,8 +218,6 @@ namespace mvlt
         recordRefToErase.Mtx.lock();
         RecursiveReadWriteMtx.WriteLock();
 
-        recordRefToErase.IsRefValid = false;
-
         if (RecordsSet.find(recordRefToErase.DataRecord) == RecordsSet.end())
         {
             RecursiveReadWriteMtx.WriteUnlock();

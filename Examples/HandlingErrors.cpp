@@ -245,5 +245,23 @@ int main()
     if (!opr.IsOperationSuccess)
         std::cout << "\t\t" << opr.ResultCodeString() << std::endl;
 
+    // ============================================================================== //
+
+    std::cout << "\tDeleted vault" << std::endl;
+
+    mvlt::Vault* vltp = new mvlt::Vault;
+    vltp->SetKey("A", 1);
+
+    vltp->CreateRecord();
+
+    opr = vltp->GetRecord("A", 1, vrr);
+
+    if (opr.IsOperationSuccess)
+        std::cout << "\t\t" << opr.ResultCodeString() << std::endl;
+
+    delete vltp;
+
+    std::cout << vrr.IsValid() << " " << vrr.GetRecordUniqueId() << std::endl;
+
     std::cout << "Test ended" << std::endl;
 }

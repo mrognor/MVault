@@ -32,9 +32,6 @@ namespace mvlt
         // but there is no point in calling them to block Vault for writing
         mutable std::recursive_mutex Mtx;
 
-        // Variable for tracking the validity status
-        bool IsRefValid = false;
-
         /**
             \brief The method for binding RecordRef to Record 
             
@@ -76,7 +73,7 @@ namespace mvlt
         
         /// \brief Comparison operator
         /// \param [in] other the object to compare with
-        /// \return true if the objects are equal, otherwise false
+        /// \return true if the objects are equal, otherwise false. Two invalid objects are equal
         bool operator==(const VaultRecordRef& other) const;
 
         /// \brief A method for obtaining a unique record identifier
@@ -143,6 +140,7 @@ namespace mvlt
         bool IsValid() const;
 
         /// \brief The method for getting all the keys
+        /// If the record is not valid, it will return an empty vector
         /// \return vector with keys
         std::vector<std::string> GetKeys() const;
         

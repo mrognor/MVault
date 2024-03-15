@@ -7,9 +7,6 @@ namespace mvlt
         switch (ResultCode)
         {
         default:
-        case VaultOperationResultCode::VaultNoValid:
-            return "The vault referenced by VaultRecordRef is not valid.";
-
         case VaultOperationResultCode::DataRecordNotValid:
             return "The record referenced by VaultRecordRef is not valid.";
 
