@@ -366,9 +366,7 @@ namespace mvlt
         vaultRequestResult.RecursiveReadWriteMtx.WriteLock();
         RecursiveReadWriteMtx.ReadLock();
 
-        // Copy keys from this to vaultRequestResult
-        for (auto& keyCopierIt : VaultKeyCopiers)
-            keyCopierIt.second(vaultRequestResult);
+        vaultRequestResult.CopyKeysFromVault(this);
         
         // Pointer to store map inside VaultStructureHashMap
         std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
@@ -380,21 +378,8 @@ namespace mvlt
         auto equalRange = TtoVaultRecordHashMap->equal_range(keyValue);
         if (equalRange.first != TtoVaultRecordHashMap->end())
         {
-            vaultRequestResult.ParentVault = this;
-            
             for (auto it = equalRange.first; it != equalRange.second; ++it)
-            {
-                // Add pointer to record from this to vaultRequestResult
-                vaultRequestResult.RecordsSet.emplace(it->second);
-                
-                // Add pointer to record from this to vaultRequestResult structure
-                for (auto& adder : vaultRequestResult.VaultRecordAdders)
-                    adder.second(it->second);
-
-                it->second->Mtx->lock();
-                it->second->dependentVaultRequestResults.emplace(&vaultRequestResult);
-                it->second->Mtx->unlock();
-            }
+                vaultRequestResult.AddRecord(it->second);
         }
 
         RecursiveReadWriteMtx.ReadUnlock();

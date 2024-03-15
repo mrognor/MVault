@@ -16,6 +16,11 @@ namespace mvlt
         // Pointer to parent Vault
         Vault* ParentVault = nullptr;
 
+        /// \todo Docs
+        // потокобезопасность должна обеспечиваться отдельно
+        void CopyKeysFromVault(Vault* vlt);
+
+        void AddRecord(VaultRecord* vaultRecord);
     public:
 
         /// Make Vault class frien
@@ -24,6 +29,10 @@ namespace mvlt
         /// Provide access to Vaults PrintVault method
         using Vault::PrintVault;
         
+        using Vault::PrintAsTable;
+
+        using Vault::Size;
+
         /**
             \brief The method for getting a reference to the data inside Vault
 
@@ -44,30 +53,31 @@ namespace mvlt
         template <class T>
         VaultOperationResult GetRecord(const std::string& key, const T& keyValue, VaultRecordRef& vaultRecordRef) const
         {
+            ParentVault->RecursiveReadWriteMtx.ReadLock();
             VaultOperationResult res = Vault::GetRecord(key, keyValue, vaultRecordRef);
             vaultRecordRef.Vlt = ParentVault;
+            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
             return res;
         }
 
+        // template <class T>
+        // VaultOperationResult GetRecords(const std::string& key, const T& keyValue, std::vector<VaultRecordRef>& recordsRefs, const std::size_t& amountOfRecords = -1) const;
+
+        // /// \todo Handle errors
+        // template <class T>
+        // void RequestRecords(const std::string& key, const T& keyValue, VaultRequestResult& vaultRequestResult);
+
+        void Clear();
+
+        // void RemoveRecordRef();
+
+        // void RemoveRecordRefs();
+
+        // void GetSortedRecords();
+
+        // void SortBy();
+
         /// \brief Destructor
-        ~VaultRequestResult()
-        {
-            RecursiveReadWriteMtx.WriteLock();
-            ParentVault->RecursiveReadWriteMtx.WriteLock();
-
-            // No need to delete each record because it is RequestResult and records will be delete in original vault
-            RecordsSet.clear();
-
-            // Remove this from records
-            for (VaultRecord* record : RecordsSet)
-            {
-                record->Mtx->lock();
-                record->dependentVaultRequestResults.erase(this);
-                record->Mtx->unlock();
-            }
-
-            ParentVault->RecursiveReadWriteMtx.WriteUnlock();
-            RecursiveReadWriteMtx.WriteUnlock();
-        }
+        ~VaultRequestResult();
     };
 }
