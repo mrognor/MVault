@@ -22,9 +22,9 @@ namespace mvlt
         for (auto& adder : VaultRecordAdders)
             adder.second(vaultRecord);
 
-        vaultRecord->Mtx->lock();
+        vaultRecord->Mtx.lock();
         vaultRecord->dependentVaultRequestResults.emplace(this);
-        vaultRecord->Mtx->unlock();
+        vaultRecord->Mtx.unlock();
 
     }
 
@@ -35,9 +35,9 @@ namespace mvlt
         // Remove this from records
         for (VaultRecord* record : RecordsSet)
         {
-            record->Mtx->lock();
+            record->Mtx.lock();
             record->dependentVaultRequestResults.erase(this);
-            record->Mtx->unlock();
+            record->Mtx.unlock();
         }
 
         // No need to delete each record because it is RequestResult and records will be delete in original vault

@@ -2,37 +2,33 @@
 
 namespace mvlt
 {
-    VaultRecord::VaultRecord()
-    {
-        Mtx = new std::mutex;
-    }
-
+    VaultRecord::VaultRecord() {}
+    
     VaultRecord::VaultRecord(const VaultRecord& other)
     {
         IsValid = true;
         RefCounter = 0;
-        Mtx = new std::mutex;
 
-        other.Mtx->lock();
+        other.Mtx.lock();
         for (const auto& it : other.Container)
             Container.emplace(it);
-        other.Mtx->unlock();
+        other.Mtx.unlock();
     }
 
     void VaultRecord::AddRef()
     {
-        Mtx->lock();
+        Mtx.lock();
         if (IsValid) ++RefCounter;
-        Mtx->unlock();
+        Mtx.unlock();
     }
 
     void VaultRecord::RemoveRef()
     {
         bool isEnd = false;
-        Mtx->lock();
+        Mtx.lock();
         --RefCounter;
         if (!IsValid && RefCounter == 0) isEnd = true;
-        Mtx->unlock();
+        Mtx.unlock();
 
         if (isEnd) delete this;
     }
@@ -40,10 +36,10 @@ namespace mvlt
     void VaultRecord::Invalidate()
     {
         bool isEnd = false;
-        Mtx->lock();
+        Mtx.lock();
         IsValid = false;
         if (RefCounter == 0) isEnd = true;
-        Mtx->unlock();
+        Mtx.unlock();
 
         if (isEnd) delete this;
     }
@@ -51,14 +47,9 @@ namespace mvlt
     bool VaultRecord::GetIsValid()
     {
         bool res;
-        Mtx->lock();
+        Mtx.lock();
         res = IsValid;
-        Mtx->unlock();
+        Mtx.unlock();
         return res;
-    }
-
-    VaultRecord::~VaultRecord()
-    {
-        delete Mtx;
     }
 }

@@ -26,7 +26,7 @@ namespace mvlt
         std::size_t RefCounter = 0;
 
         // Mutex for thread safety
-        std::mutex* Mtx = nullptr;
+        mutable std::mutex Mtx;
 
         // Set with all dependent VaultRequestResults
         std::unordered_set<VaultRequestResult*> dependentVaultRequestResults;
@@ -60,8 +60,5 @@ namespace mvlt
         /// \brief A method for checking whether a record is inside a Vault
         /// \return returns the validity of the record
         bool GetIsValid();
-
-        /// \brief Default destructor
-        ~VaultRecord();
     };
 }
