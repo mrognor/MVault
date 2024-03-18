@@ -26,7 +26,7 @@ namespace mvlt
         std::size_t RefCounter = 0;
 
         // Mutex for thread safety
-        mutable std::mutex Mtx;
+        mutable std::recursive_mutex Mtx;
 
         // Set with all dependent VaultRequestResults
         std::unordered_set<VaultRequestResult*> dependentVaultRequestResults;

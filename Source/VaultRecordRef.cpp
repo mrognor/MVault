@@ -25,18 +25,19 @@ namespace mvlt
 
             if (other.IsValid())
             {
-                other.Vlt->RecursiveReadWriteMtx.ReadLock();
-
+                if (other.DataRecord != nullptr) other.DataRecord->AddRef();
                 if (DataRecord != nullptr) DataRecord->RemoveRef();
-                other.DataRecord->AddRef();
 
                 DataRecord = other.DataRecord;
                 Vlt = other.Vlt;
-
-                other.Vlt->RecursiveReadWriteMtx.ReadUnlock();
             }
-
-            // \todo else
+            else 
+            {
+                Vlt = nullptr;
+                if (DataRecord != nullptr) DataRecord->RemoveRef();
+                DataRecord = nullptr;
+            }
+            
             other.Mtx.unlock();
             Mtx.unlock();
         }
@@ -53,11 +54,7 @@ namespace mvlt
 
         if (IsValid())
         {
-            Vlt->RecursiveReadWriteMtx.ReadLock();
-
             res = (DataRecord == other.DataRecord);
-            
-            Vlt->RecursiveReadWriteMtx.ReadUnlock();
         }
         else
         {
@@ -76,9 +73,9 @@ namespace mvlt
         Mtx.lock();
         vlt->RecursiveReadWriteMtx.ReadLock();
 
-        if (DataRecord != nullptr) DataRecord->RemoveRef();
         if (vaultRecord != nullptr) vaultRecord->AddRef();
-        
+        if (DataRecord != nullptr) DataRecord->RemoveRef();
+
         DataRecord = vaultRecord;
         Vlt = vlt;
 
@@ -112,20 +109,30 @@ namespace mvlt
                 DataRecord->SetDataFromDataSaver(it.first, it.second);
         Mtx.unlock();
     }
-
+                
     bool VaultRecordRef::GetDataAsString(const std::string& key, std::string& str) const
     {
         bool res = false;
 
         Mtx.lock();
         
-        if (IsValid())
+        if (DataRecord != nullptr)
         {
-            Vlt->RecursiveReadWriteMtx.ReadLock();
+            // DataRecord lock Mtx to lock VaultRecord::Invalidate in Vault destructor.
+            // It is necessary to prevent Vault::RecursiveReadWriteMtx from deletion 
+            DataRecord->Mtx.lock();
 
-            if (DataRecord->GetIsValid()) res = DataRecord->GetDataAsString(key, str);
+            // Check if Vault still accessable
+            if (DataRecord->GetIsValid())
+            {
+                Vlt->RecursiveReadWriteMtx.ReadLock();
 
-            Vlt->RecursiveReadWriteMtx.ReadUnlock();
+                res = DataRecord->GetDataAsString(key, str);
+
+                Vlt->RecursiveReadWriteMtx.ReadUnlock();
+            }
+
+            DataRecord->Mtx.unlock();
         }
 
         Mtx.unlock();
@@ -148,13 +155,23 @@ namespace mvlt
 
         Mtx.lock();
 
-        if (IsValid())
+        if (DataRecord != nullptr)
         {
-            Vlt->RecursiveReadWriteMtx.ReadLock();
+            // DataRecord lock Mtx to lock VaultRecord::Invalidate in Vault destructor.
+            // It is necessary to prevent Vault::RecursiveReadWriteMtx from deletion 
+            DataRecord->Mtx.lock();
 
-            for (const auto& it : Vlt->VaultMapStructure) res.emplace_back(it.first);
-        
-            Vlt->RecursiveReadWriteMtx.ReadUnlock();
+            // Check if Vault still accessable
+            if (DataRecord->GetIsValid())
+            {
+                Vlt->RecursiveReadWriteMtx.ReadLock();
+
+                for (const auto& it : Vlt->VaultMapStructure) res.emplace_back(it.first);
+
+                Vlt->RecursiveReadWriteMtx.ReadUnlock();
+            }
+
+            DataRecord->Mtx.unlock();
         }
 
         Mtx.unlock();
@@ -166,23 +183,33 @@ namespace mvlt
     {
         Mtx.lock();
 
-        if (IsValid())
+        if (DataRecord != nullptr)
         {
-            Vlt->RecursiveReadWriteMtx.ReadLock();
+            // DataRecord lock Mtx to lock VaultRecord::Invalidate in Vault destructor.
+            // It is necessary to prevent Vault::RecursiveReadWriteMtx from deletion 
+            DataRecord->Mtx.lock();
 
-            std::cout << "Vault record " << DataRecord << ":" << std::endl;
-
-            for (const auto& keyPair : Vlt->VaultHashMapStructure)
+            // Check if Vault still accessable
+            if (DataRecord->GetIsValid())
             {
-                DataSaver dataSaver;
-                DataRecord->GetDataSaver(keyPair.first, dataSaver);
-            
-                std::cout << "\t" << keyPair.first << " = " << dataSaver.Str() << std::endl;
-            }
+                Vlt->RecursiveReadWriteMtx.ReadLock();
 
-            Vlt->RecursiveReadWriteMtx.ReadUnlock();
+                std::cout << "Vault record " << DataRecord << ":" << std::endl;
+
+                for (const auto& keyPair : Vlt->VaultHashMapStructure)
+                {
+                    DataSaver dataSaver;
+                    DataRecord->GetDataSaver(keyPair.first, dataSaver);
+                
+                    std::cout << "\t" << keyPair.first << " = " << dataSaver.Str() << std::endl;
+                }
+
+                Vlt->RecursiveReadWriteMtx.ReadUnlock();
+            }
+            else std::cout << "VaultRecordRef not valid!" << std::endl;
+
+            DataRecord->Mtx.unlock();
         }
-        else std::cout << "VaultRecordRef not valid!" << std::endl;
 
         Mtx.unlock();
     }
@@ -202,12 +229,34 @@ namespace mvlt
 
     void VaultRecordRef::ReadLock() const
     {
-        Vlt->RecursiveReadWriteMtx.ReadLock();
+        Mtx.lock();
+
+        if (DataRecord != nullptr)
+        {
+            // DataRecord lock Mtx to lock VaultRecord::Invalidate in Vault destructor.
+            // It is necessary to prevent Vault::RecursiveReadWriteMtx from deletion 
+            DataRecord->Mtx.lock();
+
+            Vlt->RecursiveReadWriteMtx.ReadLock();
+        }
+
+        Mtx.unlock();
     }
 
     void VaultRecordRef::ReadUnlock() const
     {
-        Vlt->RecursiveReadWriteMtx.ReadUnlock();
+        Mtx.lock();
+
+        if (DataRecord != nullptr)
+        {
+            // DataRecord lock Mtx to lock VaultRecord::Invalidate in Vault destructor.
+            // It is necessary to prevent Vault::RecursiveReadWriteMtx from deletion 
+            DataRecord->Mtx.lock();
+
+            Vlt->RecursiveReadWriteMtx.ReadUnlock();
+        }
+
+        Mtx.unlock();
     }
         
     VaultRecordRef::~VaultRecordRef()

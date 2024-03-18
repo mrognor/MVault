@@ -12,12 +12,30 @@ namespace mvlt
 
         Mtx.lock();
 
-        if (!IsValid()) 
+        if (DataRecord == nullptr)
         {
             res.Key = key;
             res.RequestedType = typeid(T);
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::DataRecordNotValid;
+
+            Mtx.unlock();
+            return res;
+        }
+
+        // DataRecord lock Mtx to lock VaultRecord::Invalidate in Vault destructor.
+        // It is necessary to prevent Vault::RecursiveReadWriteMtx from deletion 
+        DataRecord->Mtx.lock();
+
+        // Check if Vault still accessable
+        if (!DataRecord->GetIsValid())
+        {
+            res.Key = key;
+            res.RequestedType = typeid(T);
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::DataRecordNotValid;
+
+            DataRecord->Mtx.unlock();
             Mtx.unlock();
             return res;
         }
@@ -27,6 +45,7 @@ namespace mvlt
         res = Vlt->SetDataToRecord(DataRecord, key, data);
         
         Vlt->RecursiveReadWriteMtx.WriteUnlock();
+        DataRecord->Mtx.unlock();
         Mtx.unlock();
 
         return res;
@@ -42,12 +61,30 @@ namespace mvlt
 
         Mtx.lock();        
 
-        if (!IsValid()) 
+        if (DataRecord == nullptr)
         {
             res.Key = key;
             res.RequestedType = typeid(T);
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::DataRecordNotValid;
+
+            Mtx.unlock();
+            return res;
+        }
+
+        // DataRecord lock Mtx to lock VaultRecord::Invalidate in Vault destructor.
+        // It is necessary to prevent Vault::RecursiveReadWriteMtx from deletion 
+        DataRecord->Mtx.lock();
+
+        // Check if Vault still accessable
+        if (!DataRecord->GetIsValid())
+        {
+            res.Key = key;
+            res.RequestedType = typeid(T);
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::DataRecordNotValid;
+
+            DataRecord->Mtx.unlock();
             Mtx.unlock();
             return res;
         }
@@ -61,6 +98,7 @@ namespace mvlt
             res.ResultCode = VaultOperationResultCode::WrongKey;
 
             Vlt->RecursiveReadWriteMtx.ReadUnlock();
+            DataRecord->Mtx.unlock();
             Mtx.unlock();
             return res;
         }
@@ -72,6 +110,7 @@ namespace mvlt
             res.ResultCode = VaultOperationResultCode::WrongType;
 
             Vlt->RecursiveReadWriteMtx.ReadUnlock();
+            DataRecord->Mtx.unlock();
             Mtx.unlock();
             return res;
         }
@@ -81,6 +120,7 @@ namespace mvlt
         res.ResultCode = VaultOperationResultCode::Success;
 
         Vlt->RecursiveReadWriteMtx.ReadUnlock();
+        DataRecord->Mtx.unlock();
         Mtx.unlock();
 
         return res;

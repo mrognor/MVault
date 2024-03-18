@@ -121,7 +121,7 @@ void MultithreadingRecordsTest()
 {
     mvlt::Vault vlt;
     std::condition_variable cv;
-    mvlt::VaultRecordRef vrr;
+    mvlt::VaultRecordRef vrr, destVrr;
 
     vlt.SetKey("id", -1);
     vlt.SetKey("num", -1);
@@ -134,8 +134,7 @@ void MultithreadingRecordsTest()
     std::thread th1([&]()
     {
         for (int i = 0; i < 10000; ++i)
-            vlt.CreateRecord({ {"id", i} });
-        
+            vlt.CreateRecord({ {"id", i} }); 
     });
 
     // Thread for changing records
@@ -145,6 +144,7 @@ void MultithreadingRecordsTest()
         {
             vlt.GetRecord("id", i, vrr);
             vrr.SetData("num", i);
+            destVrr = vrr;
         }
     });
 
@@ -160,6 +160,7 @@ void MultithreadingRecordsTest()
         for (int i = 0; i < 10000; ++i)
         {
             vlt.GetRecord("id", i, vrr);
+            destVrr = vrr;
             vlt.EraseRecord(vrr);
         }
     });
