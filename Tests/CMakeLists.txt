@@ -23,3 +23,6 @@ include_directories(../Source)
 
 add_executable(Tests ${TestsHeaders} ${TestsSource} Tests.cpp)
 target_link_libraries(Tests MVault)
+
+add_executable(VaultRecordRefTest VaultRecordRefTest.cpp)
+target_link_libraries(VaultRecordRefTest MVault)

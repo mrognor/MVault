@@ -23,21 +23,35 @@ namespace mvlt
             Mtx.lock();
             other.Mtx.lock();
 
-            if (other.IsValid())
+            if (other.DataRecord != nullptr)
             {
-                if (other.DataRecord != nullptr) other.DataRecord->AddRef();
-                if (DataRecord != nullptr) DataRecord->RemoveRef();
+                other.DataRecord->Mtx.lock();
+                
+                VaultRecord* oldVaultRecord = DataRecord;
 
-                DataRecord = other.DataRecord;
-                Vlt = other.Vlt;
+                if (other.DataRecord->GetIsValid())
+                {
+                    if (other.DataRecord != nullptr) other.DataRecord->AddRef();
+
+                    DataRecord = other.DataRecord;
+                    Vlt = other.Vlt;
+                }
+                else 
+                {
+                    Vlt = nullptr;
+                    DataRecord = nullptr;
+                }
+                
+                other.DataRecord->Mtx.unlock();
+
+                if (oldVaultRecord != nullptr) oldVaultRecord->RemoveRef();
             }
             else 
             {
                 Vlt = nullptr;
-                if (DataRecord != nullptr) DataRecord->RemoveRef();
                 DataRecord = nullptr;
             }
-            
+
             other.Mtx.unlock();
             Mtx.unlock();
         }
