@@ -48,6 +48,7 @@ namespace mvlt
             }
             else 
             {
+                if (DataRecord != nullptr) DataRecord->RemoveRef();
                 Vlt = nullptr;
                 DataRecord = nullptr;
             }

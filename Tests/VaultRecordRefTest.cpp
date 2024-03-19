@@ -2,15 +2,33 @@
 
 #include "../Source/MVault.h"
 
-void GetDataTest(std::ofstream& testResFile)
+void OperatorAssignment(std::ofstream& testResFile)
 {
     mvlt::Vault vlt;
     vlt.SetKey("id", -1);
-    
-    mvlt::VaultRecordRef vrr1, vrr2;
+
+    mvlt::VaultRecordRef vrr1, vrr2, vrr3;
     vrr1 = vlt.CreateRecord();
 
     testResFile << "## VaultRecordRef::operator=" << std::endl;
+
+    testResFile << "### Synchronous tests" << std::endl;
+
+    testResFile << "Non assignment VaultRecordRef: ";
+
+    // Invalid to invalid
+    vrr2 = vrr3;
+    // Valid to invalid
+    vrr2 = vrr1;
+    // Invalid to valid
+    vrr1 = vrr3;
+    // Valid to valid
+    vrr2 = vlt.CreateRecord();
+    vrr2 = vrr1;
+
+    testResFile << "$\\color{green}{Success!}$" << std::endl;
+
+    testResFile << "### Asynchronous tests" << std::endl;
 
     testResFile << "VaultRecordRef assignment while SetData in other thread: ";
 
@@ -78,7 +96,7 @@ int main()
     mvlt::VaultRecordRef vrr;
     testResFile << "# VaultRecordRef" << std::endl;
 
-    GetDataTest(testResFile);
+    OperatorAssignment(testResFile);
 
     testResFile.close();
 }
