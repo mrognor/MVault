@@ -225,7 +225,8 @@ namespace mvlt
 
             DataRecord->Mtx.unlock();
         }
-
+        else std::cout << "VaultRecordRef not valid!" << std::endl;
+        
         Mtx.unlock();
     }
 
