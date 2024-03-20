@@ -174,6 +174,117 @@ void OperatorComparison(std::ofstream& testResFile)
     testResFile << "$\\color{green}{Success!}$\n\n";
 }
 
+void GetDataAsString(std::ofstream& testResFile)
+{
+    testResFile << "## VaultRecordRef::GetDataAsString" << std::endl;
+
+    testResFile << "### Synchronous tests" << std::endl;
+
+    mvlt::Vault vlt;
+    vlt.SetKey("id", -1);
+
+    mvlt::VaultRecordRef vrr;
+
+    bool isSucces = true;
+    std::string dataString;
+
+    if (vrr.GetDataAsString("key", dataString))
+    {
+        testResFile << "Wrong key: $\\color{red}{Failed!}$\n\n";
+        isSucces = false;
+    }
+
+    if (vrr.GetDataAsString("id", dataString))
+    {
+        testResFile << "Empty ref returns true: $\\color{red}{Failed!}$\n\n";
+        isSucces = false;
+    }
+
+    vrr = vlt.CreateRecord();
+
+    if (vrr.GetDataAsString("key", dataString))
+    {
+        testResFile << "Wrong key: $\\color{red}{Failed!}$\n\n";
+        isSucces = false;
+    }
+
+    if (!vrr.GetDataAsString("id", dataString))
+    {
+        testResFile << "Correct key returns true: $\\color{red}{Failed!}$\n\n";
+        isSucces = false;
+    }
+
+    if (dataString != "-1")
+    {
+        testResFile << "Wrong value in ref: $\\color{red}{Failed!}$\n\n";
+        isSucces = false;
+    }
+
+    if (isSucces)
+        testResFile << "Checks: $\\color{green}{Success!}$\n\n";
+
+    testResFile << "### Asynchronous tests" << std::endl;
+
+    testResFile << "VaultRecordRef GetDataAsString while VaultRecordRef deleting in other thread: ";
+
+
+    for (int i = 0; i < 10000; ++i)
+    {
+        vrr = vlt.CreateRecord();
+
+        auto timeout = std::chrono::steady_clock::now() + std::chrono::microseconds(10);
+
+        std::thread th1([&]()
+        {
+            std::this_thread::sleep_until(timeout);
+            
+            vrr.GetDataAsString("id", dataString);
+        });
+
+        std::thread th2([&]()
+        {
+            std::this_thread::sleep_until(timeout);
+
+            vlt.EraseRecord(vrr);
+        });
+
+        th1.join();
+        th2.join();
+    }
+
+    testResFile << "$\\color{green}{Success!}$\n\n";
+
+
+    testResFile << "VaultRecordRef GetDataAsString while Vault deleting in other thread: ";
+
+    for (int i = 0; i < 10000; ++i)
+    {
+        mvlt::Vault* vltp = new mvlt::Vault;
+        vltp->SetKey("id", -1);
+    
+        vrr = vltp->CreateRecord();
+
+        auto timeout = std::chrono::steady_clock::now() + std::chrono::microseconds(100);
+
+        std::thread th3([&]()
+        {
+            std::this_thread::sleep_until(timeout);
+            vrr.GetDataAsString("id", dataString);
+        });
+
+        std::thread th4([&]()
+        {
+            std::this_thread::sleep_until(timeout);
+            delete vltp;
+        });
+
+        th3.join();
+        th4.join();
+    }
+
+    testResFile << "$\\color{green}{Success!}$\n\n";
+}
+
 int main()
 {
     std::cout << "Testing has started" << std::endl;
@@ -183,7 +294,8 @@ int main()
 
     OperatorAssignment(testResFile);
     OperatorComparison(testResFile);
-
+    GetDataAsString(testResFile);
+    
     testResFile.close();
     std::cout << "Testing is over" << std::endl;
 }

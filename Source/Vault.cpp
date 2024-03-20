@@ -330,8 +330,6 @@ namespace mvlt
 
     Vault::~Vault()
     {
-        RecursiveReadWriteMtx.WriteLock();
-        
         // Clear VaultHashMapStructure
         for (auto& it : VaultHashMapStructure)
             it.second.ResetData();
@@ -343,7 +341,5 @@ namespace mvlt
         // Clear all records
         for (auto& it : RecordsSet)
             it->Invalidate();
-
-        RecursiveReadWriteMtx.WriteUnlock();
     }
 }
