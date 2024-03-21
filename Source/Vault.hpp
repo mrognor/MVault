@@ -39,7 +39,7 @@ namespace mvlt
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongKey;
-            RecursiveReadWriteMtx.ReadUnlock();
+            RecursiveReadWriteMtx.WriteUnlock();
             return res;
         }
 
@@ -48,7 +48,7 @@ namespace mvlt
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongType;
-            RecursiveReadWriteMtx.ReadUnlock();
+            RecursiveReadWriteMtx.WriteUnlock();
             return res;
         }
 

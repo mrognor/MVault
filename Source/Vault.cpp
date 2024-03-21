@@ -330,6 +330,10 @@ namespace mvlt
 
     Vault::~Vault()
     {
+        // Clear all records
+        for (auto& it : RecordsSet)
+            it->Invalidate();
+
         // Clear VaultHashMapStructure
         for (auto& it : VaultHashMapStructure)
             it.second.ResetData();
@@ -337,9 +341,5 @@ namespace mvlt
         // Clear VaultMapStructure
         for (auto& it : VaultMapStructure)
             it.second.ResetData();
-
-        // Clear all records
-        for (auto& it : RecordsSet)
-            it->Invalidate();
     }
 }

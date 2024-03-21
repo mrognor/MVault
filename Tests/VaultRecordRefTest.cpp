@@ -302,11 +302,18 @@ void GetKeys(std::ofstream& testResFile)
     else
         testResFile << "Checks: $\\color{red}{Failed!}$\n\n";
 
+    testResFile << "### Asynchronous tests" << std::endl;
+
     testResFile << "VaultRecordRef GetKeys while Drop Vault in other thread: ";
 
     for (int i = 0; i < 10000; ++i)
     {
         std::vector<std::string> keys;
+
+        vlt.SetKey("a", -1);
+        vlt.SetKey<std::string>("b", "");
+        vlt.SetKey<std::string>("c", "");
+        vlt.SetKey("d", true);
 
         auto timeout = std::chrono::steady_clock::now() + std::chrono::microseconds(100);
 
@@ -358,6 +365,307 @@ void GetKeys(std::ofstream& testResFile)
     testResFile << "$\\color{green}{Success!}$\n\n";
 }
 
+void SetData(std::ofstream& testResFile)
+{
+    testResFile << "## VaultRecordRef::SetData" << std::endl;
+
+    testResFile << "### Synchronous tests" << std::endl;
+
+    mvlt::VaultRecordRef vrr;
+
+    mvlt::VaultOperationResult vor = vrr.SetData("Key", -1);
+
+    if (vor.ResultCode != mvlt::VaultOperationResultCode::DataRecordNotValid)
+       testResFile << "Wrong operation result code: $\\color{red}{Failed!}$\n\n";
+
+    mvlt::Vault vlt;
+
+    vlt.SetKey("id", -1);
+    
+    vrr = vlt.CreateRecord();
+    
+    bool isSuccess = true;
+
+    vor = vrr.SetData("WrongKey", -1);
+
+    if (vor.ResultCode != mvlt::VaultOperationResultCode::WrongKey)
+    {
+        testResFile << "SetData with wrong key: $\\color{red}{Failed!}$\n\n";
+        isSuccess = false;
+    }
+
+    vor = vrr.SetData<bool>("id", true);
+
+    if (vor.ResultCode != mvlt::VaultOperationResultCode::WrongType)
+    {
+        testResFile << "SetData with wrong key type: $\\color{red}{Failed!}$\n\n";
+        isSuccess = false;
+    }
+
+    vor = vrr.SetData("id", 1);
+
+    if (vor.ResultCode != mvlt::VaultOperationResultCode::Success)
+    {
+        testResFile << "CorrectOperation: $\\color{red}{Failed!}$\n\n";
+        isSuccess = false;
+    }
+
+    if(isSuccess)
+        testResFile << "Operations: $\\color{green}{Success!}$\n\n";
+
+    testResFile << "### Asynchronous tests" << std::endl;
+
+    testResFile << "VaultRecordRef SetData 5 threads: ";
+
+    mvlt::VaultRecordRef vrr2 = vrr, vrr3 = vrr;
+
+    for (int i = 0; i < 10000; ++i)
+    {
+        auto timeout = std::chrono::steady_clock::now() + std::chrono::microseconds(100);
+
+        std::thread th1([&]()
+        {
+            std::this_thread::sleep_until(timeout);
+            vrr.SetData("id", i);
+        });
+
+        std::thread th2([&]()
+        {
+            std::this_thread::sleep_until(timeout);
+            vrr.SetData("id", i);
+        });
+
+        std::thread th3([&]()
+        {
+            std::this_thread::sleep_until(timeout);
+            vrr.SetData("id", i);
+        });
+
+        std::thread th4([&]()
+        {
+            std::this_thread::sleep_until(timeout);
+            vrr2.SetData("id", i);
+        });
+
+        std::thread th5([&]()
+        {
+            std::this_thread::sleep_until(timeout);
+            vrr3.SetData("id", i);
+        });
+
+        th1.join();
+        th2.join();
+        th3.join();
+        th4.join();
+        th5.join();
+    }
+
+    vrr3.PrintRecord();
+    
+    testResFile << "$\\color{green}{Success!}$\n\n";
+    
+    testResFile << "Set and erase: ";
+
+    for (int i = 0; i < 10000; ++i)
+    {
+        vrr = vlt.CreateRecord();
+        
+        auto timeout = std::chrono::steady_clock::now() + std::chrono::microseconds(100);
+
+        std::thread th1([&]()
+        {
+            std::this_thread::sleep_until(timeout);
+            vrr.SetData("id", i);
+        });
+
+        std::thread th2([&]()
+        {
+            std::this_thread::sleep_until(timeout);
+            vlt.EraseRecord(vrr);
+        });
+
+        th1.join();
+        th2.join();
+    }
+
+    testResFile << "$\\color{green}{Success!}$\n\n";
+
+    testResFile << "Delete vlt: ";
+
+    for (int i = 0; i < 10000; ++i)
+    {
+        mvlt::Vault* vltp = new mvlt::Vault;
+        vltp->SetKey("id", -1);
+        vrr = vltp->CreateRecord();
+        
+        auto timeout = std::chrono::steady_clock::now() + std::chrono::microseconds(100);
+
+        std::thread th1([&]()
+        {
+            std::this_thread::sleep_until(timeout);
+            vrr.SetData("id", i);
+        });
+
+        std::thread th2([&]()
+        {
+            std::this_thread::sleep_until(timeout);
+            delete vltp;
+        });
+
+        th1.join();
+        th2.join();
+    }
+
+    testResFile << "$\\color{green}{Success!}$\n\n";
+}
+
+void GetData(std::ofstream& testResFile)
+{
+    testResFile << "## VaultRecordRef::GetData" << std::endl;
+
+    testResFile << "### Synchronous tests" << std::endl;
+
+    mvlt::VaultRecordRef vrr;
+
+    int i;
+    mvlt::VaultOperationResult vor = vrr.GetData("Key", i);
+
+    if (vor.ResultCode != mvlt::VaultOperationResultCode::DataRecordNotValid)
+       testResFile << "Wrong operation result code: $\\color{red}{Failed!}$\n\n";
+
+    mvlt::Vault vlt;
+
+    vlt.SetKey("id", -1);
+    
+    vrr = vlt.CreateRecord();
+    
+    bool isSuccess = true;
+
+    vor = vrr.GetData("WrongKey", i);
+
+    if (vor.ResultCode != mvlt::VaultOperationResultCode::WrongKey)
+    {
+        testResFile << "SetData with wrong key: $\\color{red}{Failed!}$\n\n";
+        isSuccess = false;
+    }
+
+    bool b;
+    vor = vrr.GetData<bool>("id", b);
+
+    if (vor.ResultCode != mvlt::VaultOperationResultCode::WrongType)
+    {
+        testResFile << "SetData with wrong key type: $\\color{red}{Failed!}$\n\n";
+        isSuccess = false;
+    }
+
+    vor = vrr.GetData("id", i);
+
+    if (vor.ResultCode != mvlt::VaultOperationResultCode::Success)
+    {
+        testResFile << "CorrectOperation: $\\color{red}{Failed!}$\n\n";
+        isSuccess = false;
+    }
+
+    if(isSuccess)
+        testResFile << "Operations: $\\color{green}{Success!}$\n\n";
+
+    testResFile << "### Asynchronous tests" << std::endl;
+
+    testResFile << "Set and get" << std::endl;
+
+    mvlt::VaultRecordRef vrr2 = vrr;
+
+    for (int j = 0; j < 10000; ++j)
+    {
+        auto timeout = std::chrono::steady_clock::now() + std::chrono::microseconds(100);
+
+        std::thread th1([&]()
+        {
+            std::this_thread::sleep_until(timeout);
+            vrr.GetData("id", i);
+        });
+
+        std::thread th2([&]()
+        {
+            std::this_thread::sleep_until(timeout);
+            vrr.GetData("id", i);
+        });
+
+        std::thread th3([&]()
+        {
+            std::this_thread::sleep_until(timeout);
+            vrr.SetData("id", j);
+        });
+
+        std::thread th4([&]()
+        {
+            std::this_thread::sleep_until(timeout);
+            vrr2.GetData("id", j);
+        });
+
+        th1.join();
+        th2.join();
+        th3.join();
+        th4.join();
+    }
+
+    testResFile << "$\\color{green}{Success!}$\n\n";
+
+    testResFile << "Get and erase: ";
+
+    for (int j = 0; j < 10000; ++j)
+    {
+        vrr = vlt.CreateRecord();
+        
+        auto timeout = std::chrono::steady_clock::now() + std::chrono::microseconds(100);
+
+        std::thread th1([&]()
+        {
+            std::this_thread::sleep_until(timeout);
+            vrr.GetData("id", i);
+        });
+
+        std::thread th2([&]()
+        {
+            std::this_thread::sleep_until(timeout);
+            vlt.EraseRecord(vrr);
+        });
+
+        th1.join();
+        th2.join();
+    }
+
+    testResFile << "$\\color{green}{Success!}$\n\n";
+
+    testResFile << "Delete vlt: ";
+
+    for (int j = 0; j < 10000; ++j)
+    {
+        mvlt::Vault* vltp = new mvlt::Vault;
+        vltp->SetKey("id", -1);
+        vrr = vltp->CreateRecord();
+        
+        auto timeout = std::chrono::steady_clock::now() + std::chrono::microseconds(100);
+
+        std::thread th1([&]()
+        {
+            std::this_thread::sleep_until(timeout);
+            vrr.GetData("id", i);
+        });
+
+        std::thread th2([&]()
+        {
+            std::this_thread::sleep_until(timeout);
+            delete vltp;
+        });
+
+        th1.join();
+        th2.join();
+    }
+
+    testResFile << "$\\color{green}{Success!}$\n\n";
+}
+
 int main()
 {
     std::cout << "Testing has started" << std::endl;
@@ -369,6 +677,8 @@ int main()
     OperatorComparison(testResFile);
     GetDataAsString(testResFile);
     GetKeys(testResFile);
+    SetData(testResFile);
+    GetData(testResFile);
 
     testResFile.close();
     std::cout << "Testing is over" << std::endl;
