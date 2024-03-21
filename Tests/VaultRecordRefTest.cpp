@@ -210,7 +210,7 @@ void GetDataAsString(std::ofstream& testResFile)
 
     if (!vrr.GetDataAsString("id", dataString))
     {
-        testResFile << "Correct key returns true: $\\color{red}{Failed!}$\n\n";
+        testResFile << "Correct key returns false: $\\color{red}{Failed!}$\n\n";
         isSucces = false;
     }
 
@@ -285,6 +285,79 @@ void GetDataAsString(std::ofstream& testResFile)
     testResFile << "$\\color{green}{Success!}$\n\n";
 }
 
+void GetKeys(std::ofstream& testResFile)
+{
+    testResFile << "## VaultRecordRef::GetKeys" << std::endl;
+
+    testResFile << "### Synchronous tests" << std::endl;
+
+    mvlt::Vault vlt;
+    vlt.SetKey("a", -1);
+    vlt.SetKey<std::string>("b", "");
+    vlt.SetKey<std::string>("c", "");
+    vlt.SetKey("d", true);
+
+    if (vlt.GetKeys() == std::vector<std::string>({"a", "b", "c", "d"}))
+        testResFile << "Checks: $\\color{green}{Success!}$\n\n";
+    else
+        testResFile << "Checks: $\\color{red}{Failed!}$\n\n";
+
+    testResFile << "VaultRecordRef GetKeys while Drop Vault in other thread: ";
+
+    for (int i = 0; i < 10000; ++i)
+    {
+        std::vector<std::string> keys;
+
+        auto timeout = std::chrono::steady_clock::now() + std::chrono::microseconds(100);
+
+        std::thread th1([&]()
+        {
+            std::this_thread::sleep_until(timeout);
+            keys = vlt.GetKeys();
+        });
+
+        std::thread th2([&]()
+        {
+            std::this_thread::sleep_until(timeout);
+            vlt.DropVault();
+        });
+
+        th1.join();
+        th2.join();
+    }
+
+    testResFile << "$\\color{green}{Success!}$\n\n";
+
+    testResFile << "VaultRecordRef GetKeys while Vault deleting in other thread: ";
+
+    for (int i = 0; i < 10000; ++i)
+    {
+        mvlt::Vault* vltp = new mvlt::Vault;
+        vltp->SetKey("id", -1);
+
+        std::vector<std::string> keys;
+
+        auto timeout = std::chrono::steady_clock::now() + std::chrono::microseconds(100);
+
+        std::thread th3([&]()
+        {
+            std::this_thread::sleep_until(timeout);
+            keys = vlt.GetKeys();
+        });
+
+        std::thread th4([&]()
+        {
+            std::this_thread::sleep_until(timeout);
+            delete vltp;
+        });
+
+        th3.join();
+        th4.join();
+    }
+
+    testResFile << "$\\color{green}{Success!}$\n\n";
+}
+
 int main()
 {
     std::cout << "Testing has started" << std::endl;
@@ -295,7 +368,8 @@ int main()
     OperatorAssignment(testResFile);
     OperatorComparison(testResFile);
     GetDataAsString(testResFile);
-    
+    GetKeys(testResFile);
+
     testResFile.close();
     std::cout << "Testing is over" << std::endl;
 }
