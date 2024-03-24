@@ -6,6 +6,7 @@
 #include "VaultRecord.h"
 #include "Vault.h"
 #include "VaultOperationResult.h"
+#include "VaultParamInput.h"
 
 namespace mvlt 
 {
@@ -100,12 +101,13 @@ namespace mvlt
             \brief Method for updating data inside Vault
 
             Using this method, you can change the values inside the VaultRecord inside the Vault.  
-            See Vault::CreateRecord(std::vector<std::pair<std::string, DataSaver>> params) for more information
+            See Vault::CreateRecord(std::vector<std::pair<std::string, VaultParamInput>>&& params) for more information
 
             \param [in] params a vector of pairs with data to be put in the Vault
-            \todo Исправить
+
+            \return If one of the parameters is incorrect, it returns an error when setting this parameter, and all subsequent parameters will not be set
         */
-        void SetData(const std::vector<std::pair<std::string, DataSaver>>& params);
+        VaultOperationResult SetData(const std::vector<std::pair<std::string, VaultParamInput>>& params);
 
         /**
             \brief A method for getting data using a key

@@ -4,12 +4,13 @@
 #include "VaultFunctions.h"
 #include "VaultOperationResult.h"
 #include "VaultRequestResult.h"
+#include "VaultParamInput.h"
 #include "DataContainer.h"
 #include "DataSaver.h"
 #include "ReadWriteMutex.h"
 #include "Functions/ToString.h"
 #include "Functions/PrintAsTable.h"
 
-
 #include "Vault.hpp"
 #include "VaultRecordRef.hpp"
+#include "VaultParamInput.hpp"

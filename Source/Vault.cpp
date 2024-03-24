@@ -85,13 +85,13 @@ namespace mvlt
         return res;
     }
 
-    VaultOperationResult Vault::CreateRecord(const std::vector<std::pair<std::string, DataSaver>>& params)
+    VaultOperationResult Vault::CreateRecord(const std::vector<std::pair<std::string, VaultParamInput>>& params)
     {
         VaultRecordRef tmp;
         return CreateRecord(tmp, params);
     }
 
-    VaultOperationResult Vault::CreateRecord(VaultRecordRef& vaultRecordRef, const std::vector<std::pair<std::string, DataSaver>>& params)
+    VaultOperationResult Vault::CreateRecord(VaultRecordRef& vaultRecordRef, const std::vector<std::pair<std::string, VaultParamInput>>& params)
     {
         VaultOperationResult res;
 
@@ -115,7 +115,7 @@ namespace mvlt
                 // Check if type in params match type in record template
                 if (ds.GetDataType() == it.second.GetDataType())
                 {
-                    newData->SetDataFromDataSaver(it.first, it.second);
+                    it.second.SetDataToRecord(it.first, newData);
 
                     // If key in record template and key tipy match type in param
                     res.IsOperationSuccess = true;

@@ -15,19 +15,22 @@ set(MVaultHeaders
     VaultRecordRef.h
     VaultFunctions.h
     VaultOperationResult.h
+    VaultParamInput.h
     DataContainer.h 
     DataSaver.h 
     ReadWriteMutex.h
     Functions/ToString.h
     Functions/PrintAsTable.h
     Vault.hpp
-    VaultRecordRef.hpp)
+    VaultRecordRef.hpp
+    VaultParamInput.hpp)
 
 set(MVaultSource
     Vault.cpp 
     VaultRecord.cpp
     VaultRecordRef.cpp
     VaultOperationResult.cpp
+    VaultParamInput.cpp
     DataSaver.cpp
     ReadWriteMutex.cpp
     VaultRequestResult.cpp

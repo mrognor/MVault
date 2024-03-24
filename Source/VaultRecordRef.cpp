@@ -114,15 +114,21 @@ namespace mvlt
         return ss.str();
     }
 
-    void VaultRecordRef::SetData(const std::vector<std::pair<std::string, DataSaver>>& params)
+    VaultOperationResult VaultRecordRef::SetData(const std::vector<std::pair<std::string, VaultParamInput>>& params)
     {
+        VaultOperationResult res;
         Mtx.lock();
-        /// \todo Это вообще не правильно
+
         // Copy data from function parametrs
         for (auto& it : params)
-            if (DataRecord->IsData(it.first))
-                DataRecord->SetDataFromDataSaver(it.first, it.second);
+        {
+            res = it.second.SetDataToRef(it.first, *this);
+            if (!res.IsOperationSuccess) break;
+        }
+
         Mtx.unlock();
+
+        return res;
     }
                 
     bool VaultRecordRef::GetDataAsString(const std::string& key, std::string& str) const

@@ -11,6 +11,7 @@
 #include "ReadWriteMutex.h"
 #include "VaultFunctions.h"
 #include "VaultOperationResult.h"
+#include "VaultParamInput.h"
 
 namespace mvlt
 {
@@ -211,7 +212,7 @@ namespace mvlt
 
             \code{.cpp}
                 // A record with id 0 and name mrognor will be created
-                std::vector<std::pair<std::string, DataSaver>> params = { {"id", 0}, {"name", std::string("mrognor")} };
+                std::vector<std::pair<std::string, VaultParamInput>> params = { {"id", 0}, {"name", std::string("mrognor")} };
                 VaultRecordRef vltrr = vlt.CreateRecord(params);
             \endcode
 
@@ -230,7 +231,7 @@ namespace mvlt
             
             \return VaultOperationResult object with GetData result
         */
-        VaultOperationResult CreateRecord(const std::vector<std::pair<std::string, DataSaver>>& params);
+        VaultOperationResult CreateRecord(const std::vector<std::pair<std::string, VaultParamInput>>& params);
 
         /**
             \overload
@@ -241,7 +242,7 @@ namespace mvlt
 
             \return VaultOperationResult object with GetData result
         */
-        VaultOperationResult CreateRecord(VaultRecordRef& vaultRecordRef, const std::vector<std::pair<std::string, DataSaver>>& params);
+        VaultOperationResult CreateRecord(VaultRecordRef& vaultRecordRef, const std::vector<std::pair<std::string, VaultParamInput>>& params);
 
         /**
             \brief The method for getting a reference to the data inside Vault

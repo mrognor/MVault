@@ -8,6 +8,8 @@ namespace mvlt
     class VaultRecord;
     class VaultRecordRef;
     class VaultRequestResult;
+    class VaultParamInput;
+    class VaultOperationResult;
     
     /**
         A simple typedef for HashMap. It is necessary for a more understandable separation of types.

@@ -2,6 +2,7 @@
 
 #include "Vault.h"
 #include "VaultRequestResult.h"
+#include "VaultParamInput.hpp"
 
 // This file contains an implementation of the Vault template methods
 namespace mvlt

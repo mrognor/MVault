@@ -1,6 +1,7 @@
 #pragma once
 
 #include "VaultRecordRef.h"
+#include "VaultParamInput.hpp"
 
 // This file contains an implementation of the VaultRecordRef template methods
 namespace mvlt 
