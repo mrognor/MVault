@@ -366,9 +366,10 @@ namespace mvlt
         void PrintVault(const std::size_t& amountOfRecords = -1) const;
         
         /// \brief A method for displaying the contents of a Vault as a table on the screen
+        /// \param [in] isPrintId will the unique IDs be printed in the table
         /// \param [in] amountOfRecords The number of records to be printed. The default value is -1, which means that all entries will be output
         /// \param [in] keys vector of keys to be printed. By default, the vector is empty, which means that all keys will be output
-        void PrintAsTable(const std::size_t& amountOfRecords = -1, const std::vector<std::string> keys = {}) const;
+        void PrintAsTable(bool isPrintId = false, const std::size_t& amountOfRecords = -1, const std::vector<std::string> keys = {}) const;
 
         /// \brief Default destructor
         ~Vault();

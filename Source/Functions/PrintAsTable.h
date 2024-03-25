@@ -52,6 +52,14 @@ namespace mvlt
     */
     std::string GetDataAsString(const VaultRecordRef& recordRef, const std::string& key);
 
+    std::string GetUniqueId(VaultRecord* record);
+
+    std::string GetUniqueId(const VaultRecord& record);
+
+    std::string GetUniqueId(VaultRecordRef* recordRef);
+
+    std::string GetUniqueId(const VaultRecordRef& recordRef);
+
     /**
         \brief A method for printing data as tables
 
@@ -60,11 +68,12 @@ namespace mvlt
         Not thread safety.
 
         \param [in] container the container with the data to be printed
+        \param [in] isPrintId will the unique IDs be printed in the table
         \param [in] amountOfRecords The number of records to be printed. The default value is -1, which means that all entries will be output
         \param [in] keys vector of keys to be printed. By default, the vector is empty, which means that all keys will be output
     */ 
     template <class T>
-    void PrintContainerAsTable(const T& container, const std::size_t& amountOfRecords = -1, const std::vector<std::string> keys = {})
+    void PrintContainerAsTable(const T& container, bool isPrintId = false, const std::size_t& amountOfRecords = -1, const std::vector<std::string> keys = {})
     {
         std::vector<std::size_t> maxLengths(keys.size());
 
@@ -126,8 +135,11 @@ namespace mvlt
                 for (std::size_t j = dataString.length(); j < maxLengths[i]; ++j) std::cout << " ";
                     std::cout << " |";
             }
-            std::cout << std::endl;
-            
+            if (isPrintId)
+                std::cout << " " << GetUniqueId(record) << std::endl;
+            else 
+                std::cout << std::endl;
+
             ++counter;
             if (counter == amountOfRecords) break;
         }
@@ -175,11 +187,12 @@ namespace mvlt
         If all VaultRecordRefs inside the container belong to the same Vault, then this method provides thread safety
 
         \param [in] containerWithRefs Container with VaulRecordRefs
+        \param [in] isPrintId will the unique IDs be printed in the table
         \param [in] amountOfRecords The number of records to be printed. The default value is -1, which means that all entries will be output
         \param [in] keys vector of keys to be printed. By default, the vector is empty, which means that all keys will be output
     */
     template <template <class E, class Alloc = std::allocator<E>> typename  T>
-    void PrintAsTable(const T<VaultRecordRef>& containerWithRefs, const std::size_t& amountOfRecords = -1, const std::vector<std::string> keys = {})
+    void PrintAsTable(const T<VaultRecordRef>& containerWithRefs, bool isPrintId = false, const std::size_t& amountOfRecords = -1, const std::vector<std::string> keys = {})
     {
         if (containerWithRefs.empty()) 
         {
@@ -190,9 +203,9 @@ namespace mvlt
 
         containerWithRefs.begin()->ReadLock();
         if (keys.empty())
-            PrintContainerAsTable(containerWithRefs, amountOfRecords, containerWithRefs.begin()->GetKeys());
+            PrintContainerAsTable(containerWithRefs, isPrintId, amountOfRecords, containerWithRefs.begin()->GetKeys());
         else
-            PrintContainerAsTable(containerWithRefs, amountOfRecords, keys);            
+            PrintContainerAsTable(containerWithRefs, isPrintId, amountOfRecords, keys);            
         containerWithRefs.begin()->ReadUnlock();        
     }
 

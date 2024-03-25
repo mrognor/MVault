@@ -12,13 +12,13 @@ int main()
     vlt.CreateRecord({ {"B", 1} });
 
     std::cout << "Origin vault: " << std::endl;
-    vlt.PrintVault();
+    vlt.PrintAsTable(true);
 
 
     mvlt::VaultRequestResult vrer;
     vlt.RequestRecords("A", 0, vrer);
     std::cout << "Requested vault: " << std::endl;
-    vrer.PrintVault();
+    vrer.PrintAsTable(true);
 
     std::cout << "Get record: " << std::endl;
 
@@ -30,10 +30,10 @@ int main()
     vaultRecordRef.SetData("A", 2);
 
     std::cout << "Origin vault: " << std::endl;
-    vlt.PrintVault();
+    vlt.PrintAsTable(true);
 
     std::cout << "Requested vault: " << std::endl;
-    vrer.PrintVault();
+    vrer.PrintAsTable(true);
 
     std::cout << "Get record from VaultRequestResult: " << std::endl;
 

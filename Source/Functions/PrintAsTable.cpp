@@ -59,4 +59,28 @@ namespace mvlt
         recordRef.GetDataAsString(key, res);
         return res;
     }
+
+    std::string GetUniqueId(VaultRecord* record)
+    {
+        std::stringstream ss;
+        ss << record;
+        return ss.str();
+    }
+
+    std::string GetUniqueId(const VaultRecord& record)
+    {
+        std::stringstream ss;
+        ss << &record;
+        return ss.str();
+    }
+
+    std::string GetUniqueId(VaultRecordRef* recordRef)
+    {
+        return recordRef->GetRecordUniqueId();
+    }
+
+    std::string GetUniqueId(const VaultRecordRef& recordRef)
+    {
+        return recordRef.GetRecordUniqueId();
+    }
 }

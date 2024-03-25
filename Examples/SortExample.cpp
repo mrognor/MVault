@@ -124,7 +124,7 @@ int main()
     std::cout << "The first 5 records without gender after sorting in descending order by name:" << std::endl;
     // startcode{.cpp}
     sorted = vlt.GetSortedRecords("name", true, 5);
-    mvlt::PrintAsTable(sorted, -1, {"id", "name"});
+    mvlt::PrintAsTable(sorted, false, -1, {"id", "name"});
     // endcode
 
     /**

@@ -310,7 +310,7 @@ namespace mvlt
         RecursiveReadWriteMtx.ReadUnlock();
     }
 
-    void Vault::PrintAsTable(const std::size_t& amountOfRecords, const std::vector<std::string> keys) const
+    void Vault::PrintAsTable(bool isPrintId,const std::size_t& amountOfRecords, const std::vector<std::string> keys) const
     {
         RecursiveReadWriteMtx.ReadLock();
         if (keys.empty())
@@ -321,10 +321,10 @@ namespace mvlt
                 std::cout << " (" << RecordsSet.size() << " records)" << std::endl;
             }
             else
-                PrintContainerAsTable(RecordsSet, amountOfRecords, GetKeys());
+                PrintContainerAsTable(RecordsSet, isPrintId, amountOfRecords, GetKeys());
         }
         else
-            PrintContainerAsTable(RecordsSet, amountOfRecords, keys);
+            PrintContainerAsTable(RecordsSet, isPrintId, amountOfRecords, keys);
         RecursiveReadWriteMtx.ReadUnlock();
     }
 
