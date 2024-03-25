@@ -330,6 +330,13 @@ namespace mvlt
 
     Vault::~Vault()
     {
+        for (auto& it : RequestsResultsSet)
+        {
+            it->RecursiveReadWriteMtx.WriteLock();
+            it->IsParenVaultValid = false;
+            it->RecursiveReadWriteMtx.WriteUnlock();
+        }
+
         // Clear all records
         for (auto& it : RecordsSet)
             it->Invalidate();

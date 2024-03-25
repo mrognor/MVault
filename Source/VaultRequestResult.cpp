@@ -13,6 +13,9 @@ namespace mvlt
     {
         if (&other != this)
         {
+            other.RecursiveReadWriteMtx.ReadLock();
+            RecursiveReadWriteMtx.WriteLock();
+
             ParentVault = other.ParentVault;
 
             for (auto& keyCopierIt : other.VaultKeyCopiers)
@@ -30,6 +33,9 @@ namespace mvlt
                 record->dependentVaultRequestResults.emplace(this);
                 record->Mtx.unlock();
             }
+
+            RecursiveReadWriteMtx.WriteUnlock();
+            other.RecursiveReadWriteMtx.ReadUnlock();
         }
         
         return *this;

@@ -372,7 +372,8 @@ namespace mvlt
 
         // Set new parent vault to vaultRequestResult
         vaultRequestResult.ParentVault = this;
-
+        vaultRequestResult.IsParenVaultValid = true;
+        
         // Copy keys from this to vaultRequestResult
         for (auto& keyCopierIt : VaultKeyCopiers)
             keyCopierIt.second(vaultRequestResult);

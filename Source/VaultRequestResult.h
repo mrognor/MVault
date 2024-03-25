@@ -13,8 +13,11 @@ namespace mvlt
     class VaultRequestResult : protected Vault
     {
     private:
+
         // Pointer to parent Vault
         Vault* ParentVault = nullptr;
+
+        bool IsParenVaultValid = false;
 
     public:
 
@@ -59,10 +62,28 @@ namespace mvlt
         template <class T>
         VaultOperationResult GetRecord(const std::string& key, const T& keyValue, VaultRecordRef& vaultRecordRef) const
         {
-            ParentVault->RecursiveReadWriteMtx.ReadLock();
-            VaultOperationResult res = Vault::GetRecord(key, keyValue, vaultRecordRef);
-            vaultRecordRef.Vlt = ParentVault;
-            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
+            VaultOperationResult res;
+            RecursiveReadWriteMtx.ReadLock();
+
+            if (IsParenVaultValid)
+            {
+                ParentVault->RecursiveReadWriteMtx.ReadLock();
+
+                res = Vault::GetRecord(key, keyValue, vaultRecordRef);
+                vaultRecordRef.Vlt = ParentVault;
+                
+                ParentVault->RecursiveReadWriteMtx.ReadUnlock();
+            }
+            else 
+            {
+                res.Key = key;
+                res.RequestedType = typeid(keyValue);
+                res.IsOperationSuccess = false;
+                res.ResultCode = VaultOperationResultCode::DataRecordNotValid;
+            }
+
+            RecursiveReadWriteMtx.ReadUnlock();
+            
             return res;
         }
 
