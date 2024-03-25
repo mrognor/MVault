@@ -86,6 +86,9 @@ namespace mvlt
         /// \brief Unordered set with all VaultRecord pointers
         std::unordered_set<VaultRecord*> RecordsSet;
 
+        /// \brief Unordered set with all VaultRequestResult pointers
+        std::unordered_set<VaultRequestResult*> RequestsResultsSet;
+
         /// \brief Recursive mutex for thread safety
         mutable RecursiveReadWriteMutex RecursiveReadWriteMtx;
 

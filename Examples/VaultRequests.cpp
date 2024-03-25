@@ -15,8 +15,9 @@ int main()
     vlt.PrintAsTable(true);
 
 
-    mvlt::VaultRequestResult vrer;
+    mvlt::VaultRequestResult vrer, vrer2;
     vlt.RequestRecords("A", 0, vrer);
+    vrer2 = vrer;
     std::cout << "Requested vault: " << std::endl;
     vrer.PrintAsTable(true);
 
@@ -34,6 +35,9 @@ int main()
 
     std::cout << "Requested vault: " << std::endl;
     vrer.PrintAsTable(true);
+
+    std::cout << "Copied vault: " << std::endl;
+    vrer2.PrintAsTable(true);
 
     std::cout << "Get record from VaultRequestResult: " << std::endl;
 

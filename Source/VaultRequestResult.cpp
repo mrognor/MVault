@@ -2,30 +2,37 @@
 
 namespace mvlt
 {
-    void VaultRequestResult::CopyKeysFromVault(Vault* vlt)
+    VaultRequestResult::VaultRequestResult() {}
+
+    VaultRequestResult::VaultRequestResult(const VaultRequestResult& other)
     {
-        ParentVault = vlt;
-
-        // Copy keys from vlt to this
-        for (auto& keyCopierIt : vlt->VaultKeyCopiers)
-            keyCopierIt.second(*this);
-
+        *this = other;
     }
 
-    void VaultRequestResult::AddRecord(VaultRecord* vaultRecord)
+    VaultRequestResult& VaultRequestResult::operator=(const VaultRequestResult& other)
     {
+        if (&other != this)
+        {
+            ParentVault = other.ParentVault;
 
-        // Add pointer to record from this to vaultRequestResult
-        RecordsSet.emplace(vaultRecord);
+            for (auto& keyCopierIt : other.VaultKeyCopiers)
+                keyCopierIt.second(*this);
+        
+            for (VaultRecord* record : other.RecordsSet)
+            {
+                RecordsSet.emplace(record);
                 
-        // Add pointer to record from this to vaultRequestResult structure
-        for (auto& adder : VaultRecordAdders)
-            adder.second(vaultRecord);
+                for (auto& adder : VaultRecordAdders)
+                    adder.second(record);
 
-        vaultRecord->Mtx.lock();
-        vaultRecord->dependentVaultRequestResults.emplace(this);
-        vaultRecord->Mtx.unlock();
-
+                // Lock VaultRecord to thread safety add new dependent VaultRequestResult
+                record->Mtx.lock();
+                record->dependentVaultRequestResults.emplace(this);
+                record->Mtx.unlock();
+            }
+        }
+        
+        return *this;
     }
 
     void VaultRequestResult::Clear()
@@ -52,6 +59,7 @@ namespace mvlt
         ParentVault->RecursiveReadWriteMtx.WriteLock();
 
         Clear();
+        ParentVault->RequestsResultsSet.erase(this);
 
         ParentVault->RecursiveReadWriteMtx.WriteUnlock();
         RecursiveReadWriteMtx.WriteUnlock();

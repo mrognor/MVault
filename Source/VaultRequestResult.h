@@ -16,11 +16,6 @@ namespace mvlt
         // Pointer to parent Vault
         Vault* ParentVault = nullptr;
 
-        /// \todo Docs
-        // потокобезопасность должна обеспечиваться отдельно
-        void CopyKeysFromVault(Vault* vlt);
-
-        void AddRecord(VaultRecord* vaultRecord);
     public:
 
         /// Make Vault class frien
@@ -29,9 +24,20 @@ namespace mvlt
         /// Provide access to Vaults PrintVault method
         using Vault::PrintVault;
         
+        /// Provide access to Vaults PrintAsTable method
         using Vault::PrintAsTable;
 
+        /// Provide access to Vaults Size method
         using Vault::Size;
+
+        /// \brief Default constructor
+        VaultRequestResult();
+
+        /// \brief Copy constructor
+        VaultRequestResult(const VaultRequestResult& other);
+
+        /// \brief Operator assignment
+        VaultRequestResult& operator=(const VaultRequestResult& other);
 
         /**
             \brief The method for getting a reference to the data inside Vault
