@@ -333,7 +333,7 @@ namespace mvlt
         for (auto& it : RequestsResultsSet)
         {
             it->RecursiveReadWriteMtx.WriteLock();
-            it->IsParenVaultValid = false;
+            it->IsParentVaultValid = false;
             it->RecursiveReadWriteMtx.WriteUnlock();
         }
 

@@ -48,4 +48,15 @@ int main()
     vlt.PrintAsTable(true);
     vrer.PrintAsTable(true);
     vrer2.PrintAsTable(true);
+
+    std::cout << "Add record to RequestResult" << std::endl;
+    vlt.GetRecord("A", 1, vaultRecordRef);
+    vrer2.AddRecord(vaultRecordRef);
+    vrer2.PrintAsTable(true);
+
+    std::cout << "Clear and reset" << std::endl;
+    vrer.Clear();
+    vrer.PrintAsTable();
+    vrer2.Reset();
+    vrer2.PrintAsTable();
 }

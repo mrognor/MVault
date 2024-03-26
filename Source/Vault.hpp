@@ -425,7 +425,7 @@ namespace mvlt
 
         // Set new parent vault to vaultRequestResult
         vaultRequestResult.ParentVault = const_cast<Vault*>(this);
-        vaultRequestResult.IsParenVaultValid = true;
+        vaultRequestResult.IsParentVaultValid = true;
         
         // Copy keys from this to vaultRequestResult
         for (auto& keyCopierIt : VaultKeyCopiers)
