@@ -39,15 +39,13 @@ int main()
     std::cout << "Copied vault: " << std::endl;
     vrer2.PrintAsTable(true);
 
-    std::cout << "Get record from VaultRequestResult: " << std::endl;
+    std::cout << "Subrequest" << std::endl;
+    vrer.RequestRecords("A", 2, vrer2);
+    vrer2.PrintAsTable(true);
 
-    vrer.GetRecord("A", 2, vaultRecordRef);
-    vaultRecordRef.PrintRecord();
-
-    std::cout << "Get record from Vault: " << std::endl;
-
-    vlt.GetRecord("A", 2, vaultRecordRef);
-    vaultRecordRef.PrintRecord();
-
-    std::cout << "Z" << std::endl;
+    vaultRecordRef.SetData("B", 3);
+    std::cout << "SetData in ref" << std::endl;
+    vlt.PrintAsTable(true);
+    vrer.PrintAsTable(true);
+    vrer2.PrintAsTable(true);
 }

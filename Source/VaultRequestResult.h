@@ -17,21 +17,13 @@ namespace mvlt
         // Pointer to parent Vault
         Vault* ParentVault = nullptr;
 
+        // Variable to store parent vault state
         bool IsParenVaultValid = false;
 
     public:
 
         /// Make Vault class frien
         friend Vault;
-
-        /// Provide access to Vaults PrintVault method
-        using Vault::PrintVault;
-        
-        /// Provide access to Vaults PrintAsTable method
-        using Vault::PrintAsTable;
-
-        /// Provide access to Vaults Size method
-        using Vault::Size;
 
         /// \brief Default constructor
         VaultRequestResult();
@@ -41,6 +33,67 @@ namespace mvlt
 
         /// \brief Operator assignment
         VaultRequestResult& operator=(const VaultRequestResult& other);
+        
+        /// \brief Method for checking the validity of the parent Vault
+        /// \return true if it is valid, otherwise false
+        bool GetIsParentVaultValid() const;
+
+        /**
+            \brief The method for getting a default key value
+
+            \param [in] key the name of the key to search for
+
+            \return returns false if the parent vault invalid or key was not found otherwise returns true
+        */
+        bool IsKeyExist(const std::string& key) const;
+
+        /**
+            \brief The method for getting a default key value
+
+            \tparam <T> Any type of data except for c arrays
+
+            \param [in] key the name of the key to search for
+            \param [in] defaultKeyValue the value of the key
+
+            \return returns false if the parent vault invalid or the key was not found otherwise returns true
+        */
+        template <class T>
+        VaultOperationResult GetKeyValue(const std::string& key, T& defaultKeyValue) const
+        {
+            VaultOperationResult res;
+            RecursiveReadWriteMtx.ReadLock();
+
+            // Thread safety because in Vault destructor blocking this RecursiveReadWriteMtx to write
+            if (IsParenVaultValid)
+            {
+                ParentVault->RecursiveReadWriteMtx.ReadLock();
+                res = Vault::GetKeyValue(key, defaultKeyValue);
+                ParentVault->RecursiveReadWriteMtx.ReadUnlock();
+            }
+            else 
+            {
+                res.Key = key;
+                res.RequestedType = typeid(defaultKeyValue);
+                res.IsOperationSuccess = false;
+                res.ResultCode = VaultOperationResultCode::ParentVaultNotValid;
+            }
+            RecursiveReadWriteMtx.ReadUnlock();
+            return res;
+        }
+
+        /**
+            \brief The method for getting a key type
+
+            \param [in] key the name of the key to search for
+            \param [in] keyType the ref to std::type_index
+
+            \return returns false if the parent vault invalid or the key was not found otherwise returns true
+        */
+        bool GetKeyType(const std::string& key, std::type_index& keyType) const;
+
+        // void AddRecordRef();
+
+        // void AddRecordsRefs();
 
         /**
             \brief The method for getting a reference to the data inside Vault
@@ -58,7 +111,6 @@ namespace mvlt
 
             \return VaultOperationResult object with GetRecord result
         */
-        /// \todo Потокобезопасноть
         template <class T>
         VaultOperationResult GetRecord(const std::string& key, const T& keyValue, VaultRecordRef& vaultRecordRef) const
         {
@@ -79,7 +131,7 @@ namespace mvlt
                 res.Key = key;
                 res.RequestedType = typeid(keyValue);
                 res.IsOperationSuccess = false;
-                res.ResultCode = VaultOperationResultCode::DataRecordNotValid;
+                res.ResultCode = VaultOperationResultCode::ParentVaultNotValid;
             }
 
             RecursiveReadWriteMtx.ReadUnlock();
@@ -87,22 +139,155 @@ namespace mvlt
             return res;
         }
 
-        // template <class T>
-        // VaultOperationResult GetRecords(const std::string& key, const T& keyValue, std::vector<VaultRecordRef>& recordsRefs, const std::size_t& amountOfRecords = -1) const;
+        /**
+            \brief The method for getting a vector of references to the data inside Vault
 
-        // /// \todo Handle errors
-        // template <class T>
-        // void RequestRecords(const std::string& key, const T& keyValue, VaultRequestResult& vaultRequestResult);
+            \tparam <T> Any type of data except for c arrays
 
+            \param [in] key the name of the key to search for
+            \param [in] keyValue the value of the key to be found
+            \param [in] recordsRefs A reference to std::vector<VaultRecordRef?, where information about the requested records will be recorded.
+            In case of errors, the vector will not change
+            \param [in] amountOfRecords The number of records requested
+            
+            \return VaultOperationResult object with GetRecords result
+        */
+        template <class T>
+        VaultOperationResult GetRecords(const std::string& key, const T& keyValue, std::vector<VaultRecordRef>& recordsRefs, const std::size_t& amountOfRecords = -1) const
+        {
+            VaultOperationResult res;
+            RecursiveReadWriteMtx.ReadLock();
+
+            if (IsParenVaultValid)
+            {
+                ParentVault->RecursiveReadWriteMtx.ReadLock();
+
+                res = Vault::GetRecords(key, keyValue, recordsRefs);
+                for (VaultRecordRef& ref: recordsRefs)
+                    ref.Vlt = ParentVault;
+                
+                ParentVault->RecursiveReadWriteMtx.ReadUnlock();
+            }
+            else 
+            {
+                res.Key = key;
+                res.RequestedType = typeid(keyValue);
+                res.IsOperationSuccess = false;
+                res.ResultCode = VaultOperationResultCode::ParentVaultNotValid;
+            }
+
+            RecursiveReadWriteMtx.ReadUnlock();
+            
+            return res;
+        }
+
+        /**
+            \brief The method for getting the result of the request
+
+            \tparam <T> Any type of data except for c arrays
+
+            \param [in] key the name of the key to search for
+            \param [in] keyValue the value of the key to be found
+            \param [in] vaultRequestResult A reference to VaultRequestResult
+            \param [in] amountOfRecords The number of records requested
+            
+            \return VaultOperationResult object with RequestRecords result
+        */
+        template <class T>
+        VaultOperationResult RequestRecords(const std::string& key, const T& keyValue, VaultRequestResult& vaultRequestResult) const
+        {
+            VaultOperationResult res;
+            RecursiveReadWriteMtx.ReadLock();
+
+            if (IsParenVaultValid)
+            {
+                ParentVault->RecursiveReadWriteMtx.ReadLock();
+
+                // \todo Replace to reset to clear keys 
+                vaultRequestResult.Clear();
+                res = Vault::RequestRecords(key, keyValue, vaultRequestResult);
+                vaultRequestResult.ParentVault = ParentVault;
+
+                ParentVault->RecursiveReadWriteMtx.ReadUnlock();
+            }
+            else 
+            {
+                res.Key = key;
+                res.RequestedType = typeid(keyValue);
+                res.IsOperationSuccess = false;
+                res.ResultCode = VaultOperationResultCode::ParentVaultNotValid;
+            }
+
+            RecursiveReadWriteMtx.ReadUnlock();
+            
+            return res;
+        }
+
+        // void Reset();
+
+        /// \brief Clear VaultRequestResult
+        /// Remove all references to records from the Vault Request Result, 
+        /// but the records themselves in the original Vault will not be changed
         void Clear();
 
         // void RemoveRecordRef();
 
         // void RemoveRecordRefs();
 
-        // void GetSortedRecords();
+        // void RemoveRecordRefs();
 
-        // void SortBy();
+        /// \brief Method for getting the number of records
+        /// \return number of records
+        // std::size_t Size() const;
+
+        /// \brief The method for getting all the keys
+        /// \return vector with keys
+        // std::vector<std::string> GetKeys() const;
+
+        /**
+            \brief Method for getting sorted records
+
+            \param [in] key The key by which the data should be sorted
+            \param [in] isReverse Sort in descending order or descending order. By default, ascending
+            \param [in] amountOfRecords The number of records. By default, everything is
+
+            If the key is missing in the vault, the result vector will be empty
+            \return A vector with links to records. The order of entries in the vector is determined by the amountOfRecords parameter
+        */
+        // std::vector<VaultRecordRef> GetSortedRecords(const std::string& key, const bool& isReverse = false, const std::size_t& amountOfRecords = -1) const;
+
+        /**
+            \brief Method for handle sorted records
+
+            \tparam <T> A function that takes const VaultRecordRef& as a parameter and returns bool.
+            
+            \param [in] key The key by which the data should be sorted
+            \param [in] func A function takes const VaultRecordRef& as a parameter. If you need the function to be called again for the next record, 
+            then this function call should return true. To stop the loop and interrupt the processing of sorted data, the function must return false. 
+            To get values from a function, use lambdas and context capture
+            \param [in] isReverse Sort in descending order or descending order. By default, ascending
+            \param [in] amountOfRecords The number of records. By default, everything is
+
+            The function iterate over all records sorted by the key parameter, in the order specified by the isReverse parameter. 
+            For each record, the function passed in the func parameter is called.
+            This function does not sort the data when it is called, the sorted data is already stored inside the Vault.
+            If the key is missing in the vault, the function will be called 0 times
+        */
+        // template<class F>
+        // void SortBy(const std::string& key, const F&& func, const bool& isReverse = false, const std::size_t& amountOfRecords = -1) const;
+
+        /// \brief A method for displaying the contents of a Vault on the screen
+        /// \param [in] amountOfRecords The number of records to be printed. The default value is -1, which means that all entries will be output
+        // void PrintVault(const std::size_t& amountOfRecords = -1) const;
+        
+        /**
+            \brief A method for displaying the contents of a Vault as a table on the screen
+            
+            \param [in] isPrintId will the unique IDs be printed in the table
+            \param [in] amountOfRecords The number of records to be printed. The default value is -1, which means that all entries will be output
+            \param [in] keys vector of keys to be printed. By default, the vector is empty, which means that all keys will be output
+        */
+        void PrintAsTable(bool isPrintId = false, const std::size_t& amountOfRecords = -1, const std::vector<std::string> keys = {}) const;
 
         /// \brief Destructor
         ~VaultRequestResult();

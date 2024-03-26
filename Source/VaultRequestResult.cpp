@@ -41,6 +41,50 @@ namespace mvlt
         return *this;
     }
 
+    bool VaultRequestResult::GetIsParentVaultValid() const
+    {
+        bool res;
+        RecursiveReadWriteMtx.ReadLock();
+        res = IsParenVaultValid;
+        RecursiveReadWriteMtx.ReadUnlock();
+        return res;
+    }
+
+    bool VaultRequestResult::IsKeyExist(const std::string& key) const
+    {
+        bool res = false;
+        RecursiveReadWriteMtx.ReadLock();
+
+        // Thread safety because in Vault destructor blocking this RecursiveReadWriteMtx to write
+        if (IsParenVaultValid)
+        {
+            ParentVault->RecursiveReadWriteMtx.ReadLock();
+            res = Vault::IsKeyExist(key);
+            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
+        }
+        
+        RecursiveReadWriteMtx.ReadUnlock();
+        return res;
+    }
+
+    bool VaultRequestResult::GetKeyType(const std::string& key, std::type_index& keyType) const
+    {
+        bool res = false;
+        RecursiveReadWriteMtx.ReadLock();
+
+        // Thread safety because in Vault destructor blocking this RecursiveReadWriteMtx to write
+        if (IsParenVaultValid)
+        {
+            ParentVault->RecursiveReadWriteMtx.ReadLock();
+            res = Vault::GetKeyType(key, keyType);
+            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
+        }
+        
+        RecursiveReadWriteMtx.ReadUnlock();
+        return res;
+    }
+
+
     void VaultRequestResult::Clear()
     {
         RecursiveReadWriteMtx.WriteLock();
@@ -57,6 +101,23 @@ namespace mvlt
         RecordsSet.clear();
 
         RecursiveReadWriteMtx.WriteUnlock();
+    }
+
+    void VaultRequestResult::PrintAsTable(bool isPrintId, const std::size_t& amountOfRecords, const std::vector<std::string> keys) const
+    {
+        RecursiveReadWriteMtx.ReadLock();
+
+        // Thread safety because in Vault destructor blocking this RecursiveReadWriteMtx to write
+        if (IsParenVaultValid)
+        {
+            ParentVault->RecursiveReadWriteMtx.ReadLock();
+            Vault::PrintAsTable(isPrintId, amountOfRecords, keys);
+            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
+        }
+        else 
+            std::cout << "The parent Vault is not valid!" << std::endl;
+        
+        RecursiveReadWriteMtx.ReadUnlock();
     }
 
     VaultRequestResult::~VaultRequestResult()
