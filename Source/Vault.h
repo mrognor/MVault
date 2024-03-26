@@ -164,7 +164,6 @@ namespace mvlt
         /**
             \brief The method for getting a key type
 
-
             \param [in] key the name of the key to search for
             \param [in] keyType the ref to std::type_index
 
@@ -280,9 +279,20 @@ namespace mvlt
         template <class T>
         VaultOperationResult GetRecords(const std::string& key, const T& keyValue, std::vector<VaultRecordRef>& recordsRefs, const std::size_t& amountOfRecords = -1) const;
 
-        /// \todo Handle errors
+        /**
+            \brief The method for getting the result of the request
+
+            \tparam <T> Any type of data except for c arrays
+
+            \param [in] key the name of the key to search for
+            \param [in] keyValue the value of the key to be found
+            \param [in] vaultRequestResult A reference to VaultRequestResult
+            \param [in] amountOfRecords The number of records requested
+            
+            \return VaultOperationResult object with RequestRecords result
+        */
         template <class T>
-        void RequestRecords(const std::string& key, const T& keyValue, VaultRequestResult& vaultRequestResult);
+        VaultOperationResult RequestRecords(const std::string& key, const T& keyValue, VaultRequestResult& vaultRequestResult, const std::size_t& amountOfRecords = -1) const;
 
         /// \brief A method for deleting all data and keys
         void DropVault();

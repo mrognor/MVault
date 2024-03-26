@@ -389,16 +389,42 @@ namespace mvlt
     }
 
     template <class T>
-    void Vault::RequestRecords(const std::string& key, const T& keyValue, VaultRequestResult& vaultRequestResult)
+    VaultOperationResult Vault::RequestRecords(const std::string& key, const T& keyValue, VaultRequestResult& vaultRequestResult, const std::size_t& amountOfRecords) const
     {
+        // Fill res info known at start
+        VaultOperationResult res;
+        res.Key = key;
+        res.RequestedType = typeid(T);
+        
         vaultRequestResult.RecursiveReadWriteMtx.WriteLock();
         RecursiveReadWriteMtx.ReadLock();
 
+        // If key not exist
+        if(!GetKeyType(key, res.SavedType))
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::WrongKey;
+            RecursiveReadWriteMtx.ReadUnlock();
+            vaultRequestResult.RecursiveReadWriteMtx.WriteUnlock();
+
+            return res;
+        }
+
+        // Check types
+        if (res.SavedType != res.RequestedType)
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::WrongType;
+            RecursiveReadWriteMtx.ReadUnlock();
+            vaultRequestResult.RecursiveReadWriteMtx.WriteUnlock();
+            return res;
+        }
+        
         // Save vaultRequestResult
-        RequestsResultsSet.emplace(&vaultRequestResult);
+        const_cast<std::unordered_set<VaultRequestResult*>*>(&RequestsResultsSet)->emplace(&vaultRequestResult);
 
         // Set new parent vault to vaultRequestResult
-        vaultRequestResult.ParentVault = this;
+        vaultRequestResult.ParentVault = const_cast<Vault*>(this);
         vaultRequestResult.IsParenVaultValid = true;
         
         // Copy keys from this to vaultRequestResult
@@ -408,13 +434,14 @@ namespace mvlt
         // Pointer to store map inside VaultStructureHashMap
         std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
 
-        // Checking whether such a key exists
+        // Get map
         VaultHashMapStructure.GetData(key, TtoVaultRecordHashMap);
         
         // Pair with begin and end iterator with T type and keyValue value
         auto equalRange = TtoVaultRecordHashMap->equal_range(keyValue);
         if (equalRange.first != TtoVaultRecordHashMap->end())
         {
+            std::size_t counter = 0;
             for (auto it = equalRange.first; it != equalRange.second; ++it)
             {
                 // Add pointer to record from this to vaultRequestResult
@@ -428,11 +455,20 @@ namespace mvlt
                 it->second->Mtx.lock();
                 it->second->dependentVaultRequestResults.emplace(&vaultRequestResult);
                 it->second->Mtx.unlock();
+
+                ++counter;
+                if (counter > amountOfRecords) break;
             }
         }
 
         RecursiveReadWriteMtx.ReadUnlock();
         vaultRequestResult.RecursiveReadWriteMtx.WriteUnlock();
+
+        res.ResultCode = VaultOperationResultCode::Success;
+        res.SavedType = res.RequestedType;
+        res.IsOperationSuccess = true;
+
+        return res;
     }
 
     template <class T>
