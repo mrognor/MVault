@@ -156,10 +156,10 @@ namespace mvlt
             \param [in] key the name of the key to search for
             \param [in] defaultKeyValue the value of the key
 
-            \return returns true if the key was found otherwise returns false
+            \return VaultOperationResult with operation result
         */
         template <class T>
-        bool GetKeyValue(const std::string& key, T& defaultKeyValue) const;
+        VaultOperationResult GetKeyValue(const std::string& key, T& defaultKeyValue) const;
 
         /**
             \brief The method for getting a key type

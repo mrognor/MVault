@@ -239,11 +239,38 @@ namespace mvlt
     }
 
     template <class T>
-    bool Vault::GetKeyValue(const std::string& key, T& defaultKeyValue) const
+    VaultOperationResult Vault::GetKeyValue(const std::string& key, T& defaultKeyValue) const
     {
-        bool res;
+        VaultOperationResult res;
+        res.Key = key;
+        res.RequestedType = typeid(T);
+
         RecursiveReadWriteMtx.ReadLock();
-        res = RecordTemplate.GetData(key, defaultKeyValue);
+
+        // If key not exist
+        if(!GetKeyType(key, res.SavedType))
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::WrongKey;
+            RecursiveReadWriteMtx.ReadUnlock();
+            return res;
+        }
+
+        // Check types
+        if (res.SavedType != res.RequestedType)
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::WrongType;
+            RecursiveReadWriteMtx.ReadUnlock();
+            return res;
+        }
+
+        RecordTemplate.GetData(key, defaultKeyValue);
+        
+        res.IsOperationSuccess = true;
+        res.ResultCode = VaultOperationResultCode::Success;
+        res.SavedType = res.RequestedType;
+
         RecursiveReadWriteMtx.ReadUnlock();
         return res;
     }
