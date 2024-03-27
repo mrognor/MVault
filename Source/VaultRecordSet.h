@@ -97,7 +97,7 @@ namespace mvlt
 
         /// \brief Method for adding a recordы to VaultRecordSet
         /// \param [in] recordRef A constant reference indicating a vector with refs
-        void AddRecordsRefs(const std::vector<VaultRecordRef> recordsRefs);
+        void AddRecords(const std::vector<VaultRecordRef> recordsRefs);
 
         /**
             \brief The method for getting a reference to the data inside Vault
@@ -235,11 +235,97 @@ namespace mvlt
         /// but the records themselves in the original Vault will not be changed
         void Clear();
 
-        // void RemoveRecordRef();
+        /**
+            \brief Method for remove a record from a Vault
 
-        // void RemoveRecordRefs();
+            The record itself will not be changed in any way
 
-        // void RemoveRecordRefs();
+            \param [in] recordRefToErase the reference to the record that needs to be removed
+
+            \return Returns true if the record existed and was successfully removed, otherwise it returns false
+        */
+        bool RemoveRecord(const VaultRecordRef& recordRefToErase);
+
+        /**
+            \brief Method for remove a record from a Vault
+
+            \tparam <T> Any type of data except for c arrays
+
+            The record itself will not be changed in any way
+
+            \param [in] key the name of the key to search for
+            \param [in] keyValue the value of the key to be found
+            
+            \return VaultOperationResult object with RemoveRecord result
+        */
+        template <class T>
+        VaultOperationResult RemoveRecord(const std::string& key, const T& keyValue)
+        {
+            VaultOperationResult res;
+            RecursiveReadWriteMtx.ReadLock();
+
+            if (IsParentVaultValid)
+            {
+                ParentVault->RecursiveReadWriteMtx.ReadLock();
+
+                res = Vault::RemoveRecord(false, key, keyValue);
+
+                ParentVault->RecursiveReadWriteMtx.ReadUnlock();
+            }
+            else 
+            {
+                res.Key = key;
+                res.RequestedType = typeid(keyValue);
+                res.IsOperationSuccess = false;
+                res.ResultCode = VaultOperationResultCode::ParentVaultNotValid;
+            }
+
+            RecursiveReadWriteMtx.ReadUnlock();
+            
+            return res;
+        }
+
+        /**
+            \brief The method for remove records using key and value
+
+            \tparam <T> Any type of data except for c arrays
+
+            The records itself will not be changed in any way
+
+            \param [in] key the name of the key to search for
+            \param [in] keyValue the value of the key to be found
+            \param [in] amountOfRecords The number of records to delete. By default set to minus one or all records.
+            
+            If the amountOfRecords is greater than the number of records stored inside the Vault, then all records with this key and value will be deleted.
+
+            \return VaultOperationResult object with RemoveRecords result
+        */
+        template <class T>
+        VaultOperationResult RemoveRecords(const std::string& key, const T& keyValue, const std::size_t& amountOfRecords = -1)
+        {
+            VaultOperationResult res;
+            RecursiveReadWriteMtx.ReadLock();
+
+            if (IsParentVaultValid)
+            {
+                ParentVault->RecursiveReadWriteMtx.ReadLock();
+
+                res = Vault::RemoveRecords(false, key, keyValue, amountOfRecords);
+
+                ParentVault->RecursiveReadWriteMtx.ReadUnlock();
+            }
+            else 
+            {
+                res.Key = key;
+                res.RequestedType = typeid(keyValue);
+                res.IsOperationSuccess = false;
+                res.ResultCode = VaultOperationResultCode::ParentVaultNotValid;
+            }
+
+            RecursiveReadWriteMtx.ReadUnlock();
+            
+            return res;
+        }
 
         /// \brief Method for getting the number of records
         /// If the parent Vault is not valid, it will return 0

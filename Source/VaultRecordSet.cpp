@@ -17,7 +17,8 @@ namespace mvlt
             RecursiveReadWriteMtx.WriteLock();
 
             ParentVault = other.ParentVault;
-
+            IsParentVaultValid = true;
+            
             for (auto& keyCopierIt : other.VaultKeyCopiers)
                 keyCopierIt.second(*this);
         
@@ -111,7 +112,7 @@ namespace mvlt
         RecursiveReadWriteMtx.WriteUnlock();
     }
 
-    void VaultRecordSet::AddRecordsRefs(const std::vector<VaultRecordRef> recordsRefs)
+    void VaultRecordSet::AddRecords(const std::vector<VaultRecordRef> recordsRefs)
     {
         RecursiveReadWriteMtx.WriteLock();
 
@@ -151,7 +152,7 @@ namespace mvlt
             Clear();
             Vault::DropVault();
 
-            ParentVault->RequestsResultsSet.erase(this);
+            ParentVault->RecordSetsSet.erase(this);
             ParentVault->RecursiveReadWriteMtx.WriteUnlock();
             ParentVault = nullptr;
             IsParentVaultValid = false;
@@ -180,6 +181,11 @@ namespace mvlt
         RecordsSet.clear();
 
         RecursiveReadWriteMtx.WriteUnlock();
+    }
+
+    bool VaultRecordSet::RemoveRecord(const VaultRecordRef& recordRefToErase)
+    {
+        return Vault::RemoveRecord(false, recordRefToErase);
     }
 
     std::size_t VaultRecordSet::Size() const

@@ -4,6 +4,32 @@
 
 namespace mvlt
 {
+    bool Vault::RemoveRecord(bool isDelete, const VaultRecordRef& recordRefToErase)
+    {
+        recordRefToErase.Mtx.lock();
+        RecursiveReadWriteMtx.WriteLock();
+
+        if (RecordsSet.find(recordRefToErase.DataRecord) == RecordsSet.end())
+        {
+            RecursiveReadWriteMtx.WriteUnlock();
+            recordRefToErase.Mtx.unlock();
+            return false;
+        }
+
+        // Get pointer to record from record ref
+        VaultRecord* tmpRec = recordRefToErase.DataRecord;
+        // Iterate over all VaultRecordErasers and call function to erase record from structure
+        for (auto& eraser : VaultRecordErasers)
+            eraser.second(tmpRec);
+
+        RecordsSet.erase(tmpRec);
+        if (isDelete) tmpRec->Invalidate();
+        
+        RecursiveReadWriteMtx.WriteUnlock();
+        recordRefToErase.Mtx.unlock();
+        return true;
+    }
+
     Vault::Vault() {}
 
     bool Vault::IsKeyExist(const std::string& key) const
@@ -213,30 +239,9 @@ namespace mvlt
         RecursiveReadWriteMtx.WriteUnlock();
     }
 
-    bool Vault::EraseRecord(VaultRecordRef& recordRefToErase)
+    bool Vault::EraseRecord(const VaultRecordRef& recordRefToErase)
     {
-        recordRefToErase.Mtx.lock();
-        RecursiveReadWriteMtx.WriteLock();
-
-        if (RecordsSet.find(recordRefToErase.DataRecord) == RecordsSet.end())
-        {
-            RecursiveReadWriteMtx.WriteUnlock();
-            recordRefToErase.Mtx.unlock();
-            return false;
-        }
-
-        // Get pointer to record from record ref
-        VaultRecord* tmpRec = recordRefToErase.DataRecord;
-        // Iterate over all VaultRecordErasers and call function to erase record from structure
-        for (auto& eraser : VaultRecordErasers)
-            eraser.second(tmpRec);
-
-        RecordsSet.erase(tmpRec);
-        tmpRec->Invalidate();
-        
-        RecursiveReadWriteMtx.WriteUnlock();
-        recordRefToErase.Mtx.unlock();
-        return true;
+        return RemoveRecord(true, recordRefToErase);
     }
 
     std::size_t Vault::Size() const
@@ -330,7 +335,7 @@ namespace mvlt
 
     Vault::~Vault()
     {
-        for (auto& it : RequestsResultsSet)
+        for (auto& it : RecordSetsSet)
         {
             it->RecursiveReadWriteMtx.WriteLock();
             it->IsParentVaultValid = false;

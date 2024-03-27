@@ -87,7 +87,7 @@ namespace mvlt
         std::unordered_set<VaultRecord*> RecordsSet;
 
         /// \brief Unordered set with all VaultRecordSet pointers
-        std::unordered_set<VaultRecordSet*> RequestsResultsSet;
+        std::unordered_set<VaultRecordSet*> RecordSetsSet;
 
         /// \brief Recursive mutex for thread safety
         mutable RecursiveReadWriteMutex RecursiveReadWriteMtx;
@@ -109,6 +109,49 @@ namespace mvlt
         template <class T>
         VaultOperationResult SetDataToRecord(VaultRecord* dataRecord, const std::string& key, const T& data, bool isCalledFromVault = true);
         
+        /**
+            \brief Method for removing a record from a Vault
+
+            This method allows you to remove a record with or without deletion
+
+            \param [in] recordRefToErase the reference to the record that needs to be deleted
+            \return Returns true if the record existed and was successfully deleted, otherwise it returns false
+        */
+        bool RemoveRecord(bool isDelete, const VaultRecordRef& recordRefToErase);
+
+        /**
+            \brief Method for removing a record
+
+            \tparam <T> Any type of data except for c arrays
+
+            This method allows you to remove a record with or without deletion
+
+            \param [in] key the name of the key to search for
+            \param [in] keyValue the value of the key to be found
+            
+            \return VaultOperationResult object with GetRecords result
+        */
+        template <class T>
+        VaultOperationResult RemoveRecord(bool isDelete, const std::string& key, const T& keyValue);
+
+        /**
+            \brief Method for removing a records
+
+            \tparam <T> Any type of data except for c arrays
+
+            This method allows you to remove a records with or without deletion
+
+            \param [in] key the name of the key to search for
+            \param [in] keyValue the value of the key to be found
+            \param [in] amountOfRecords The number of records to delete. By default set to minus one or all records.
+            
+            If the amountOfRecords is greater than the number of records stored inside the Vault, then all records with this key and value will be deleted.
+
+            \return VaultOperationResult object with GetRecords result
+        */
+        template <class T>
+        VaultOperationResult RemoveRecords(bool isDelete, const std::string& key, const T& keyValue, const std::size_t& amountOfRecords = -1);
+
     public:
 
         /// Making the VaultRecordRef class friendly so that it has access to the internal members of the Vault class
@@ -303,7 +346,7 @@ namespace mvlt
         /// \brief Method for deleting a record from a Vault
         /// \param [in] recordRefToErase the reference to the record that needs to be deleted
         /// \return Returns true if the record existed and was successfully deleted, otherwise it returns false
-        bool EraseRecord(VaultRecordRef& recordRefToErase);
+        bool EraseRecord(const VaultRecordRef& recordRefToErase);
 
         /**
             \brief The method for erase record using key and value
@@ -313,7 +356,7 @@ namespace mvlt
             \param [in] key the name of the key to search for
             \param [in] keyValue the value of the key to be found
             
-            \return VaultOperationResult object with GetRecords result
+            \return VaultOperationResult object with EraseRecord result
         */
         template <class T>
         VaultOperationResult EraseRecord(const std::string& key, const T& keyValue);
@@ -329,7 +372,7 @@ namespace mvlt
             
             If the amountOfRecords is greater than the number of records stored inside the Vault, then all records with this key and value will be deleted.
 
-            \return VaultOperationResult object with GetRecords result
+            \return VaultOperationResult object with EraseRecords result
         */
         template <class T>
         VaultOperationResult EraseRecords(const std::string& key, const T& keyValue, const std::size_t& amountOfRecords = -1);
