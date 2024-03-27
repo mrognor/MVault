@@ -78,16 +78,16 @@ namespace mvlt
         // isReverse parameter is used for the reverse order.
         std::unordered_map<std::string, std::function<void( std::function<bool(const VaultRecordRef&)> functionToSortedData, bool isReverse )>> VaultRecordSorters;
 
-        // Unordered_map of functions that copy keys from this to VaultltRequestResult
-        std::unordered_map<std::string, std::function<void(VaultRequestResult& vaultRequestResult)>> VaultKeyCopiers;
+        // Unordered_map of functions that copy keys from this to VaultRecordSet
+        std::unordered_map<std::string, std::function<void(VaultRecordSet& vaultRecordSet)>> VaultKeyCopiers;
 
     protected:
 
         /// \brief Unordered set with all VaultRecord pointers
         std::unordered_set<VaultRecord*> RecordsSet;
 
-        /// \brief Unordered set with all VaultRequestResult pointers
-        std::unordered_set<VaultRequestResult*> RequestsResultsSet;
+        /// \brief Unordered set with all VaultRecordSet pointers
+        std::unordered_set<VaultRecordSet*> RequestsResultsSet;
 
         /// \brief Recursive mutex for thread safety
         mutable RecursiveReadWriteMutex RecursiveReadWriteMtx;
@@ -101,8 +101,8 @@ namespace mvlt
             \param [in] key key to set data
             \param [in] data new data
             \param [in] isCalledFromVault The parameter responsible for where this method was called from. This method can be called from the following classes:
-            1. Vault. In this case, the method will change the structure of the Vault, change the DataRecord, and call itself for all VaultRequestResult dependent on the DataRecord
-            2. VaultRequestResult. In this case, the method will only change the structure of this with the VaultRequestResult type
+            1. Vault. In this case, the method will change the structure of the Vault, change the DataRecord, and call itself for all VaultRecordSet dependent on the DataRecord
+            2. VaultRecordSet. In this case, the method will only change the structure of this with the VaultRecordSet type
 
             \return VaultOperationResult object with GetData result.
         */
@@ -114,8 +114,8 @@ namespace mvlt
         /// Making the VaultRecordRef class friendly so that it has access to the internal members of the Vault class
         friend VaultRecordRef;
 
-        /// Making the VaultRequestResult class friendly so that it has access to the internal members of the Vault class
-        friend VaultRequestResult;
+        /// Making the VaultRecordSet class friendly so that it has access to the internal members of the Vault class
+        friend VaultRecordSet;
         
         /// \brief Default constructor
         Vault();
@@ -286,13 +286,13 @@ namespace mvlt
 
             \param [in] key the name of the key to search for
             \param [in] keyValue the value of the key to be found
-            \param [in] vaultRequestResult A reference to VaultRequestResult
+            \param [in] vaultRecordRef A reference to VaultRecordSet
             \param [in] amountOfRecords The number of records requested
             
             \return VaultOperationResult object with RequestRecords result
         */
         template <class T>
-        VaultOperationResult RequestRecords(const std::string& key, const T& keyValue, VaultRequestResult& vaultRequestResult, const std::size_t& amountOfRecords = -1) const;
+        VaultOperationResult RequestRecords(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordRef, const std::size_t& amountOfRecords = -1) const;
 
         /// \brief A method for deleting all data and keys
         void DropVault();

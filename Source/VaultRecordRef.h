@@ -46,8 +46,8 @@ namespace mvlt
         /// Making the Vault class friendly so that it has access to the internal members of the VaultRecordRef class
         friend Vault;
 
-        /// Making the VaultRequestResult class friendly so that it has access to the internal members of the VaultRecordRef class
-        friend VaultRequestResult;
+        /// Making the VaultRecordSet class friendly so that it has access to the internal members of the VaultRecordRef class
+        friend VaultRecordSet;
 
         /// Making the std::hash<VaultRecordRef> struct friendly so that it has access to the internal members of the VaultRecordRef class
         friend std::hash<VaultRecordRef>;

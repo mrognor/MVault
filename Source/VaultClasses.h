@@ -7,7 +7,7 @@ namespace mvlt
     class Vault;
     class VaultRecord;
     class VaultRecordRef;
-    class VaultRequestResult;
+    class VaultRecordSet;
     class VaultParamInput;
     class VaultOperationResult;
     

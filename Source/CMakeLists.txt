@@ -15,6 +15,7 @@ set(MVaultHeaders
     VaultRecordRef.h
     VaultFunctions.h
     VaultOperationResult.h
+    VaultRecordSet.h
     VaultParamInput.h
     DataContainer.h 
     DataSaver.h 
@@ -33,7 +34,7 @@ set(MVaultSource
     VaultParamInput.cpp
     DataSaver.cpp
     ReadWriteMutex.cpp
-    VaultRequestResult.cpp
+    VaultRecordSet.cpp
     Functions/PrintAsTable.cpp)
 
 project(MVault)

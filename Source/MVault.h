@@ -3,7 +3,7 @@
 #include "VaultRecordRef.h"
 #include "VaultFunctions.h"
 #include "VaultOperationResult.h"
-#include "VaultRequestResult.h"
+#include "VaultRecordSet.h"
 #include "VaultParamInput.h"
 #include "DataContainer.h"
 #include "DataSaver.h"

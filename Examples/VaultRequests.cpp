@@ -15,7 +15,7 @@ int main()
     vlt.PrintAsTable(true);
 
 
-    mvlt::VaultRequestResult vrer, vrer2;
+    mvlt::VaultRecordSet vrer, vrer2;
     vlt.RequestRecords("A", 0, vrer);
     vrer2 = vrer;
     std::cout << "Requested vault: " << std::endl;
@@ -49,7 +49,7 @@ int main()
     vrer.PrintAsTable(true);
     vrer2.PrintAsTable(true);
 
-    std::cout << "Add record to RequestResult" << std::endl;
+    std::cout << "Add record to RecordSet" << std::endl;
     vlt.GetRecord("A", 1, vaultRecordRef);
     vrer2.AddRecord(vaultRecordRef);
     vrer2.PrintAsTable(true);

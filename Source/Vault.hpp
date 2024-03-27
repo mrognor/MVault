@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Vault.h"
-#include "VaultRequestResult.h"
+#include "VaultRecordSet.h"
 #include "VaultParamInput.hpp"
 
 // This file contains an implementation of the Vault template methods
@@ -101,15 +101,15 @@ namespace mvlt
 
 
         // Check if this method was original called. That mean that this method called not from next if statement.
-        // It is required since VaultRequestResult child of Vault and may also call this method
+        // It is required since VaultRecordSet child of Vault and may also call this method
         if (isCalledFromVault)
         {
             // Update data inside VaultRecord pointer inside VaultRecordRef and Vault
             dataRecord->SetData(key, data);
         
-            // Update all dependent VaulRequestResults structures
-            for (VaultRequestResult* vaultRequestResult : dataRecord->dependentVaultRequestResults)
-                vaultRequestResult->SetDataToRecord(dataRecord, key, data, false);
+            // Update all dependent VaultRecordSets structures
+            for (VaultRecordSet* vaultRecordSet : dataRecord->dependentVaultRecordSets)
+                vaultRecordSet->SetDataToRecord(dataRecord, key, data, false);
         }
 
         res.IsOperationSuccess = true;
@@ -221,9 +221,9 @@ namespace mvlt
             }
         });
         
-        VaultKeyCopiers.emplace(key, [=](VaultRequestResult& vaultRequestResult)
+        VaultKeyCopiers.emplace(key, [=](VaultRecordSet& vaultRecordSet)
         {
-            vaultRequestResult.SetKey(key, defaultKeyValue);
+            vaultRecordSet.SetKey(key, defaultKeyValue);
         });  
 
 
@@ -389,14 +389,14 @@ namespace mvlt
     }
 
     template <class T>
-    VaultOperationResult Vault::RequestRecords(const std::string& key, const T& keyValue, VaultRequestResult& vaultRequestResult, const std::size_t& amountOfRecords) const
+    VaultOperationResult Vault::RequestRecords(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
     {
         // Fill res info known at start
         VaultOperationResult res;
         res.Key = key;
         res.RequestedType = typeid(T);
         
-        vaultRequestResult.RecursiveReadWriteMtx.WriteLock();
+        vaultRecordSet.RecursiveReadWriteMtx.WriteLock();
         RecursiveReadWriteMtx.ReadLock();
 
         // If key not exist
@@ -405,7 +405,7 @@ namespace mvlt
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongKey;
             RecursiveReadWriteMtx.ReadUnlock();
-            vaultRequestResult.RecursiveReadWriteMtx.WriteUnlock();
+            vaultRecordSet.RecursiveReadWriteMtx.WriteUnlock();
 
             return res;
         }
@@ -416,20 +416,20 @@ namespace mvlt
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongType;
             RecursiveReadWriteMtx.ReadUnlock();
-            vaultRequestResult.RecursiveReadWriteMtx.WriteUnlock();
+            vaultRecordSet.RecursiveReadWriteMtx.WriteUnlock();
             return res;
         }
         
-        // Save vaultRequestResult
-        const_cast<std::unordered_set<VaultRequestResult*>*>(&RequestsResultsSet)->emplace(&vaultRequestResult);
+        // Save vaultRecordSet
+        const_cast<std::unordered_set<VaultRecordSet*>*>(&RequestsResultsSet)->emplace(&vaultRecordSet);
 
-        // Set new parent vault to vaultRequestResult
-        vaultRequestResult.ParentVault = const_cast<Vault*>(this);
-        vaultRequestResult.IsParentVaultValid = true;
+        // Set new parent vault to vaultRecordSet
+        vaultRecordSet.ParentVault = const_cast<Vault*>(this);
+        vaultRecordSet.IsParentVaultValid = true;
         
-        // Copy keys from this to vaultRequestResult
+        // Copy keys from this to vaultRecordSet
         for (auto& keyCopierIt : VaultKeyCopiers)
-            keyCopierIt.second(vaultRequestResult);
+            keyCopierIt.second(vaultRecordSet);
         
         // Pointer to store map inside VaultStructureHashMap
         std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
@@ -444,16 +444,16 @@ namespace mvlt
             std::size_t counter = 0;
             for (auto it = equalRange.first; it != equalRange.second; ++it)
             {
-                // Add pointer to record from this to vaultRequestResult
-                vaultRequestResult.RecordsSet.emplace(it->second);
+                // Add pointer to record from this to vaultRecordSet
+                vaultRecordSet.RecordsSet.emplace(it->second);
                 
-                // Add pointer to record from this to vaultRequestResult structure
-                for (auto& adder : vaultRequestResult.VaultRecordAdders)
+                // Add pointer to record from this to vaultRecordSet structure
+                for (auto& adder : vaultRecordSet.VaultRecordAdders)
                     adder.second(it->second);
 
-                // Lock VaultRecord to thread safety add new dependent VaultRequestResult
+                // Lock VaultRecord to thread safety add new dependent VaultRecordSet
                 it->second->Mtx.lock();
-                it->second->dependentVaultRequestResults.emplace(&vaultRequestResult);
+                it->second->dependentVaultRecordSets.emplace(&vaultRecordSet);
                 it->second->Mtx.unlock();
 
                 ++counter;
@@ -462,7 +462,7 @@ namespace mvlt
         }
 
         RecursiveReadWriteMtx.ReadUnlock();
-        vaultRequestResult.RecursiveReadWriteMtx.WriteUnlock();
+        vaultRecordSet.RecursiveReadWriteMtx.WriteUnlock();
 
         res.ResultCode = VaultOperationResultCode::Success;
         res.SavedType = res.RequestedType;

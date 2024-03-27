@@ -1,15 +1,15 @@
-#include "VaultRequestResult.h"
+#include "VaultRecordSet.h"
 
 namespace mvlt
 {
-    VaultRequestResult::VaultRequestResult() {}
+    VaultRecordSet::VaultRecordSet() {}
 
-    VaultRequestResult::VaultRequestResult(const VaultRequestResult& other)
+    VaultRecordSet::VaultRecordSet(const VaultRecordSet& other)
     {
         *this = other;
     }
 
-    VaultRequestResult& VaultRequestResult::operator=(const VaultRequestResult& other)
+    VaultRecordSet& VaultRecordSet::operator=(const VaultRecordSet& other)
     {
         if (&other != this)
         {
@@ -28,9 +28,9 @@ namespace mvlt
                 for (auto& adder : VaultRecordAdders)
                     adder.second(record);
 
-                // Lock VaultRecord to thread safety add new dependent VaultRequestResult
+                // Lock VaultRecord to thread safety add new dependent VaultRecordSet
                 record->Mtx.lock();
-                record->dependentVaultRequestResults.emplace(this);
+                record->dependentVaultRecordSets.emplace(this);
                 record->Mtx.unlock();
             }
 
@@ -41,7 +41,7 @@ namespace mvlt
         return *this;
     }
 
-    bool VaultRequestResult::GetIsParentVaultValid() const
+    bool VaultRecordSet::GetIsParentVaultValid() const
     {
         bool res;
         RecursiveReadWriteMtx.ReadLock();
@@ -50,7 +50,7 @@ namespace mvlt
         return res;
     }
 
-    bool VaultRequestResult::IsKeyExist(const std::string& key) const
+    bool VaultRecordSet::IsKeyExist(const std::string& key) const
     {
         bool res = false;
         RecursiveReadWriteMtx.ReadLock();
@@ -67,7 +67,7 @@ namespace mvlt
         return res;
     }
 
-    bool VaultRequestResult::GetKeyType(const std::string& key, std::type_index& keyType) const
+    bool VaultRecordSet::GetKeyType(const std::string& key, std::type_index& keyType) const
     {
         bool res = false;
         RecursiveReadWriteMtx.ReadLock();
@@ -84,7 +84,7 @@ namespace mvlt
         return res;
     }
 
-    void VaultRequestResult::AddRecord(const VaultRecordRef& recordRef)
+    void VaultRecordSet::AddRecord(const VaultRecordRef& recordRef)
     {
         RecursiveReadWriteMtx.WriteLock();
 
@@ -96,13 +96,13 @@ namespace mvlt
             // Add pointer to record from recordRef to this
             RecordsSet.emplace(recordRef.DataRecord);
                 
-            // Add pointer to record from recordRef to this::vaultRequestResult structure
+            // Add pointer to record from recordRef to this::vaultRecordRef structure
             for (auto& adder : VaultRecordAdders)
                 adder.second(recordRef.DataRecord);
 
-            // Lock VaultRecord to thread safety add new dependent VaultRequestResult
+            // Lock VaultRecord to thread safety add new dependent VaultRecordSet
             recordRef.DataRecord->Mtx.lock();
-            recordRef.DataRecord->dependentVaultRequestResults.emplace(this);
+            recordRef.DataRecord->dependentVaultRecordSets.emplace(this);
             recordRef.DataRecord->Mtx.unlock();
 
             ParentVault->RecursiveReadWriteMtx.ReadUnlock();    
@@ -111,7 +111,7 @@ namespace mvlt
         RecursiveReadWriteMtx.WriteUnlock();
     }
 
-    void VaultRequestResult::AddRecordsRefs(const std::vector<VaultRecordRef> recordsRefs)
+    void VaultRecordSet::AddRecordsRefs(const std::vector<VaultRecordRef> recordsRefs)
     {
         RecursiveReadWriteMtx.WriteLock();
 
@@ -125,13 +125,13 @@ namespace mvlt
                 // Add pointer to record from recordRef to this
                 RecordsSet.emplace(recordRef.DataRecord);
                     
-                // Add pointer to record from recordRef to this::vaultRequestResult structure
+                // Add pointer to record from recordRef to this::vaultRecordRef structure
                 for (auto& adder : VaultRecordAdders)
                     adder.second(recordRef.DataRecord);
 
-                // Lock VaultRecord to thread safety add new dependent VaultRequestResult
+                // Lock VaultRecord to thread safety add new dependent VaultRecordSet
                 recordRef.DataRecord->Mtx.lock();
-                recordRef.DataRecord->dependentVaultRequestResults.emplace(this);
+                recordRef.DataRecord->dependentVaultRecordSets.emplace(this);
                 recordRef.DataRecord->Mtx.unlock();
             }
 
@@ -141,7 +141,7 @@ namespace mvlt
         RecursiveReadWriteMtx.WriteUnlock();
     }
 
-    void VaultRequestResult::Reset()
+    void VaultRecordSet::Reset()
     {
         RecursiveReadWriteMtx.WriteLock();
 
@@ -160,7 +160,7 @@ namespace mvlt
         RecursiveReadWriteMtx.WriteUnlock();
     }
 
-    void VaultRequestResult::Clear()
+    void VaultRecordSet::Clear()
     {
         RecursiveReadWriteMtx.WriteLock();
 
@@ -168,7 +168,7 @@ namespace mvlt
         for (VaultRecord* record : RecordsSet)
         {
             record->Mtx.lock();
-            record->dependentVaultRequestResults.erase(this);
+            record->dependentVaultRecordSets.erase(this);
             record->Mtx.unlock();
         }
 
@@ -176,13 +176,13 @@ namespace mvlt
         for (auto& it : VaultRecordClearers)
             it.second();
 
-        // No need to delete each record because it is RequestResult and records will be delete in original vault
+        // No need to delete each record because it is RecordSet and records will be delete in original vault
         RecordsSet.clear();
 
         RecursiveReadWriteMtx.WriteUnlock();
     }
 
-    std::size_t VaultRequestResult::Size() const
+    std::size_t VaultRecordSet::Size() const
     {
         std::size_t res = 0;
         RecursiveReadWriteMtx.ReadLock();
@@ -199,7 +199,7 @@ namespace mvlt
         return res;
     }
 
-    std::vector<std::string> VaultRequestResult::GetKeys() const
+    std::vector<std::string> VaultRecordSet::GetKeys() const
     {
         std::vector<std::string> res;
         RecursiveReadWriteMtx.ReadLock();
@@ -216,7 +216,7 @@ namespace mvlt
         return res;
     }
 
-    std::vector<VaultRecordRef> VaultRequestResult::GetSortedRecords(const std::string& key, const bool& isReverse, const std::size_t& amountOfRecords) const
+    std::vector<VaultRecordRef> VaultRecordSet::GetSortedRecords(const std::string& key, const bool& isReverse, const std::size_t& amountOfRecords) const
     {
         std::vector<VaultRecordRef> res;
         RecursiveReadWriteMtx.ReadLock();
@@ -233,7 +233,7 @@ namespace mvlt
         return res;
     }
 
-    void VaultRequestResult::PrintVault(const std::size_t& amountOfRecords) const
+    void VaultRecordSet::PrintVault(const std::size_t& amountOfRecords) const
     {
         RecursiveReadWriteMtx.ReadLock();
 
@@ -250,7 +250,7 @@ namespace mvlt
         RecursiveReadWriteMtx.ReadUnlock();
     }
 
-    void VaultRequestResult::PrintAsTable(bool isPrintId, const std::size_t& amountOfRecords, const std::vector<std::string> keys) const
+    void VaultRecordSet::PrintAsTable(bool isPrintId, const std::size_t& amountOfRecords, const std::vector<std::string> keys) const
     {
         RecursiveReadWriteMtx.ReadLock();
 
@@ -267,7 +267,7 @@ namespace mvlt
         RecursiveReadWriteMtx.ReadUnlock();
     }
 
-    VaultRequestResult::~VaultRequestResult()
+    VaultRecordSet::~VaultRecordSet()
     {
         Reset();
     }

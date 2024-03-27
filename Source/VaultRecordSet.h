@@ -10,7 +10,7 @@ namespace mvlt
         The class inherits from Vault, but does not provide functionality for working with keys and creating new records.
         No new records will be created during the request, and this class will only store pointers to records in the original Vault.
     */
-    class VaultRequestResult : protected Vault
+    class VaultRecordSet : protected Vault
     {
     private:
 
@@ -22,17 +22,17 @@ namespace mvlt
 
     public:
 
-        /// Make Vault class frien
+        /// Make Vault class friend
         friend Vault;
 
         /// \brief Default constructor
-        VaultRequestResult();
+        VaultRecordSet();
 
         /// \brief Copy constructor
-        VaultRequestResult(const VaultRequestResult& other);
+        VaultRecordSet(const VaultRecordSet& other);
 
         /// \brief Operator assignment
-        VaultRequestResult& operator=(const VaultRequestResult& other);
+        VaultRecordSet& operator=(const VaultRecordSet& other);
         
         /// \brief Method for checking the validity of the parent Vault
         /// \return true if it is valid, otherwise false
@@ -91,11 +91,11 @@ namespace mvlt
         */
         bool GetKeyType(const std::string& key, std::type_index& keyType) const;
 
-        /// \brief Method for adding a record to VaultRequestResult
+        /// \brief Method for adding a record to VaultRecordSet
         /// \param [in] recordRef A constant reference pointing to a record
         void AddRecord(const VaultRecordRef& recordRef);
 
-        /// \brief Method for adding a recordы to VaultRequestResult
+        /// \brief Method for adding a recordы to VaultRecordSet
         /// \param [in] recordRef A constant reference indicating a vector with refs
         void AddRecordsRefs(const std::vector<VaultRecordRef> recordsRefs);
 
@@ -192,13 +192,13 @@ namespace mvlt
 
             \param [in] key the name of the key to search for
             \param [in] keyValue the value of the key to be found
-            \param [in] vaultRequestResult A reference to VaultRequestResult
+            \param [in] vaultRecordRef A reference to VaultRecordSet
             \param [in] amountOfRecords The number of records requested
             
             \return VaultOperationResult object with RequestRecords result
         */
         template <class T>
-        VaultOperationResult RequestRecords(const std::string& key, const T& keyValue, VaultRequestResult& vaultRequestResult) const
+        VaultOperationResult RequestRecords(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordRef) const
         {
             VaultOperationResult res;
             RecursiveReadWriteMtx.ReadLock();
@@ -208,9 +208,9 @@ namespace mvlt
                 ParentVault->RecursiveReadWriteMtx.ReadLock();
 
                 // \todo Replace to reset to clear keys 
-                vaultRequestResult.Clear();
-                res = Vault::RequestRecords(key, keyValue, vaultRequestResult);
-                vaultRequestResult.ParentVault = ParentVault;
+                vaultRecordRef.Clear();
+                res = Vault::RequestRecords(key, keyValue, vaultRecordRef);
+                vaultRecordRef.ParentVault = ParentVault;
 
                 ParentVault->RecursiveReadWriteMtx.ReadUnlock();
             }
@@ -230,7 +230,7 @@ namespace mvlt
         /// \brief Resets the object to its initial state
         void Reset();
 
-        /// \brief Clear VaultRequestResult
+        /// \brief Clear VaultRecordSet
         /// Remove all references to records from the Vault Request Result, 
         /// but the records themselves in the original Vault will not be changed
         void Clear();
@@ -312,6 +312,6 @@ namespace mvlt
         void PrintAsTable(bool isPrintId = false, const std::size_t& amountOfRecords = -1, const std::vector<std::string> keys = {}) const;
 
         /// \brief Destructor
-        ~VaultRequestResult();
+        ~VaultRecordSet();
     };
 }

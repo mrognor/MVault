@@ -181,7 +181,7 @@ int main()
         The record with the largest id with name Alexander: 9
         ```
 
-        Let's check it out. We will request all entries with the name Alexander and print them.
+        Let's check it out. We will request all records with the name Alexander and print them.
     */
 
     std::cout << "Alexanders: " << std::endl;

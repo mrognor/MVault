@@ -28,8 +28,8 @@ namespace mvlt
         // Mutex for thread safety
         mutable std::recursive_mutex Mtx;
 
-        // Set with all dependent VaultRequestResults
-        std::unordered_set<VaultRequestResult*> dependentVaultRequestResults;
+        // Set with all dependent VaultRecordSets
+        std::unordered_set<VaultRecordSet*> dependentVaultRecordSets;
 
     public:
 
@@ -39,8 +39,8 @@ namespace mvlt
         /// Making the VaultRecordRef class friendly so that it has access to the internal members of the VaultRecord class
         friend VaultRecordRef;
 
-        /// Making the VaultRequestResult class friendly so that it has access to the internal members of the VaultRecord class
-        friend VaultRequestResult;
+        /// Making the VaultRecordSet class friendly so that it has access to the internal members of the VaultRecord class
+        friend VaultRecordSet;
         
         /// \brief Default constructor
         VaultRecord();
