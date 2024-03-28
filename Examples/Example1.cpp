@@ -64,11 +64,12 @@ int main()
     vlt.PrintAsTable();
     vlt.EraseRecord("id", 1);
     vlt.PrintAsTable();
-    // vlt.EraseRecords("slaves", std::vector<int>());
     vlt.PrintAsTable();
 
     vltrr = vlt.CreateRecord();
 
     vltrr.SetData({ {"id", 112}, {"name", std::string("sg")}, {"slaves", std::vector<int>{300, 30, 3}} });
     vltrr.PrintRecord();
+
+    vlt.EraseRecords("slaves", std::vector<int>());
 }

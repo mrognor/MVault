@@ -221,8 +221,12 @@ namespace mvlt
         if (equalRange.first != TtoVaultRecordHashMap->end())
         {
             std::size_t counter = 0;
-            for (auto it = equalRange.first; it != equalRange.second; ++it)
+            for (auto it = equalRange.first; it != equalRange.second;)
             {
+                // Save next iterator
+                auto next = it;
+                ++next;
+
                 ++counter;
 
                 VaultRecord* tmpRec = it->second;
@@ -236,6 +240,8 @@ namespace mvlt
                 if (isDelete) tmpRec->Invalidate();
                 
                 if (counter >= amountOfRecords) break;
+                
+                it = next;
             }
         }
         else
