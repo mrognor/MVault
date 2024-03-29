@@ -35,6 +35,8 @@ namespace mvlt
                 record->Mtx.unlock();
             }
 
+            other.ParentVault->RecordSetsSet.emplace(this);
+
             RecursiveReadWriteMtx.WriteUnlock();
             other.RecursiveReadWriteMtx.ReadUnlock();
         }

@@ -15,48 +15,93 @@ int main()
     vlt.PrintAsTable(true);
 
 
-    mvlt::VaultRecordSet vrer, vrer2;
-    vlt.RequestRecords("A", 0, vrer);
-    vrer2 = vrer;
+    mvlt::VaultRecordSet vrs, vrs2;
+    vlt.RequestRecords("A", 0, vrs);
+    vrs2 = vrs;
     std::cout << "Requested vault: " << std::endl;
-    vrer.PrintAsTable(true);
+    vrs.PrintAsTable(true);
 
     std::cout << "Get record: " << std::endl;
 
-    mvlt::VaultRecordRef vaultRecordRef;
-    vrer.GetRecord("B", 1, vaultRecordRef);
-    vaultRecordRef.PrintRecord();
+    mvlt::VaultRecordRef vrr;
+    vrs.GetRecord("B", 1, vrr);
+    vrr.PrintRecord();
 
     std::cout << "Chanhing value in requested vault" << std::endl;
-    vaultRecordRef.SetData("A", 2);
+    vrr.SetData("A", 2);
 
     std::cout << "Origin vault: " << std::endl;
     vlt.PrintAsTable(true);
 
     std::cout << "Requested vault: " << std::endl;
-    vrer.PrintAsTable(true);
+    vrs.PrintAsTable(true);
 
     std::cout << "Copied vault: " << std::endl;
-    vrer2.PrintAsTable(true);
+    vrs2.PrintAsTable(true);
 
     std::cout << "Subrequest" << std::endl;
-    vrer.RequestRecords("A", 2, vrer2);
-    vrer2.PrintAsTable(true);
+    vrs.RequestRecords("A", 2, vrs2);
+    vrs2.PrintAsTable(true);
 
-    vaultRecordRef.SetData("B", 3);
+    vrr.SetData("B", 3);
     std::cout << "SetData in ref" << std::endl;
     vlt.PrintAsTable(true);
-    vrer.PrintAsTable(true);
-    vrer2.PrintAsTable(true);
+    vrs.PrintAsTable(true);
+    vrs2.PrintAsTable(true);
 
     std::cout << "Add record to RecordSet" << std::endl;
-    vlt.GetRecord("A", 1, vaultRecordRef);
-    vrer2.AddRecord(vaultRecordRef);
-    vrer2.PrintAsTable(true);
+    vlt.GetRecord("A", 1, vrr);
+    vrs2.AddRecord(vrr);
+    vrs2.PrintAsTable(true);
 
+    std::cout << "Erase record from vault. 1" << std::endl;
+    std::cout << "Before:" << std::endl;
+    vlt.PrintAsTable(true);
+    vrs.PrintAsTable(true);
+
+    vrs2.GetRecord("A", 2, vrr);
+    vlt.EraseRecord(vrr);
+
+    std::cout << "After:" << std::endl;
+    vlt.PrintAsTable(true);
+    vrs.PrintAsTable(true);
+
+    std::cout << "Erase record from vault. 2" << std::endl;
+    std::cout << "Before:" << std::endl;
+    vlt.PrintAsTable(true);
+    vrs.PrintAsTable(true);
+
+    vlt.EraseRecord("A", 0);
+
+    std::cout << "After:" << std::endl;
+    vlt.PrintAsTable(true);
+    vrs.PrintAsTable(true);
+
+    std::cout << "Drop vault" << std::endl;
+    vlt.DropData();
+    vrs.PrintAsTable();
+    
     std::cout << "Clear and reset" << std::endl;
-    vrer.Clear();
-    vrer.PrintAsTable();
-    vrer2.Reset();
-    vrer2.PrintAsTable();
+    vrs.Clear();
+    vrs.PrintAsTable();
+    vrs2.Reset();
+    vrs2.PrintAsTable();
+
+    std::cout << "Erase records" << std::endl;
+
+    vlt.CreateRecord();
+    vlt.CreateRecord();
+    vlt.CreateRecord();
+    
+    vlt.RequestRecords("A", 0, vrs);
+
+    std::cout << "Before" << std::endl;
+    vlt.PrintAsTable(true);
+    vrs.PrintAsTable(true);
+
+    std::cout << "After" << std::endl;
+    
+    vlt.EraseRecords("A", 0);
+    vlt.PrintAsTable(true);
+    vrs.PrintAsTable(true);
 }

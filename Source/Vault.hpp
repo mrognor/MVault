@@ -167,7 +167,19 @@ namespace mvlt
             
             // Check if it is delete. By now it is deletion when EraseRecord called from vault.
             // It is not deleting when RemoveRecord called from VaultRecordSet
-            if (isCalledFromVault) tmpRec->Invalidate();
+            if (isCalledFromVault) 
+            {
+                tmpRec->Mtx.lock();
+                for (VaultRecordSet* set : tmpRec->dependentVaultRecordSets)
+                {
+                    set->RecursiveReadWriteMtx.WriteLock();
+                    static_cast<Vault*>(set)->RemoveRecord(tmpRec, false);
+                    set->RecursiveReadWriteMtx.WriteUnlock();
+                }
+                tmpRec->Mtx.unlock();
+
+                tmpRec->Invalidate();
+            }
 
             res.IsOperationSuccess = true;
             res.ResultCode = VaultOperationResultCode::Success;
@@ -237,7 +249,18 @@ namespace mvlt
 
                 // Check if it is delete. By now it is deletion when EraseRecord called from vault.
                 // It is not deleting when RemoveRecord called from VaultRecordSet
-                if (isCalledFromVault) tmpRec->Invalidate();
+                if (isCalledFromVault) 
+                {
+                    tmpRec->Mtx.lock();
+                    for (VaultRecordSet* set : tmpRec->dependentVaultRecordSets)
+                    {
+                        set->RecursiveReadWriteMtx.WriteLock();
+                        static_cast<Vault*>(set)->RemoveRecord(tmpRec, false);
+                        set->RecursiveReadWriteMtx.WriteUnlock();
+                    }
+                    tmpRec->Mtx.unlock();
+                    tmpRec->Invalidate();
+                }
                 
                 if (counter >= amountOfRecords) break;
                 
@@ -555,7 +578,7 @@ namespace mvlt
         }
         
         // Save vaultRecordSet
-        const_cast<std::unordered_set<VaultRecordSet*>*>(&RecordSetsSet)->emplace(&vaultRecordSet);
+        RecordSetsSet.emplace(&vaultRecordSet);
 
         // Set new parent vault to vaultRecordSet
         vaultRecordSet.ParentVault = const_cast<Vault*>(this);

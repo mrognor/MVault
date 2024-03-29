@@ -87,7 +87,7 @@ namespace mvlt
         std::unordered_set<VaultRecord*> RecordsSet;
 
         /// \brief Unordered set with all VaultRecordSet pointers
-        std::unordered_set<VaultRecordSet*> RecordSetsSet;
+        mutable std::unordered_set<VaultRecordSet*> RecordSetsSet;
 
         /// \brief Recursive mutex for thread safety
         mutable RecursiveReadWriteMutex RecursiveReadWriteMtx;
@@ -109,6 +109,20 @@ namespace mvlt
         template <class T>
         VaultOperationResult SetDataToRecord(VaultRecord* dataRecord, const std::string& key, const T& data, const bool& isCalledFromVault);
         
+        /**
+            \brief Method for removing a record from a Vault
+
+            This method allows you to remove a record with or without deletion
+
+            \param [in] recordToErase the reference to the record that needs to be deleted
+            \param [in] isCalledFromVault The parameter responsible for where this method was called from. This method can be called from the following classes:
+            1. Vault. In this case, the method will change the structure of the Vault, change the DataRecord, and call itself for all VaultRecordSet dependent on the DataRecord
+            2. VaultRecordSet. In this case, the method will only change the structure of this with the VaultRecordSet type
+
+            \return Returns true if the record existed and was successfully deleted, otherwise it returns false
+        */
+        bool RemoveRecord(VaultRecord* recordToErase, const bool& isCalledFromVault);
+
         /**
             \brief Method for removing a record from a Vault
 
