@@ -4,7 +4,7 @@
 
 namespace mvlt
 {
-    bool Vault::RemoveRecord(bool isDelete, const VaultRecordRef& recordRefToErase)
+    bool Vault::RemoveRecord(const VaultRecordRef& recordRefToErase, const bool& isCalledFromVault)
     {
         recordRefToErase.Mtx.lock();
         RecursiveReadWriteMtx.WriteLock();
@@ -23,7 +23,7 @@ namespace mvlt
             eraser.second(tmpRec);
 
         RecordsSet.erase(tmpRec);
-        if (isDelete) tmpRec->Invalidate();
+        if (isCalledFromVault) tmpRec->Invalidate();
         
         RecursiveReadWriteMtx.WriteUnlock();
         recordRefToErase.Mtx.unlock();
@@ -241,7 +241,7 @@ namespace mvlt
 
     bool Vault::EraseRecord(const VaultRecordRef& recordRefToErase)
     {
-        return RemoveRecord(true, recordRefToErase);
+        return RemoveRecord(recordRefToErase, true);
     }
 
     std::size_t Vault::Size() const

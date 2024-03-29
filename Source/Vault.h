@@ -107,7 +107,7 @@ namespace mvlt
             \return VaultOperationResult object with GetData result.
         */
         template <class T>
-        VaultOperationResult SetDataToRecord(VaultRecord* dataRecord, const std::string& key, const T& data, bool isCalledFromVault = true);
+        VaultOperationResult SetDataToRecord(VaultRecord* dataRecord, const std::string& key, const T& data, const bool& isCalledFromVault);
         
         /**
             \brief Method for removing a record from a Vault
@@ -115,9 +115,13 @@ namespace mvlt
             This method allows you to remove a record with or without deletion
 
             \param [in] recordRefToErase the reference to the record that needs to be deleted
+            \param [in] isCalledFromVault The parameter responsible for where this method was called from. This method can be called from the following classes:
+            1. Vault. In this case, the method will change the structure of the Vault, change the DataRecord, and call itself for all VaultRecordSet dependent on the DataRecord
+            2. VaultRecordSet. In this case, the method will only change the structure of this with the VaultRecordSet type
+
             \return Returns true if the record existed and was successfully deleted, otherwise it returns false
         */
-        bool RemoveRecord(bool isDelete, const VaultRecordRef& recordRefToErase);
+        bool RemoveRecord(const VaultRecordRef& recordRefToErase, const bool& isCalledFromVault);
 
         /**
             \brief Method for removing a record
@@ -128,11 +132,14 @@ namespace mvlt
 
             \param [in] key the name of the key to search for
             \param [in] keyValue the value of the key to be found
-            
+            \param [in] isCalledFromVault The parameter responsible for where this method was called from. This method can be called from the following classes:
+            1. Vault. In this case, the method will change the structure of the Vault, change the DataRecord, and call itself for all VaultRecordSet dependent on the DataRecord
+            2. VaultRecordSet. In this case, the method will only change the structure of this with the VaultRecordSet type
+
             \return VaultOperationResult object with GetRecords result
         */
         template <class T>
-        VaultOperationResult RemoveRecord(bool isDelete, const std::string& key, const T& keyValue);
+        VaultOperationResult RemoveRecord(const std::string& key, const T& keyValue, const bool& isCalledFromVault);
 
         /**
             \brief Method for removing a records
@@ -144,13 +151,16 @@ namespace mvlt
             \param [in] key the name of the key to search for
             \param [in] keyValue the value of the key to be found
             \param [in] amountOfRecords The number of records to delete. By default set to minus one or all records.
-            
+            \param [in] isCalledFromVault The parameter responsible for where this method was called from. This method can be called from the following classes:
+            1. Vault. In this case, the method will change the structure of the Vault, change the DataRecord, and call itself for all VaultRecordSet dependent on the DataRecord
+            2. VaultRecordSet. In this case, the method will only change the structure of this with the VaultRecordSet type
+
             If the amountOfRecords is greater than the number of records stored inside the Vault, then all records with this key and value will be deleted.
 
             \return VaultOperationResult object with GetRecords result
         */
         template <class T>
-        VaultOperationResult RemoveRecords(bool isDelete, const std::string& key, const T& keyValue, const std::size_t& amountOfRecords = -1);
+        VaultOperationResult RemoveRecords(const std::string& key, const T& keyValue, const std::size_t& amountOfRecords, const bool& isCalledFromVault);
 
     public:
 

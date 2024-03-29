@@ -8,7 +8,7 @@
 namespace mvlt
 {
     template <class T>
-    VaultOperationResult Vault::SetDataToRecord(VaultRecord* dataRecord, const std::string& key, const T& data, bool isCalledFromVault)
+    VaultOperationResult Vault::SetDataToRecord(VaultRecord* dataRecord, const std::string& key, const T& data, const bool& isCalledFromVault)
     {
         // Fill res info known at start
         VaultOperationResult res;
@@ -121,7 +121,7 @@ namespace mvlt
     }
 
     template <class T>
-    VaultOperationResult Vault::RemoveRecord(bool isDelete, const std::string& key, const T& keyValue)
+    VaultOperationResult Vault::RemoveRecord(const std::string& key, const T& keyValue, const bool& isCalledFromVault)
     {
         // Fill res info known at start
         VaultOperationResult res;
@@ -167,7 +167,7 @@ namespace mvlt
             
             // Check if it is delete. By now it is deletion when EraseRecord called from vault.
             // It is not deleting when RemoveRecord called from VaultRecordSet
-            if (isDelete) tmpRec->Invalidate();
+            if (isCalledFromVault) tmpRec->Invalidate();
 
             res.IsOperationSuccess = true;
             res.ResultCode = VaultOperationResultCode::Success;
@@ -183,7 +183,7 @@ namespace mvlt
     }
 
     template <class T>
-    VaultOperationResult Vault::RemoveRecords(bool isDelete, const std::string& key, const T& keyValue, const std::size_t& amountOfRecords)
+    VaultOperationResult Vault::RemoveRecords(const std::string& key, const T& keyValue, const std::size_t& amountOfRecords, const bool& isCalledFromVault)
     {
         // Fill res info known at start
         VaultOperationResult res;
@@ -237,7 +237,7 @@ namespace mvlt
 
                 // Check if it is delete. By now it is deletion when EraseRecord called from vault.
                 // It is not deleting when RemoveRecord called from VaultRecordSet
-                if (isDelete) tmpRec->Invalidate();
+                if (isCalledFromVault) tmpRec->Invalidate();
                 
                 if (counter >= amountOfRecords) break;
                 
@@ -608,13 +608,13 @@ namespace mvlt
     template <class T>
     VaultOperationResult Vault::EraseRecord(const std::string& key, const T& keyValue)
     {
-        return RemoveRecord(true, key, keyValue);
+        return RemoveRecord(key, keyValue, true);
     }
 
     template <class T>
     VaultOperationResult Vault::EraseRecords(const std::string& key, const T& keyValue, const std::size_t& amountOfRecords)
     {
-        return RemoveRecords(true, key, keyValue, amountOfRecords);
+        return RemoveRecords(key, keyValue, amountOfRecords, true);
     }
 
     template<class F>

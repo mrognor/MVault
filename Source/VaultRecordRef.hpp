@@ -43,7 +43,7 @@ namespace mvlt
 
         Vlt->RecursiveReadWriteMtx.WriteLock();
 
-        res = Vlt->SetDataToRecord(DataRecord, key, data);
+        res = Vlt->SetDataToRecord(DataRecord, key, data, true);
 
         Vlt->RecursiveReadWriteMtx.WriteUnlock();
         DataRecord->Mtx.unlock();

@@ -185,7 +185,7 @@ namespace mvlt
 
     bool VaultRecordSet::RemoveRecord(const VaultRecordRef& recordRefToErase)
     {
-        return Vault::RemoveRecord(false, recordRefToErase);
+        return Vault::RemoveRecord(recordRefToErase, false);
     }
 
     std::size_t VaultRecordSet::Size() const
