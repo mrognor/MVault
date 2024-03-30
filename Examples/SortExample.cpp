@@ -27,9 +27,9 @@ int main()
     // startcode{.cpp}
     mvlt::Vault vlt;
     
-    vlt.SetKey("id", -1);
-    vlt.SetKey<std::string>("name", "");
-    vlt.SetKey<bool>("gender", true);
+    vlt.AddKey("id", -1);
+    vlt.AddKey<std::string>("name", "");
+    vlt.AddKey<bool>("gender", true);
     // endcode
 
     /**

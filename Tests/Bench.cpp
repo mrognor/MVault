@@ -3,7 +3,7 @@
 void Bench()
 {
     mvlt::Vault vlt;
-    vlt.SetKey<std::size_t>("id", -1);
+    vlt.AddKey<std::size_t>("id", -1);
 
     for (std::size_t i = 0; i < 10000000; ++i)
         vlt.CreateRecord({ {"id", i} });

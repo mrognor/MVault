@@ -160,8 +160,8 @@ namespace mvlt
             Usage example:
             \code{.cpp}
             Vault vlt;
-            vlt.SetKey<std::size_t>("Id", 0);
-            vlt.SetKey<std::vector<int>>("Friends", std::vector<int>());
+            vlt.AddKey<std::size_t>("Id", 0);
+            vlt.AddKey<std::vector<int>>("Friends", std::vector<int>());
 
             ...
 

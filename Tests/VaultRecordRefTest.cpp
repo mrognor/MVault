@@ -5,7 +5,7 @@
 void OperatorAssignment(std::ofstream& testResFile)
 {
     mvlt::Vault vlt;
-    vlt.SetKey("id", -1);
+    vlt.AddKey("id", -1);
 
     mvlt::VaultRecordRef vrr1, vrr2, vrr3;
     vrr1 = vlt.CreateRecord();
@@ -62,7 +62,7 @@ void OperatorAssignment(std::ofstream& testResFile)
     for (int i = 0; i < 10000; ++i)
     {
         mvlt::Vault* vltp = new mvlt::Vault;
-        vltp->SetKey("id", -1);
+        vltp->AddKey("id", -1);
     
         vrr1 = vltp->CreateRecord();
 
@@ -96,7 +96,7 @@ void OperatorComparison(std::ofstream& testResFile)
     testResFile << "### Synchronous tests" << std::endl;
 
     mvlt::Vault vlt;
-    vlt.SetKey("id", -1);
+    vlt.AddKey("id", -1);
 
     mvlt::VaultRecordRef vrr1, vrr2;
 
@@ -146,7 +146,7 @@ void OperatorComparison(std::ofstream& testResFile)
     for (int i = 0; i < 10000; ++i)
     {
         mvlt::Vault* vltp = new mvlt::Vault;
-        vltp->SetKey("id", -1);
+        vltp->AddKey("id", -1);
     
         vrr1 = vltp->CreateRecord();
 
@@ -181,7 +181,7 @@ void GetDataAsString(std::ofstream& testResFile)
     testResFile << "### Synchronous tests" << std::endl;
 
     mvlt::Vault vlt;
-    vlt.SetKey("id", -1);
+    vlt.AddKey("id", -1);
 
     mvlt::VaultRecordRef vrr;
 
@@ -260,7 +260,7 @@ void GetDataAsString(std::ofstream& testResFile)
     for (int i = 0; i < 10000; ++i)
     {
         mvlt::Vault* vltp = new mvlt::Vault;
-        vltp->SetKey("id", -1);
+        vltp->AddKey("id", -1);
     
         vrr = vltp->CreateRecord();
 
@@ -292,10 +292,10 @@ void GetKeys(std::ofstream& testResFile)
     testResFile << "### Synchronous tests" << std::endl;
 
     mvlt::Vault vlt;
-    vlt.SetKey("a", -1);
-    vlt.SetKey<std::string>("b", "");
-    vlt.SetKey<std::string>("c", "");
-    vlt.SetKey("d", true);
+    vlt.AddKey("a", -1);
+    vlt.AddKey<std::string>("b", "");
+    vlt.AddKey<std::string>("c", "");
+    vlt.AddKey("d", true);
 
     if (vlt.GetKeys() == std::vector<std::string>({"a", "b", "c", "d"}))
         testResFile << "Checks: $\\color{green}{Success!}$\n\n";
@@ -310,10 +310,10 @@ void GetKeys(std::ofstream& testResFile)
     {
         std::vector<std::string> keys;
 
-        vlt.SetKey("a", -1);
-        vlt.SetKey<std::string>("b", "");
-        vlt.SetKey<std::string>("c", "");
-        vlt.SetKey("d", true);
+        vlt.AddKey("a", -1);
+        vlt.AddKey<std::string>("b", "");
+        vlt.AddKey<std::string>("c", "");
+        vlt.AddKey("d", true);
 
         auto timeout = std::chrono::steady_clock::now() + std::chrono::microseconds(100);
 
@@ -340,7 +340,7 @@ void GetKeys(std::ofstream& testResFile)
     for (int i = 0; i < 10000; ++i)
     {
         mvlt::Vault* vltp = new mvlt::Vault;
-        vltp->SetKey("id", -1);
+        vltp->AddKey("id", -1);
 
         std::vector<std::string> keys;
 
@@ -380,7 +380,7 @@ void SetData(std::ofstream& testResFile)
 
     mvlt::Vault vlt;
 
-    vlt.SetKey("id", -1);
+    vlt.AddKey("id", -1);
     
     vrr = vlt.CreateRecord();
     
@@ -495,7 +495,7 @@ void SetData(std::ofstream& testResFile)
     for (int i = 0; i < 10000; ++i)
     {
         mvlt::Vault* vltp = new mvlt::Vault;
-        vltp->SetKey("id", -1);
+        vltp->AddKey("id", -1);
         vrr = vltp->CreateRecord();
         
         auto timeout = std::chrono::steady_clock::now() + std::chrono::microseconds(100);
@@ -535,7 +535,7 @@ void GetData(std::ofstream& testResFile)
 
     mvlt::Vault vlt;
 
-    vlt.SetKey("id", -1);
+    vlt.AddKey("id", -1);
     
     vrr = vlt.CreateRecord();
     
@@ -642,7 +642,7 @@ void GetData(std::ofstream& testResFile)
     for (int j = 0; j < 10000; ++j)
     {
         mvlt::Vault* vltp = new mvlt::Vault;
-        vltp->SetKey("id", -1);
+        vltp->AddKey("id", -1);
         vrr = vltp->CreateRecord();
         
         auto timeout = std::chrono::steady_clock::now() + std::chrono::microseconds(100);

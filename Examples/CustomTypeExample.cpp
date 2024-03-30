@@ -76,7 +76,7 @@ public:
 
 /** 
     \page CustomTypeExample
-    Then the caching functionality will look like this:
+    Then the hashing functionality will look like this:
 */
 
 // startcode{.cpp}
@@ -148,7 +148,7 @@ int main()
     // startcode{.cpp}
     mvlt::Vault vlt;
 
-    vlt.SetKey("Human", Human());
+    vlt.AddKey("Human", Human());
 
     vlt.CreateRecord({ {"Human", Human(167, "Ciolkovskiy", true)} });
     vlt.CreateRecord({ {"Human", Human(190, "Mendeleev", true)} });

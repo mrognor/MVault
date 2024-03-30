@@ -278,13 +278,16 @@ namespace mvlt
     }
 
     template <class T>
-    void Vault::SetKey(const std::string& key, const T& defaultKeyValue)
+    bool Vault::AddKey(const std::string& key, const T& defaultKeyValue)
     {
         RecursiveReadWriteMtx.WriteLock();
 
         // If the key was added earlier, then it must be deleted
         if (KeysTypes.find(key) != KeysTypes.end())
-            RemoveKey(key);
+        {
+            RecursiveReadWriteMtx.WriteUnlock();
+            return false;
+        }
 
         // Add key type to hash map with keys types
         KeysTypes.emplace(key, typeid(T)); 
@@ -380,7 +383,7 @@ namespace mvlt
         
         VaultKeyCopiers.emplace(key, [=](VaultRecordSet& vaultRecordSet)
         {
-            vaultRecordSet.SetKey(key, defaultKeyValue);
+            vaultRecordSet.AddKey(key, defaultKeyValue);
         });  
 
 
@@ -393,6 +396,44 @@ namespace mvlt
         }
 
         RecursiveReadWriteMtx.WriteUnlock();
+        return true;
+    }
+
+    template <class T>
+    VaultOperationResult Vault::UpdateKey(const std::string& key, const T& defaultKeyValue)
+    {
+        VaultOperationResult res;
+        res.Key = key;
+        res.RequestedType = typeid(defaultKeyValue);
+        
+        RecursiveReadWriteMtx.WriteLock();
+
+        // If the key was not added earlier, then it can not be updated
+        std::unordered_map<std::string, std::type_index>::iterator keyTypeIt = KeysTypes.find(key);
+        if (keyTypeIt == KeysTypes.end())
+        {
+            RecursiveReadWriteMtx.WriteUnlock();
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::WrongKey;
+            return res;
+        }
+
+        // Check it is trying to set coorect type 
+        if (res.RequestedType != keyTypeIt->second)
+        {
+            RecursiveReadWriteMtx.WriteUnlock();
+            res.RequestedType = keyTypeIt->second;
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::WrongType;
+            return res;
+        }
+
+        // Change data in template
+        RecordTemplate.SetData(key, defaultKeyValue);
+
+        RecursiveReadWriteMtx.WriteUnlock();
+
+        return res;
     }
 
     template <class T>

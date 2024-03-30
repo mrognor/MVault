@@ -8,7 +8,7 @@ void MultithreadingReadTest()
     
     std::cout << "\t\tReading test started: " << std::flush;
 
-    vlt.SetKey<int>("key", -1);
+    vlt.AddKey<int>("key", -1);
 
     for (int i = 0; i < 100000; ++i)
         vlt.CreateRecord({ {"key", i} });
@@ -94,7 +94,7 @@ void MultithreadingKeysTest()
         cv.wait_until(lk, timeout);
 
         for (int i = 0; i < 100000; ++i)
-            vlt.SetKey(std::to_string(i), i);
+            vlt.AddKey(std::to_string(i), i);
         
     });
 
@@ -123,8 +123,8 @@ void MultithreadingRecordsTest()
     std::condition_variable cv;
     mvlt::VaultRecordRef vrr, destVrr;
 
-    vlt.SetKey("id", -1);
-    vlt.SetKey("num", -1);
+    vlt.AddKey("id", -1);
+    vlt.AddKey("num", -1);
 
     std::cout << "\t\tRecords test started: " << std::flush;
 

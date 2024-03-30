@@ -34,10 +34,10 @@ int main()
 {
     mvlt::Vault vlt;
 
-    vlt.SetKey("id", -1);
-    vlt.SetKey<std::string>("name", "");
-    vlt.SetKey("gender", true);
-    vlt.SetKey("slaves", std::vector<int>());
+    vlt.AddKey("id", -1);
+    vlt.AddKey<std::string>("name", "");
+    vlt.AddKey("gender", true);
+    vlt.AddKey("slaves", std::vector<int>());
 
     vlt.CreateRecord({ {"id", 0}, {"name", std::string("A")}, {"gender", true} });
     vlt.CreateRecord({ {"id", 1}, {"name", std::string("B")}, {"gender", false} });
@@ -72,4 +72,13 @@ int main()
     vltrr.PrintRecord();
 
     vlt.EraseRecords("slaves", std::vector<int>());
+
+    vlt.DropVault();
+
+    vlt.AddKey("id", -1);
+    vlt.CreateRecord();
+    vlt.PrintAsTable(true);
+    vlt.UpdateKey("id", 0);
+    vlt.CreateRecord();
+    vlt.PrintAsTable(true);
 }

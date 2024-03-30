@@ -6,7 +6,7 @@ int main()
     mvlt::Vault vlt;
     mvlt::VaultRecordRef vrr;
 
-    vlt.SetKey("Key", -1);
+    vlt.AddKey("Key", -1);
     
     vlt.CreateRecord({ {"Key", 12} });
 
@@ -250,7 +250,7 @@ int main()
     std::cout << "\tDeleted vault" << std::endl;
 
     mvlt::Vault* vltp = new mvlt::Vault;
-    vltp->SetKey("A", 1);
+    vltp->AddKey("A", 1);
 
     vltp->CreateRecord();
 

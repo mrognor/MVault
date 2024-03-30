@@ -4,8 +4,8 @@ int main()
 {
     mvlt::Vault vlt;
     
-    vlt.SetKey("A", 0);
-    vlt.SetKey("B", 0);
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
 
     vlt.CreateRecord();
     vlt.CreateRecord({ {"A", 1} });

@@ -194,17 +194,32 @@ namespace mvlt
         Vault& operator= (const Vault& other) = delete;
 
         /**
-            \brief Template function to add new key with default value to Vault
+            \brief Template method to add new key with default value to Vault
 
             \tparam <T> Any type of data except for c arrays
 
-            If the key was added earlier, the default value will be updated when this function is called again
-
             \param [in] key new key name
             \param [in] defaultKeyValue default key value
+
+            \return Returns false if such a key already exists, otherwise it returns true
         */
         template <class T>
-        void SetKey(const std::string& key, const T& defaultKeyValue);
+        bool AddKey(const std::string& key, const T& defaultKeyValue);
+
+        /**
+            \brief Template method to update default key value
+
+            \tparam <T> Any type of data except for c arrays
+
+            \param [in] key new key name
+            \param [in] defaultKeyValue new default key value
+
+            The type of the defaultKeyValue must match the type of the old value
+
+            \return Returns VaultOperationResult with the result of the operation
+        */
+        template <class T>
+        VaultOperationResult UpdateKey(const std::string& key, const T& defaultKeyValue);
 
         /**
             \brief The method for getting a default key value
