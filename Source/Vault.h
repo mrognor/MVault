@@ -176,6 +176,34 @@ namespace mvlt
         template <class T>
         VaultOperationResult RemoveRecords(const std::string& key, const T& keyValue, const std::size_t& amountOfRecords, const bool& isCalledFromVault);
 
+        /**
+            \brief Template method to add new key with default value to Vault
+
+            \tparam <T> Any type of data except for c arrays
+
+            \param [in] key new key name
+            \param [in] defaultKeyValue default key value
+            \param [in] isCalledFromVault The parameter responsible for where this method was called from. This method can be called from the following classes:
+            1. Vault. In this case, the method will change the structure of the Vault, change the DataRecord, and call itself for all VaultRecordSet dependent on the DataRecord
+            2. VaultRecordSet. In this case, the method will only change the structure of this with the VaultRecordSet type
+
+            \return Returns false if such a key already exists, otherwise it returns true
+        */
+        template <class T>
+        bool AddKey(const std::string& key, const T& defaultKeyValue, const bool& isCalledFromVault);
+
+        /**
+            \brief The method for deleting the key
+
+            \param [in] key the key to remove
+            \param [in] isCalledFromVault The parameter responsible for where this method was called from. This method can be called from the following classes:
+            1. Vault. In this case, the method will change the structure of the Vault, change the DataRecord, and call itself for all VaultRecordSet dependent on the DataRecord
+            2. VaultRecordSet. In this case, the method will only change the structure of this with the VaultRecordSet type
+            
+            \return Returns true if the key existed, otherwise returns false
+        */
+        bool RemoveKey(const std::string& key, const bool& isCalledFromVault);
+
     public:
 
         /// Making the VaultRecordRef class friendly so that it has access to the internal members of the Vault class

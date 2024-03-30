@@ -104,4 +104,19 @@ int main()
     vlt.EraseRecords("A", 0);
     vlt.PrintAsTable(true);
     vrs.PrintAsTable(true);
+
+    std::cout << "Adding keys" << std::endl;
+    std::cout << "Before" << std::endl; 
+    vlt.PrintAsTable();
+    vrs.PrintAsTable();
+    
+    std::cout << "After 1" << std::endl;
+    vlt.AddKey("C", -1);
+    vlt.PrintAsTable();
+    vrs.PrintAsTable();
+
+    std::cout << "After 2" << std::endl;
+    vlt.RemoveKey("B");
+    vlt.PrintAsTable();
+    vrs.PrintAsTable();
 }

@@ -278,7 +278,7 @@ namespace mvlt
     }
 
     template <class T>
-    bool Vault::AddKey(const std::string& key, const T& defaultKeyValue)
+    bool Vault::AddKey(const std::string& key, const T& defaultKeyValue, const bool& isCalledFromVault)
     {
         RecursiveReadWriteMtx.WriteLock();
 
@@ -387,16 +387,32 @@ namespace mvlt
         });  
 
 
-        // Add new data to record set
-        for (auto& it : RecordsSet)
+        if (isCalledFromVault)
         {
-            it->SetData(key, defaultKeyValue);
-            TtoVaultRecordHashMap->emplace(defaultKeyValue, it);
-            TtoVaultRecordMap->emplace(defaultKeyValue, it);
+            // Add new data to record set
+            for (auto& it : RecordsSet)
+            {
+                it->SetData(key, defaultKeyValue);
+                TtoVaultRecordHashMap->emplace(defaultKeyValue, it);
+                TtoVaultRecordMap->emplace(defaultKeyValue, it);
+            }
+
+            for (VaultRecordSet* set : RecordSetsSet)
+            {
+                set->RecursiveReadWriteMtx.WriteLock();
+                set->AddKey(key, defaultKeyValue, false);
+                set->RecursiveReadWriteMtx.WriteUnlock();
+            }
         }
 
         RecursiveReadWriteMtx.WriteUnlock();
         return true;
+    }
+
+    template <class T>
+    bool Vault::AddKey(const std::string& key, const T& defaultKeyValue)
+    {
+        return AddKey(key, defaultKeyValue, true);
     }
 
     template <class T>

@@ -53,6 +53,54 @@ namespace mvlt
         return res;
     }
 
+    bool Vault::RemoveKey(const std::string& key, const bool& isCalledFromVault)
+    {
+        RecursiveReadWriteMtx.WriteLock();
+
+        if (KeysTypes.find(key) == KeysTypes.end()) 
+        {
+            RecursiveReadWriteMtx.WriteUnlock();
+            return false;
+        }
+
+        // Remove key from hash map with keys types
+        KeysTypes.erase(key);
+
+        // Erase key from record template
+        RecordTemplate.EraseData(key);
+
+        // Erase key from VaultHashMapStructure
+        VaultHashMapStructure.EraseData(key);
+
+        // Erase key from VaultMapStructure
+        VaultMapStructure.EraseData(key);
+
+        // Erase key from all maps
+        VaultRecordAdders.erase(key);
+        VaultRecordClearers.erase(key);
+        VaultRecordErasers.erase(key);
+        VaultRecordSorters.erase(key);
+        VaultKeyCopiers.erase(key);
+
+        if (isCalledFromVault)
+        {
+            // Erase key data from all records
+            for (auto& it : RecordsSet)
+                it->EraseData(key);
+
+            for (VaultRecordSet* set : RecordSetsSet)
+            {
+                set->RecursiveReadWriteMtx.WriteLock();
+                set->RemoveKey(key, false);
+                set->RecursiveReadWriteMtx.WriteUnlock();
+            }
+        }
+
+        RecursiveReadWriteMtx.WriteUnlock();
+
+        return true;
+    }
+
     Vault::Vault() {}
 
     bool Vault::IsKeyExist(const std::string& key) const
@@ -80,38 +128,7 @@ namespace mvlt
 
     bool Vault::RemoveKey(const std::string& key)
     {
-        RecursiveReadWriteMtx.WriteLock();
-        if (KeysTypes.find(key) == KeysTypes.end()) 
-        {
-            RecursiveReadWriteMtx.WriteUnlock();
-            return false;
-        }
-
-        // Remove key from hash map with keys types
-        KeysTypes.erase(key);
-
-        // Erase key from record template
-        RecordTemplate.EraseData(key);
-
-        // Erase key from VaultHashMapStructure
-        VaultHashMapStructure.EraseData(key);
-
-        // Erase key from VaultMapStructure
-        VaultMapStructure.EraseData(key);
-
-        // Erase key from all maps
-        VaultRecordAdders.erase(key);
-        VaultRecordClearers.erase(key);
-        VaultRecordErasers.erase(key);
-        VaultRecordSorters.erase(key);
-        VaultKeyCopiers.erase(key);
-
-        // Erase key data from all records
-        for (auto& it : RecordsSet)
-            it->EraseData(key);
-        
-        RecursiveReadWriteMtx.WriteUnlock();
-        return true;
+        return RemoveKey(key, true);
     }
 
     VaultRecordRef Vault::CreateRecord()
