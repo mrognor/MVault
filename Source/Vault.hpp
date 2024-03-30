@@ -654,7 +654,8 @@ namespace mvlt
                 {
                     if (counter >= amountOfRecords) return false;
                     
-                    func(vaultRecordRef);
+                    if (!func(vaultRecordRef)) return false;
+
                     ++counter;
                     return true;
                 }, isReverse);

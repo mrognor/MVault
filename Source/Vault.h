@@ -433,6 +433,7 @@ namespace mvlt
             \param [in] isReverse Sort in descending order or descending order. By default, ascending
             \param [in] amountOfRecords The number of records. By default, everything is
 
+            If func returns false, then SortBy will return.
             The function iterate over all records sorted by the key parameter, in the order specified by the isReverse parameter. 
             For each record, the function passed in the func parameter is called.
             This function does not sort the data when it is called, the sorted data is already stored inside the Vault.

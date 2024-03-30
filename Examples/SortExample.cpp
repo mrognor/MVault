@@ -153,7 +153,7 @@ int main()
         In this example, we are looking for an record with the name Alexander and the largest id
     */
 
-    std::cout << "The record with the largest id with name Alexander: ";
+    std::cout << "The largest id with name Alexander: ";
     // startcode{.cpp}
     int greatestAlexanderId = -1;
     vlt.SortBy("id", [&](const mvlt::VaultRecordRef& recordRef)
@@ -167,7 +167,7 @@ int main()
             }
             else
                 return true;
-        });
+        }, true);
     std::cout << greatestAlexanderId << std::endl;
     // endcode
 
