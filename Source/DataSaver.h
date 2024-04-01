@@ -1,7 +1,7 @@
 #pragma once
 
-#include <iostream>
 #include <string>
+#include <iostream>
 #include <typeindex>
 
 #include "Functions/ToString.h"
@@ -9,7 +9,7 @@
 namespace mvlt
 {
     /**
-    \brief A class for storing any type of data
+        \brief A class for storing any type of data
 
         If a pointer is stored in a class, then you can set a function to automatically clear this pointer when an object of the class is destroyed.
         By default, it stores the void type.

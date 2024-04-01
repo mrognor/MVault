@@ -5,8 +5,6 @@
 #include <mutex>
 
 #include "VaultClasses.h"
-#include "DataContainer.h"
-#include "ReadWriteMutex.h"
 
 namespace mvlt
 {

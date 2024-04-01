@@ -1,9 +1,9 @@
 #pragma once
 
-#include <thread>
 #include <mutex>
-#include <iostream>
 #include <atomic>
+#include <thread>
+#include <iostream>
 #include <condition_variable>
 
 /**

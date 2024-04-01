@@ -4,14 +4,12 @@
 #include <vector>
 
 #include "VaultClasses.h"
-#include "DataSaver.h"
-#include "DataContainer.h"
+
 #include "VaultRecord.h"
 #include "VaultRecordRef.h"
-#include "ReadWriteMutex.h"
 #include "VaultFunctions.h"
-#include "VaultOperationResult.h"
 #include "VaultParamInput.h"
+#include "VaultOperationResult.h"
 
 namespace mvlt
 {
@@ -402,7 +400,7 @@ namespace mvlt
             \return VaultOperationResult object with RequestRecords result
         */
         template <class T>
-        VaultOperationResult RequestRecords(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordRef, const std::size_t& amountOfRecords = -1) const;
+        VaultOperationResult RequestRecords(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords = -1) const;
 
         /// \brief A method for deleting all data and keys
         void DropVault();

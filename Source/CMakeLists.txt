@@ -8,35 +8,45 @@ endif()
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(MVaultHeaders 
+set(MVaultHeaders
     MVault.h
+
     Vault.h 
     VaultRecord.h
     VaultRecordRef.h
     VaultFunctions.h
-    VaultOperationResult.h
     VaultRecordSet.h
     VaultParamInput.h
+    VaultOperationResult.h
+
     DataContainer.h 
     DataSaver.h 
     ReadWriteMutex.h
+
     Functions/ToString.h
     Functions/PrintAsTable.h
-    Vault.hpp
+)
+
+set(MVaultTemplates
     VaultRecordRef.hpp
-    VaultParamInput.hpp)
+    VaultParamInput.hpp
+    VaultRecordSet.hpp
+)
 
 set(MVaultSource
     Vault.cpp 
     VaultRecord.cpp
     VaultRecordRef.cpp
-    VaultOperationResult.cpp
     VaultParamInput.cpp
+    VaultOperationResult.cpp
+
     DataSaver.cpp
     ReadWriteMutex.cpp
     VaultRecordSet.cpp
-    Functions/PrintAsTable.cpp)
+    
+    Functions/PrintAsTable.cpp
+)
 
 project(MVault)
 
-add_library(MVault STATIC ${MVaultHeaders} ${MVaultSource})
+add_library(MVault STATIC ${MVaultHeaders} ${MVaultTemplates} ${MVaultSource})

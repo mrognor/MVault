@@ -1,8 +1,8 @@
 #pragma once
 
 #include <string>
-#include <typeindex>
 #include <typeinfo>
+#include <typeindex>
 
 namespace mvlt
 {

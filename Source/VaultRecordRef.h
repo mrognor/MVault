@@ -1,12 +1,10 @@
 #pragma once
 
-#include "VaultClasses.h"
-#include "DataContainer.h"
-#include "ReadWriteMutex.h"
-#include "VaultRecord.h"
 #include "Vault.h"
-#include "VaultOperationResult.h"
+#include "VaultRecord.h"
+#include "VaultClasses.h"
 #include "VaultParamInput.h"
+#include "VaultOperationResult.h"
 
 namespace mvlt 
 {

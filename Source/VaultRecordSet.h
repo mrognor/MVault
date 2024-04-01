@@ -58,28 +58,7 @@ namespace mvlt
             \return returns false if the parent vault invalid or the key was not found otherwise returns true
         */
         template <class T>
-        VaultOperationResult GetKeyValue(const std::string& key, T& defaultKeyValue) const
-        {
-            VaultOperationResult res;
-            RecursiveReadWriteMtx.ReadLock();
-
-            // Thread safety because in Vault destructor blocking this RecursiveReadWriteMtx to write
-            if (IsParentVaultValid)
-            {
-                ParentVault->RecursiveReadWriteMtx.ReadLock();
-                res = Vault::GetKeyValue(key, defaultKeyValue);
-                ParentVault->RecursiveReadWriteMtx.ReadUnlock();
-            }
-            else 
-            {
-                res.Key = key;
-                res.RequestedType = typeid(defaultKeyValue);
-                res.IsOperationSuccess = false;
-                res.ResultCode = VaultOperationResultCode::ParentVaultNotValid;
-            }
-            RecursiveReadWriteMtx.ReadUnlock();
-            return res;
-        }
+        VaultOperationResult GetKeyValue(const std::string& key, T& defaultKeyValue) const;
 
         /**
             \brief The method for getting a key type
@@ -116,32 +95,7 @@ namespace mvlt
             \return VaultOperationResult object with GetRecord result
         */
         template <class T>
-        VaultOperationResult GetRecord(const std::string& key, const T& keyValue, VaultRecordRef& vaultRecordRef) const
-        {
-            VaultOperationResult res;
-            RecursiveReadWriteMtx.ReadLock();
-
-            if (IsParentVaultValid)
-            {
-                ParentVault->RecursiveReadWriteMtx.ReadLock();
-
-                res = Vault::GetRecord(key, keyValue, vaultRecordRef);
-                vaultRecordRef.Vlt = ParentVault;
-                
-                ParentVault->RecursiveReadWriteMtx.ReadUnlock();
-            }
-            else 
-            {
-                res.Key = key;
-                res.RequestedType = typeid(keyValue);
-                res.IsOperationSuccess = false;
-                res.ResultCode = VaultOperationResultCode::ParentVaultNotValid;
-            }
-
-            RecursiveReadWriteMtx.ReadUnlock();
-            
-            return res;
-        }
+        VaultOperationResult GetRecord(const std::string& key, const T& keyValue, VaultRecordRef& vaultRecordRef) const;
 
         /**
             \brief The method for getting a vector of references to the data inside Vault
@@ -157,33 +111,7 @@ namespace mvlt
             \return VaultOperationResult object with GetRecords result
         */
         template <class T>
-        VaultOperationResult GetRecords(const std::string& key, const T& keyValue, std::vector<VaultRecordRef>& recordsRefs, const std::size_t& amountOfRecords = -1) const
-        {
-            VaultOperationResult res;
-            RecursiveReadWriteMtx.ReadLock();
-
-            if (IsParentVaultValid)
-            {
-                ParentVault->RecursiveReadWriteMtx.ReadLock();
-
-                res = Vault::GetRecords(key, keyValue, recordsRefs);
-                for (VaultRecordRef& ref: recordsRefs)
-                    ref.Vlt = ParentVault;
-                
-                ParentVault->RecursiveReadWriteMtx.ReadUnlock();
-            }
-            else 
-            {
-                res.Key = key;
-                res.RequestedType = typeid(keyValue);
-                res.IsOperationSuccess = false;
-                res.ResultCode = VaultOperationResultCode::ParentVaultNotValid;
-            }
-
-            RecursiveReadWriteMtx.ReadUnlock();
-            
-            return res;
-        }
+        VaultOperationResult GetRecords(const std::string& key, const T& keyValue, std::vector<VaultRecordRef>& recordsRefs, const std::size_t& amountOfRecords = -1) const;
 
         /**
             \brief The method for getting the result of the request
@@ -198,34 +126,7 @@ namespace mvlt
             \return VaultOperationResult object with RequestRecords result
         */
         template <class T>
-        VaultOperationResult RequestRecords(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordRef) const
-        {
-            VaultOperationResult res;
-            RecursiveReadWriteMtx.ReadLock();
-
-            if (IsParentVaultValid)
-            {
-                ParentVault->RecursiveReadWriteMtx.ReadLock();
-
-                // \todo Replace to reset to clear keys 
-                vaultRecordRef.Clear();
-                res = Vault::RequestRecords(key, keyValue, vaultRecordRef);
-                vaultRecordRef.ParentVault = ParentVault;
-
-                ParentVault->RecursiveReadWriteMtx.ReadUnlock();
-            }
-            else 
-            {
-                res.Key = key;
-                res.RequestedType = typeid(keyValue);
-                res.IsOperationSuccess = false;
-                res.ResultCode = VaultOperationResultCode::ParentVaultNotValid;
-            }
-
-            RecursiveReadWriteMtx.ReadUnlock();
-            
-            return res;
-        }
+        VaultOperationResult RequestRecords(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordRef) const;
 
         /// \brief Resets the object to its initial state
         void Reset();
@@ -259,31 +160,7 @@ namespace mvlt
             \return VaultOperationResult object with RemoveRecord result
         */
         template <class T>
-        VaultOperationResult RemoveRecord(const std::string& key, const T& keyValue)
-        {
-            VaultOperationResult res;
-            RecursiveReadWriteMtx.ReadLock();
-
-            if (IsParentVaultValid)
-            {
-                ParentVault->RecursiveReadWriteMtx.ReadLock();
-
-                res = Vault::RemoveRecord(key, keyValue, false);
-
-                ParentVault->RecursiveReadWriteMtx.ReadUnlock();
-            }
-            else 
-            {
-                res.Key = key;
-                res.RequestedType = typeid(keyValue);
-                res.IsOperationSuccess = false;
-                res.ResultCode = VaultOperationResultCode::ParentVaultNotValid;
-            }
-
-            RecursiveReadWriteMtx.ReadUnlock();
-            
-            return res;
-        }
+        VaultOperationResult RemoveRecord(const std::string& key, const T& keyValue);
 
         /**
             \brief The method for remove records using key and value
@@ -301,31 +178,7 @@ namespace mvlt
             \return VaultOperationResult object with RemoveRecords result
         */
         template <class T>
-        VaultOperationResult RemoveRecords(const std::string& key, const T& keyValue, const std::size_t& amountOfRecords = -1)
-        {
-            VaultOperationResult res;
-            RecursiveReadWriteMtx.ReadLock();
-
-            if (IsParentVaultValid)
-            {
-                ParentVault->RecursiveReadWriteMtx.ReadLock();
-
-                res = Vault::RemoveRecords(key, keyValue, amountOfRecords, false);
-
-                ParentVault->RecursiveReadWriteMtx.ReadUnlock();
-            }
-            else 
-            {
-                res.Key = key;
-                res.RequestedType = typeid(keyValue);
-                res.IsOperationSuccess = false;
-                res.ResultCode = VaultOperationResultCode::ParentVaultNotValid;
-            }
-
-            RecursiveReadWriteMtx.ReadUnlock();
-            
-            return res;
-        }
+        VaultOperationResult RemoveRecords(const std::string& key, const T& keyValue, const std::size_t& amountOfRecords = -1);
 
         /// \brief Method for getting the number of records
         /// If the parent Vault is not valid, it will return 0
@@ -369,20 +222,7 @@ namespace mvlt
             If the key is missing in the vault, the function will be called 0 times
         */
         template<class F>
-        void SortBy(const std::string& key, const F&& func, const bool& isReverse = false, const std::size_t& amountOfRecords = -1) const
-        {
-            RecursiveReadWriteMtx.ReadLock();
-
-            // Thread safety because in Vault destructor blocking this RecursiveReadWriteMtx to write
-            if (IsParentVaultValid)
-            {
-                ParentVault->RecursiveReadWriteMtx.ReadLock();
-                Vault::SortBy(key, func, isReverse, amountOfRecords);
-                ParentVault->RecursiveReadWriteMtx.ReadUnlock();
-            }
-
-            RecursiveReadWriteMtx.ReadUnlock();
-        }
+        void SortBy(const std::string& key, const F&& func, const bool& isReverse = false, const std::size_t& amountOfRecords = -1) const;
 
         /// \brief A method for displaying the contents of a Vault on the screen
         /// \param [in] amountOfRecords The number of records to be printed. The default value is -1, which means that all entries will be output
