@@ -24,5 +24,5 @@ target_link_libraries(CustomTypeExample MVault)
 add_executable(HandlingErrors HandlingErrors.cpp)
 target_link_libraries(HandlingErrors MVault)
 
-add_executable(VaultRequests VaultRequests.cpp)
-target_link_libraries(VaultRequests MVault)
+add_executable(VaultRecordSet VaultRecordSet.cpp)
+target_link_libraries(VaultRecordSet MVault)
