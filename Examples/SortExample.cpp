@@ -206,6 +206,6 @@ int main()
         (2 records)
         ```
 
-        As you can easily see, the largest id of an entry with the name Alexander is 9.
+        As you can easily see, the largest id of an record with the name Alexander is 9.
     */
 }

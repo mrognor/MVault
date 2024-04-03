@@ -152,7 +152,7 @@ namespace mvlt
 
         /**
             \brief A method for locking record
-            This method prevents the deletion of an entry from the Vault
+            This method prevents the deletion of an record from the Vault
             If the record is not valid, then the method will not do anything
 
             Usage example:

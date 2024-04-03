@@ -221,7 +221,7 @@ namespace mvlt
             \param [in] key the name of the key to search for
             \param [in] keyValue the value of the key to be found
             \param [in] vaultRecordRef A reference to VaultRecordSet
-            \param [in] amountOfRecords The number of records requested
+            \param [in] amountOfRecords The number of records requested. By default request all records
             
             \return VaultOperationResult object with RequestRecords result
         */
@@ -373,7 +373,7 @@ namespace mvlt
             \overload
             \brief Method to create new VaultRecord.
 
-            \param [in] vaultRecordRef The reference to the VaultRecordRef to which the new entry will be assigned
+            \param [in] vaultRecordRef The reference to the VaultRecordRef to which the new record will be assigned
             \param [in] params a vector of pairs with data to be put in the Vault
 
             \return VaultOperationResult object with GetData result
@@ -421,7 +421,7 @@ namespace mvlt
             \param [in] key the name of the key to search for
             \param [in] keyValue the value of the key to be found
             \param [in] vaultRecordRef A reference to VaultRecordSet
-            \param [in] amountOfRecords The number of records requested
+            \param [in] amountOfRecords The number of records requested. By default request all records
             
             \return VaultOperationResult object with RequestRecords result
         */
@@ -436,7 +436,7 @@ namespace mvlt
             \param [in] key the name of the key to search for
             \param [in] keyValue the value of the key to be found
             \param [in] vaultRecordRef A reference to VaultRecordSet
-            \param [in] amountOfRecords The number of records requested
+            \param [in] amountOfRecords The number of records requested. By default request all records
             
             \return VaultOperationResult object with RequestRecords result
         */
@@ -451,7 +451,7 @@ namespace mvlt
             \param [in] key the name of the key to search for
             \param [in] keyValue the value of the key to be found
             \param [in] vaultRecordRef A reference to VaultRecordSet
-            \param [in] amountOfRecords The number of records requested
+            \param [in] amountOfRecords The number of records requested. By default request all records
             
             \return VaultOperationResult object with RequestRecords result
         */
@@ -466,7 +466,7 @@ namespace mvlt
             \param [in] key the name of the key to search for
             \param [in] keyValue the value of the key to be found
             \param [in] vaultRecordRef A reference to VaultRecordSet
-            \param [in] amountOfRecords The number of records requested
+            \param [in] amountOfRecords The number of records requested. By default request all records
             
             \return VaultOperationResult object with RequestRecords result
         */
@@ -481,7 +481,7 @@ namespace mvlt
             \param [in] key the name of the key to search for
             \param [in] keyValue the value of the key to be found
             \param [in] vaultRecordRef A reference to VaultRecordSet
-            \param [in] amountOfRecords The number of records requested
+            \param [in] amountOfRecords The number of records requested. By default request all records
             
             \return VaultOperationResult object with RequestRecords result
         */

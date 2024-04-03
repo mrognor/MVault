@@ -5,6 +5,36 @@
 namespace mvlt
 {
     template <class T>
+    VaultOperationResult VaultRecordSet::RequestRecords(const RequestType& requestType, const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t amountOfRecords) const
+    {
+        VaultOperationResult res;
+        RecursiveReadWriteMtx.ReadLock();
+
+        if (IsParentVaultValid)
+        {
+            ParentVault->RecursiveReadWriteMtx.ReadLock();
+
+            // \todo Replace to reset to clear keys 
+            vaultRecordSet.Clear();
+            res = Vault::RequestRecords(requestType, key, keyValue, vaultRecordSet, amountOfRecords);
+            vaultRecordSet.ParentVault = ParentVault;
+
+            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
+        }
+        else 
+        {
+            res.Key = key;
+            res.RequestedType = typeid(keyValue);
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::ParentVaultNotValid;
+        }
+
+        RecursiveReadWriteMtx.ReadUnlock();
+        
+        return res;
+    }
+
+    template <class T>
     VaultOperationResult VaultRecordSet::GetKeyValue(const std::string& key, T& defaultKeyValue) const
     {
         VaultOperationResult res;
@@ -84,38 +114,37 @@ namespace mvlt
         
         return res;
     }
-
+    
     template <class T>
-    VaultOperationResult VaultRecordSet::RequestRecords(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordRef) const
+    VaultOperationResult VaultRecordSet::RequestEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
     {
-        VaultOperationResult res;
-        RecursiveReadWriteMtx.ReadLock();
-
-        if (IsParentVaultValid)
-        {
-            ParentVault->RecursiveReadWriteMtx.ReadLock();
-
-            // \todo Replace to reset to clear keys 
-            vaultRecordRef.Clear();
-            res = Vault::RequestRecords(RequestType::Equal, key, keyValue, vaultRecordRef);
-            vaultRecordRef.ParentVault = ParentVault;
-
-            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
-        }
-        else 
-        {
-            res.Key = key;
-            res.RequestedType = typeid(keyValue);
-            res.IsOperationSuccess = false;
-            res.ResultCode = VaultOperationResultCode::ParentVaultNotValid;
-        }
-
-        RecursiveReadWriteMtx.ReadUnlock();
-        
-        return res;
+        return RequestRecords(RequestType::Equal, key, keyValue, vaultRecordSet, amountOfRecords);
     }
 
-        
+    template <class T>
+    VaultOperationResult VaultRecordSet::RequestGreater(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
+    {
+        return RequestRecords(RequestType::Greater, key, keyValue, vaultRecordSet, amountOfRecords);
+    }
+
+    template <class T>
+    VaultOperationResult VaultRecordSet::RequestGreaterOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
+    {
+        return RequestRecords(RequestType::GreaterOrEqual, key, keyValue, vaultRecordSet, amountOfRecords);
+    }
+
+    template <class T>
+    VaultOperationResult VaultRecordSet::RequestLess(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
+    {
+        return RequestRecords(RequestType::Less, key, keyValue, vaultRecordSet, amountOfRecords);
+    }
+
+    template <class T>
+    VaultOperationResult VaultRecordSet::RequestLessOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
+    {
+        return RequestRecords(RequestType::LessOrEqual, key, keyValue, vaultRecordSet, amountOfRecords);
+    }
+
     template <class T>
     VaultOperationResult VaultRecordSet::RemoveRecord(const std::string& key, const T& keyValue)
     {

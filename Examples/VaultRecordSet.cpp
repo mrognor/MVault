@@ -40,7 +40,7 @@ int main()
     vrs2.PrintAsTable(true);
 
     std::cout << "Subrequest" << std::endl;
-    vrs.RequestRecords("A", 2, vrs2);
+    vrs.RequestEqual("A", 2, vrs2);
     vrs2.PrintAsTable(true);
 
     vrr.SetData("B", 3);
