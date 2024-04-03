@@ -278,6 +278,184 @@ namespace mvlt
     }
 
     template <class T>
+    VaultOperationResult Vault::RequestRecords(const RequestType& requestType, const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
+    {
+        // Fill res info known at start
+        VaultOperationResult res;
+        res.Key = key;
+        res.RequestedType = typeid(T);
+        
+        vaultRecordSet.RecursiveReadWriteMtx.WriteLock();
+        RecursiveReadWriteMtx.ReadLock();
+
+        // If key not exist
+        if(!GetKeyType(key, res.SavedType))
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::WrongKey;
+            RecursiveReadWriteMtx.ReadUnlock();
+            vaultRecordSet.RecursiveReadWriteMtx.WriteUnlock();
+
+            return res;
+        }
+
+        // Check types
+        if (res.SavedType != res.RequestedType)
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::WrongType;
+            RecursiveReadWriteMtx.ReadUnlock();
+            vaultRecordSet.RecursiveReadWriteMtx.WriteUnlock();
+            return res;
+        }
+        
+        // Save vaultRecordSet
+        RecordSetsSet.emplace(&vaultRecordSet);
+
+        // Set new parent vault to vaultRecordSet
+        vaultRecordSet.ParentVault = const_cast<Vault*>(this);
+        vaultRecordSet.IsParentVaultValid = true;
+        
+        // Copy keys from this to vaultRecordSet
+        for (auto& keyCopierIt : VaultKeyCopiers)
+            keyCopierIt.second(vaultRecordSet);
+        
+        // Check if request type is equal
+        if (requestType == RequestType::Equal)
+        {
+            // Pointer to store hash map inside VaultStructureHashMap
+            std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
+
+            // Get hash map
+            VaultHashMapStructure.GetData(key, TtoVaultRecordHashMap);
+            
+            // Pair with begin and end iterator with T type and keyValue value
+            auto equalRange = TtoVaultRecordHashMap->equal_range(keyValue);
+            if (equalRange.first != TtoVaultRecordHashMap->end())
+            {
+                std::size_t counter = 0;
+                for (auto it = equalRange.first; it != equalRange.second; ++it)
+                {
+                    // Add pointer to record from this to vaultRecordSet
+                    vaultRecordSet.RecordsSet.emplace(it->second);
+                    
+                    // Add pointer to record from this to vaultRecordSet structure
+                    for (auto& adder : vaultRecordSet.VaultRecordAdders)
+                        adder.second(it->second);
+
+                    // Lock VaultRecord to thread safety add new dependent VaultRecordSet
+                    it->second->Mtx.lock();
+                    it->second->dependentVaultRecordSets.emplace(&vaultRecordSet);
+                    it->second->Mtx.unlock();
+
+                    ++counter;
+                    if (counter > amountOfRecords) break;
+                }
+            }
+        }
+        else 
+        {
+            // Pointer to store map inside VaultStructureHashMap
+            std::multimap<T, VaultRecord*>* TtoVaultRecordMap = nullptr;
+
+            // Get map
+            VaultMapStructure.GetData(key, TtoVaultRecordMap);
+            
+            // Iterator to set it in switch
+            decltype(TtoVaultRecordMap->end()) startIt, endIt;
+
+            // Simpe bool variable for switch
+            bool flag = false;
+
+            // Switch by request type
+            switch (requestType) 
+            {
+            case GreaterOrEqual:
+                startIt = TtoVaultRecordMap->lower_bound(keyValue);
+                endIt = TtoVaultRecordMap->end();
+                break;
+            
+            case Greater:
+                startIt = TtoVaultRecordMap->lower_bound(keyValue);
+
+                // Iterate to the next value
+                for (auto it = startIt; it != TtoVaultRecordMap->end(); ++it)
+                {
+                    if (it->first != startIt->first) 
+                    {
+                        startIt = it;
+                        flag = true;
+                        break;
+                    }
+                }
+                
+                // Check if it is any record with key value greater than keyValue 
+                if (!flag) startIt = TtoVaultRecordMap->end();
+                
+                endIt = TtoVaultRecordMap->end();
+                break;
+            
+            case Less:
+                startIt = TtoVaultRecordMap->begin();
+                endIt = TtoVaultRecordMap->upper_bound(keyValue);
+
+                // Check if TtoVaultRecordMap size not zero and endIt not last iterator
+                if (endIt != TtoVaultRecordMap->begin() && TtoVaultRecordMap->size() > 0)
+                {
+                    // Upper bound return next iterator with value greater then keyValue
+                    --endIt;
+
+                    // Iterate to previous value
+                    while(endIt != TtoVaultRecordMap->begin() && endIt->first == keyValue)
+                        --endIt;
+                    
+                    // Increase iterator to add later last element in vaultRecordSet 
+                    if (endIt != TtoVaultRecordMap->begin())
+                        ++endIt;
+                }
+
+                break;
+            
+            case LessOrEqual:
+                startIt = TtoVaultRecordMap->begin();
+                endIt = TtoVaultRecordMap->upper_bound(keyValue);
+                break;
+            
+            case Equal:
+                break;
+            }
+
+            std::size_t counter = 0;
+            for (auto it = startIt; it != endIt; ++it)
+            {
+                // Add pointer to record from this to vaultRecordSet
+                vaultRecordSet.RecordsSet.emplace(it->second);
+                
+                // Add pointer to record from this to vaultRecordSet structure
+                for (auto& adder : vaultRecordSet.VaultRecordAdders)
+                    adder.second(it->second);
+
+                // Lock VaultRecord to thread safety add new dependent VaultRecordSet
+                it->second->Mtx.lock();
+                it->second->dependentVaultRecordSets.emplace(&vaultRecordSet);
+                it->second->Mtx.unlock();
+
+                ++counter;
+                if (counter >= amountOfRecords) break;
+            }
+        }
+
+        RecursiveReadWriteMtx.ReadUnlock();
+        vaultRecordSet.RecursiveReadWriteMtx.WriteUnlock();
+
+        res.ResultCode = VaultOperationResultCode::Success;
+        res.SavedType = res.RequestedType;
+        res.IsOperationSuccess = true;
+
+        return res;
+    }
+
+    template <class T>
     bool Vault::AddKey(const std::string& key, const T& defaultKeyValue, const bool& isCalledFromVault)
     {
         RecursiveReadWriteMtx.WriteLock();
@@ -603,86 +781,33 @@ namespace mvlt
     }
 
     template <class T>
-    VaultOperationResult Vault::RequestRecords(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
+    VaultOperationResult Vault::RequestEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
     {
-        // Fill res info known at start
-        VaultOperationResult res;
-        res.Key = key;
-        res.RequestedType = typeid(T);
-        
-        vaultRecordSet.RecursiveReadWriteMtx.WriteLock();
-        RecursiveReadWriteMtx.ReadLock();
+        return RequestRecords(RequestType::Equal, key, keyValue, vaultRecordSet, amountOfRecords);
+    }
 
-        // If key not exist
-        if(!GetKeyType(key, res.SavedType))
-        {
-            res.IsOperationSuccess = false;
-            res.ResultCode = VaultOperationResultCode::WrongKey;
-            RecursiveReadWriteMtx.ReadUnlock();
-            vaultRecordSet.RecursiveReadWriteMtx.WriteUnlock();
+    template <class T>
+    VaultOperationResult Vault::RequestGreater(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
+    {
+        return RequestRecords(RequestType::Greater, key, keyValue, vaultRecordSet, amountOfRecords);
+    }
 
-            return res;
-        }
+    template <class T>
+    VaultOperationResult Vault::RequestGreaterOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
+    {
+        return RequestRecords(RequestType::GreaterOrEqual, key, keyValue, vaultRecordSet, amountOfRecords);
+    }
 
-        // Check types
-        if (res.SavedType != res.RequestedType)
-        {
-            res.IsOperationSuccess = false;
-            res.ResultCode = VaultOperationResultCode::WrongType;
-            RecursiveReadWriteMtx.ReadUnlock();
-            vaultRecordSet.RecursiveReadWriteMtx.WriteUnlock();
-            return res;
-        }
-        
-        // Save vaultRecordSet
-        RecordSetsSet.emplace(&vaultRecordSet);
+    template <class T>
+    VaultOperationResult Vault::RequestLess(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
+    {
+        return RequestRecords(RequestType::Less, key, keyValue, vaultRecordSet, amountOfRecords);
+    }
 
-        // Set new parent vault to vaultRecordSet
-        vaultRecordSet.ParentVault = const_cast<Vault*>(this);
-        vaultRecordSet.IsParentVaultValid = true;
-        
-        // Copy keys from this to vaultRecordSet
-        for (auto& keyCopierIt : VaultKeyCopiers)
-            keyCopierIt.second(vaultRecordSet);
-        
-        // Pointer to store map inside VaultStructureHashMap
-        std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
-
-        // Get map
-        VaultHashMapStructure.GetData(key, TtoVaultRecordHashMap);
-        
-        // Pair with begin and end iterator with T type and keyValue value
-        auto equalRange = TtoVaultRecordHashMap->equal_range(keyValue);
-        if (equalRange.first != TtoVaultRecordHashMap->end())
-        {
-            std::size_t counter = 0;
-            for (auto it = equalRange.first; it != equalRange.second; ++it)
-            {
-                // Add pointer to record from this to vaultRecordSet
-                vaultRecordSet.RecordsSet.emplace(it->second);
-                
-                // Add pointer to record from this to vaultRecordSet structure
-                for (auto& adder : vaultRecordSet.VaultRecordAdders)
-                    adder.second(it->second);
-
-                // Lock VaultRecord to thread safety add new dependent VaultRecordSet
-                it->second->Mtx.lock();
-                it->second->dependentVaultRecordSets.emplace(&vaultRecordSet);
-                it->second->Mtx.unlock();
-
-                ++counter;
-                if (counter > amountOfRecords) break;
-            }
-        }
-
-        RecursiveReadWriteMtx.ReadUnlock();
-        vaultRecordSet.RecursiveReadWriteMtx.WriteUnlock();
-
-        res.ResultCode = VaultOperationResultCode::Success;
-        res.SavedType = res.RequestedType;
-        res.IsOperationSuccess = true;
-
-        return res;
+    template <class T>
+    VaultOperationResult Vault::RequestLessOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
+    {
+        return RequestRecords(RequestType::LessOrEqual, key, keyValue, vaultRecordSet, amountOfRecords);
     }
 
     template <class T>

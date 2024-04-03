@@ -81,6 +81,16 @@ namespace mvlt
 
     protected:
 
+        /// \brief An enum with the types of all possible requests
+        enum RequestType 
+        {
+            Greater,       ///< A request that will receive all records with a key value greater than the requested one
+            GreaterOrEqual,///< A request that will receive all records with a key value greater than or equal to the requested one
+            Equal,         ///< A request that will receive all records whose key value is equal to the requested one
+            LessOrEqual,   ///< A request that will receive all records whose key value is less than or equal to the requested one
+            Less           ///< A request that will receive all records with a key value less than the requested one
+        };
+
         /// \brief Unordered set with all VaultRecord pointers
         std::unordered_set<VaultRecord*> RecordsSet;
 
@@ -201,6 +211,22 @@ namespace mvlt
             \return Returns true if the key existed, otherwise returns false
         */
         bool RemoveKey(const std::string& key, const bool& isCalledFromVault);
+
+        /**
+            \brief The method for getting the result of the request
+
+            \tparam <T> Any type of data except for c arrays
+
+            \param [in] requestType Type of request
+            \param [in] key the name of the key to search for
+            \param [in] keyValue the value of the key to be found
+            \param [in] vaultRecordRef A reference to VaultRecordSet
+            \param [in] amountOfRecords The number of records requested
+            
+            \return VaultOperationResult object with RequestRecords result
+        */
+        template <class T>
+        VaultOperationResult RequestRecords(const RequestType& requestType, const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords = -1) const;
 
     public:
 
@@ -386,9 +412,9 @@ namespace mvlt
         */
         template <class T>
         VaultOperationResult GetRecords(const std::string& key, const T& keyValue, std::vector<VaultRecordRef>& recordsRefs, const std::size_t& amountOfRecords = -1) const;
-
+        
         /**
-            \brief The method for getting the result of the request
+            \brief A method for getting all records that have a value equal to keyValue stored by the key key
 
             \tparam <T> Any type of data except for c arrays
 
@@ -400,7 +426,67 @@ namespace mvlt
             \return VaultOperationResult object with RequestRecords result
         */
         template <class T>
-        VaultOperationResult RequestRecords(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords = -1) const;
+        VaultOperationResult RequestEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords = -1) const;
+
+        /**
+            \brief A method for getting all records that have a value greater than keyValue stored by the key key
+
+            \tparam <T> Any type of data except for c arrays
+
+            \param [in] key the name of the key to search for
+            \param [in] keyValue the value of the key to be found
+            \param [in] vaultRecordRef A reference to VaultRecordSet
+            \param [in] amountOfRecords The number of records requested
+            
+            \return VaultOperationResult object with RequestRecords result
+        */
+        template <class T>
+        VaultOperationResult RequestGreater(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords = -1) const;
+
+        /**
+            \brief A method for getting all records that have a value greater than or equal to keyValue stored by the key key
+
+            \tparam <T> Any type of data except for c arrays
+
+            \param [in] key the name of the key to search for
+            \param [in] keyValue the value of the key to be found
+            \param [in] vaultRecordRef A reference to VaultRecordSet
+            \param [in] amountOfRecords The number of records requested
+            
+            \return VaultOperationResult object with RequestRecords result
+        */
+        template <class T>
+        VaultOperationResult RequestGreaterOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords = -1) const;
+
+        /**
+            \brief A method for getting all records that have a value less than keyValue stored by the key key
+
+            \tparam <T> Any type of data except for c arrays
+
+            \param [in] key the name of the key to search for
+            \param [in] keyValue the value of the key to be found
+            \param [in] vaultRecordRef A reference to VaultRecordSet
+            \param [in] amountOfRecords The number of records requested
+            
+            \return VaultOperationResult object with RequestRecords result
+        */
+        template <class T>
+        VaultOperationResult RequestLess(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords = -1) const;
+
+        /**
+            \brief A method for getting all records that have a value less than or equal to keyValue stored by the key key
+
+            \tparam <T> Any type of data except for c arrays
+
+            \param [in] key the name of the key to search for
+            \param [in] keyValue the value of the key to be found
+            \param [in] vaultRecordRef A reference to VaultRecordSet
+            \param [in] amountOfRecords The number of records requested
+            
+            \return VaultOperationResult object with RequestRecords result
+        */
+        template <class T>
+        VaultOperationResult RequestLessOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords = -1) const;
 
         /// \brief A method for deleting all data and keys
         void DropVault();

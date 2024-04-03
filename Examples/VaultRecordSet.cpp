@@ -16,7 +16,7 @@ int main()
 
 
     mvlt::VaultRecordSet vrs, vrs2;
-    vlt.RequestRecords("A", 0, vrs);
+    vlt.RequestEqual("A", 0, vrs);
     vrs2 = vrs;
     std::cout << "Requested vault: " << std::endl;
     vrs.PrintAsTable(true);
@@ -93,7 +93,7 @@ int main()
     vlt.CreateRecord();
     vlt.CreateRecord();
     
-    vlt.RequestRecords("A", 0, vrs);
+    vlt.RequestEqual("A", 0, vrs);
 
     std::cout << "Before" << std::endl;
     vlt.PrintAsTable(true);

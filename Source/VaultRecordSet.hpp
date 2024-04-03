@@ -97,7 +97,7 @@ namespace mvlt
 
             // \todo Replace to reset to clear keys 
             vaultRecordRef.Clear();
-            res = Vault::RequestRecords(key, keyValue, vaultRecordRef);
+            res = Vault::RequestRecords(RequestType::Equal, key, keyValue, vaultRecordRef);
             vaultRecordRef.ParentVault = ParentVault;
 
             ParentVault->RecursiveReadWriteMtx.ReadUnlock();
