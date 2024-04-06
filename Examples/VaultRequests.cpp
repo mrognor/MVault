@@ -31,4 +31,32 @@ int main()
     vrs.Clear();
     vlt.RequestLess("A", 5, vrs);
     vrs.PrintAsTable();
+
+    std::cout << "Request interval [2, 4]" << std::endl;
+    vrs.Clear();
+    vlt.RequestInterval("A", 2, 4, vrs);
+    vrs.PrintAsTable();
+
+    std::cout << "Request interval [5, 9)" << std::endl;
+    vrs.Clear();
+    vlt.RequestInterval("A", 5, 9, vrs, true, false);
+    vrs.PrintAsTable();
+
+    std::cout << "Request interval (4, 7]" << std::endl;
+    vrs.Clear();
+    vlt.RequestInterval("A", 4, 7, vrs, false, true);
+    vrs.PrintAsTable();
+
+    std::cout << "Request interval (1, 6)" << std::endl;
+    vrs.Clear();
+    vlt.RequestInterval("A", 1, 6, vrs, false, false);
+    vrs.PrintAsTable();
+
+    std::cout << "Request interval [1, 9) and less 5 inside it" << std::endl;
+    vrs.Clear();
+    vlt.RequestInterval("A", 1, 9, vrs, true, false);
+
+    mvlt::VaultRecordSet vrsReq;
+    vrs.RequestLess("A", 5, vrsReq);
+    vrsReq.PrintAsTable();
 }

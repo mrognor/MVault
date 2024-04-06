@@ -27,15 +27,19 @@ namespace mvlt
 
             \param [in] requestType Type of request
             \param [in] key the name of the key to search for
-            \param [in] keyValue the value of the key to be found
+            \param [in] beginKeyValue the begin value of the key to be found
+            \param [in] endKeyValue the end value of the key to be found
+            \param [in] isIncludeBeginKeyValue include beginKeyValue in the interval or not
+            \param [in] isIncludeEndKeyValue include endKeyValue in the interval or not
             \param [in] vaultRecordSet A reference to VaultRecordSet
             \param [in] amountOfRecords The number of records requested. By default request all records
             
             \return VaultOperationResult object with RequestRecords result
         */
         template <class T>
-        VaultOperationResult RequestRecords(const RequestType& requestType, const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t amountOfRecords = -1) const;
-
+        VaultOperationResult RequestRecords(const RequestType& requestType, const std::string& key, const T& beginKeyValue,
+            const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue, 
+            const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords) const;
     public:
 
         /// Make Vault class friend
@@ -204,6 +208,26 @@ namespace mvlt
         template <class T>
         VaultOperationResult RequestLessOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords = -1) const;
 
+        /**
+            \brief The method for getting the result of the request
+
+            \tparam <T> Any type of data except for c arrays
+
+            \param [in] key the name of the key to search for
+            \param [in] beginKeyValue the begin value of the key to be found
+            \param [in] endKeyValue the end value of the key to be found
+            \param [in] isIncludeBeginKeyValue include beginKeyValue in the interval or not
+            \param [in] isIncludeEndKeyValue include endKeyValue in the interval or not
+            \param [in] vaultRecordSet A reference to VaultRecordSet
+            \param [in] amountOfRecords The number of records requested. By default request all records
+            
+            \return VaultOperationResult object with RequestRecords result
+        */
+        template <class T>
+        VaultOperationResult RequestInterval(const std::string& key, const T& beginKeyValue,
+            const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue = true, 
+            const bool& isIncludeEndKeyValue = true, const std::size_t& amountOfRecords = -1) const;
+            
         /// \brief Resets the object to its initial state
         void Reset();
 

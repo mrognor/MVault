@@ -88,7 +88,8 @@ namespace mvlt
             GreaterOrEqual,///< A request that will receive all records with a key value greater than or equal to the requested one
             Equal,         ///< A request that will receive all records whose key value is equal to the requested one
             LessOrEqual,   ///< A request that will receive all records whose key value is less than or equal to the requested one
-            Less           ///< A request that will receive all records with a key value less than the requested one
+            Less,          ///< A request that will receive all records with a key value less than the requested one
+            Interval       ///< A request that will receive all records with a key value between requested
         };
 
         /// \brief Unordered set with all VaultRecord pointers
@@ -219,14 +220,19 @@ namespace mvlt
 
             \param [in] requestType Type of request
             \param [in] key the name of the key to search for
-            \param [in] keyValue the value of the key to be found
-            \param [in] vaultRecordRef A reference to VaultRecordSet
+            \param [in] beginKeyValue the begin value of the key to be found
+            \param [in] endKeyValue the end value of the key to be found
+            \param [in] isIncludeBeginKeyValue include beginKeyValue in the interval or not
+            \param [in] isIncludeEndKeyValue include endKeyValue in the interval or not
+            \param [in] vaultRecordSet A reference to VaultRecordSet
             \param [in] amountOfRecords The number of records requested. By default request all records
             
             \return VaultOperationResult object with RequestRecords result
         */
         template <class T>
-        VaultOperationResult RequestRecords(const RequestType& requestType, const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords = -1) const;
+        VaultOperationResult RequestRecords(const RequestType& requestType, const std::string& key, const T& beginKeyValue,
+            const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue, 
+            const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords) const;
 
     public:
 
@@ -488,6 +494,26 @@ namespace mvlt
         template <class T>
         VaultOperationResult RequestLessOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords = -1) const;
 
+        /**
+            \brief The method for getting the result of the request
+
+            \tparam <T> Any type of data except for c arrays
+
+            \param [in] key the name of the key to search for
+            \param [in] beginKeyValue the begin value of the key to be found
+            \param [in] endKeyValue the end value of the key to be found
+            \param [in] isIncludeBeginKeyValue include beginKeyValue in the interval or not
+            \param [in] isIncludeEndKeyValue include endKeyValue in the interval or not
+            \param [in] vaultRecordSet A reference to VaultRecordSet
+            \param [in] amountOfRecords The number of records requested. By default request all records
+            
+            \return VaultOperationResult object with RequestRecords result
+        */
+        template <class T>
+        VaultOperationResult RequestInterval(const std::string& key, const T& beginKeyValue,
+            const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue = true, 
+            const bool& isIncludeEndKeyValue = true, const std::size_t& amountOfRecords = -1) const;
+        
         /// \brief A method for deleting all data and keys
         void DropVault();
 

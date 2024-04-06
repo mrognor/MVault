@@ -278,7 +278,9 @@ namespace mvlt
     }
 
     template <class T>
-    VaultOperationResult Vault::RequestRecords(const RequestType& requestType, const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
+    VaultOperationResult Vault::RequestRecords(const RequestType& requestType, const std::string& key, const T& beginKeyValue,
+        const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue, 
+        const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords) const
     {
         // Fill res info known at start
         VaultOperationResult res;
@@ -329,8 +331,8 @@ namespace mvlt
             // Get hash map
             VaultHashMapStructure.GetData(key, TtoVaultRecordHashMap);
             
-            // Pair with begin and end iterator with T type and keyValue value
-            auto equalRange = TtoVaultRecordHashMap->equal_range(keyValue);
+            // Pair with begin and end iterator with T type and beginKeyValue value
+            auto equalRange = TtoVaultRecordHashMap->equal_range(beginKeyValue);
             if (equalRange.first != TtoVaultRecordHashMap->end())
             {
                 std::size_t counter = 0;
@@ -364,63 +366,89 @@ namespace mvlt
             // Iterator to set it in switch
             decltype(TtoVaultRecordMap->end()) startIt, endIt;
 
-            // Simpe bool variable for switch
-            bool flag = false;
+            // Lambda function for finding greater value iterator
+            auto findGreater = [&]()
+                {
+                    bool flag = false;
+                    startIt = TtoVaultRecordMap->lower_bound(beginKeyValue);
+
+                    // If it is not beginKeyValue in map and it is value bigger than beginKeyValue in map
+                    if (startIt != TtoVaultRecordMap->end() && startIt->first > beginKeyValue)
+                        return;
+                        
+                    // Iterate to the next value
+                    for (auto it = startIt; it != TtoVaultRecordMap->end(); ++it)
+                    {
+                        if (it->first != startIt->first) 
+                        {
+                            startIt = it;
+                            flag = true;
+                            break;
+                        }
+                    }
+                
+                    // Check if it is any record with key value greater than beginKeyValue 
+                    if (!flag) startIt = TtoVaultRecordMap->end();
+                };
+
+            // Lambda function for finding less value iterator
+            auto findLess = [&]()
+                {
+                    endIt = TtoVaultRecordMap->upper_bound(endKeyValue);
+
+                    // Check if TtoVaultRecordMap size not zero and endIt not last iterator
+                    if (endIt != TtoVaultRecordMap->begin() && TtoVaultRecordMap->size() > 0)
+                    {
+                        // Upper bound return next iterator with value greater then endKeyValue
+                        --endIt;
+
+                        // Iterate to previous value
+                        while(endIt != TtoVaultRecordMap->begin() && endIt->first == endKeyValue)
+                            --endIt;
+                        
+                        // Increase iterator to add later last element in vaultRecordSet 
+                        // if (endIt != TtoVaultRecordMap->begin())
+                            ++endIt;
+                    }
+                };
 
             // Switch by request type
             switch (requestType) 
             {
             case GreaterOrEqual:
-                startIt = TtoVaultRecordMap->lower_bound(keyValue);
+                startIt = TtoVaultRecordMap->lower_bound(beginKeyValue);
                 endIt = TtoVaultRecordMap->end();
                 break;
             
             case Greater:
-                startIt = TtoVaultRecordMap->lower_bound(keyValue);
-
-                // Iterate to the next value
-                for (auto it = startIt; it != TtoVaultRecordMap->end(); ++it)
-                {
-                    if (it->first != startIt->first) 
-                    {
-                        startIt = it;
-                        flag = true;
-                        break;
-                    }
-                }
-                
-                // Check if it is any record with key value greater than keyValue 
-                if (!flag) startIt = TtoVaultRecordMap->end();
-                
+                findGreater();
                 endIt = TtoVaultRecordMap->end();
                 break;
             
             case Less:
                 startIt = TtoVaultRecordMap->begin();
-                endIt = TtoVaultRecordMap->upper_bound(keyValue);
-
-                // Check if TtoVaultRecordMap size not zero and endIt not last iterator
-                if (endIt != TtoVaultRecordMap->begin() && TtoVaultRecordMap->size() > 0)
-                {
-                    // Upper bound return next iterator with value greater then keyValue
-                    --endIt;
-
-                    // Iterate to previous value
-                    while(endIt != TtoVaultRecordMap->begin() && endIt->first == keyValue)
-                        --endIt;
-                    
-                    // Increase iterator to add later last element in vaultRecordSet 
-                    if (endIt != TtoVaultRecordMap->begin())
-                        ++endIt;
-                }
-
+                findLess();
                 break;
             
             case LessOrEqual:
                 startIt = TtoVaultRecordMap->begin();
-                endIt = TtoVaultRecordMap->upper_bound(keyValue);
+                endIt = TtoVaultRecordMap->upper_bound(beginKeyValue);
                 break;
             
+            case Interval:
+                if (beginKeyValue > endKeyValue || (beginKeyValue == endKeyValue && (isIncludeBeginKeyValue == false || isIncludeEndKeyValue == false)))
+                {
+                    startIt = TtoVaultRecordMap->end();
+                    endIt = TtoVaultRecordMap->end();
+                    break;
+                }
+
+                if(isIncludeBeginKeyValue) startIt = TtoVaultRecordMap->lower_bound(beginKeyValue);
+                else findGreater();
+                if(isIncludeEndKeyValue) endIt = TtoVaultRecordMap->upper_bound(endKeyValue);
+                else findLess();
+                break;
+
             case Equal:
                 break;
             }
@@ -783,31 +811,41 @@ namespace mvlt
     template <class T>
     VaultOperationResult Vault::RequestEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
     {
-        return RequestRecords(RequestType::Equal, key, keyValue, vaultRecordSet, amountOfRecords);
+        return RequestRecords(RequestType::Equal, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords);
     }
 
     template <class T>
     VaultOperationResult Vault::RequestGreater(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
     {
-        return RequestRecords(RequestType::Greater, key, keyValue, vaultRecordSet, amountOfRecords);
+        return RequestRecords(RequestType::Greater, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords);
     }
 
     template <class T>
     VaultOperationResult Vault::RequestGreaterOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
     {
-        return RequestRecords(RequestType::GreaterOrEqual, key, keyValue, vaultRecordSet, amountOfRecords);
+        return RequestRecords(RequestType::GreaterOrEqual, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords);
     }
 
     template <class T>
     VaultOperationResult Vault::RequestLess(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
     {
-        return RequestRecords(RequestType::Less, key, keyValue, vaultRecordSet, amountOfRecords);
+        return RequestRecords(RequestType::Less, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords);
     }
 
     template <class T>
     VaultOperationResult Vault::RequestLessOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
     {
-        return RequestRecords(RequestType::LessOrEqual, key, keyValue, vaultRecordSet, amountOfRecords);
+        return RequestRecords(RequestType::LessOrEqual, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords);
+    }
+
+    template <class T>
+    VaultOperationResult Vault::RequestInterval(const std::string& key, const T& beginKeyValue,
+        const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue, 
+        const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords) const
+    {
+        return RequestRecords(RequestType::Interval, key, beginKeyValue, 
+            endKeyValue, vaultRecordSet, isIncludeBeginKeyValue, isIncludeEndKeyValue, 
+            amountOfRecords);
     }
 
     template <class T>

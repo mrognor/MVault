@@ -5,7 +5,9 @@
 namespace mvlt
 {
     template <class T>
-    VaultOperationResult VaultRecordSet::RequestRecords(const RequestType& requestType, const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t amountOfRecords) const
+    VaultOperationResult VaultRecordSet::RequestRecords(const RequestType& requestType, const std::string& key, const T& beginKeyValue,
+            const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue, 
+            const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords) const
     {
         VaultOperationResult res;
         RecursiveReadWriteMtx.ReadLock();
@@ -16,7 +18,7 @@ namespace mvlt
 
             // \todo Replace to reset to clear keys 
             vaultRecordSet.Clear();
-            res = Vault::RequestRecords(requestType, key, keyValue, vaultRecordSet, amountOfRecords);
+            res = Vault::RequestRecords(requestType, key, beginKeyValue, endKeyValue, vaultRecordSet, false, false, amountOfRecords);
             vaultRecordSet.ParentVault = ParentVault;
 
             ParentVault->RecursiveReadWriteMtx.ReadUnlock();
@@ -24,7 +26,7 @@ namespace mvlt
         else 
         {
             res.Key = key;
-            res.RequestedType = typeid(keyValue);
+            res.RequestedType = typeid(beginKeyValue);
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::ParentVaultNotValid;
         }
@@ -118,31 +120,41 @@ namespace mvlt
     template <class T>
     VaultOperationResult VaultRecordSet::RequestEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
     {
-        return RequestRecords(RequestType::Equal, key, keyValue, vaultRecordSet, amountOfRecords);
+        return RequestRecords(RequestType::Equal, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords);
     }
 
     template <class T>
     VaultOperationResult VaultRecordSet::RequestGreater(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
     {
-        return RequestRecords(RequestType::Greater, key, keyValue, vaultRecordSet, amountOfRecords);
+        return RequestRecords(RequestType::Greater, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords);
     }
 
     template <class T>
     VaultOperationResult VaultRecordSet::RequestGreaterOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
     {
-        return RequestRecords(RequestType::GreaterOrEqual, key, keyValue, vaultRecordSet, amountOfRecords);
+        return RequestRecords(RequestType::GreaterOrEqual, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords);
     }
 
     template <class T>
     VaultOperationResult VaultRecordSet::RequestLess(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
     {
-        return RequestRecords(RequestType::Less, key, keyValue, vaultRecordSet, amountOfRecords);
+        return RequestRecords(RequestType::Less, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords);
     }
 
     template <class T>
     VaultOperationResult VaultRecordSet::RequestLessOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
     {
-        return RequestRecords(RequestType::LessOrEqual, key, keyValue, vaultRecordSet, amountOfRecords);
+        return RequestRecords(RequestType::LessOrEqual, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords);
+    }
+
+    template <class T>
+    VaultOperationResult VaultRecordSet::RequestInterval(const std::string& key, const T& beginKeyValue,
+        const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue, 
+        const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords) const
+    {
+        return RequestRecords(RequestType::Interval, key, beginKeyValue, 
+            endKeyValue, vaultRecordSet, isIncludeBeginKeyValue, isIncludeEndKeyValue, 
+            amountOfRecords);
     }
 
     template <class T>
