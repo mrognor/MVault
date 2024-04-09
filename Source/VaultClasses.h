@@ -6,13 +6,22 @@
 
 namespace mvlt
 {
+    // MVault classes
     class Vault;
     class VaultRecord;
+    class VaultRequest;
     class VaultRecordRef;
     class VaultRecordSet;
     class VaultParamInput;
     class VaultOperationResult;
     
+    // MVault requests
+    class Less;
+    class Equal;
+    class Greater;
+    class LessOrEqual;
+    class GreaterOrEqual;
+
     /**
         A simple typedef for HashMap. It is necessary for a more understandable separation of types.
         Represents the internal structure of the Vault.

@@ -13,6 +13,7 @@ set(MVaultHeaders
 
     Vault.h 
     VaultRecord.h
+    VaultRequest.h
     VaultRecordRef.h
     VaultFunctions.h
     VaultRecordSet.h
@@ -28,14 +29,16 @@ set(MVaultHeaders
 )
 
 set(MVaultTemplates
+    VaultRequest.hpp
     VaultRecordRef.hpp
-    VaultParamInput.hpp
     VaultRecordSet.hpp
+    VaultParamInput.hpp
 )
 
 set(MVaultSource
-    Vault.cpp 
+    Vault.cpp
     VaultRecord.cpp
+    VaultRequest.cpp
     VaultRecordRef.cpp
     VaultParamInput.cpp
     VaultOperationResult.cpp

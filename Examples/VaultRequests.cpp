@@ -59,4 +59,14 @@ int main()
     mvlt::VaultRecordSet vrsReq;
     vrs.RequestLess("A", 5, vrsReq);
     vrsReq.PrintAsTable();
+
+    std::cout << "Complex request A equal 2" << std::endl;
+    vrs.Clear();
+    vlt.Request(mvlt::Equal("A", 2), vrs);
+    vrs.PrintAsTable();
+
+    std::cout << "Complex request A greater 7" << std::endl;
+    vrs.Clear();
+    vlt.Request(mvlt::Greater("A", 7), vrs);
+    vrs.PrintAsTable();
 }

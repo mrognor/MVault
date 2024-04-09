@@ -1,5 +1,7 @@
 #include "Vault.h"
+
 #include "Vault.hpp"
+#include "VaultRequest.hpp"
 #include "VaultRecordRef.hpp"
 
 namespace mvlt
@@ -218,6 +220,11 @@ namespace mvlt
         RecursiveReadWriteMtx.WriteUnlock();
 
         return res;
+    }
+
+    void Vault::Request(const VaultRequest& request, VaultRecordSet& vaultRecordSet) const
+    {
+        request.Request(const_cast<Vault*>(this), vaultRecordSet);
     }
 
     void Vault::DropVault()

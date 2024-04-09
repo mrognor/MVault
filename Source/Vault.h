@@ -6,6 +6,7 @@
 #include "VaultClasses.h"
 
 #include "VaultRecord.h"
+#include "VaultRequest.h"
 #include "VaultRecordRef.h"
 #include "VaultFunctions.h"
 #include "VaultParamInput.h"
@@ -513,6 +514,14 @@ namespace mvlt
         VaultOperationResult RequestInterval(const std::string& key, const T& beginKeyValue,
             const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue = true, 
             const bool& isIncludeEndKeyValue = true, const std::size_t& amountOfRecords = -1) const;
+        
+        /**
+            \brief A method for complex requests
+
+            \param [in] request The inheritor of the Request class for the request
+            \param [in] vaultRecordSet Set, to save the query result
+        */
+        void Request(const VaultRequest& request, VaultRecordSet& vaultRecordSet) const;
         
         /// \brief A method for deleting all data and keys
         void DropVault();

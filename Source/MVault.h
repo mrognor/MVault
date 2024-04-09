@@ -1,5 +1,6 @@
 #include "Vault.h"
 #include "VaultRecord.h"
+#include "VaultRequest.h"
 #include "VaultRecordRef.h"
 #include "VaultFunctions.h"
 #include "VaultRecordSet.h"
@@ -14,6 +15,7 @@
 #include "Functions/PrintAsTable.h"
 
 #include "Vault.hpp"
+#include "VaultRequest.hpp"
 #include "VaultRecordSet.hpp"
 #include "VaultRecordRef.hpp"
 #include "VaultParamInput.hpp"
