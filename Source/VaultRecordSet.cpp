@@ -276,6 +276,56 @@ namespace mvlt
         RecursiveReadWriteMtx.ReadUnlock();
     }
 
+    void VaultRecordSet::Join(const VaultRecordSet& a)
+    {
+        a.RecursiveReadWriteMtx.ReadLock();
+        RecursiveReadWriteMtx.WriteLock();
+
+        // Thread safety because in Vault destructor blocking this RecursiveReadWriteMtx to write
+        if (IsParentVaultValid && a.IsParentVaultValid)
+        {
+            ParentVault->RecursiveReadWriteMtx.ReadLock();
+        
+            for (VaultRecord* record : a.RecordsSet)
+            {
+                if (RecordsSet.find(record) == RecordsSet.end())
+                {
+                    RecordsSet.emplace(record);
+                
+                    for (auto& adder : VaultRecordAdders)
+                        adder.second(record);
+                }
+            }
+
+            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
+        }
+
+        RecursiveReadWriteMtx.WriteUnlock();
+        a.RecursiveReadWriteMtx.ReadUnlock();
+    }
+
+    void VaultRecordSet::Exclude(const VaultRecordSet& a)
+    {
+        a.RecursiveReadWriteMtx.ReadLock();
+        RecursiveReadWriteMtx.WriteLock();
+
+        // Thread safety because in Vault destructor blocking this RecursiveReadWriteMtx to write
+        if (IsParentVaultValid && a.IsParentVaultValid)
+        {
+            ParentVault->RecursiveReadWriteMtx.ReadLock();
+        
+            for (VaultRecord* record : RecordsSet)
+                if (a.RecordsSet.find(record) != a.RecordsSet.end())
+                    Vault::RemoveRecord(record, false);
+            
+
+            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
+        }
+
+        RecursiveReadWriteMtx.WriteUnlock();
+        a.RecursiveReadWriteMtx.ReadUnlock();
+    }
+        
     VaultRecordSet::~VaultRecordSet()
     {
         Reset();

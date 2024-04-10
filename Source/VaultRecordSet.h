@@ -337,6 +337,14 @@ namespace mvlt
         */
         void PrintAsTable(bool isPrintId = false, const std::size_t& amountOfRecords = -1, const std::vector<std::string> keys = {}) const;
 
+        /// \brief A method for adding records from one VaultRecordSet to this
+        /// \param [in] a another VaultRecordSet
+        void Join(const VaultRecordSet& a);
+
+        /// \brief Method for deleting from this, all records in another VaultRecordSet
+        /// \param [in] a another VaultRecordSet
+        void Exclude(const VaultRecordSet& a);
+        
         /// \brief Destructor
         ~VaultRecordSet();
     };
