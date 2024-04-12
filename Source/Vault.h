@@ -81,18 +81,7 @@ namespace mvlt
         std::unordered_map<std::string, std::function<void(VaultRecordSet& vaultRecordSet)>> VaultKeyCopiers;
 
     protected:
-
-        /// \brief An enum with the types of all possible requests
-        enum RequestType 
-        {
-            Greater,       ///< A request that will receive all records with a key value greater than the requested one
-            GreaterOrEqual,///< A request that will receive all records with a key value greater than or equal to the requested one
-            Equal,         ///< A request that will receive all records whose key value is equal to the requested one
-            LessOrEqual,   ///< A request that will receive all records whose key value is less than or equal to the requested one
-            Less,          ///< A request that will receive all records with a key value less than the requested one
-            Interval       ///< A request that will receive all records with a key value between requested
-        };
-
+    
         /// \brief Unordered set with all VaultRecord pointers
         std::unordered_set<VaultRecord*> RecordsSet;
 
@@ -231,7 +220,7 @@ namespace mvlt
             \return VaultOperationResult object with RequestRecords result
         */
         template <class T>
-        VaultOperationResult RequestRecords(const RequestType& requestType, const std::string& key, const T& beginKeyValue,
+        VaultOperationResult RequestRecords(const VaultRequestType& requestType, const std::string& key, const T& beginKeyValue,
             const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue, 
             const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords) const;
 
@@ -521,7 +510,8 @@ namespace mvlt
             \param [in] request The inheritor of the Request class for the request
             \param [in] vaultRecordSet Set, to save the query result
         */
-        void Request(const VaultRequest& request, VaultRecordSet& vaultRecordSet) const;
+        template <VaultRequestType Type>
+        void Request(const VaultRequest<Type>& request, VaultRecordSet& vaultRecordSet) const;
         
         /// \brief A method for deleting all data and keys
         void DropVault();

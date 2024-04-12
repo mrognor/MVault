@@ -6,48 +6,52 @@
 
 namespace mvlt
 {
-    template<class T>
-    Equal::Equal(const std::string& key, const T& keyValue)
+    template <VaultRequestType Type>
+    template <class T>
+    VaultRequest<Type>::VaultRequest(const std::string& key, const T& keyValue)
     {
-        RequestFunc = [=](Vault* vlt, VaultRecordSet& vaultRecordSet)
+        switch (Type) 
+        {
+        case VaultRequestType::Equal:
+            RequestFunc = [=](Vault* vlt, VaultRecordSet& vaultRecordSet)
             {
                 vlt->RequestEqual(key, keyValue, vaultRecordSet);
             };
-    }
+            break;
 
-    template<class T>
-    Greater::Greater(const std::string& key, const T& keyValue)
-    {
-        RequestFunc = [=](Vault* vlt, VaultRecordSet& vaultRecordSet)
+        case VaultRequestType::Greater:
+            RequestFunc = [=](Vault* vlt, VaultRecordSet& vaultRecordSet)
             {
                 vlt->RequestGreater(key, keyValue, vaultRecordSet);
             };
-    }
+            break;
 
-    template<class T>
-    GreaterOrEqual::GreaterOrEqual(const std::string& key, const T& keyValue)
-    {
-        RequestFunc = [=](Vault* vlt, VaultRecordSet& vaultRecordSet)
+        case VaultRequestType::GreaterOrEqual:
+            RequestFunc = [=](Vault* vlt, VaultRecordSet& vaultRecordSet)
             {
                 vlt->RequestGreaterOrEqual(key, keyValue, vaultRecordSet);
             };
-    }
+            break;
 
-    template<class T>
-    Less::Less(const std::string& key, const T& keyValue)
-    {
-        RequestFunc = [=](Vault* vlt, VaultRecordSet& vaultRecordSet)
+        case VaultRequestType::Less:
+            RequestFunc = [=](Vault* vlt, VaultRecordSet& vaultRecordSet)
             {
                 vlt->RequestLess(key, keyValue, vaultRecordSet);
             };
-    }
+            break;
 
-    template<class T>
-    LessOrEqual::LessOrEqual(const std::string& key, const T& keyValue)
-    {
-        RequestFunc = [=](Vault* vlt, VaultRecordSet& vaultRecordSet)
+        case VaultRequestType::LessOrEqual:
+            RequestFunc = [=](Vault* vlt, VaultRecordSet& vaultRecordSet)
             {
                 vlt->RequestLessOrEqual(key, keyValue, vaultRecordSet);
             };
+            break;
+        }
+    }
+
+    template <VaultRequestType Type>
+    void VaultRequest<Type>::Request(Vault* vlt, VaultRecordSet& vaultRecordSet) const
+    {
+        RequestFunc(vlt, vaultRecordSet);
     }
 }

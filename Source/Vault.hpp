@@ -278,7 +278,7 @@ namespace mvlt
     }
 
     template <class T>
-    VaultOperationResult Vault::RequestRecords(const RequestType& requestType, const std::string& key, const T& beginKeyValue,
+    VaultOperationResult Vault::RequestRecords(const VaultRequestType& requestType, const std::string& key, const T& beginKeyValue,
         const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue, 
         const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords) const
     {
@@ -323,7 +323,7 @@ namespace mvlt
             keyCopierIt.second(vaultRecordSet);
         
         // Check if request type is equal
-        if (requestType == RequestType::Equal)
+        if (requestType == VaultRequestType::Equal)
         {
             // Pointer to store hash map inside VaultStructureHashMap
             std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
@@ -407,35 +407,34 @@ namespace mvlt
                             --endIt;
                         
                         // Increase iterator to add later last element in vaultRecordSet 
-                        // if (endIt != TtoVaultRecordMap->begin())
-                            ++endIt;
+                        ++endIt;
                     }
                 };
 
             // Switch by request type
             switch (requestType) 
             {
-            case GreaterOrEqual:
+            case VaultRequestType::GreaterOrEqual:
                 startIt = TtoVaultRecordMap->lower_bound(beginKeyValue);
                 endIt = TtoVaultRecordMap->end();
                 break;
             
-            case Greater:
+            case VaultRequestType::Greater:
                 findGreater();
                 endIt = TtoVaultRecordMap->end();
                 break;
             
-            case Less:
+            case VaultRequestType::Less:
                 startIt = TtoVaultRecordMap->begin();
                 findLess();
                 break;
             
-            case LessOrEqual:
+            case VaultRequestType::LessOrEqual:
                 startIt = TtoVaultRecordMap->begin();
                 endIt = TtoVaultRecordMap->upper_bound(beginKeyValue);
                 break;
             
-            case Interval:
+            case VaultRequestType::Interval:
                 if (beginKeyValue > endKeyValue || (beginKeyValue == endKeyValue && (isIncludeBeginKeyValue == false || isIncludeEndKeyValue == false)))
                 {
                     startIt = TtoVaultRecordMap->end();
@@ -449,7 +448,7 @@ namespace mvlt
                 else findLess();
                 break;
 
-            case Equal:
+            case VaultRequestType::Equal:
                 break;
             }
 
@@ -811,31 +810,31 @@ namespace mvlt
     template <class T>
     VaultOperationResult Vault::RequestEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
     {
-        return RequestRecords(RequestType::Equal, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords);
+        return RequestRecords(VaultRequestType::Equal, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords);
     }
 
     template <class T>
     VaultOperationResult Vault::RequestGreater(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
     {
-        return RequestRecords(RequestType::Greater, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords);
+        return RequestRecords(VaultRequestType::Greater, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords);
     }
 
     template <class T>
     VaultOperationResult Vault::RequestGreaterOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
     {
-        return RequestRecords(RequestType::GreaterOrEqual, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords);
+        return RequestRecords(VaultRequestType::GreaterOrEqual, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords);
     }
 
     template <class T>
     VaultOperationResult Vault::RequestLess(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
     {
-        return RequestRecords(RequestType::Less, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords);
+        return RequestRecords(VaultRequestType::Less, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords);
     }
 
     template <class T>
     VaultOperationResult Vault::RequestLessOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
     {
-        return RequestRecords(RequestType::LessOrEqual, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords);
+        return RequestRecords(VaultRequestType::LessOrEqual, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords);
     }
 
     template <class T>
@@ -843,9 +842,15 @@ namespace mvlt
         const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue, 
         const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords) const
     {
-        return RequestRecords(RequestType::Interval, key, beginKeyValue, 
+        return RequestRecords(VaultRequestType::Interval, key, beginKeyValue, 
             endKeyValue, vaultRecordSet, isIncludeBeginKeyValue, isIncludeEndKeyValue, 
             amountOfRecords);
+    }
+
+    template <VaultRequestType Type>
+    void Vault::Request(const VaultRequest<Type>& request, VaultRecordSet& vaultRecordSet) const
+    {
+        request.Request(const_cast<Vault*>(this), vaultRecordSet);
     }
 
     template <class T>

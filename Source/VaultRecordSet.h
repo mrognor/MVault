@@ -37,7 +37,7 @@ namespace mvlt
             \return VaultOperationResult object with RequestRecords result
         */
         template <class T>
-        VaultOperationResult RequestRecords(const RequestType& requestType, const std::string& key, const T& beginKeyValue,
+        VaultOperationResult RequestRecords(const VaultRequestType& requestType, const std::string& key, const T& beginKeyValue,
             const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue, 
             const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords) const;
     public:

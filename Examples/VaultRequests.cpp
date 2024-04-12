@@ -59,20 +59,20 @@ int main()
     vrs1.RequestLess("A", 5, vrs2);
     vrs2.PrintAsTable();
 
-    std::cout << "Join A < 2 and A > 7 and Exclude B < 5" << std::endl;
-    vrs1.Clear();
-    vrs2.Clear();
+    // std::cout << "Join A < 2 and A > 7 and Exclude B < 5" << std::endl;
+    // vrs1.Clear();
+    // vrs2.Clear();
 
-    vlt.Request(mvlt::Less("A", 2), vrs1);
-    vlt.Request(mvlt::Greater("A", 7), vrs2);
-    vlt.Request(mvlt::Less("B", 5), vrs3);
+    // vlt.Request(mvlt::Less("A", 2), vrs1);
+    // vlt.Request(mvlt::Greater("A", 7), vrs2);
+    // vlt.Request(mvlt::Less("B", 5), vrs3);
 
-    vrs1.PrintAsTable();
-    vrs2.PrintAsTable();
-    vrs3.PrintAsTable();
+    // vrs1.PrintAsTable();
+    // vrs2.PrintAsTable();
+    // vrs3.PrintAsTable();
 
-    vrs1.Join(vrs2);
-    vrs1.Exclude(vrs3);
+    // vrs1.Join(vrs2);
+    // vrs1.Exclude(vrs3);
 
-    vrs1.PrintAsTable();
+    // vrs1.PrintAsTable();
 }

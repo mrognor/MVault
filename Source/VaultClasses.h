@@ -6,10 +6,20 @@
 
 namespace mvlt
 {
+    /// \brief An enum with the types of all possible requests
+    enum class VaultRequestType 
+    {
+        Greater,       ///< A request that will receive all records with a key value greater than the requested one
+        GreaterOrEqual,///< A request that will receive all records with a key value greater than or equal to the requested one
+        Equal,         ///< A request that will receive all records whose key value is equal to the requested one
+        LessOrEqual,   ///< A request that will receive all records whose key value is less than or equal to the requested one
+        Less,          ///< A request that will receive all records with a key value less than the requested one
+        Interval       ///< A request that will receive all records with a key value between requested
+    };
+
     // MVault classes
     class Vault;
     class VaultRecord;
-    class VaultRequest;
     class VaultRecordRef;
     class VaultRecordSet;
     class VaultParamInput;
@@ -21,6 +31,9 @@ namespace mvlt
     class Greater;
     class LessOrEqual;
     class GreaterOrEqual;
+
+    template <VaultRequestType Type>
+    class VaultRequest;
 
     /**
         A simple typedef for HashMap. It is necessary for a more understandable separation of types.

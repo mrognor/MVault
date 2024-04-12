@@ -222,11 +222,6 @@ namespace mvlt
         return res;
     }
 
-    void Vault::Request(const VaultRequest& request, VaultRecordSet& vaultRecordSet) const
-    {
-        request.Request(const_cast<Vault*>(this), vaultRecordSet);
-    }
-
     void Vault::DropVault()
     {
         RecursiveReadWriteMtx.WriteLock();
