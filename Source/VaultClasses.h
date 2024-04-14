@@ -14,7 +14,9 @@ namespace mvlt
         Equal,         ///< A request that will receive all records whose key value is equal to the requested one
         LessOrEqual,   ///< A request that will receive all records whose key value is less than or equal to the requested one
         Less,          ///< A request that will receive all records with a key value less than the requested one
-        Interval       ///< A request that will receive all records with a key value between requested
+        Interval,      ///< A request that will receive all records with a key value between requested
+        Or,
+        And
     };
 
     // MVault classes
@@ -34,6 +36,8 @@ namespace mvlt
     typedef VaultRequest<VaultRequestType::Equal> Equal;
     typedef VaultRequest<VaultRequestType::GreaterOrEqual> GreaterOrEqual;
     typedef VaultRequest<VaultRequestType::Greater> Greater;
+    typedef VaultRequest<VaultRequestType::Or> Or;
+    typedef VaultRequest<VaultRequestType::And> And;
 
     /**
         A simple typedef for HashMap. It is necessary for a more understandable separation of types.

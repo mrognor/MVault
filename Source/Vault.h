@@ -253,7 +253,11 @@ namespace mvlt
 
         /// Making the VaultRecordSet class friendly so that it has access to the internal members of the Vault class
         friend VaultRecordSet;
-        
+
+        /// Making the VaultRequest class friendly so that it has access to the internal members of the Vault class
+        template <VaultRequestType Type>
+        friend class VaultRequest;
+         
         /// \brief Default constructor
         Vault();
 

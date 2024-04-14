@@ -426,6 +426,8 @@ namespace mvlt
                 break;
 
             case VaultRequestType::Equal:
+            case VaultRequestType::Or:
+            case VaultRequestType::And:
                 break;
             }
 
@@ -855,7 +857,40 @@ namespace mvlt
     template <VaultRequestType Type>
     void Vault::Request(const VaultRequest<Type>&& request, VaultRecordSet& vaultRecordSet) const
     {
-        request.Request(const_cast<Vault*>(this), vaultRecordSet);
+        // VaultOperationResult res;
+
+        vaultRecordSet.RecursiveReadWriteMtx.WriteLock();
+
+        // Save vaultRecordSet
+        RecordSetsSet.emplace(&vaultRecordSet);
+
+        // Set new parent vault to vaultRecordSet
+        vaultRecordSet.ParentVault = const_cast<Vault*>(this);
+        vaultRecordSet.IsParentVaultValid = true;
+        
+        // Copy keys from this to vaultRecordSet
+        for (auto& keyCopierIt : VaultKeyCopiers)
+            keyCopierIt.second(vaultRecordSet);
+        
+        request.Request(const_cast<Vault*>(this), vaultRecordSet.RecordsSet);
+
+        for (VaultRecord* record : vaultRecordSet.RecordsSet)
+        {
+            // Add pointer to record from this to vaultRecordSet structure
+            for (auto& adder : vaultRecordSet.VaultRecordAdders)
+                adder.second(record);
+
+            // Lock VaultRecord to thread safety add new dependent VaultRecordSet
+            record->Mtx.lock();
+            record->dependentVaultRecordSets.emplace(&vaultRecordSet);
+            record->Mtx.unlock();
+        }
+
+        vaultRecordSet.RecursiveReadWriteMtx.WriteUnlock();
+        
+        // return res;
+
+        
     }
 
     template <class T>
