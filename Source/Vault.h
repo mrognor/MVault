@@ -205,6 +205,27 @@ namespace mvlt
         bool RemoveKey(const std::string& key, const bool& isCalledFromVault);
 
         /**
+            \brief The method for getting the result of the request in the std::set
+
+            \tparam <T> Any type of data except for c arrays
+
+            \param [in] requestType Type of request
+            \param [in] key the name of the key to search for
+            \param [in] beginKeyValue the begin value of the key to be found
+            \param [in] endKeyValue the end value of the key to be found
+            \param [in] isIncludeBeginKeyValue include beginKeyValue in the interval or not
+            \param [in] isIncludeEndKeyValue include endKeyValue in the interval or not
+            \param [in] recordsSet A reference to std::set<VaultRecord*> 
+            \param [in] amountOfRecords The number of records requested. By default request all records
+            
+            \return VaultOperationResult object with RequestRecords result
+        */
+        template <class T>
+        VaultOperationResult RequestRecordsSet(const VaultRequestType& requestType, const std::string& key, const T& beginKeyValue,
+            const T& endKeyValue, std::unordered_set<VaultRecord*>& recordsSet, const bool& isIncludeBeginKeyValue, 
+            const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords) const;
+
+        /**
             \brief The method for getting the result of the request
 
             \tparam <T> Any type of data except for c arrays

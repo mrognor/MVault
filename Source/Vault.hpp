@@ -278,8 +278,8 @@ namespace mvlt
     }
 
     template <class T>
-    VaultOperationResult Vault::RequestRecords(const VaultRequestType& requestType, const std::string& key, const T& beginKeyValue,
-        const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue, 
+    VaultOperationResult Vault::RequestRecordsSet(const VaultRequestType& requestType, const std::string& key, const T& beginKeyValue,
+        const T& endKeyValue, std::unordered_set<VaultRecord*>& vaultRecords, const bool& isIncludeBeginKeyValue, 
         const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords) const
     {
         // Fill res info known at start
@@ -287,7 +287,6 @@ namespace mvlt
         res.Key = key;
         res.RequestedType = typeid(T);
         
-        vaultRecordSet.RecursiveReadWriteMtx.WriteLock();
         RecursiveReadWriteMtx.ReadLock();
 
         // If key not exist
@@ -296,7 +295,6 @@ namespace mvlt
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongKey;
             RecursiveReadWriteMtx.ReadUnlock();
-            vaultRecordSet.RecursiveReadWriteMtx.WriteUnlock();
 
             return res;
         }
@@ -307,20 +305,9 @@ namespace mvlt
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongType;
             RecursiveReadWriteMtx.ReadUnlock();
-            vaultRecordSet.RecursiveReadWriteMtx.WriteUnlock();
+
             return res;
         }
-        
-        // Save vaultRecordSet
-        RecordSetsSet.emplace(&vaultRecordSet);
-
-        // Set new parent vault to vaultRecordSet
-        vaultRecordSet.ParentVault = const_cast<Vault*>(this);
-        vaultRecordSet.IsParentVaultValid = true;
-        
-        // Copy keys from this to vaultRecordSet
-        for (auto& keyCopierIt : VaultKeyCopiers)
-            keyCopierIt.second(vaultRecordSet);
         
         // Check if request type is equal
         if (requestType == VaultRequestType::Equal)
@@ -338,18 +325,8 @@ namespace mvlt
                 std::size_t counter = 0;
                 for (auto it = equalRange.first; it != equalRange.second; ++it)
                 {
-                    // Add pointer to record from this to vaultRecordSet
-                    vaultRecordSet.RecordsSet.emplace(it->second);
+                    vaultRecords.emplace(it->second);
                     
-                    // Add pointer to record from this to vaultRecordSet structure
-                    for (auto& adder : vaultRecordSet.VaultRecordAdders)
-                        adder.second(it->second);
-
-                    // Lock VaultRecord to thread safety add new dependent VaultRecordSet
-                    it->second->Mtx.lock();
-                    it->second->dependentVaultRecordSets.emplace(&vaultRecordSet);
-                    it->second->Mtx.unlock();
-
                     ++counter;
                     if (counter > amountOfRecords) break;
                 }
@@ -406,7 +383,7 @@ namespace mvlt
                         while(endIt != TtoVaultRecordMap->begin() && endIt->first == endKeyValue)
                             --endIt;
                         
-                        // Increase iterator to add later last element in vaultRecordSet 
+                        // Increase iterator to add later last element in vaultRecords 
                         ++endIt;
                     }
                 };
@@ -455,17 +432,7 @@ namespace mvlt
             std::size_t counter = 0;
             for (auto it = startIt; it != endIt; ++it)
             {
-                // Add pointer to record from this to vaultRecordSet
-                vaultRecordSet.RecordsSet.emplace(it->second);
-                
-                // Add pointer to record from this to vaultRecordSet structure
-                for (auto& adder : vaultRecordSet.VaultRecordAdders)
-                    adder.second(it->second);
-
-                // Lock VaultRecord to thread safety add new dependent VaultRecordSet
-                it->second->Mtx.lock();
-                it->second->dependentVaultRecordSets.emplace(&vaultRecordSet);
-                it->second->Mtx.unlock();
+                vaultRecords.emplace(it->second);
 
                 ++counter;
                 if (counter >= amountOfRecords) break;
@@ -473,12 +440,50 @@ namespace mvlt
         }
 
         RecursiveReadWriteMtx.ReadUnlock();
-        vaultRecordSet.RecursiveReadWriteMtx.WriteUnlock();
 
         res.ResultCode = VaultOperationResultCode::Success;
         res.SavedType = res.RequestedType;
         res.IsOperationSuccess = true;
 
+        return res;
+    }
+
+    template <class T>
+    VaultOperationResult Vault::RequestRecords(const VaultRequestType& requestType, const std::string& key, const T& beginKeyValue,
+        const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue, 
+        const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords) const
+    {
+        VaultOperationResult res;
+
+        vaultRecordSet.RecursiveReadWriteMtx.WriteLock();
+
+        // Save vaultRecordSet
+        RecordSetsSet.emplace(&vaultRecordSet);
+
+        // Set new parent vault to vaultRecordSet
+        vaultRecordSet.ParentVault = const_cast<Vault*>(this);
+        vaultRecordSet.IsParentVaultValid = true;
+        
+        // Copy keys from this to vaultRecordSet
+        for (auto& keyCopierIt : VaultKeyCopiers)
+            keyCopierIt.second(vaultRecordSet);
+        
+        res = RequestRecordsSet(requestType, key, beginKeyValue, endKeyValue, vaultRecordSet.RecordsSet, isIncludeBeginKeyValue, isIncludeEndKeyValue, amountOfRecords);
+
+        for (VaultRecord* record : vaultRecordSet.RecordsSet)
+        {
+            // Add pointer to record from this to vaultRecordSet structure
+            for (auto& adder : vaultRecordSet.VaultRecordAdders)
+                adder.second(record);
+
+            // Lock VaultRecord to thread safety add new dependent VaultRecordSet
+            record->Mtx.lock();
+            record->dependentVaultRecordSets.emplace(&vaultRecordSet);
+            record->Mtx.unlock();
+        }
+
+        vaultRecordSet.RecursiveReadWriteMtx.WriteUnlock();
+        
         return res;
     }
 
