@@ -173,7 +173,7 @@ namespace mvlt
                 for (VaultRecordSet* set : tmpRec->dependentVaultRecordSets)
                 {
                     set->RecursiveReadWriteMtx.WriteLock();
-                    static_cast<Vault*>(set)->RemoveRecord(tmpRec, false);
+                    static_cast<Vault*>(set)->RemoveRecord(tmpRec, false, nullptr);
                     set->RecursiveReadWriteMtx.WriteUnlock();
                 }
                 tmpRec->Mtx.unlock();
@@ -255,7 +255,7 @@ namespace mvlt
                     for (VaultRecordSet* set : tmpRec->dependentVaultRecordSets)
                     {
                         set->RecursiveReadWriteMtx.WriteLock();
-                        static_cast<Vault*>(set)->RemoveRecord(tmpRec, false);
+                        static_cast<Vault*>(set)->RemoveRecord(tmpRec, false, nullptr);
                         set->RecursiveReadWriteMtx.WriteUnlock();
                     }
                     tmpRec->Mtx.unlock();
@@ -848,7 +848,7 @@ namespace mvlt
     }
 
     template <VaultRequestType Type>
-    void Vault::Request(const VaultRequest<Type>& request, VaultRecordSet& vaultRecordSet) const
+    void Vault::Request(const VaultRequest<Type>&& request, VaultRecordSet& vaultRecordSet) const
     {
         request.Request(const_cast<Vault*>(this), vaultRecordSet);
     }

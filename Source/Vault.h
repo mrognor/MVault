@@ -117,10 +117,11 @@ namespace mvlt
             \param [in] isCalledFromVault The parameter responsible for where this method was called from. This method can be called from the following classes:
             1. Vault. In this case, the method will change the structure of the Vault, change the DataRecord, and call itself for all VaultRecordSet dependent on the DataRecord
             2. VaultRecordSet. In this case, the method will only change the structure of this with the VaultRecordSet type
-
-            \return Returns true if the record existed and was successfully deleted, otherwise it returns false
+            \param [out] wasDeleted indicates whether the record has been deleted
+            
+            \return Returns an iterator to the RecordSet element immediately following the one being deleted. If the element to be deleted is not found, it returns RecordSet->end()
         */
-        bool RemoveRecord(VaultRecord* recordToErase, const bool& isCalledFromVault);
+        std::unordered_set<VaultRecord *>::iterator RemoveRecord(VaultRecord* recordToErase, const bool& isCalledFromVault, bool* wasDeleted);
 
         /**
             \brief Method for removing a record from a Vault
@@ -507,11 +508,11 @@ namespace mvlt
         /**
             \brief A method for complex requests
 
-            \param [in] request The inheritor of the Request class for the request
+            \param [in] request The request
             \param [in] vaultRecordSet Set, to save the query result
         */
         template <VaultRequestType Type>
-        void Request(const VaultRequest<Type>& request, VaultRecordSet& vaultRecordSet) const;
+        void Request(const VaultRequest<Type>&& request, VaultRecordSet& vaultRecordSet) const;
         
         /// \brief A method for deleting all data and keys
         void DropVault();

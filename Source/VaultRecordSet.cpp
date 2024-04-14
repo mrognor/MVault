@@ -314,10 +314,14 @@ namespace mvlt
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
         
-            for (VaultRecord* record : RecordsSet)
-                if (a.RecordsSet.find(record) != a.RecordsSet.end())
-                    Vault::RemoveRecord(record, false);
-            
+            for (auto it = RecordsSet.begin(); it != RecordsSet.end();)
+            {
+                // if found record in a then delete it here
+                if (a.RecordsSet.find(*it) != a.RecordsSet.end())
+                    it = Vault::RemoveRecord(*it, false, nullptr);
+                else 
+                    ++it;
+            }
 
             ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }

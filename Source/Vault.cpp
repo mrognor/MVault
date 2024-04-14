@@ -6,21 +6,23 @@
 
 namespace mvlt
 {
-    bool Vault::RemoveRecord(VaultRecord* recordToErase, const bool& isCalledFromVault)
+    std::unordered_set<VaultRecord *>::iterator Vault::RemoveRecord(VaultRecord* recordToErase, const bool& isCalledFromVault, bool* wasDeleted)
     {
         RecursiveReadWriteMtx.WriteLock();
 
-        if (RecordsSet.find(recordToErase) == RecordsSet.end())
+        std::unordered_set<VaultRecord *>::iterator dataIt = RecordsSet.find(recordToErase);
+        if (dataIt == RecordsSet.end())
         {
             RecursiveReadWriteMtx.WriteUnlock();
-            return false;
+            if (wasDeleted != nullptr) *wasDeleted = false;
+            return dataIt;
         }
 
         // Iterate over all VaultRecordErasers and call function to erase record from structure
         for (auto& eraser : VaultRecordErasers)
             eraser.second(recordToErase);
 
-        RecordsSet.erase(recordToErase);
+        dataIt = RecordsSet.erase(dataIt);
 
         if (isCalledFromVault) 
         {
@@ -30,7 +32,7 @@ namespace mvlt
             for (VaultRecordSet* set : recordToErase->dependentVaultRecordSets)
             {
                 set->RecursiveReadWriteMtx.WriteLock();
-                static_cast<Vault*>(set)->RemoveRecord(recordToErase, false);
+                static_cast<Vault*>(set)->RemoveRecord(recordToErase, false, wasDeleted);
                 set->RecursiveReadWriteMtx.WriteUnlock();
             }
             recordToErase->Mtx.unlock();
@@ -38,7 +40,8 @@ namespace mvlt
         }
 
         RecursiveReadWriteMtx.WriteUnlock();
-        return true;
+        if (wasDeleted != nullptr) *wasDeleted = true;
+        return dataIt;
     }
 
     bool Vault::RemoveRecord(const VaultRecordRef& recordRefToErase, const bool& isCalledFromVault)
@@ -48,8 +51,8 @@ namespace mvlt
         recordRefToErase.Mtx.lock();
         RecursiveReadWriteMtx.WriteLock();
 
-        res = RemoveRecord(recordRefToErase.DataRecord, isCalledFromVault);
-        
+        RemoveRecord(recordRefToErase.DataRecord, isCalledFromVault, &res);
+
         RecursiveReadWriteMtx.WriteUnlock();
         recordRefToErase.Mtx.unlock();
         return res;
@@ -278,7 +281,7 @@ namespace mvlt
             for (VaultRecordSet* set : it->dependentVaultRecordSets)
             {
                 set->RecursiveReadWriteMtx.WriteLock();
-                static_cast<Vault*>(set)->RemoveRecord(it, false);
+                static_cast<Vault*>(set)->RemoveRecord(it, false, nullptr);
                 set->RecursiveReadWriteMtx.WriteUnlock();
             }
             it->Mtx.unlock();
