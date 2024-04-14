@@ -26,14 +26,14 @@ namespace mvlt
     class VaultOperationResult;
     
     // MVault requests
-    class Less;
-    class Equal;
-    class Greater;
-    class LessOrEqual;
-    class GreaterOrEqual;
-
     template <VaultRequestType Type>
     class VaultRequest;
+
+    typedef VaultRequest<VaultRequestType::Less> Less;
+    typedef VaultRequest<VaultRequestType::LessOrEqual> LessOrEqual;
+    typedef VaultRequest<VaultRequestType::Equal> Equal;
+    typedef VaultRequest<VaultRequestType::GreaterOrEqual> GreaterOrEqual;
+    typedef VaultRequest<VaultRequestType::Greater> Greater;
 
     /**
         A simple typedef for HashMap. It is necessary for a more understandable separation of types.

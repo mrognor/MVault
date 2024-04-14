@@ -6,7 +6,8 @@
 
 namespace mvlt
 {
-    /// A class for requests to Vault
+    /// \brief A class for requests to Vault
+    /// \tparam <VaultRequestType> type of the request
     template <VaultRequestType Type>
     class VaultRequest 
     {
@@ -16,6 +17,14 @@ namespace mvlt
 
     public:
 
+        /**
+            \brief Request constructor
+
+            \tparam <T> Any type of data except c-arrays
+
+            \param [in] key requested key
+            \param [in] keyValue requested data
+        */
         template <class T>
         VaultRequest(const std::string& key, const T& keyValue);
 
@@ -27,19 +36,4 @@ namespace mvlt
         */
         void Request(Vault* vlt, VaultRecordSet& vaultRecordSet) const;
     };
-    
-    template <>
-    class VaultRequest <VaultRequestType::Equal> {};
-
-    template <>
-    class VaultRequest <VaultRequestType::Greater> {};
-
-    template <>
-    class VaultRequest <VaultRequestType::GreaterOrEqual> {};
-
-    template <>
-    class VaultRequest <VaultRequestType::Less> {};
-
-    template <>
-    class VaultRequest <VaultRequestType::LessOrEqual> {};
 }
