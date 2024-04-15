@@ -346,15 +346,25 @@ namespace mvlt
         */
         void PrintAsTable(bool isPrintId = false, const std::size_t& amountOfRecords = -1, const std::vector<std::string> keys = {}) const;
 
-        /// \brief A method for adding records from one VaultRecordSet to this
-        /// \param [in] a another VaultRecordSet
+        /// \brief A method for adding all records from a to this
+        /// \param [in] a the set from which the recordings will be added
         void Join(const VaultRecordSet& a);
 
-        /// \brief Method for deleting from this, all records in another VaultRecordSet
-        /// \param [in] a another VaultRecordSet
+        /// \brief A method for deleting all records from this that are also in a
+        /// \param [in] a the record set that contains the records to remove
         void Exclude(const VaultRecordSet& a);
         
+        /// \brief A method to delete all records from this that are not in a
+        /// \param [in] a a set that contains records that do not need to be removed
+        void Intersect(const VaultRecordSet& a);
+
         /// \brief Destructor
         ~VaultRecordSet();
+
+        /// Making Union function friendly
+        friend void Union(const VaultRecordSet& a, const VaultRecordSet& b, VaultRecordSet& res);
+
+        /// Making Intersection function friendly
+        friend void Intersection(const VaultRecordSet& a, const VaultRecordSet& b, VaultRecordSet& res);
     };
 }

@@ -96,4 +96,18 @@ int main()
     mvlt::VaultOperationResult res = vlt.Request(mvlt::And(mvlt::GreaterOrEqual("Z", 3), mvlt::Less("A", 7)), vrs1);
     if (!res.IsOperationSuccess)
         std::cout << res.ResultCodeString() << " Requested key: " << res.Key << std::endl;
+
+    vrs1.Clear();
+    vrs2.Clear();
+    vrs3.Clear();
+    vlt.Request(mvlt::Equal("A", 0), vrs1);
+    vlt.Request(mvlt::Equal("A", 9), vrs2);
+    mvlt::Union(vrs1, vrs2, vrs3);
+    vrs3.PrintAsTable();
+
+    vrs1.Clear();
+    vrs2.Clear();
+    vlt.Request(mvlt::Equal("B", 1), vrs1);
+    mvlt::Intersection(vrs1, vrs3, vrs2);
+    vrs2.PrintAsTable();
 }

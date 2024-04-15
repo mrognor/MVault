@@ -635,5 +635,8 @@ namespace mvlt
 
         /// \brief Default destructor
         ~Vault();
+
+        /// Making Intersection function friendly
+        friend void Intersection(const VaultRecordSet& a, const VaultRecordSet& b, VaultRecordSet& res);
     };
 }

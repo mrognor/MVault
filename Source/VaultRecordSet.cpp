@@ -23,6 +23,8 @@ namespace mvlt
             for (auto& keyCopierIt : other.VaultKeyCopiers)
                 keyCopierIt.second(*this);
         
+            other.ParentVault->RecordSetsSet.emplace(this);
+
             for (VaultRecord* record : other.RecordsSet)
             {
                 RecordsSet.emplace(record);
@@ -35,8 +37,6 @@ namespace mvlt
                 record->dependentVaultRecordSets.emplace(this);
                 record->Mtx.unlock();
             }
-
-            other.ParentVault->RecordSetsSet.emplace(this);
 
             RecursiveReadWriteMtx.WriteUnlock();
             other.RecursiveReadWriteMtx.ReadUnlock();
@@ -329,7 +329,33 @@ namespace mvlt
         RecursiveReadWriteMtx.WriteUnlock();
         a.RecursiveReadWriteMtx.ReadUnlock();
     }
+
+    void VaultRecordSet::Intersect(const VaultRecordSet& a)
+    {
+        a.RecursiveReadWriteMtx.ReadLock();
+        RecursiveReadWriteMtx.WriteLock();
+
+        // Thread safety because in Vault destructor blocking this RecursiveReadWriteMtx to write
+        if (IsParentVaultValid && a.IsParentVaultValid)
+        {
+            ParentVault->RecursiveReadWriteMtx.ReadLock();
         
+            for (auto it = RecordsSet.begin(); it != RecordsSet.end();)
+            {
+                // if not found record in a then delete it here
+                if (a.RecordsSet.find(*it) == a.RecordsSet.end())
+                    it = Vault::RemoveRecord(*it, false, nullptr);
+                else 
+                    ++it;
+            }
+
+            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
+        }
+
+        RecursiveReadWriteMtx.WriteUnlock();
+        a.RecursiveReadWriteMtx.ReadUnlock();
+    }
+
     VaultRecordSet::~VaultRecordSet()
     {
         Reset();
