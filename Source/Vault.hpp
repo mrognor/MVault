@@ -855,9 +855,11 @@ namespace mvlt
     }
 
     template <VaultRequestType Type>
-    void Vault::Request(const VaultRequest<Type>&& request, VaultRecordSet& vaultRecordSet) const
+    VaultOperationResult Vault::Request(const VaultRequest<Type>&& request, VaultRecordSet& vaultRecordSet) const
     {
-        // VaultOperationResult res;
+        VaultOperationResult res;
+        res.IsOperationSuccess = true;
+        res.ResultCode = VaultOperationResultCode::Success;
 
         vaultRecordSet.RecursiveReadWriteMtx.WriteLock();
 
@@ -872,25 +874,32 @@ namespace mvlt
         for (auto& keyCopierIt : VaultKeyCopiers)
             keyCopierIt.second(vaultRecordSet);
         
-        request.Request(const_cast<Vault*>(this), vaultRecordSet.RecordsSet);
-
-        for (VaultRecord* record : vaultRecordSet.RecordsSet)
+        // Try to make complex request 
+        try
         {
-            // Add pointer to record from this to vaultRecordSet structure
-            for (auto& adder : vaultRecordSet.VaultRecordAdders)
-                adder.second(record);
+            request.Request(const_cast<Vault*>(this), vaultRecordSet.RecordsSet);
 
-            // Lock VaultRecord to thread safety add new dependent VaultRecordSet
-            record->Mtx.lock();
-            record->dependentVaultRecordSets.emplace(&vaultRecordSet);
-            record->Mtx.unlock();
+            for (VaultRecord* record : vaultRecordSet.RecordsSet)
+            {
+                // Add pointer to record from this to vaultRecordSet structure
+                for (auto& adder : vaultRecordSet.VaultRecordAdders)
+                    adder.second(record);
+
+                // Lock VaultRecord to thread safety add new dependent VaultRecordSet
+                record->Mtx.lock();
+                record->dependentVaultRecordSets.emplace(&vaultRecordSet);
+                record->Mtx.unlock();
+            }
+        }
+        catch(VaultOperationResult result) // Catch complex request errors
+        {
+            vaultRecordSet.Clear();
+            res = result;
         }
 
         vaultRecordSet.RecursiveReadWriteMtx.WriteUnlock();
         
-        // return res;
-
-        
+        return res;
     }
 
     template <class T>

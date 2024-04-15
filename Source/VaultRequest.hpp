@@ -15,11 +15,15 @@ namespace mvlt
         // Set Request func
         DataRequestFunc = [](const std::string& key, Vault* vlt, std::unordered_set<VaultRecord*>& vaultRecordSet, void* beginValue, void* endValue, bool isIncludeBeginKeyValue, bool isIncludeEndKeyValue)
         {
+            VaultOperationResult res;
             // Simple data request to vlt
             if (endValue == nullptr)
-                vlt->RequestRecordsSet(Type, key, *static_cast<T*>(beginValue), *static_cast<T*>(beginValue), vaultRecordSet, false, false, -1);
+                res = vlt->RequestRecordsSet(Type, key, *static_cast<T*>(beginValue), *static_cast<T*>(beginValue), vaultRecordSet, false, false, -1);
             else
-                vlt->RequestRecordsSet(VaultRequestType::Interval, key, *static_cast<T*>(beginValue), *static_cast<T*>(endValue), vaultRecordSet, isIncludeBeginKeyValue, isIncludeEndKeyValue, -1);
+                res = vlt->RequestRecordsSet(VaultRequestType::Interval, key, *static_cast<T*>(beginValue), *static_cast<T*>(endValue), vaultRecordSet, isIncludeBeginKeyValue, isIncludeEndKeyValue, -1);
+        
+            // Throw error
+            if (!res.IsOperationSuccess) throw res;
         };
 
         DeleteFunc = [](void* ptrToDelete)

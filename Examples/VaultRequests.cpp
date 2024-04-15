@@ -91,4 +91,9 @@ int main()
     vrs1.Clear();
     vlt.Request(mvlt::And(mvlt::GreaterOrEqual("A", 3), mvlt::Less("A", 7)), vrs1);
     vrs1.PrintAsTable();
+
+    vrs1.Clear();
+    mvlt::VaultOperationResult res = vlt.Request(mvlt::And(mvlt::GreaterOrEqual("Z", 3), mvlt::Less("A", 7)), vrs1);
+    if (!res.IsOperationSuccess)
+        std::cout << res.ResultCodeString() << " Requested key: " << res.Key << std::endl;
 }

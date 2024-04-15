@@ -537,7 +537,7 @@ namespace mvlt
             \param [in] vaultRecordSet Set, to save the query result
         */
         template <VaultRequestType Type>
-        void Request(const VaultRequest<Type>&& request, VaultRecordSet& vaultRecordSet) const;
+        VaultOperationResult Request(const VaultRequest<Type>&& request, VaultRecordSet& vaultRecordSet) const;
         
         /// \brief A method for deleting all data and keys
         void DropVault();
