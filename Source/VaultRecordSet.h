@@ -227,7 +227,16 @@ namespace mvlt
         VaultOperationResult RequestInterval(const std::string& key, const T& beginKeyValue,
             const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue = true, 
             const bool& isIncludeEndKeyValue = true, const std::size_t& amountOfRecords = -1) const;
-            
+        
+        /**
+            \brief A method for complex requests
+
+            \param [in] request The request
+            \param [in] vaultRecordSet Set, to save the query result
+        */
+        template <VaultRequestType Type>
+        VaultOperationResult Request(const VaultRequest<Type>&& request, VaultRecordSet& vaultRecordSet) const;
+
         /// \brief Resets the object to its initial state
         void Reset();
 

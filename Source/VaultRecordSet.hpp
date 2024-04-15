@@ -157,6 +157,34 @@ namespace mvlt
             amountOfRecords);
     }
 
+    template <VaultRequestType Type>
+    VaultOperationResult VaultRecordSet::Request(const VaultRequest<Type>&& request, VaultRecordSet& vaultRecordSet) const
+    {
+        VaultOperationResult res;
+        RecursiveReadWriteMtx.ReadLock();
+
+        if (IsParentVaultValid)
+        {
+            ParentVault->RecursiveReadWriteMtx.ReadLock();
+
+            // \todo Replace to reset to clear keys 
+            vaultRecordSet.Clear();
+            res = Vault::Request(request, &vaultRecordSet);
+            vaultRecordSet.ParentVault = ParentVault;
+
+            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
+        }
+        else 
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::ParentVaultNotValid;
+        }
+
+        RecursiveReadWriteMtx.ReadUnlock();
+        
+        return res;
+    }
+
     template <class T>
     VaultOperationResult VaultRecordSet::RemoveRecord(const std::string& key, const T& keyValue)
     {
