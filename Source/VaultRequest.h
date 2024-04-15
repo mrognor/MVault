@@ -11,11 +11,31 @@ namespace mvlt
     template <VaultRequestType Type>
     class VaultRequest 
     {
-    protected:
-        /// A variable that stores a function that requests data from Vault and stores it in std::set<VaultRecord*>
-        std::function<void (Vault*, std::unordered_set<VaultRecord*>&)> RequestFunc;
+    private:
+
+        /// Request type
+        VaultRequestType RequestType = Type;
+
+        /// Function for requesting data
+        void (*DataRequestFunc)(const std::string&, Vault*, std::unordered_set<VaultRecord*>&, void*, void*, bool, bool);
+        
+        /// A variable for storing a logical request function
+        std::function<void (Vault*, std::unordered_set<VaultRecord*>&)> LogicalRequestFunction;
+
+        /// A pointer to a function that delete data
+        void (*DeleteFunc)(void*) = nullptr;
+
+        /// Request key
+        std::string Key;
+
+        /// Pointer to Data saved inside Request
+        void* DataPtr = nullptr;
 
     public:
+
+        /// Making the all VaultRequest templates friendly
+        template <VaultRequestType TType>
+        friend class VaultRequest;
 
         /**
             \brief Request constructor
@@ -38,7 +58,7 @@ namespace mvlt
             \param [in] request2 second request
         */
         template <VaultRequestType RequestType1, VaultRequestType RequestType2>
-        VaultRequest(const VaultRequest<RequestType1>&& request1, const VaultRequest<RequestType2>&& request2);
+        VaultRequest(const VaultRequest<RequestType1>& request1, const VaultRequest<RequestType2>& request2);
 
         /**
             \brief Function for requesting data from Vault
@@ -47,5 +67,8 @@ namespace mvlt
             \param [in] vaultRecords A reference to the std::unordered_set<VaultRecord*> where the recordings will be saved
         */
         void Request(Vault* vlt, std::unordered_set<VaultRecord*>& vaultRecords) const;
+
+        /// \brief Default destructor
+        ~VaultRequest();
     };
 }

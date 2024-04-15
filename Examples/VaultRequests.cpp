@@ -87,4 +87,8 @@ int main()
     vrs1.Clear();
     vlt.Request(mvlt::Or(mvlt::And(mvlt::Less("A", 3), mvlt::Greater("B", 7)), mvlt::Equal("A", 0)), vrs1);
     vrs1.PrintAsTable();
+
+    vrs1.Clear();
+    vlt.Request(mvlt::And(mvlt::GreaterOrEqual("A", 3), mvlt::Less("A", 7)), vrs1);
+    vrs1.PrintAsTable();
 }
