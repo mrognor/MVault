@@ -7,7 +7,7 @@ namespace mvlt
     template <class T>
     VaultOperationResult VaultRecordSet::RequestRecords(const VaultRequestType& requestType, const std::string& key, const T& beginKeyValue,
             const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue, 
-            const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords) const
+            const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords) const noexcept
     {
         VaultOperationResult res;
         RecursiveReadWriteMtx.ReadLock();
@@ -37,7 +37,7 @@ namespace mvlt
     }
 
     template <class T>
-    VaultOperationResult VaultRecordSet::GetKeyValue(const std::string& key, T& defaultKeyValue) const
+    VaultOperationResult VaultRecordSet::GetKeyValue(const std::string& key, T& defaultKeyValue) const noexcept
     {
         VaultOperationResult res;
         RecursiveReadWriteMtx.ReadLock();
@@ -61,7 +61,7 @@ namespace mvlt
     }
 
     template <class T>
-    VaultOperationResult VaultRecordSet::GetRecord(const std::string& key, const T& keyValue, VaultRecordRef& vaultRecordRef) const
+    VaultOperationResult VaultRecordSet::GetRecord(const std::string& key, const T& keyValue, VaultRecordRef& vaultRecordRef) const noexcept
     {
         VaultOperationResult res;
         RecursiveReadWriteMtx.ReadLock();
@@ -89,7 +89,7 @@ namespace mvlt
     }
 
     template <class T>
-    VaultOperationResult VaultRecordSet::GetRecords(const std::string& key, const T& keyValue, std::vector<VaultRecordRef>& recordsRefs, const std::size_t& amountOfRecords) const
+    VaultOperationResult VaultRecordSet::GetRecords(const std::string& key, const T& keyValue, std::vector<VaultRecordRef>& recordsRefs, const std::size_t& amountOfRecords) const noexcept
     {
         VaultOperationResult res;
         RecursiveReadWriteMtx.ReadLock();
@@ -118,31 +118,31 @@ namespace mvlt
     }
     
     template <class T>
-    VaultOperationResult VaultRecordSet::RequestEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
+    VaultOperationResult VaultRecordSet::RequestEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const noexcept
     {
         return RequestRecords(VaultRequestType::Equal, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords);
     }
 
     template <class T>
-    VaultOperationResult VaultRecordSet::RequestGreater(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
+    VaultOperationResult VaultRecordSet::RequestGreater(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const noexcept
     {
         return RequestRecords(VaultRequestType::Greater, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords);
     }
 
     template <class T>
-    VaultOperationResult VaultRecordSet::RequestGreaterOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
+    VaultOperationResult VaultRecordSet::RequestGreaterOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const noexcept
     {
         return RequestRecords(VaultRequestType::GreaterOrEqual, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords);
     }
 
     template <class T>
-    VaultOperationResult VaultRecordSet::RequestLess(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
+    VaultOperationResult VaultRecordSet::RequestLess(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const noexcept
     {
         return RequestRecords(VaultRequestType::Less, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords);
     }
 
     template <class T>
-    VaultOperationResult VaultRecordSet::RequestLessOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const
+    VaultOperationResult VaultRecordSet::RequestLessOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const noexcept
     {
         return RequestRecords(VaultRequestType::LessOrEqual, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords);
     }
@@ -150,7 +150,7 @@ namespace mvlt
     template <class T>
     VaultOperationResult VaultRecordSet::RequestInterval(const std::string& key, const T& beginKeyValue,
         const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue, 
-        const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords) const
+        const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords) const noexcept
     {
         return RequestRecords(VaultRequestType::Interval, key, beginKeyValue, 
             endKeyValue, vaultRecordSet, isIncludeBeginKeyValue, isIncludeEndKeyValue, 
@@ -158,7 +158,7 @@ namespace mvlt
     }
 
     template <VaultRequestType Type>
-    VaultOperationResult VaultRecordSet::Request(const VaultRequest<Type>&& request, VaultRecordSet& vaultRecordSet) const
+    VaultOperationResult VaultRecordSet::Request(const VaultRequest<Type>&& request, VaultRecordSet& vaultRecordSet) const noexcept
     {
         VaultOperationResult res;
         RecursiveReadWriteMtx.ReadLock();
@@ -186,7 +186,7 @@ namespace mvlt
     }
 
     template <class T>
-    VaultOperationResult VaultRecordSet::RemoveRecord(const std::string& key, const T& keyValue)
+    VaultOperationResult VaultRecordSet::RemoveRecord(const std::string& key, const T& keyValue) noexcept
     {
         VaultOperationResult res;
         RecursiveReadWriteMtx.ReadLock();
@@ -213,7 +213,7 @@ namespace mvlt
     }
 
     template <class T>
-    VaultOperationResult VaultRecordSet::RemoveRecords(const std::string& key, const T& keyValue, const std::size_t& amountOfRecords)
+    VaultOperationResult VaultRecordSet::RemoveRecords(const std::string& key, const T& keyValue, const std::size_t& amountOfRecords) noexcept
     {
         VaultOperationResult res;
         RecursiveReadWriteMtx.ReadLock();
@@ -240,7 +240,7 @@ namespace mvlt
     }
 
     template<class F>
-    void VaultRecordSet::SortBy(const std::string& key, const F&& func, const bool& isReverse, const std::size_t& amountOfRecords) const
+    void VaultRecordSet::SortBy(const std::string& key, const F&& func, const bool& isReverse, const std::size_t& amountOfRecords) const noexcept
     {
         RecursiveReadWriteMtx.ReadLock();
 

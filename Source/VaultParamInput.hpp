@@ -7,7 +7,7 @@
 namespace mvlt
 {
     template <class T>
-    VaultParamInput::VaultParamInput(const T& data) : DataType(typeid(T))
+    VaultParamInput::VaultParamInput(const T& data) noexcept : DataType(typeid(T))
     {
         SetDataToRefFunc = [=](const std::string& key, VaultRecordRef& refToSetData)
         {

@@ -34,7 +34,7 @@ namespace mvlt
 
     template <VaultRequestType Type>
     template <VaultRequestType RequestType1, VaultRequestType RequestType2>
-    VaultRequest<Type>::VaultRequest(const VaultRequest<RequestType1>& request1, const VaultRequest<RequestType2>& request2)
+    VaultRequest<Type>::VaultRequest(const VaultRequest<RequestType1>& request1, const VaultRequest<RequestType2>& request2) noexcept
     {
         // Switch by request type Or or And
         switch (Type)
@@ -112,7 +112,7 @@ namespace mvlt
     }
 
     template <VaultRequestType Type>
-    VaultRequest<Type>::~VaultRequest()
+    VaultRequest<Type>::~VaultRequest() noexcept
     {
         if (DeleteFunc != nullptr && DataPtr != nullptr)
             DeleteFunc(DataPtr);

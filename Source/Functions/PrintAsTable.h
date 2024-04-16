@@ -14,7 +14,7 @@ namespace mvlt
 
         \return the value of the key in the string
     */
-    std::string GetDataAsString(VaultRecord* record, const std::string& key);
+    std::string GetDataAsString(VaultRecord* record, const std::string& key) noexcept;
 
     /**
         \brief Function for PrintContainerAsTable
@@ -26,7 +26,7 @@ namespace mvlt
 
         \return the value of the key in the string
     */
-    std::string GetDataAsString(const VaultRecord& record, const std::string& key);
+    std::string GetDataAsString(const VaultRecord& record, const std::string& key) noexcept;
 
     /**
         \brief Function for PrintContainerAsTable
@@ -38,7 +38,7 @@ namespace mvlt
 
         \return the value of the key in the string
     */
-    std::string GetDataAsString(VaultRecordRef* recordRef, const std::string& key);
+    std::string GetDataAsString(VaultRecordRef* recordRef, const std::string& key) noexcept;
 
     /**
         \brief Function for PrintContainerAsTable
@@ -50,15 +50,15 @@ namespace mvlt
 
         \return the value of the key in the string
     */
-    std::string GetDataAsString(const VaultRecordRef& recordRef, const std::string& key);
+    std::string GetDataAsString(const VaultRecordRef& recordRef, const std::string& key) noexcept;
 
-    std::string GetUniqueId(VaultRecord* record);
+    std::string GetUniqueId(VaultRecord* record) noexcept;
 
-    std::string GetUniqueId(const VaultRecord& record);
+    std::string GetUniqueId(const VaultRecord& record) noexcept;
 
-    std::string GetUniqueId(VaultRecordRef* recordRef);
+    std::string GetUniqueId(VaultRecordRef* recordRef) noexcept;
 
-    std::string GetUniqueId(const VaultRecordRef& recordRef);
+    std::string GetUniqueId(const VaultRecordRef& recordRef) noexcept;
 
     /**
         \brief A method for printing data as tables
@@ -73,7 +73,7 @@ namespace mvlt
         \param [in] keys vector of keys to be printed. By default, the vector is empty, which means that all keys will be output
     */ 
     template <class T>
-    void PrintContainerAsTable(const T& container, bool isPrintId = false, const std::size_t& amountOfRecords = -1, const std::vector<std::string> keys = {})
+    void PrintContainerAsTable(const T& container, bool isPrintId = false, const std::size_t& amountOfRecords = -1, const std::vector<std::string> keys = {}) noexcept
     {
         std::vector<std::size_t> maxLengths(keys.size());
 
@@ -192,7 +192,7 @@ namespace mvlt
         \param [in] keys vector of keys to be printed. By default, the vector is empty, which means that all keys will be output
     */
     template <template <class E, class Alloc = std::allocator<E>> typename  T>
-    void PrintAsTable(const T<VaultRecordRef>& containerWithRefs, bool isPrintId = false, const std::size_t& amountOfRecords = -1, const std::vector<std::string> keys = {})
+    void PrintAsTable(const T<VaultRecordRef>& containerWithRefs, bool isPrintId = false, const std::size_t& amountOfRecords = -1, const std::vector<std::string> keys = {}) noexcept
     {
         if (containerWithRefs.empty()) 
         {

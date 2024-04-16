@@ -1,12 +1,12 @@
 #include "ReadWriteMutex.h"
 
-ReadWriteMutex::ReadWriteMutex() 
+ReadWriteMutex::ReadWriteMutex() noexcept
 { 
     ReadCounter.store(0);
     IsCondVarWaiting.store(false);
 }
 
-void ReadWriteMutex::ReadLock()
+void ReadWriteMutex::ReadLock() noexcept
 {
     WriteMutex.lock();
     ReadMutex.lock();
@@ -15,7 +15,7 @@ void ReadWriteMutex::ReadLock()
     WriteMutex.unlock();
 }
 
-void ReadWriteMutex::ReadUnlock()
+void ReadWriteMutex::ReadUnlock() noexcept
 {
     ReadMutex.lock();
     ReadCounter.fetch_sub(1);
@@ -26,7 +26,7 @@ void ReadWriteMutex::ReadUnlock()
     ReadMutex.unlock();
 }
 
-void ReadWriteMutex::WriteLock()
+void ReadWriteMutex::WriteLock() noexcept
 {
     std::mutex mtx;
     std::unique_lock<std::mutex> lk(mtx);
@@ -40,7 +40,7 @@ void ReadWriteMutex::WriteLock()
     IsCondVarWaiting.store(false);
 }
 
-void ReadWriteMutex::WriteUnlock()
+void ReadWriteMutex::WriteUnlock() noexcept
 {
     WriteMutex.unlock();
 }
@@ -48,7 +48,7 @@ void ReadWriteMutex::WriteUnlock()
 thread_local std::size_t LocalThreadReadLockCounter = 0;
 thread_local std::size_t LocalThreadWriteLockCounter = 0;
 
-void RecursiveReadWriteMutex::ReadLock()
+void RecursiveReadWriteMutex::ReadLock() noexcept
 {
     if (LocalThreadWriteLockCounter == 0)
     {
@@ -59,7 +59,7 @@ void RecursiveReadWriteMutex::ReadLock()
     }
 }
 
-void RecursiveReadWriteMutex::ReadUnlock()
+void RecursiveReadWriteMutex::ReadUnlock() noexcept
 {
     if (LocalThreadWriteLockCounter == 0)
     {
@@ -70,7 +70,7 @@ void RecursiveReadWriteMutex::ReadUnlock()
     }
 }
 
-void RecursiveReadWriteMutex::WriteLock()
+void RecursiveReadWriteMutex::WriteLock() noexcept
 {
     if (LocalThreadWriteLockCounter == 0)
     {
@@ -84,7 +84,7 @@ void RecursiveReadWriteMutex::WriteLock()
 }
 
 
-void RecursiveReadWriteMutex::WriteUnlock()
+void RecursiveReadWriteMutex::WriteUnlock() noexcept
 {
     if (LocalThreadWriteLockCounter == 1)
     {

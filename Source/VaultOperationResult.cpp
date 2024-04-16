@@ -2,7 +2,7 @@
 
 namespace mvlt
 {
-    std::string VaultOperationResult::ResultCodeString() const
+    std::string VaultOperationResult::ResultCodeString() const noexcept
     {
         switch (ResultCode)
         {

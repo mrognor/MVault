@@ -32,12 +32,12 @@ namespace mvlt
 
             \return VaultRecordRef::SetData status
         */
-        VaultOperationResult SetDataToRef(const std::string& key, VaultRecordRef& refToSetData) const;
+        VaultOperationResult SetDataToRef(const std::string& key, VaultRecordRef& refToSetData) const noexcept;
 
         /// \brief Method for setting key data in VaultRecord
         /// \param [in] key data key
         /// \param [in] recordToSetData pointer to VaultRecord
-        void SetDataToRecord(const std::string& key, VaultRecord* recordToSetData) const;
+        void SetDataToRecord(const std::string& key, VaultRecord* recordToSetData) const noexcept;
 
     public:
         
@@ -51,10 +51,10 @@ namespace mvlt
         /// \tparam <T> Any type of data except for c arrays
         /// \param [in] data data to be stored inside VaultParamInput
         template <class T>
-        VaultParamInput(const T& data);
+        VaultParamInput(const T& data) noexcept;
 
         /// \brief A method for getting the type of saved data.
         /// \return std::type_index object with saved data type
-        std::type_index GetDataType() const;
+        std::type_index GetDataType() const noexcept;
     };
 }

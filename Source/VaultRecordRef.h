@@ -37,7 +37,7 @@ namespace mvlt
             \param [in] vaultRecord A pointer to the Vault referenced by the class object VaultRecordRef
             \param [in] vlt A pointer to Vault
         */
-        void SetRecord(VaultRecord* vaultRecord, Vault* vlt);
+        void SetRecord(VaultRecord* vaultRecord, Vault* vlt) noexcept;
 
     public:
 
@@ -51,7 +51,7 @@ namespace mvlt
         friend std::hash<VaultRecordRef>;
 
         /// \todo Конструктор по умолчанию
-        VaultRecordRef();
+        VaultRecordRef() noexcept;
         
         /**
             \brief Constructor
@@ -60,25 +60,25 @@ namespace mvlt
             \param [in] vaultRecord A pointer to the VaultRecord referenced by the class object VaultRecordRef
             \param [in] vlt A pointer to Vault
         */
-        VaultRecordRef(VaultRecord* vaultRecord, Vault* vlt);
+        VaultRecordRef(VaultRecord* vaultRecord, Vault* vlt) noexcept;
 
         /// \brief Copy constructor
         /// \param [in] other other VaultRecordRef object
-        VaultRecordRef(const VaultRecordRef& other);
+        VaultRecordRef(const VaultRecordRef& other) noexcept;
 
         /// \brief Assignment operator
         /// \param [in] other other VaultRecordRef object
-        VaultRecordRef& operator=(const VaultRecordRef& other);
+        VaultRecordRef& operator=(const VaultRecordRef& other) noexcept;
         
         /// \brief Comparison operator
         /// \param [in] other the object to compare with
         /// \return true if the objects are equal, otherwise false. Two invalid objects are equal
-        bool operator==(const VaultRecordRef& other) const;
+        bool operator==(const VaultRecordRef& other) const noexcept;
 
         /// \brief A method for obtaining a unique record identifier
         ///  Important. Two VaultRecordRef objects pointing to the same record will return the same value. Invalid record will return null
         /// \return the unique identifier of the record
-        std::string GetRecordUniqueId() const;
+        std::string GetRecordUniqueId() const noexcept;
 
         /**
             \brief Method for updating data inside Vault
@@ -93,7 +93,7 @@ namespace mvlt
             \return VaultOperationResult object with GetData result.
         */
         template <class T>
-        VaultOperationResult SetData(const std::string& key, const T& data);
+        VaultOperationResult SetData(const std::string& key, const T& data) noexcept;
 
         /**
             \brief Method for updating data inside Vault
@@ -105,7 +105,7 @@ namespace mvlt
 
             \return If one of the parameters is incorrect, it returns an error when setting this parameter, and all subsequent parameters will not be set
         */
-        VaultOperationResult SetData(const std::vector<std::pair<std::string, VaultParamInput>>& params);
+        VaultOperationResult SetData(const std::vector<std::pair<std::string, VaultParamInput>>& params) noexcept;
 
         /**
             \brief A method for getting data using a key
@@ -118,7 +118,7 @@ namespace mvlt
             \return VaultOperationResult object with GetData result.
         */
         template <class T>
-        VaultOperationResult GetData(const std::string& key, T& data) const;
+        VaultOperationResult GetData(const std::string& key, T& data) const noexcept;
         
         /**
             \brief Method for getting data converted to string from a container using a key
@@ -132,23 +132,23 @@ namespace mvlt
 
             \return Returns false if the key was not found, and otherwise returns true.
         */ 
-        bool GetDataAsString(const std::string& key, std::string& str) const;
+        bool GetDataAsString(const std::string& key, std::string& str) const noexcept;
 
         /// \brief A function to check the validity of a class object
         /// An object may no longer be valid if the record it refers to has been deleted
         /// \return returns true if the object is valid, otherwise false
-        bool IsValid() const;
+        bool IsValid() const noexcept;
 
         /// \brief The method for getting all the keys
         /// If the record is not valid, it will return an empty vector
         /// \return vector with keys
-        std::vector<std::string> GetKeys() const;
+        std::vector<std::string> GetKeys() const noexcept;
         
         /// \brief A method for displaying VaultRecordRef content on the screen
-        void PrintRecord() const;
+        void PrintRecord() const noexcept;
         
         /// \brief A method for decoupling a class object from record. Reset class object to default state
-        void Reset();
+        void Reset() noexcept;
 
         /**
             \brief A method for locking record
@@ -176,12 +176,12 @@ namespace mvlt
             
             \endcode
         */
-        void ReadLock() const;
+        void ReadLock() const noexcept;
 
         /// \brief A method for unlocking record
-        void ReadUnlock() const;
+        void ReadUnlock() const noexcept;
 
         /// \brief Default destructor
-        ~VaultRecordRef();
+        ~VaultRecordRef() noexcept;
     };
 }

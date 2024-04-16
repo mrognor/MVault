@@ -39,24 +39,24 @@ namespace mvlt
         template <class T>
         VaultOperationResult RequestRecords(const VaultRequestType& requestType, const std::string& key, const T& beginKeyValue,
             const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue, 
-            const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords) const;
+            const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords) const noexcept;
     public:
 
         /// Make Vault class friend
         friend Vault;
 
         /// \brief Default constructor
-        VaultRecordSet();
+        VaultRecordSet() noexcept;
 
         /// \brief Copy constructor
-        VaultRecordSet(const VaultRecordSet& other);
+        VaultRecordSet(const VaultRecordSet& other) noexcept;
 
         /// \brief Operator assignment
-        VaultRecordSet& operator=(const VaultRecordSet& other);
+        VaultRecordSet& operator=(const VaultRecordSet& other) noexcept;
         
         /// \brief Method for checking the validity of the parent Vault
         /// \return true if it is valid, otherwise false
-        bool GetIsParentVaultValid() const;
+        bool GetIsParentVaultValid() const noexcept;
 
         /**
             \brief The method for getting a default key value
@@ -65,7 +65,7 @@ namespace mvlt
 
             \return returns false if the parent vault invalid or key was not found otherwise returns true
         */
-        bool IsKeyExist(const std::string& key) const;
+        bool IsKeyExist(const std::string& key) const noexcept;
 
         /**
             \brief The method for getting a default key value
@@ -78,7 +78,7 @@ namespace mvlt
             \return returns false if the parent vault invalid or the key was not found otherwise returns true
         */
         template <class T>
-        VaultOperationResult GetKeyValue(const std::string& key, T& defaultKeyValue) const;
+        VaultOperationResult GetKeyValue(const std::string& key, T& defaultKeyValue) const noexcept;
 
         /**
             \brief The method for getting a key type
@@ -88,15 +88,15 @@ namespace mvlt
 
             \return returns false if the parent vault invalid or the key was not found otherwise returns true
         */
-        bool GetKeyType(const std::string& key, std::type_index& keyType) const;
+        bool GetKeyType(const std::string& key, std::type_index& keyType) const noexcept;
 
         /// \brief Method for adding a record to VaultRecordSet
         /// \param [in] recordRef A constant reference pointing to a record
-        void AddRecord(const VaultRecordRef& recordRef);
+        void AddRecord(const VaultRecordRef& recordRef) noexcept;
 
         /// \brief Method for adding a recordы to VaultRecordSet
         /// \param [in] recordRef A constant reference indicating a vector with refs
-        void AddRecords(const std::vector<VaultRecordRef> recordsRefs);
+        void AddRecords(const std::vector<VaultRecordRef> recordsRefs) noexcept;
 
         /**
             \brief The method for getting a reference to the data inside Vault
@@ -115,7 +115,7 @@ namespace mvlt
             \return VaultOperationResult object with GetRecord result
         */
         template <class T>
-        VaultOperationResult GetRecord(const std::string& key, const T& keyValue, VaultRecordRef& vaultRecordRef) const;
+        VaultOperationResult GetRecord(const std::string& key, const T& keyValue, VaultRecordRef& vaultRecordRef) const noexcept;
 
         /**
             \brief The method for getting a vector of references to the data inside Vault
@@ -131,7 +131,7 @@ namespace mvlt
             \return VaultOperationResult object with GetRecords result
         */
         template <class T>
-        VaultOperationResult GetRecords(const std::string& key, const T& keyValue, std::vector<VaultRecordRef>& recordsRefs, const std::size_t& amountOfRecords = -1) const;
+        VaultOperationResult GetRecords(const std::string& key, const T& keyValue, std::vector<VaultRecordRef>& recordsRefs, const std::size_t& amountOfRecords = -1) const noexcept;
 
         /**
             \brief A method for getting all records that have a value equal to keyValue stored by the key key
@@ -146,7 +146,7 @@ namespace mvlt
             \return VaultOperationResult object with RequestRecords result
         */
         template <class T>
-        VaultOperationResult RequestEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords = -1) const;
+        VaultOperationResult RequestEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords = -1) const noexcept;
 
         /**
             \brief A method for getting all records that have a value greater than keyValue stored by the key key
@@ -161,7 +161,7 @@ namespace mvlt
             \return VaultOperationResult object with RequestRecords result
         */
         template <class T>
-        VaultOperationResult RequestGreater(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords = -1) const;
+        VaultOperationResult RequestGreater(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords = -1) const noexcept;
 
         /**
             \brief A method for getting all records that have a value greater than or equal to keyValue stored by the key key
@@ -176,7 +176,7 @@ namespace mvlt
             \return VaultOperationResult object with RequestRecords result
         */
         template <class T>
-        VaultOperationResult RequestGreaterOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords = -1) const;
+        VaultOperationResult RequestGreaterOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords = -1) const noexcept;
 
         /**
             \brief A method for getting all records that have a value less than keyValue stored by the key key
@@ -191,7 +191,7 @@ namespace mvlt
             \return VaultOperationResult object with RequestRecords result
         */
         template <class T>
-        VaultOperationResult RequestLess(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords = -1) const;
+        VaultOperationResult RequestLess(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords = -1) const noexcept;
 
         /**
             \brief A method for getting all records that have a value less than or equal to keyValue stored by the key key
@@ -206,7 +206,7 @@ namespace mvlt
             \return VaultOperationResult object with RequestRecords result
         */
         template <class T>
-        VaultOperationResult RequestLessOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords = -1) const;
+        VaultOperationResult RequestLessOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords = -1) const noexcept;
 
         /**
             \brief The method for getting the result of the request
@@ -226,7 +226,7 @@ namespace mvlt
         template <class T>
         VaultOperationResult RequestInterval(const std::string& key, const T& beginKeyValue,
             const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue = true, 
-            const bool& isIncludeEndKeyValue = true, const std::size_t& amountOfRecords = -1) const;
+            const bool& isIncludeEndKeyValue = true, const std::size_t& amountOfRecords = -1) const noexcept;
         
         /**
             \brief A method for complex requests
@@ -235,15 +235,15 @@ namespace mvlt
             \param [in] vaultRecordSet Set, to save the query result
         */
         template <VaultRequestType Type>
-        VaultOperationResult Request(const VaultRequest<Type>&& request, VaultRecordSet& vaultRecordSet) const;
+        VaultOperationResult Request(const VaultRequest<Type>&& request, VaultRecordSet& vaultRecordSet) const noexcept;
 
         /// \brief Resets the object to its initial state
-        void Reset();
+        void Reset() noexcept;
 
         /// \brief Clear VaultRecordSet
         /// Remove all references to records from the Vault Request Result, 
         /// but the records themselves in the original Vault will not be changed
-        void Clear();
+        void Clear() noexcept;
 
         /**
             \brief Method for remove a record from a Vault
@@ -254,7 +254,7 @@ namespace mvlt
 
             \return Returns true if the record existed and was successfully removed, otherwise it returns false
         */
-        bool RemoveRecord(const VaultRecordRef& recordRefToErase);
+        bool RemoveRecord(const VaultRecordRef& recordRefToErase) noexcept;
 
         /**
             \brief Method for remove a record from a Vault
@@ -269,7 +269,7 @@ namespace mvlt
             \return VaultOperationResult object with RemoveRecord result
         */
         template <class T>
-        VaultOperationResult RemoveRecord(const std::string& key, const T& keyValue);
+        VaultOperationResult RemoveRecord(const std::string& key, const T& keyValue) noexcept;
 
         /**
             \brief The method for remove records using key and value
@@ -287,17 +287,17 @@ namespace mvlt
             \return VaultOperationResult object with RemoveRecords result
         */
         template <class T>
-        VaultOperationResult RemoveRecords(const std::string& key, const T& keyValue, const std::size_t& amountOfRecords = -1);
+        VaultOperationResult RemoveRecords(const std::string& key, const T& keyValue, const std::size_t& amountOfRecords = -1) noexcept;
 
         /// \brief Method for getting the number of records
         /// If the parent Vault is not valid, it will return 0
         /// \return number of records
-        std::size_t Size() const;
+        std::size_t Size() const noexcept;
 
         /// \brief The method for getting all the keys
         /// If the parent Vault is not valid, it will return an empty vector
         /// \return vector with keys
-        std::vector<std::string> GetKeys() const;
+        std::vector<std::string> GetKeys() const noexcept;
 
         /**
             \brief Method for getting sorted records
@@ -310,7 +310,7 @@ namespace mvlt
             If the key is missing in the vault, the result vector will be empty
             \return A vector with links to records. The order of entries in the vector is determined by the amountOfRecords parameter
         */
-        std::vector<VaultRecordRef> GetSortedRecords(const std::string& key, const bool& isReverse = false, const std::size_t& amountOfRecords = -1) const;
+        std::vector<VaultRecordRef> GetSortedRecords(const std::string& key, const bool& isReverse = false, const std::size_t& amountOfRecords = -1) const noexcept;
 
         /**
             \brief Method for handle sorted records
@@ -331,11 +331,11 @@ namespace mvlt
             If the key is missing in the vault, the function will be called 0 times
         */
         template<class F>
-        void SortBy(const std::string& key, const F&& func, const bool& isReverse = false, const std::size_t& amountOfRecords = -1) const;
+        void SortBy(const std::string& key, const F&& func, const bool& isReverse = false, const std::size_t& amountOfRecords = -1) const noexcept;
 
         /// \brief A method for displaying the contents of a Vault on the screen
         /// \param [in] amountOfRecords The number of records to be printed. The default value is -1, which means that all entries will be output
-        void PrintVault(const std::size_t& amountOfRecords = -1) const;
+        void PrintVault(const std::size_t& amountOfRecords = -1) const noexcept;
         
         /**
             \brief A method for displaying the contents of a Vault as a table on the screen
@@ -344,27 +344,27 @@ namespace mvlt
             \param [in] amountOfRecords The number of records to be printed. The default value is -1, which means that all entries will be output
             \param [in] keys vector of keys to be printed. By default, the vector is empty, which means that all keys will be output
         */
-        void PrintAsTable(bool isPrintId = false, const std::size_t& amountOfRecords = -1, const std::vector<std::string> keys = {}) const;
+        void PrintAsTable(bool isPrintId = false, const std::size_t& amountOfRecords = -1, const std::vector<std::string> keys = {}) const noexcept;
 
         /// \brief A method for adding all records from a to this
         /// \param [in] a the set from which the recordings will be added
-        void Join(const VaultRecordSet& a);
+        void Join(const VaultRecordSet& a) noexcept;
 
         /// \brief A method for deleting all records from this that are also in a
         /// \param [in] a the record set that contains the records to remove
-        void Exclude(const VaultRecordSet& a);
+        void Exclude(const VaultRecordSet& a) noexcept;
         
         /// \brief A method to delete all records from this that are not in a
         /// \param [in] a a set that contains records that do not need to be removed
-        void Intersect(const VaultRecordSet& a);
+        void Intersect(const VaultRecordSet& a) noexcept;
 
         /// \brief Destructor
-        ~VaultRecordSet();
+        ~VaultRecordSet() noexcept;
 
         /// Making Union function friendly
-        friend void Union(const VaultRecordSet& a, const VaultRecordSet& b, VaultRecordSet& res);
+        friend void Union(const VaultRecordSet& a, const VaultRecordSet& b, VaultRecordSet& res) noexcept;
 
         /// Making Intersection function friendly
-        friend void Intersection(const VaultRecordSet& a, const VaultRecordSet& b, VaultRecordSet& res);
+        friend void Intersection(const VaultRecordSet& a, const VaultRecordSet& b, VaultRecordSet& res) noexcept;
     };
 }

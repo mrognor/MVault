@@ -2,7 +2,7 @@
 
 namespace mvlt
 {
-    void Union(const VaultRecordSet& a, const VaultRecordSet& b, VaultRecordSet& res)
+    void Union(const VaultRecordSet& a, const VaultRecordSet& b, VaultRecordSet& res) noexcept
     {
         a.RecursiveReadWriteMtx.ReadLock();
         b.RecursiveReadWriteMtx.ReadLock();
@@ -16,7 +16,7 @@ namespace mvlt
         a.RecursiveReadWriteMtx.ReadUnlock();
     }
 
-    void Intersection(const VaultRecordSet& a, const VaultRecordSet& b, VaultRecordSet& res)
+    void Intersection(const VaultRecordSet& a, const VaultRecordSet& b, VaultRecordSet& res) noexcept
     {
         a.RecursiveReadWriteMtx.ReadLock();
         b.RecursiveReadWriteMtx.ReadLock();

@@ -7,7 +7,7 @@
 namespace mvlt 
 {
     template <class T>
-    VaultOperationResult VaultRecordRef::SetData(const std::string& key, const T& data)
+    VaultOperationResult VaultRecordRef::SetData(const std::string& key, const T& data) noexcept
     {
         VaultOperationResult res;
 
@@ -53,7 +53,7 @@ namespace mvlt
     }
 
     template <class T>
-    VaultOperationResult VaultRecordRef::GetData(const std::string& key, T& data) const
+    VaultOperationResult VaultRecordRef::GetData(const std::string& key, T& data) const noexcept
     {
         // Fill res info known at start
         VaultOperationResult res;

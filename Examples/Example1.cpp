@@ -3,7 +3,7 @@
 template <>
 struct std::hash<std::vector<int>>
 {
-    std::size_t operator()(const std::vector<int>& vec) const
+    std::size_t operator()(const std::vector<int>& vec) const noexcept
     {
         std::size_t seed = vec.size();
   		for(auto& i : vec)
@@ -14,7 +14,7 @@ struct std::hash<std::vector<int>>
 
 /// \todo Добавить описание этой функции в доки
 template <>
-std::string mvlt::ToString(const std::vector<int>& data) 
+std::string mvlt::ToString(const std::vector<int>& data)  noexcept
 {
     if (data.size() == 0) return "{}";
     std::string res = "{";

@@ -6,7 +6,7 @@
 
 namespace mvlt
 {
-    std::unordered_set<VaultRecord *>::iterator Vault::RemoveRecord(VaultRecord* recordToErase, const bool& isCalledFromVault, bool* wasDeleted)
+    std::unordered_set<VaultRecord *>::iterator Vault::RemoveRecord(VaultRecord* recordToErase, const bool& isCalledFromVault, bool* wasDeleted) noexcept
     {
         RecursiveReadWriteMtx.WriteLock();
 
@@ -44,7 +44,7 @@ namespace mvlt
         return dataIt;
     }
 
-    bool Vault::RemoveRecord(const VaultRecordRef& recordRefToErase, const bool& isCalledFromVault)
+    bool Vault::RemoveRecord(const VaultRecordRef& recordRefToErase, const bool& isCalledFromVault) noexcept
     {
         bool res;
 
@@ -58,7 +58,7 @@ namespace mvlt
         return res;
     }
 
-    bool Vault::RemoveKey(const std::string& key, const bool& isCalledFromVault)
+    bool Vault::RemoveKey(const std::string& key, const bool& isCalledFromVault) noexcept
     {
         RecursiveReadWriteMtx.WriteLock();
 
@@ -106,9 +106,9 @@ namespace mvlt
         return true;
     }
 
-    Vault::Vault() {}
+    Vault::Vault() noexcept {}
 
-    bool Vault::IsKeyExist(const std::string& key) const
+    bool Vault::IsKeyExist(const std::string& key) const noexcept
     {
         bool res;
         RecursiveReadWriteMtx.ReadLock();
@@ -117,7 +117,7 @@ namespace mvlt
         return res;
     }
 
-    bool Vault::GetKeyType(const std::string& key, std::type_index& keyType) const
+    bool Vault::GetKeyType(const std::string& key, std::type_index& keyType) const noexcept
     {
         bool res = true;
         RecursiveReadWriteMtx.ReadLock();
@@ -131,12 +131,12 @@ namespace mvlt
         return res;
     }
 
-    bool Vault::RemoveKey(const std::string& key)
+    bool Vault::RemoveKey(const std::string& key) noexcept
     {
         return RemoveKey(key, true);
     }
 
-    VaultRecordRef Vault::CreateRecord()
+    VaultRecordRef Vault::CreateRecord() noexcept
     {
         RecursiveReadWriteMtx.WriteLock();
 
@@ -156,13 +156,13 @@ namespace mvlt
         return res;
     }
 
-    VaultOperationResult Vault::CreateRecord(const std::vector<std::pair<std::string, VaultParamInput>>& params)
+    VaultOperationResult Vault::CreateRecord(const std::vector<std::pair<std::string, VaultParamInput>>& params) noexcept
     {
         VaultRecordRef tmp;
         return CreateRecord(tmp, params);
     }
 
-    VaultOperationResult Vault::CreateRecord(VaultRecordRef& vaultRecordRef, const std::vector<std::pair<std::string, VaultParamInput>>& params)
+    VaultOperationResult Vault::CreateRecord(VaultRecordRef& vaultRecordRef, const std::vector<std::pair<std::string, VaultParamInput>>& params) noexcept
     {
         VaultOperationResult res;
 
@@ -225,7 +225,7 @@ namespace mvlt
         return res;
     }
 
-    void Vault::DropVault()
+    void Vault::DropVault() noexcept
     {
         RecursiveReadWriteMtx.WriteLock();
 
@@ -266,7 +266,7 @@ namespace mvlt
         RecursiveReadWriteMtx.WriteUnlock();
     }
 
-    void Vault::DropData()
+    void Vault::DropData() noexcept
     {
         RecursiveReadWriteMtx.WriteLock();
 
@@ -294,12 +294,12 @@ namespace mvlt
         RecursiveReadWriteMtx.WriteUnlock();
     }
 
-    bool Vault::EraseRecord(const VaultRecordRef& recordRefToErase)
+    bool Vault::EraseRecord(const VaultRecordRef& recordRefToErase) noexcept
     {
         return RemoveRecord(recordRefToErase, true);
     }
 
-    std::size_t Vault::Size() const
+    std::size_t Vault::Size() const noexcept
     {
         std::size_t res;
         RecursiveReadWriteMtx.ReadLock();
@@ -308,7 +308,7 @@ namespace mvlt
         return res;
     }
 
-    std::vector<std::string> Vault::GetKeys() const
+    std::vector<std::string> Vault::GetKeys() const noexcept
     {
         std::vector<std::string> res;
 
@@ -319,7 +319,7 @@ namespace mvlt
         return res;
     }
 
-    std::vector<VaultRecordRef> Vault::GetSortedRecords(const std::string& key, const bool& isReverse, const std::size_t& amountOfRecords) const
+    std::vector<VaultRecordRef> Vault::GetSortedRecords(const std::string& key, const bool& isReverse, const std::size_t& amountOfRecords) const noexcept
     {
         std::vector<VaultRecordRef> res;
         std::size_t counter = 0;
@@ -344,7 +344,7 @@ namespace mvlt
         return res;
     }
 
-    void Vault::PrintVault(const std::size_t& amountOfRecords) const
+    void Vault::PrintVault(const std::size_t& amountOfRecords) const noexcept
     {
         RecursiveReadWriteMtx.ReadLock();
 
@@ -370,7 +370,7 @@ namespace mvlt
         RecursiveReadWriteMtx.ReadUnlock();
     }
 
-    void Vault::PrintAsTable(bool isPrintId,const std::size_t& amountOfRecords, const std::vector<std::string> keys) const
+    void Vault::PrintAsTable(bool isPrintId,const std::size_t& amountOfRecords, const std::vector<std::string> keys) const noexcept
     {
         RecursiveReadWriteMtx.ReadLock();
         if (keys.empty())

@@ -39,17 +39,17 @@ namespace mvlt
 
     public:
         /// Default constructor
-        DataSaver();
+        DataSaver() noexcept;
 
         /// \brief Copy constructor
         /// \param [in] dataSaver object to be copied
-        DataSaver(const DataSaver& dataSaver);
+        DataSaver(const DataSaver& dataSaver) noexcept;
 
         /// \brief A template constructor that accepts a variable to store inside DataSaver
         /// \tparam <T> Any type of data except for c arrays
         /// \param [in] data data to be stored inside DataSaver
         template<class T>
-        DataSaver(const T& data) : DataType(typeid(void))
+        DataSaver(const T& data) noexcept : DataType(typeid(void))
         {
             SetData(data);
         }
@@ -67,7 +67,7 @@ namespace mvlt
             \param [in] customDeleteFunc function to delete data
         */ 
         template<class T, class F>
-        DataSaver(const T& data, F&& customDeleteFunc) : DataType(typeid(void))
+        DataSaver(const T& data, F&& customDeleteFunc) noexcept : DataType(typeid(void))
         {
             SetData(data, customDeleteFunc);
         }
@@ -78,7 +78,7 @@ namespace mvlt
             \param [in] dataSaver object to be copied
             \return returns a new object, with data from dataSaver
         */
-        DataSaver& operator=(const DataSaver& dataSaver);
+        DataSaver& operator=(const DataSaver& dataSaver) noexcept;
         
         /// \brief Template method to save data inside DataSaver
         /// \tparam <T> Any type of data except for c arrays
@@ -99,7 +99,7 @@ namespace mvlt
             \param [in] customDeleteFunc function to delete data
         */
         template <class T, class F>
-        void SetData(const T& data, F&& customDeleteFunc)
+        void SetData(const T& data, F&& customDeleteFunc) noexcept
         {
             // Clear Ptr if it was data before
             if (Ptr != nullptr)
@@ -147,7 +147,7 @@ namespace mvlt
             If there was no data or they were of a different type it will return false
         */
         template <class T>
-        bool GetData(T& data) const
+        bool GetData(T& data) const noexcept
         {
             // Check data type stored in DataSaver
             if (DataType != typeid(data))
@@ -167,22 +167,22 @@ namespace mvlt
 
         /// \brief Resets the object to its initial state.
         /// If deleteFunc was set, it will be called
-        void ResetData();
+        void ResetData() noexcept;
 
         /// \brief Swap data between 2 DataSavers
         /// \param [in, out] dataSaver dataSaver from where the data will be copied to this and where the data from this will be written
-        void Swap(DataSaver& dataSaver);
+        void Swap(DataSaver& dataSaver) noexcept;
 
         /// \brief A method for getting a string that represents data inside a class object
         /// Used ToString function. 
         /// \return A string of data
-        std::string Str() const;
+        std::string Str() const noexcept;
 
         /// \brief A method for getting the type of saved data.
         /// \return std::type_index object with saved data type
-        std::type_index GetDataType() const;
+        std::type_index GetDataType() const noexcept;
         
         /// \brief Default destructor
-        ~DataSaver();
+        ~DataSaver() noexcept;
     };
 }

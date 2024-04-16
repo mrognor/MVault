@@ -41,22 +41,22 @@ namespace mvlt
         friend VaultRecordSet;
         
         /// \brief Default constructor
-        VaultRecord();
+        VaultRecord() noexcept;
 
         /// \brief Copy constructor
-        VaultRecord(const VaultRecord& other);
+        VaultRecord(const VaultRecord& other) noexcept;
 
         /// \brief A method for increasing the number of references to an object
-        void AddRef();
+        void AddRef() noexcept;
 
         /// \brief A method to reduce the number of references to an object
-        void RemoveRef();
+        void RemoveRef() noexcept;
 
         /// \brief A method to indicate that the record is no longer valid and is not inside Vault
-        void Invalidate();
+        void Invalidate() noexcept;
 
         /// \brief A method for checking whether a record is inside a Vault
         /// \return returns the validity of the record
-        bool GetIsValid();
+        bool GetIsValid() noexcept;
     };
 }

@@ -2,15 +2,15 @@
 
 namespace mvlt
 {
-    DataSaver::DataSaver() : DataType(typeid(void)) {}
+    DataSaver::DataSaver() noexcept : DataType(typeid(void)) {}
 
-    DataSaver::DataSaver(const DataSaver& dataSaver) : DataType(typeid(void))
+    DataSaver::DataSaver(const DataSaver& dataSaver) noexcept : DataType(typeid(void))
     {
         // Call operator= method
         *this = dataSaver;
     }
 
-    DataSaver& DataSaver::operator=(const DataSaver& dataSaver)
+    DataSaver& DataSaver::operator=(const DataSaver& dataSaver) noexcept
     {
         // We check that there is no self-bonding
         if (&dataSaver != this)
@@ -50,7 +50,7 @@ namespace mvlt
         return *this;
     }
 
-    void DataSaver::ResetData()
+    void DataSaver::ResetData() noexcept
     {
         if (CustomDeleteFunc != nullptr)
         {
@@ -69,24 +69,24 @@ namespace mvlt
         ToStringFunc = nullptr;
     }
 
-    void DataSaver::Swap(DataSaver& dataSaver)
+    void DataSaver::Swap(DataSaver& dataSaver) noexcept
     {
         DataSaver tmp = dataSaver;
         dataSaver = *this;
         *this = tmp;
     }
 
-    std::string DataSaver::Str() const
+    std::string DataSaver::Str() const noexcept
     {
         return ToStringFunc(Ptr);
     }
 
-    std::type_index DataSaver::GetDataType() const
+    std::type_index DataSaver::GetDataType() const noexcept
     {
         return DataType;
     }
 
-    DataSaver::~DataSaver()
+    DataSaver::~DataSaver() noexcept
     {
         if (Ptr != nullptr)
             DeleteFunc(Ptr);

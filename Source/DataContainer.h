@@ -59,7 +59,7 @@ namespace mvlt
             \param [in] data data to store in container
         */
         template <class T>
-        void AddData(const std::string& key, const T& data)
+        void AddData(const std::string& key, const T& data) noexcept
         {
             Container.emplace(key, DataSaver(data));
         }
@@ -77,7 +77,7 @@ namespace mvlt
             \param [in] deleteFunc function to delete data
         */
         template <class T, class F>
-        void AddData(const std::string& key, const T& data, F&& deleteFunc)
+        void AddData(const std::string& key, const T& data, F&& deleteFunc) noexcept
         {
             Container.emplace(key, DataSaver(data, deleteFunc));
         }
@@ -88,7 +88,7 @@ namespace mvlt
             \param [in] key the key whose value needs to be changed
             \param [in] dataSaver dataSaver with any type, the value from which will be copied to the container 
         */
-        void AddDataFromDataSaver(const std::string& key, const DataSaver& dataSaver)
+        void AddDataFromDataSaver(const std::string& key, const DataSaver& dataSaver) noexcept
         {
             Container.emplace(key, dataSaver);
         }
@@ -104,7 +104,7 @@ namespace mvlt
             \param [in] data new key value
         */
         template <class T>
-        void SetData(const std::string& key, const T& data)
+        void SetData(const std::string& key, const T& data) noexcept
         {
             SetData(key, data, nullptr);
         }
@@ -122,7 +122,7 @@ namespace mvlt
             \param [in] deleteFunc function to delete data
         */
         template <class T, class F>
-        void SetData(const std::string& key, const T& data, F&& deleteFunc)
+        void SetData(const std::string& key, const T& data, F&& deleteFunc) noexcept
         {
             // Find data iterator
             auto f = Container.find(key);
@@ -142,7 +142,7 @@ namespace mvlt
             \param [in] key the key whose value needs to be changed
             \param [in] dataSaver dataSaver with any type, the value from which will be copied to the container 
         */
-        void SetDataFromDataSaver(const std::string& key, const DataSaver& dataSaver)
+        void SetDataFromDataSaver(const std::string& key, const DataSaver& dataSaver) noexcept
         {
             // Find data iterator
             auto f = Container.find(key);
@@ -166,7 +166,7 @@ namespace mvlt
             \return Returns false if the key was not found, and otherwise returns true.
         */ 
         template <class T>
-        bool GetData(const std::string& key, T& data) const
+        bool GetData(const std::string& key, T& data) const noexcept
         {
             auto f = Container.find(key);
             if (f == Container.end())
@@ -185,7 +185,7 @@ namespace mvlt
 
             \return Returns false if the key was not found, and otherwise returns true.
         */ 
-        bool GetDataSaver(const std::string& key, DataSaver& dataSaver) const
+        bool GetDataSaver(const std::string& key, DataSaver& dataSaver) const noexcept
         {
             auto f = Container.find(key);
             if (f == Container.end())
@@ -204,7 +204,7 @@ namespace mvlt
 
             \return Returns false if the key was not found, and otherwise returns true.
         */ 
-        bool GetDataAsString(const std::string& key, std::string& str) const
+        bool GetDataAsString(const std::string& key, std::string& str) const noexcept
         {
             auto f = Container.find(key);
             if (f == Container.end())
@@ -217,7 +217,7 @@ namespace mvlt
         /// \brief A method for checking whether data with such a key is in the container
         /// \param [in] key key to find in container
         /// \return Returns false if the key was not found, and otherwise returns true.
-        bool IsData(const std::string& key) const
+        bool IsData(const std::string& key) const noexcept
         {
             return Container.find(key) != Container.end();
         }
@@ -229,7 +229,7 @@ namespace mvlt
 
             \param [in] key key to find in container
         */
-        void EraseData(const std::string& key)
+        void EraseData(const std::string& key) noexcept
         {
             auto f = Container.find(key);
             if (f != Container.end())
@@ -241,14 +241,14 @@ namespace mvlt
 
         /// \brief Method for clear all data inside container
         /// Note that if pointers were stored in the container, they must be cleaned manually
-        void Clear()
+        void Clear() noexcept
         {
             Container.clear();
         }
 
         /// \brief Method for getting the container size
         /// \return Container size
-        std::size_t Size() const
+        std::size_t Size() const noexcept
         {
             return Container.size();
         }
@@ -270,7 +270,7 @@ namespace mvlt
 
             \return pair of iterators. The first iterator points to the first element with the same key, and the second to the last element
         */
-        std::pair<DataContainer::const_iterator, DataContainer::const_iterator> GetAllData(const std::string& key) const
+        std::pair<DataContainer::const_iterator, DataContainer::const_iterator> GetAllData(const std::string& key) const noexcept
         {
             return Container.equal_range(key);
         }
@@ -292,7 +292,7 @@ namespace mvlt
 
             \return pair of iterators. The first iterator points to the first element with the same key, and the second to the last element
         */
-        std::pair<DataContainer::const_iterator, DataContainer::const_iterator> GetAllData(const std::string& key) const
+        std::pair<DataContainer::const_iterator, DataContainer::const_iterator> GetAllData(const std::string& key) const noexcept
         {
             return Container.equal_range(key);
         }

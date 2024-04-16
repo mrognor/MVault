@@ -60,17 +60,17 @@ public:
 
     Human(const int& age, const std::string& name, const bool& gender) : Age(age), Name(name), Gender(gender) {}
 
-    void SetAge(const int& age) {Age = age;}
+    void SetAge(const int& age) noexcept {Age = age;}
 
-    void SetName(const std::string& name) {Name = name;}
+    void SetName(const std::string& name) noexcept {Name = name;}
 
-    void SetGender(const bool& gender) {Gender = gender;}
+    void SetGender(const bool& gender) noexcept {Gender = gender;}
 
-    int GetAge() const {return Age;}
+    int GetAge() const noexcept {return Age;}
 
-    std::string GetName() const {return Name;}
+    std::string GetName() const noexcept {return Name;}
 
-    bool GetGender() const {return Gender;}
+    bool GetGender() const noexcept {return Gender;}
 };
 // endignore
 
@@ -126,7 +126,7 @@ bool operator<(const Human& a, const Human& b)
 */
 // startcode{.cpp}
 template <>
-std::string mvlt::ToString(const Human& human) 
+std::string mvlt::ToString(const Human& human) noexcept
 {
     std::string res = "Name:" + human.GetName() + ", Age:" + std::to_string(human.GetAge()) + ", Gender:";
     if (human.GetGender())

@@ -2,7 +2,7 @@
 
 namespace mvlt
 {
-    std::string GetDataAsString(VaultRecord* record, const std::string& key)
+    std::string GetDataAsString(VaultRecord* record, const std::string& key) noexcept
     {
         std::string res;
         record->GetDataAsString(key, res);
@@ -19,7 +19,7 @@ namespace mvlt
 
         \return the value of the key in the string
     */
-    std::string GetDataAsString(const VaultRecord& record, const std::string& key)
+    std::string GetDataAsString(const VaultRecord& record, const std::string& key) noexcept
     {
         std::string res;
         record.GetDataAsString(key, res);
@@ -36,7 +36,7 @@ namespace mvlt
 
         \return the value of the key in the string
     */
-    std::string GetDataAsString(VaultRecordRef* recordRef, const std::string& key)
+    std::string GetDataAsString(VaultRecordRef* recordRef, const std::string& key) noexcept
     {
         std::string res;
         recordRef->GetDataAsString(key, res);
@@ -53,33 +53,33 @@ namespace mvlt
 
         \return the value of the key in the string
     */
-    std::string GetDataAsString(const VaultRecordRef& recordRef, const std::string& key)
+    std::string GetDataAsString(const VaultRecordRef& recordRef, const std::string& key) noexcept
     {
         std::string res;
         recordRef.GetDataAsString(key, res);
         return res;
     }
 
-    std::string GetUniqueId(VaultRecord* record)
+    std::string GetUniqueId(VaultRecord* record) noexcept
     {
         std::stringstream ss;
         ss << record;
         return ss.str();
     }
 
-    std::string GetUniqueId(const VaultRecord& record)
+    std::string GetUniqueId(const VaultRecord& record) noexcept
     {
         std::stringstream ss;
         ss << &record;
         return ss.str();
     }
 
-    std::string GetUniqueId(VaultRecordRef* recordRef)
+    std::string GetUniqueId(VaultRecordRef* recordRef) noexcept
     {
         return recordRef->GetRecordUniqueId();
     }
 
-    std::string GetUniqueId(const VaultRecordRef& recordRef)
+    std::string GetUniqueId(const VaultRecordRef& recordRef) noexcept
     {
         return recordRef.GetRecordUniqueId();
     }

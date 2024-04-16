@@ -4,19 +4,19 @@
 
 namespace mvlt 
 {
-    VaultRecordRef::VaultRecordRef() {}
+    VaultRecordRef::VaultRecordRef() noexcept {}
 
-    VaultRecordRef::VaultRecordRef(VaultRecord* vaultRecord, Vault* vlt)
+    VaultRecordRef::VaultRecordRef(VaultRecord* vaultRecord, Vault* vlt) noexcept
     {
         SetRecord(vaultRecord, vlt);
     }
 
-    VaultRecordRef::VaultRecordRef(const VaultRecordRef& other)
+    VaultRecordRef::VaultRecordRef(const VaultRecordRef& other) noexcept
     {
         *this = other;
     }
 
-    VaultRecordRef& VaultRecordRef::operator=(const VaultRecordRef& other)
+    VaultRecordRef& VaultRecordRef::operator=(const VaultRecordRef& other) noexcept
     {
         if (&other != this)
         {
@@ -60,7 +60,7 @@ namespace mvlt
         return *this;
     }
 
-    bool VaultRecordRef::operator==(const VaultRecordRef& other) const
+    bool VaultRecordRef::operator==(const VaultRecordRef& other) const noexcept
     {
         bool res;
 
@@ -83,7 +83,7 @@ namespace mvlt
         return res;
     }
 
-    void VaultRecordRef::SetRecord(VaultRecord* vaultRecord, Vault* vlt)
+    void VaultRecordRef::SetRecord(VaultRecord* vaultRecord, Vault* vlt) noexcept
     {
         Mtx.lock();
         vlt->RecursiveReadWriteMtx.ReadLock();
@@ -98,7 +98,7 @@ namespace mvlt
         Mtx.unlock();
     }
 
-    std::string VaultRecordRef::GetRecordUniqueId() const
+    std::string VaultRecordRef::GetRecordUniqueId() const noexcept
     {
         std::stringstream ss;
 
@@ -114,7 +114,7 @@ namespace mvlt
         return ss.str();
     }
 
-    VaultOperationResult VaultRecordRef::SetData(const std::vector<std::pair<std::string, VaultParamInput>>& params)
+    VaultOperationResult VaultRecordRef::SetData(const std::vector<std::pair<std::string, VaultParamInput>>& params) noexcept
     {
         VaultOperationResult res;
         Mtx.lock();
@@ -131,7 +131,7 @@ namespace mvlt
         return res;
     }
                 
-    bool VaultRecordRef::GetDataAsString(const std::string& key, std::string& str) const
+    bool VaultRecordRef::GetDataAsString(const std::string& key, std::string& str) const noexcept
     {
         bool res = false;
 
@@ -161,7 +161,7 @@ namespace mvlt
         return res;
     }
 
-    bool VaultRecordRef::IsValid() const
+    bool VaultRecordRef::IsValid() const noexcept
     {
         bool res = false;
         Mtx.lock();
@@ -170,7 +170,7 @@ namespace mvlt
         return res;
     }
 
-    std::vector<std::string> VaultRecordRef::GetKeys() const
+    std::vector<std::string> VaultRecordRef::GetKeys() const noexcept
     {
         std::vector<std::string> res;
 
@@ -200,7 +200,7 @@ namespace mvlt
         return res;
     }
 
-    void VaultRecordRef::PrintRecord() const
+    void VaultRecordRef::PrintRecord() const noexcept
     {
         Mtx.lock();
 
@@ -236,7 +236,7 @@ namespace mvlt
         Mtx.unlock();
     }
 
-    void VaultRecordRef::Reset()
+    void VaultRecordRef::Reset() noexcept
     {
         Mtx.lock();
 
@@ -249,7 +249,7 @@ namespace mvlt
         Mtx.unlock();
     }
 
-    void VaultRecordRef::ReadLock() const
+    void VaultRecordRef::ReadLock() const noexcept
     {
         Mtx.lock();
 
@@ -265,7 +265,7 @@ namespace mvlt
         Mtx.unlock();
     }
 
-    void VaultRecordRef::ReadUnlock() const
+    void VaultRecordRef::ReadUnlock() const noexcept
     {
         Mtx.lock();
 
@@ -281,7 +281,7 @@ namespace mvlt
         Mtx.unlock();
     }
         
-    VaultRecordRef::~VaultRecordRef()
+    VaultRecordRef::~VaultRecordRef() noexcept
     {
         if (DataRecord != nullptr) DataRecord->RemoveRef();
     }

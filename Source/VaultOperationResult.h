@@ -47,6 +47,6 @@ namespace mvlt
 
         /// \brief Function for getting a text description of the operation result
         /// \return Operation description string
-        std::string ResultCodeString() const;
+        std::string ResultCodeString() const noexcept;
     };
 }

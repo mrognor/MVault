@@ -71,7 +71,7 @@ namespace mvlt
         The specialization of this function for types will return strings with data from data.
     */
     template <class T>
-    std::string ToString(const T& data) { return ""; }
+    std::string ToString(const T& data) noexcept { return ""; }
 
     /**       
         \brief Specialization of the ToString method for the int type
@@ -82,7 +82,7 @@ namespace mvlt
         \return result of std::to_string function
     */
     template <>
-    inline std::string ToString(const int& data) { return std::to_string(data); }
+    inline std::string ToString(const int& data) noexcept { return std::to_string(data); }
 
     /**       
         \brief Specialization of the ToString method for the bool type
@@ -93,7 +93,7 @@ namespace mvlt
         \return string with true if data true, otherwise retutn string with false
     */
     template <>
-    inline std::string ToString(const bool& data) { if(data) return "true"; else return "false"; }
+    inline std::string ToString(const bool& data) noexcept { if(data) return "true"; else return "false"; }
 
     /**       
         \brief Specialization of the ToString method for the std::string type
@@ -104,7 +104,7 @@ namespace mvlt
         \return data
     */
     template <>
-    inline std::string ToString(const std::string& data) { return data; }
+    inline std::string ToString(const std::string& data) noexcept { return data; }
 
     /**       
         \brief Specialization of the ToString method for the float type
@@ -115,7 +115,7 @@ namespace mvlt
         \return result of std::to_string function
     */
     template <>
-    inline std::string ToString(const float& data) { return std::to_string(data); }
+    inline std::string ToString(const float& data) noexcept { return std::to_string(data); }
 
     /**@} */
 }
