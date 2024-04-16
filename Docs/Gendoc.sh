@@ -1,4 +1,3 @@
-# Add main page doxygen command to ReadMe.md
 cd $(dirname "$0")
 
 # Create examples

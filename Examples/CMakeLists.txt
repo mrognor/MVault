@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.6)
 if(WIN32)
     set(CMAKE_CXX_FLAGS "-Wall -g")
 else()
-    set(CMAKE_CXX_FLAGS "-Wall -fsanitize=address  -fsanitize=leak -g")
+    set(CMAKE_CXX_FLAGS "-Wall -fsanitize=address -fsanitize=leak -g")
 endif()
 
 set(CMAKE_CXX_STANDARD 11)
