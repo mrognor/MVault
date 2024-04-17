@@ -38,6 +38,7 @@ set(MVaultHeaders
 )
 
 set(MVaultTemplates
+    Vault.hpp
     VaultRequest.hpp
     VaultRecordRef.hpp
     VaultRecordSet.hpp
