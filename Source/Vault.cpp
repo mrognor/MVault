@@ -388,7 +388,7 @@ namespace mvlt
         RecursiveReadWriteMtx.ReadUnlock();
     }
 
-    Vault::~Vault()
+    Vault::~Vault() noexcept
     {
         for (auto& it : RecordSetsSet)
         {

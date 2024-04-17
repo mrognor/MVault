@@ -25,7 +25,9 @@ namespace mvlt
     class VaultRecordRef;
     class VaultRecordSet;
     class VaultParamInput;
-    class VaultOperationResult;
+    
+    // MVault structs
+    struct VaultOperationResult;
     
     // MVault requests
     template <VaultRequestType Type>

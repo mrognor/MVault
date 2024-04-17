@@ -356,7 +356,7 @@ namespace mvlt
         a.RecursiveReadWriteMtx.ReadUnlock();
     }
 
-    VaultRecordSet::~VaultRecordSet()
+    VaultRecordSet::~VaultRecordSet() noexcept
     {
         Reset();
     }

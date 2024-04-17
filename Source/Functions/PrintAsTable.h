@@ -191,7 +191,7 @@ namespace mvlt
         \param [in] amountOfRecords The number of records to be printed. The default value is -1, which means that all entries will be output
         \param [in] keys vector of keys to be printed. By default, the vector is empty, which means that all keys will be output
     */
-    template <template <class E, class Alloc = std::allocator<E>> typename  T>
+    template <template <class E, class Alloc = std::allocator<E>> class T>
     void PrintAsTable(const T<VaultRecordRef>& containerWithRefs, bool isPrintId = false, const std::size_t& amountOfRecords = -1, const std::vector<std::string> keys = {}) noexcept
     {
         if (containerWithRefs.empty()) 
