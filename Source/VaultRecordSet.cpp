@@ -192,7 +192,7 @@ namespace mvlt
 
     bool VaultRecordSet::RemoveRecord(const VaultRecordRef& recordRefToErase) noexcept
     {
-        return Vault::RemoveRecord(recordRefToErase, false);
+        return Vault::EraseRecord(recordRefToErase);
     }
 
     std::size_t VaultRecordSet::Size() const noexcept
@@ -322,7 +322,7 @@ namespace mvlt
             {
                 // if found record in a then delete it here
                 if (a.RecordsSet.find(*it) != a.RecordsSet.end())
-                    it = Vault::RemoveRecord(*it, false, nullptr);
+                    it = Vault::RemoveRecord(*it, nullptr);
                 else
                     ++it;
             }
@@ -348,7 +348,7 @@ namespace mvlt
             {
                 // if not found record in a then delete it here
                 if (a.RecordsSet.find(*it) == a.RecordsSet.end())
-                    it = Vault::RemoveRecord(*it, false, nullptr);
+                    it = Vault::RemoveRecord(*it, nullptr);
                 else
                     ++it;
             }

@@ -109,14 +109,11 @@ namespace mvlt
             \param [in] dataRecord pointer to VaultRecord inside Vault
             \param [in] key key to set data
             \param [in] data new data
-            \param [in] isCalledFromVault The parameter responsible for where this method was called from. This method can be called from the following classes:
-            1. Vault. In this case, the method will change the structure of the Vault, change the DataRecord, and call itself for all VaultRecordSet dependent on the DataRecord
-            2. VaultRecordSet. In this case, the method will only change the structure of this with the VaultRecordSet type
 
             \return VaultOperationResult object with GetData result.
         */
         template <class T>
-        VaultOperationResult SetDataToRecord(VaultRecord* dataRecord, const std::string& key, const T& data, const bool& isCalledFromVault) noexcept;
+        VaultOperationResult SetDataToRecord(VaultRecord* dataRecord, const std::string& key, const T& data) noexcept;
         
         /**
             \brief Method for removing a record from a Vault
@@ -124,95 +121,11 @@ namespace mvlt
             This method allows you to remove a record with or without deletion
 
             \param [in] recordToErase the reference to the record that needs to be deleted
-            \param [in] isCalledFromVault The parameter responsible for where this method was called from. This method can be called from the following classes:
-            1. Vault. In this case, the method will change the structure of the Vault, change the DataRecord, and call itself for all VaultRecordSet dependent on the DataRecord
-            2. VaultRecordSet. In this case, the method will only change the structure of this with the VaultRecordSet type
             \param [out] wasDeleted indicates whether the record has been deleted
             
             \return Returns an iterator to the RecordSet element immediately following the one being deleted. If the element to be deleted is not found, it returns RecordSet->end()
         */
-        std::unordered_set<VaultRecord *>::iterator RemoveRecord(VaultRecord* recordToErase, const bool& isCalledFromVault, bool* wasDeleted) noexcept;
-
-        /**
-            \brief Method for removing a record from a Vault
-
-            This method allows you to remove a record with or without deletion
-
-            \param [in] recordRefToErase the reference to the record that needs to be deleted
-            \param [in] isCalledFromVault The parameter responsible for where this method was called from. This method can be called from the following classes:
-            1. Vault. In this case, the method will change the structure of the Vault, change the DataRecord, and call itself for all VaultRecordSet dependent on the DataRecord
-            2. VaultRecordSet. In this case, the method will only change the structure of this with the VaultRecordSet type
-
-            \return Returns true if the record existed and was successfully deleted, otherwise it returns false
-        */
-        bool RemoveRecord(const VaultRecordRef& recordRefToErase, const bool& isCalledFromVault) noexcept;
-
-        /**
-            \brief Method for removing a record
-
-            \tparam <T> Any type of data except for c arrays
-
-            This method allows you to remove a record with or without deletion
-
-            \param [in] key the name of the key to search for
-            \param [in] keyValue the value of the key to be found
-            \param [in] isCalledFromVault The parameter responsible for where this method was called from. This method can be called from the following classes:
-            1. Vault. In this case, the method will change the structure of the Vault, change the DataRecord, and call itself for all VaultRecordSet dependent on the DataRecord
-            2. VaultRecordSet. In this case, the method will only change the structure of this with the VaultRecordSet type
-
-            \return VaultOperationResult object with GetRecords result
-        */
-        template <class T>
-        VaultOperationResult RemoveRecord(const std::string& key, const T& keyValue, const bool& isCalledFromVault) noexcept;
-
-        /**
-            \brief Method for removing a records
-
-            \tparam <T> Any type of data except for c arrays
-
-            This method allows you to remove a records with or without deletion
-
-            \param [in] key the name of the key to search for
-            \param [in] keyValue the value of the key to be found
-            \param [in] amountOfRecords The number of records to delete. By default set to minus one or all records.
-            \param [in] isCalledFromVault The parameter responsible for where this method was called from. This method can be called from the following classes:
-            1. Vault. In this case, the method will change the structure of the Vault, change the DataRecord, and call itself for all VaultRecordSet dependent on the DataRecord
-            2. VaultRecordSet. In this case, the method will only change the structure of this with the VaultRecordSet type
-
-            If the amountOfRecords is greater than the number of records stored inside the Vault, then all records with this key and value will be deleted.
-
-            \return VaultOperationResult object with GetRecords result
-        */
-        template <class T>
-        VaultOperationResult RemoveRecords(const std::string& key, const T& keyValue, const std::size_t& amountOfRecords, const bool& isCalledFromVault) noexcept;
-
-        /**
-            \brief Template method to add new key with default value to Vault
-
-            \tparam <T> Any type of data except for c arrays
-
-            \param [in] key new key name
-            \param [in] defaultKeyValue default key value
-            \param [in] isCalledFromVault The parameter responsible for where this method was called from. This method can be called from the following classes:
-            1. Vault. In this case, the method will change the structure of the Vault, change the DataRecord, and call itself for all VaultRecordSet dependent on the DataRecord
-            2. VaultRecordSet. In this case, the method will only change the structure of this with the VaultRecordSet type
-
-            \return Returns false if such a key already exists, otherwise it returns true
-        */
-        template <class T>
-        bool AddKey(const std::string& key, const T& defaultKeyValue, const bool& isCalledFromVault) noexcept;
-
-        /**
-            \brief The method for deleting the key
-
-            \param [in] key the key to remove
-            \param [in] isCalledFromVault The parameter responsible for where this method was called from. This method can be called from the following classes:
-            1. Vault. In this case, the method will change the structure of the Vault, change the DataRecord, and call itself for all VaultRecordSet dependent on the DataRecord
-            2. VaultRecordSet. In this case, the method will only change the structure of this with the VaultRecordSet type
-            
-            \return Returns true if the key existed, otherwise returns false
-        */
-        bool RemoveKey(const std::string& key, const bool& isCalledFromVault) noexcept;
+        std::unordered_set<VaultRecord *>::iterator RemoveRecord(VaultRecord* recordToErase, bool* wasDeleted) noexcept;
 
         /**
             \brief The method for getting the result of the request in the std::set

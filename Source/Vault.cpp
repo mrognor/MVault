@@ -6,7 +6,7 @@
 
 namespace mvlt
 {
-    std::unordered_set<VaultRecord*>::iterator Vault::RemoveRecord(VaultRecord* recordToErase, const bool& isCalledFromVault, bool* wasDeleted) noexcept
+    std::unordered_set<VaultRecord*>::iterator Vault::RemoveRecord(VaultRecord* recordToErase, bool* wasDeleted) noexcept
     {
         RecursiveReadWriteMtx.WriteLock();
 
@@ -24,7 +24,7 @@ namespace mvlt
 
         dataIt = RecordsSet.erase(dataIt);
 
-        if (isCalledFromVault)
+        if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
         {
             recordToErase->Invalidate();
 
@@ -32,7 +32,8 @@ namespace mvlt
             for (VaultRecordSet* set : recordToErase->dependentVaultRecordSets)
             {
                 set->RecursiveReadWriteMtx.WriteLock();
-                static_cast<Vault*>(set)->RemoveRecord(recordToErase, false, wasDeleted);
+                // "If" before this line will not called because type saved in VaultDerivedClass variable
+                static_cast<Vault*>(set)->RemoveRecord(recordToErase, nullptr);
                 set->RecursiveReadWriteMtx.WriteUnlock();
             }
             recordToErase->Mtx.unlock();
@@ -42,68 +43,6 @@ namespace mvlt
         RecursiveReadWriteMtx.WriteUnlock();
         if (wasDeleted != nullptr) *wasDeleted = true;
         return dataIt;
-    }
-
-    bool Vault::RemoveRecord(const VaultRecordRef& recordRefToErase, const bool& isCalledFromVault) noexcept
-    {
-        bool res;
-
-        recordRefToErase.Mtx.lock();
-        RecursiveReadWriteMtx.WriteLock();
-
-        RemoveRecord(recordRefToErase.DataRecord, isCalledFromVault, &res);
-
-        RecursiveReadWriteMtx.WriteUnlock();
-        recordRefToErase.Mtx.unlock();
-        return res;
-    }
-
-    bool Vault::RemoveKey(const std::string& key, const bool& isCalledFromVault) noexcept
-    {
-        RecursiveReadWriteMtx.WriteLock();
-
-        if (KeysTypes.find(key) == KeysTypes.end())
-        {
-            RecursiveReadWriteMtx.WriteUnlock();
-            return false;
-        }
-
-        // Remove key from hash map with keys types
-        KeysTypes.erase(key);
-
-        // Erase key from record template
-        RecordTemplate.EraseData(key);
-
-        // Erase key from VaultHashMapStructure
-        VaultHashMapStructure.EraseData(key);
-
-        // Erase key from VaultMapStructure
-        VaultMapStructure.EraseData(key);
-
-        // Erase key from all maps
-        VaultRecordAdders.erase(key);
-        VaultRecordClearers.erase(key);
-        VaultRecordErasers.erase(key);
-        VaultRecordSorters.erase(key);
-        VaultKeyCopiers.erase(key);
-
-        if (isCalledFromVault)
-        {
-            // Erase key data from all records
-            for (auto& it : RecordsSet)
-                it->EraseData(key);
-
-            for (VaultRecordSet* set : RecordSetsSet)
-            {
-                set->RecursiveReadWriteMtx.WriteLock();
-                set->RemoveKey(key, false);
-                set->RecursiveReadWriteMtx.WriteUnlock();
-            }
-        }
-
-        RecursiveReadWriteMtx.WriteUnlock();
-
-        return true;
     }
 
     Vault::Vault() noexcept 
@@ -136,7 +75,50 @@ namespace mvlt
 
     bool Vault::RemoveKey(const std::string& key) noexcept
     {
-        return RemoveKey(key, true);
+                RecursiveReadWriteMtx.WriteLock();
+
+        if (KeysTypes.find(key) == KeysTypes.end())
+        {
+            RecursiveReadWriteMtx.WriteUnlock();
+            return false;
+        }
+
+        // Remove key from hash map with keys types
+        KeysTypes.erase(key);
+
+        // Erase key from record template
+        RecordTemplate.EraseData(key);
+
+        // Erase key from VaultHashMapStructure
+        VaultHashMapStructure.EraseData(key);
+
+        // Erase key from VaultMapStructure
+        VaultMapStructure.EraseData(key);
+
+        // Erase key from all maps
+        VaultRecordAdders.erase(key);
+        VaultRecordClearers.erase(key);
+        VaultRecordErasers.erase(key);
+        VaultRecordSorters.erase(key);
+        VaultKeyCopiers.erase(key);
+
+        if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
+        {
+            // Erase key data from all records
+            for (auto& it : RecordsSet)
+                it->EraseData(key);
+
+            for (VaultRecordSet* set : RecordSetsSet)
+            {
+                set->RecursiveReadWriteMtx.WriteLock();
+                set->RemoveKey(key);
+                set->RecursiveReadWriteMtx.WriteUnlock();
+            }
+        }
+
+        RecursiveReadWriteMtx.WriteUnlock();
+
+        return true;
     }
 
     VaultRecordRef Vault::CreateRecord() noexcept
@@ -284,7 +266,7 @@ namespace mvlt
             for (VaultRecordSet* set : it->dependentVaultRecordSets)
             {
                 set->RecursiveReadWriteMtx.WriteLock();
-                static_cast<Vault*>(set)->RemoveRecord(it, false, nullptr);
+                static_cast<Vault*>(set)->RemoveRecord(it, nullptr);
                 set->RecursiveReadWriteMtx.WriteUnlock();
             }
             it->Mtx.unlock();
@@ -299,7 +281,16 @@ namespace mvlt
 
     bool Vault::EraseRecord(const VaultRecordRef& recordRefToErase) noexcept
     {
-        return RemoveRecord(recordRefToErase, true);
+        bool res;
+
+        recordRefToErase.Mtx.lock();
+        RecursiveReadWriteMtx.WriteLock();
+
+        RemoveRecord(recordRefToErase.DataRecord, &res);
+
+        RecursiveReadWriteMtx.WriteUnlock();
+        recordRefToErase.Mtx.unlock();
+        return res;
     }
 
     std::size_t Vault::Size() const noexcept

@@ -8,7 +8,7 @@
 namespace mvlt
 {
     template <class T>
-    VaultOperationResult Vault::SetDataToRecord(VaultRecord* dataRecord, const std::string& key, const T& data, const bool& isCalledFromVault) noexcept
+    VaultOperationResult Vault::SetDataToRecord(VaultRecord* dataRecord, const std::string& key, const T& data) noexcept
     {
         // Fill res info known at start
         VaultOperationResult res;
@@ -102,14 +102,14 @@ namespace mvlt
 
         // Check if this method was original called. That mean that this method called not from next if statement.
         // It is required since VaultRecordSet child of Vault and may also call this method
-        if (isCalledFromVault)
+        if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
         {
             // Update data inside VaultRecord pointer inside VaultRecordRef and Vault
             dataRecord->SetData(key, data);
         
             // Update all dependent VaultRecordSets structures
             for (VaultRecordSet* vaultRecordSet : dataRecord->dependentVaultRecordSets)
-                vaultRecordSet->SetDataToRecord(dataRecord, key, data, false);
+                vaultRecordSet->SetDataToRecord(dataRecord, key, data);
         }
 
         res.IsOperationSuccess = true;
@@ -117,163 +117,6 @@ namespace mvlt
 
         // Unlock Vault
         RecursiveReadWriteMtx.WriteUnlock();
-        return res;
-    }
-
-    template <class T>
-    VaultOperationResult Vault::RemoveRecord(const std::string& key, const T& keyValue, const bool& isCalledFromVault) noexcept
-    {
-        // Fill res info known at start
-        VaultOperationResult res;
-        res.Key = key;
-        res.RequestedType = typeid(T);
-
-        RecursiveReadWriteMtx.ReadLock();
-
-        // If key not exist
-        if(!GetKeyType(key, res.SavedType))
-        {
-            res.IsOperationSuccess = false;
-            res.ResultCode = VaultOperationResultCode::WrongKey;
-            RecursiveReadWriteMtx.ReadUnlock();
-            return res;
-        }
-
-        // Check types
-        if (res.SavedType != res.RequestedType)
-        {
-            res.IsOperationSuccess = false;
-            res.ResultCode = VaultOperationResultCode::WrongType;
-            RecursiveReadWriteMtx.ReadUnlock();
-            return res;
-        }
-
-        // Pointer to store map inside VaultStructureHashMap
-        std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
-
-        // Checking whether such a key exists
-        VaultHashMapStructure.GetData(key, TtoVaultRecordHashMap);
-        
-        // Iterator to element with T type and keyValue value
-        auto TtoVaultRecordIt = TtoVaultRecordHashMap->find(keyValue);
-        if (TtoVaultRecordIt != TtoVaultRecordHashMap->end())
-        {
-            VaultRecord* tmpRec = TtoVaultRecordIt->second;
-
-            for (auto& eraser : VaultRecordErasers)
-                eraser.second(tmpRec);
-
-            RecordsSet.erase(tmpRec);
-            
-            // Check if it is delete. By now it is deletion when EraseRecord called from vault.
-            // It is not deleting when RemoveRecord called from VaultRecordSet
-            if (isCalledFromVault) 
-            {
-                tmpRec->Mtx.lock();
-                for (VaultRecordSet* set : tmpRec->dependentVaultRecordSets)
-                {
-                    set->RecursiveReadWriteMtx.WriteLock();
-                    static_cast<Vault*>(set)->RemoveRecord(tmpRec, false, nullptr);
-                    set->RecursiveReadWriteMtx.WriteUnlock();
-                }
-                tmpRec->Mtx.unlock();
-
-                tmpRec->Invalidate();
-            }
-
-            res.IsOperationSuccess = true;
-            res.ResultCode = VaultOperationResultCode::Success;
-        }
-        else
-        {
-            res.IsOperationSuccess = false;
-            res.ResultCode = VaultOperationResultCode::WrongValue;
-        }
-
-        RecursiveReadWriteMtx.ReadUnlock();
-        return res;
-    }
-
-    template <class T>
-    VaultOperationResult Vault::RemoveRecords(const std::string& key, const T& keyValue, const std::size_t& amountOfRecords, const bool& isCalledFromVault) noexcept
-    {
-        // Fill res info known at start
-        VaultOperationResult res;
-        res.Key = key;
-        res.RequestedType = typeid(T);
-
-        RecursiveReadWriteMtx.ReadLock();
-
-        // If key not exist
-        if(!GetKeyType(key, res.SavedType))
-        {
-            res.IsOperationSuccess = false;
-            res.ResultCode = VaultOperationResultCode::WrongKey;
-            RecursiveReadWriteMtx.ReadUnlock();
-            return res;
-        }
-
-        // Check types
-        if (res.SavedType != res.RequestedType)
-        {
-            res.IsOperationSuccess = false;
-            res.ResultCode = VaultOperationResultCode::WrongType;
-            RecursiveReadWriteMtx.ReadUnlock();
-            return res;
-        }
-
-        // Pointer to store map inside VaultStructureHashMap
-        std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
-
-        // Checking whether such a key exists
-        VaultHashMapStructure.GetData(key, TtoVaultRecordHashMap);
-        
-        // Pair with begin and end iterator with T type and keyValue value
-        auto equalRange = TtoVaultRecordHashMap->equal_range(keyValue);
-        if (equalRange.first != TtoVaultRecordHashMap->end())
-        {
-            std::size_t counter = 0;
-            for (auto it = equalRange.first; it != equalRange.second;)
-            {
-                // Save next iterator
-                auto next = it;
-                ++next;
-
-                ++counter;
-
-                VaultRecord* tmpRec = it->second;
-                for (auto& eraser : VaultRecordErasers)
-                    eraser.second(tmpRec);
-
-                RecordsSet.erase(tmpRec);
-
-                // Check if it is delete. By now it is deletion when EraseRecord called from vault.
-                // It is not deleting when RemoveRecord called from VaultRecordSet
-                if (isCalledFromVault) 
-                {
-                    tmpRec->Mtx.lock();
-                    for (VaultRecordSet* set : tmpRec->dependentVaultRecordSets)
-                    {
-                        set->RecursiveReadWriteMtx.WriteLock();
-                        static_cast<Vault*>(set)->RemoveRecord(tmpRec, false, nullptr);
-                        set->RecursiveReadWriteMtx.WriteUnlock();
-                    }
-                    tmpRec->Mtx.unlock();
-                    tmpRec->Invalidate();
-                }
-                
-                if (counter >= amountOfRecords) break;
-                
-                it = next;
-            }
-        }
-        else
-        {
-            res.IsOperationSuccess = false;
-            res.ResultCode = VaultOperationResultCode::WrongValue;
-        }
-
-        RecursiveReadWriteMtx.ReadUnlock();
         return res;
     }
 
@@ -491,7 +334,7 @@ namespace mvlt
     }
 
     template <class T>
-    bool Vault::AddKey(const std::string& key, const T& defaultKeyValue, const bool& isCalledFromVault) noexcept
+    bool Vault::AddKey(const std::string& key, const T& defaultKeyValue) noexcept
     {
         RecursiveReadWriteMtx.WriteLock();
 
@@ -600,7 +443,7 @@ namespace mvlt
         });  
 
 
-        if (isCalledFromVault)
+        if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
         {
             // Add new data to record set
             for (auto& it : RecordsSet)
@@ -613,19 +456,13 @@ namespace mvlt
             for (VaultRecordSet* set : RecordSetsSet)
             {
                 set->RecursiveReadWriteMtx.WriteLock();
-                set->AddKey(key, defaultKeyValue, false);
+                set->AddKey(key, defaultKeyValue);
                 set->RecursiveReadWriteMtx.WriteUnlock();
             }
         }
 
         RecursiveReadWriteMtx.WriteUnlock();
         return true;
-    }
-
-    template <class T>
-    bool Vault::AddKey(const std::string& key, const T& defaultKeyValue) noexcept
-    {
-        return AddKey(key, defaultKeyValue, true);
     }
 
     template <class T>
@@ -907,13 +744,158 @@ namespace mvlt
     template <class T>
     VaultOperationResult Vault::EraseRecord(const std::string& key, const T& keyValue) noexcept
     {
-        return RemoveRecord(key, keyValue, true);
+        // Fill res info known at start
+        VaultOperationResult res;
+        res.Key = key;
+        res.RequestedType = typeid(T);
+
+        RecursiveReadWriteMtx.ReadLock();
+
+        // If key not exist
+        if(!GetKeyType(key, res.SavedType))
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::WrongKey;
+            RecursiveReadWriteMtx.ReadUnlock();
+            return res;
+        }
+
+        // Check types
+        if (res.SavedType != res.RequestedType)
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::WrongType;
+            RecursiveReadWriteMtx.ReadUnlock();
+            return res;
+        }
+
+        // Pointer to store map inside VaultStructureHashMap
+        std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
+
+        // Checking whether such a key exists
+        VaultHashMapStructure.GetData(key, TtoVaultRecordHashMap);
+        
+        // Iterator to element with T type and keyValue value
+        auto TtoVaultRecordIt = TtoVaultRecordHashMap->find(keyValue);
+        if (TtoVaultRecordIt != TtoVaultRecordHashMap->end())
+        {
+            VaultRecord* tmpRec = TtoVaultRecordIt->second;
+
+            for (auto& eraser : VaultRecordErasers)
+                eraser.second(tmpRec);
+
+            RecordsSet.erase(tmpRec);
+            
+            // Check if it is delete. By now it is deletion when EraseRecord called from vault.
+            // It is not deleting when RemoveRecord called from VaultRecordSet
+            if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
+            {
+                tmpRec->Mtx.lock();
+                for (VaultRecordSet* set : tmpRec->dependentVaultRecordSets)
+                {
+                    set->RecursiveReadWriteMtx.WriteLock();
+                    static_cast<Vault*>(set)->RemoveRecord(tmpRec, nullptr);
+                    set->RecursiveReadWriteMtx.WriteUnlock();
+                }
+                tmpRec->Mtx.unlock();
+
+                tmpRec->Invalidate();
+            }
+
+            res.IsOperationSuccess = true;
+            res.ResultCode = VaultOperationResultCode::Success;
+        }
+        else
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::WrongValue;
+        }
+
+        RecursiveReadWriteMtx.ReadUnlock();
+        return res;
     }
 
     template <class T>
     VaultOperationResult Vault::EraseRecords(const std::string& key, const T& keyValue, const std::size_t& amountOfRecords) noexcept
     {
-        return RemoveRecords(key, keyValue, amountOfRecords, true);
+        // Fill res info known at start
+        VaultOperationResult res;
+        res.Key = key;
+        res.RequestedType = typeid(T);
+
+        RecursiveReadWriteMtx.ReadLock();
+
+        // If key not exist
+        if(!GetKeyType(key, res.SavedType))
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::WrongKey;
+            RecursiveReadWriteMtx.ReadUnlock();
+            return res;
+        }
+
+        // Check types
+        if (res.SavedType != res.RequestedType)
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::WrongType;
+            RecursiveReadWriteMtx.ReadUnlock();
+            return res;
+        }
+
+        // Pointer to store map inside VaultStructureHashMap
+        std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
+
+        // Checking whether such a key exists
+        VaultHashMapStructure.GetData(key, TtoVaultRecordHashMap);
+        
+        // Pair with begin and end iterator with T type and keyValue value
+        auto equalRange = TtoVaultRecordHashMap->equal_range(keyValue);
+        if (equalRange.first != TtoVaultRecordHashMap->end())
+        {
+            std::size_t counter = 0;
+            for (auto it = equalRange.first; it != equalRange.second;)
+            {
+                // Save next iterator
+                auto next = it;
+                ++next;
+
+                ++counter;
+
+                VaultRecord* tmpRec = it->second;
+                for (auto& eraser : VaultRecordErasers)
+                    eraser.second(tmpRec);
+
+                RecordsSet.erase(tmpRec);
+
+                // Check if it is delete. By now it is deletion when EraseRecord called from vault.
+                // It is not deleting when RemoveRecord called from VaultRecordSet
+                if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
+                {
+                    tmpRec->Mtx.lock();
+                    for (VaultRecordSet* set : tmpRec->dependentVaultRecordSets)
+                    {
+                        set->RecursiveReadWriteMtx.WriteLock();
+                        static_cast<Vault*>(set)->RemoveRecord(tmpRec, nullptr);
+                        set->RecursiveReadWriteMtx.WriteUnlock();
+                    }
+                    tmpRec->Mtx.unlock();
+                    tmpRec->Invalidate();
+                }
+                
+                if (counter >= amountOfRecords) break;
+                
+                it = next;
+            }
+        }
+        else
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::WrongValue;
+        }
+
+        RecursiveReadWriteMtx.ReadUnlock();
+        return res;
     }
 
     template<class F>

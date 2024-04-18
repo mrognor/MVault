@@ -230,7 +230,7 @@ namespace mvlt
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
 
-            res = Vault::RemoveRecords(key, keyValue, amountOfRecords, false);
+            res = Vault::EraseRecords(key, keyValue, amountOfRecords);
 
             ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
