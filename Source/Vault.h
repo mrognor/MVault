@@ -81,7 +81,17 @@ namespace mvlt
         std::unordered_map<std::string, std::function<void(VaultRecordSet& vaultRecordSet)>> VaultKeyCopiers;
 
     protected:
-    
+
+        /// \brief Enum for storing the object type during inheritance
+        enum class VaultDerivedClasses
+        {
+            VaultBase,            ///< Vault class itself
+            VaultRecordSetDerived ///< VaultRecordSet class
+        };
+
+        /// \brief A variable for storing the object type in the Vault inheritance tree
+        VaultDerivedClasses VaultDerivedClass;
+
         /// \brief Unordered set with all VaultRecord pointers
         std::unordered_set<VaultRecord*> RecordsSet;
 

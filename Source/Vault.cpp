@@ -6,11 +6,11 @@
 
 namespace mvlt
 {
-    std::unordered_set<VaultRecord *>::iterator Vault::RemoveRecord(VaultRecord* recordToErase, const bool& isCalledFromVault, bool* wasDeleted) noexcept
+    std::unordered_set<VaultRecord*>::iterator Vault::RemoveRecord(VaultRecord* recordToErase, const bool& isCalledFromVault, bool* wasDeleted) noexcept
     {
         RecursiveReadWriteMtx.WriteLock();
 
-        std::unordered_set<VaultRecord *>::iterator dataIt = RecordsSet.find(recordToErase);
+        std::unordered_set<VaultRecord*>::iterator dataIt = RecordsSet.find(recordToErase);
         if (dataIt == RecordsSet.end())
         {
             RecursiveReadWriteMtx.WriteUnlock();
@@ -24,10 +24,10 @@ namespace mvlt
 
         dataIt = RecordsSet.erase(dataIt);
 
-        if (isCalledFromVault) 
+        if (isCalledFromVault)
         {
             recordToErase->Invalidate();
-            
+
             recordToErase->Mtx.lock();
             for (VaultRecordSet* set : recordToErase->dependentVaultRecordSets)
             {
@@ -62,7 +62,7 @@ namespace mvlt
     {
         RecursiveReadWriteMtx.WriteLock();
 
-        if (KeysTypes.find(key) == KeysTypes.end()) 
+        if (KeysTypes.find(key) == KeysTypes.end())
         {
             RecursiveReadWriteMtx.WriteUnlock();
             return false;
@@ -106,7 +106,10 @@ namespace mvlt
         return true;
     }
 
-    Vault::Vault() noexcept {}
+    Vault::Vault() noexcept 
+    {
+        VaultDerivedClass = VaultDerivedClasses::VaultBase;
+    }
 
     bool Vault::IsKeyExist(const std::string& key) const noexcept
     {
@@ -174,13 +177,13 @@ namespace mvlt
         for (const auto& it : params)
         {
             DataSaver ds;
-            
+
             res.Key = it.first;
             res.RequestedType = it.second.GetDataType();
 
             // Check if key exist in record template
-            if(newData->GetDataSaver(it.first, ds))
-            {                
+            if (newData->GetDataSaver(it.first, ds))
+            {
                 res.RequestedType = KeysTypes.find(it.first)->second;
 
                 // Check if type in params match type in record template
@@ -193,7 +196,7 @@ namespace mvlt
                     res.SavedType = it.second.GetDataType();
                     res.ResultCode = VaultOperationResultCode::Success;
                 }
-                else 
+                else
                 {   // If the type in param not match type in record template
                     res.IsOperationSuccess = false;
                     res.SavedType = it.second.GetDataType();
@@ -201,7 +204,7 @@ namespace mvlt
                     break;
                 }
             }
-            else 
+            else
             {   // If key not exist then stop set data from params
                 res.IsOperationSuccess = false;
                 res.SavedType = typeid(void);
@@ -217,9 +220,9 @@ namespace mvlt
         // Add new record to every maps inside VaultStructureHashMap
         for (auto& it : VaultRecordAdders)
             it.second(newData);
-        
+
         vaultRecordRef.SetRecord(newData, this);
-        
+
         RecursiveReadWriteMtx.WriteUnlock();
 
         return res;
@@ -255,7 +258,7 @@ namespace mvlt
         VaultRecordErasers.clear();
         VaultRecordSorters.clear();
         VaultKeyCopiers.clear();
-        
+
         // Delete all Records
         for (auto& it : RecordsSet)
             it->Invalidate();
@@ -315,7 +318,7 @@ namespace mvlt
         RecursiveReadWriteMtx.ReadLock();
         for (const auto& it : VaultMapStructure) res.emplace_back(it.first);
         RecursiveReadWriteMtx.ReadUnlock();
-        
+
         return res;
     }
 
@@ -325,14 +328,14 @@ namespace mvlt
         std::size_t counter = 0;
 
         RecursiveReadWriteMtx.ReadLock();
-        
+
         auto f = VaultRecordSorters.find(key);
         if (f != VaultRecordSorters.end())
         {
             f->second([&](const VaultRecordRef& vaultRecordRef)
                 {
                     if (counter >= amountOfRecords) return false;
-                    
+
                     res.emplace_back(vaultRecordRef);
                     ++counter;
                     return true;
@@ -340,7 +343,7 @@ namespace mvlt
         }
 
         RecursiveReadWriteMtx.ReadUnlock();
-        
+
         return res;
     }
 
@@ -370,7 +373,7 @@ namespace mvlt
         RecursiveReadWriteMtx.ReadUnlock();
     }
 
-    void Vault::PrintAsTable(bool isPrintId,const std::size_t& amountOfRecords, const std::vector<std::string> keys) const noexcept
+    void Vault::PrintAsTable(bool isPrintId, const std::size_t& amountOfRecords, const std::vector<std::string> keys) const noexcept
     {
         RecursiveReadWriteMtx.ReadLock();
         if (keys.empty())

@@ -18,6 +18,10 @@ namespace mvlt
 
             // \todo Replace to reset to clear keys 
             vaultRecordSet.Clear();
+
+            // Save vaultRecordSet
+            ParentVault->RecordSetsSet.emplace(&vaultRecordSet);
+
             res = Vault::RequestRecords(requestType, key, beginKeyValue, endKeyValue, vaultRecordSet, false, false, amountOfRecords);
             vaultRecordSet.ParentVault = ParentVault;
 
@@ -169,6 +173,10 @@ namespace mvlt
 
             // \todo Replace to reset to clear keys 
             vaultRecordSet.Clear();
+
+            // Save vaultRecordSet
+            ParentVault->RecordSetsSet.emplace(&vaultRecordSet);
+
             res = Vault::Request(request, &vaultRecordSet);
             vaultRecordSet.ParentVault = ParentVault;
 

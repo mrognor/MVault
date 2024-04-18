@@ -460,7 +460,8 @@ namespace mvlt
         vaultRecordSet.RecursiveReadWriteMtx.WriteLock();
 
         // Save vaultRecordSet
-        RecordSetsSet.emplace(&vaultRecordSet);
+        if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
+            RecordSetsSet.emplace(&vaultRecordSet);
 
         // Set new parent vault to vaultRecordSet
         vaultRecordSet.ParentVault = const_cast<Vault*>(this);
@@ -864,7 +865,8 @@ namespace mvlt
         vaultRecordSet.RecursiveReadWriteMtx.WriteLock();
 
         // Save vaultRecordSet
-        RecordSetsSet.emplace(&vaultRecordSet);
+        if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
+            RecordSetsSet.emplace(&vaultRecordSet);
 
         // Set new parent vault to vaultRecordSet
         vaultRecordSet.ParentVault = const_cast<Vault*>(this);

@@ -3,7 +3,10 @@
 
 namespace mvlt
 {
-    VaultRecordSet::VaultRecordSet() noexcept {}
+    VaultRecordSet::VaultRecordSet() noexcept 
+    {
+        VaultDerivedClass = VaultDerivedClasses::VaultRecordSetDerived;
+    }
 
     VaultRecordSet::VaultRecordSet(const VaultRecordSet& other) noexcept
     {
@@ -17,18 +20,19 @@ namespace mvlt
             other.RecursiveReadWriteMtx.ReadLock();
             RecursiveReadWriteMtx.WriteLock();
 
+            VaultDerivedClass = VaultDerivedClasses::VaultRecordSetDerived;
             ParentVault = other.ParentVault;
             IsParentVaultValid = true;
-            
+
             for (auto& keyCopierIt : other.VaultKeyCopiers)
                 keyCopierIt.second(*this);
-        
+
             other.ParentVault->RecordSetsSet.emplace(this);
 
             for (VaultRecord* record : other.RecordsSet)
             {
                 RecordsSet.emplace(record);
-                
+
                 for (auto& adder : VaultRecordAdders)
                     adder.second(record);
 
@@ -41,7 +45,7 @@ namespace mvlt
             RecursiveReadWriteMtx.WriteUnlock();
             other.RecursiveReadWriteMtx.ReadUnlock();
         }
-        
+
         return *this;
     }
 
@@ -66,7 +70,7 @@ namespace mvlt
             res = Vault::IsKeyExist(key);
             ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
-        
+
         RecursiveReadWriteMtx.ReadUnlock();
         return res;
     }
@@ -83,7 +87,7 @@ namespace mvlt
             res = Vault::GetKeyType(key, keyType);
             ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
-        
+
         RecursiveReadWriteMtx.ReadUnlock();
         return res;
     }
@@ -99,7 +103,7 @@ namespace mvlt
 
             // Add pointer to record from recordRef to this
             RecordsSet.emplace(recordRef.DataRecord);
-                
+
             // Add pointer to record from recordRef to this::vaultRecordRef structure
             for (auto& adder : VaultRecordAdders)
                 adder.second(recordRef.DataRecord);
@@ -109,9 +113,9 @@ namespace mvlt
             recordRef.DataRecord->dependentVaultRecordSets.emplace(this);
             recordRef.DataRecord->Mtx.unlock();
 
-            ParentVault->RecursiveReadWriteMtx.ReadUnlock();    
+            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
-        
+
         RecursiveReadWriteMtx.WriteUnlock();
     }
 
@@ -128,7 +132,7 @@ namespace mvlt
             {
                 // Add pointer to record from recordRef to this
                 RecordsSet.emplace(recordRef.DataRecord);
-                    
+
                 // Add pointer to record from recordRef to this::vaultRecordRef structure
                 for (auto& adder : VaultRecordAdders)
                     adder.second(recordRef.DataRecord);
@@ -139,9 +143,9 @@ namespace mvlt
                 recordRef.DataRecord->Mtx.unlock();
             }
 
-            ParentVault->RecursiveReadWriteMtx.ReadUnlock();    
+            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
-        
+
         RecursiveReadWriteMtx.WriteUnlock();
     }
 
@@ -253,9 +257,9 @@ namespace mvlt
             Vault::PrintVault(amountOfRecords);
             ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
-        else 
+        else
             std::cout << "The parent Vault is not valid!" << std::endl;
-        
+
         RecursiveReadWriteMtx.ReadUnlock();
     }
 
@@ -270,9 +274,9 @@ namespace mvlt
             Vault::PrintAsTable(isPrintId, amountOfRecords, keys);
             ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
-        else 
+        else
             std::cout << "The parent Vault is not valid!" << std::endl;
-        
+
         RecursiveReadWriteMtx.ReadUnlock();
     }
 
@@ -285,13 +289,13 @@ namespace mvlt
         if (IsParentVaultValid && a.IsParentVaultValid)
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
-        
+
             for (VaultRecord* record : a.RecordsSet)
             {
                 if (RecordsSet.find(record) == RecordsSet.end())
                 {
                     RecordsSet.emplace(record);
-                
+
                     for (auto& adder : VaultRecordAdders)
                         adder.second(record);
                 }
@@ -313,13 +317,13 @@ namespace mvlt
         if (IsParentVaultValid && a.IsParentVaultValid)
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
-        
+
             for (auto it = RecordsSet.begin(); it != RecordsSet.end();)
             {
                 // if found record in a then delete it here
                 if (a.RecordsSet.find(*it) != a.RecordsSet.end())
                     it = Vault::RemoveRecord(*it, false, nullptr);
-                else 
+                else
                     ++it;
             }
 
@@ -339,13 +343,13 @@ namespace mvlt
         if (IsParentVaultValid && a.IsParentVaultValid)
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
-        
+
             for (auto it = RecordsSet.begin(); it != RecordsSet.end();)
             {
                 // if not found record in a then delete it here
                 if (a.RecordsSet.find(*it) == a.RecordsSet.end())
                     it = Vault::RemoveRecord(*it, false, nullptr);
-                else 
+                else
                     ++it;
             }
 
