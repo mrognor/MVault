@@ -345,6 +345,9 @@ namespace mvlt
             return false;
         }
 
+        // Add key to list with key order
+        KeysOrder.emplace_back(key);
+
         // Add key type to hash map with keys types
         KeysTypes.emplace(key, typeid(T)); 
 

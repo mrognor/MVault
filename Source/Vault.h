@@ -1,7 +1,8 @@
 #pragma once
 
-#include <functional>
+#include <list>
 #include <vector>
+#include <functional>
 
 #include "VaultClasses.h"
 
@@ -79,6 +80,9 @@ namespace mvlt
 
         // Unordered_map of functions that copy keys from this to VaultRecordSet
         std::unordered_map<std::string, std::function<void(VaultRecordSet& vaultRecordSet)>> VaultKeyCopiers;
+
+        // List to store keys order
+        std::list<std::string> KeysOrder;
 
     protected:
 

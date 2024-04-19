@@ -75,16 +75,30 @@ namespace mvlt
 
     bool Vault::RemoveKey(const std::string& key) noexcept
     {
-                RecursiveReadWriteMtx.WriteLock();
+        RecursiveReadWriteMtx.WriteLock();
 
-        if (KeysTypes.find(key) == KeysTypes.end())
+        // Find key in hash map
+        auto foundedKeyInHashMapIt = KeysTypes.find(key);
+
+        // If key was not find return false
+        if (foundedKeyInHashMapIt == KeysTypes.end())
         {
             RecursiveReadWriteMtx.WriteUnlock();
             return false;
         }
 
         // Remove key from hash map with keys types
-        KeysTypes.erase(key);
+        KeysTypes.erase(foundedKeyInHashMapIt);
+
+        // Remove key from list with key order
+        for (auto it = KeysOrder.begin(); it != KeysOrder.end(); ++it)
+        {
+            if (key == *it)
+            {
+                KeysOrder.erase(it);
+                break;
+            }
+        }
 
         // Erase key from record template
         RecordTemplate.EraseData(key);
