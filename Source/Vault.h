@@ -556,9 +556,12 @@ namespace mvlt
             
             \param [in] isPrintId will the unique IDs be printed in the table
             \param [in] amountOfRecords The number of records to be printed. The default value is -1, which means that all entries will be output
-            \param [in] keys vector of keys to be printed. By default, the vector is empty, which means that all keys will be output
+            \param [in] primaryKey The key by which the data will be sorted
+            \param [in] isReverse The sorting direction. If true, the data will be output from the larger to the smaller
+            \param [in] keys list of keys to be printed. By default, the list is empty, which means that all keys will be output
         */
-        void PrintAsTable(bool isPrintId = false, const std::size_t& amountOfRecords = -1, const std::vector<std::string> keys = {}) const noexcept;
+        void PrintAsTable(bool isPrintId = false, const std::size_t& amountOfRecords = -1, std::string primaryKey = "", const bool& isReverse = false,
+            const std::list<std::string> keys = {}) const noexcept;
 
         /// \brief Default destructor
         ~Vault() noexcept;

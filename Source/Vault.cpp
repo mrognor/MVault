@@ -378,21 +378,137 @@ namespace mvlt
         RecursiveReadWriteMtx.ReadUnlock();
     }
 
-    void Vault::PrintAsTable(bool isPrintId, const std::size_t& amountOfRecords, const std::vector<std::string> keys) const noexcept
+    void Vault::PrintAsTable(bool isPrintId, const std::size_t& amountOfRecords, std::string primaryKey, const bool& isReverse,
+        const std::list<std::string> keys) const noexcept
     {
         RecursiveReadWriteMtx.ReadLock();
-        if (keys.empty())
+
+        if (VaultMapStructure.Size() == 0)
         {
-            if (VaultMapStructure.Size() == 0)
+            std::cout << "Vault does not contain keys!" << std::endl;
+            std::cout << " (" << RecordsSet.size() << " records)" << std::endl;
+            RecursiveReadWriteMtx.ReadUnlock();
+            return;
+        }
+
+        // Set proper list with all keys
+        const std::list<std::string>* keysList;
+        if (keys.size() != 0)
+            keysList = &keys;
+        else
+            keysList = &KeysOrder;
+
+        // Counter for iteration cycles
+        std::size_t counter = 0;
+
+        // Vector for maximal cell length
+        std::vector<std::size_t> maxLengths(keysList->size());
+
+        // Fill each max length using key length
+        for (const std::string& key : *keysList)
+        {
+            maxLengths[counter] = key.length();
+            ++counter;
+        }
+
+        // Find each real max length
+        std::string dataString;
+        counter = 0;
+        for (const std::string& key : *keysList)
+        {
+            for (const auto& record : RecordsSet)
             {
-                std::cout << "Vault does not contain keys!" << std::endl;
-                std::cout << " (" << RecordsSet.size() << " records)" << std::endl;
+                record->GetDataAsString(key, dataString);
+                if (dataString.length() > maxLengths[counter]) maxLengths[counter] = dataString.length();   
             }
-            else
-                PrintContainerAsTable(RecordsSet, isPrintId, amountOfRecords, GetKeys());
+            ++counter;
+        }
+
+        // Print splitter
+        counter = 0;
+        std::cout << "+";
+        for (std::size_t i = 0; i < keysList->size(); ++i)
+        {
+            std::cout << "-";
+            for (std::size_t j = 0; j < maxLengths[counter]; ++j) std::cout << "-";
+            std::cout << "-+";
+            ++counter;
+        }
+        std::cout << std::endl;
+
+        // Print header
+        counter = 0;
+        std::cout << "|";
+        for (const std::string& key : *keysList)
+        {
+            std::cout << " " << key;
+            for (std::size_t j = key.length(); j < maxLengths[counter]; ++j) std::cout << " ";
+            std::cout << " |";
+            ++counter;
+        }
+        std::cout << std::endl;
+        
+        // Print splitter
+        counter = 0;
+        std::cout << "+";
+        for (std::size_t i = 0; i < keysList->size(); ++i)
+        {
+            std::cout << "-";
+            for (std::size_t j = 0; j < maxLengths[counter]; ++j) std::cout << "-";
+            std::cout << "-+";
+            ++counter;
+        }
+        std::cout << std::endl;
+
+        // Print records
+        counter = 0;
+        if (primaryKey.empty()) primaryKey = KeysOrder.front();
+        SortBy(primaryKey, [&](const VaultRecordRef& record)
+            {
+                counter = 0;
+                std::cout << "|";
+                for (const std::string& key : *keysList)
+                {
+                    record.GetDataAsString(key, dataString);
+                    std::cout << " " << dataString;
+                    for (std::size_t j = dataString.length(); j < maxLengths[counter]; ++j) std::cout << " ";
+                        std::cout << " |";
+                    ++counter;
+                }
+                if (isPrintId)
+                    std::cout << " " << record.GetRecordUniqueId() << std::endl;
+                else 
+                    std::cout << std::endl;
+                return true;
+            }, isReverse, amountOfRecords);
+
+        // Print splitter
+        if (amountOfRecords >= RecordsSet.size())
+        {
+            std::cout << "+";
+            for (std::size_t i = 0; i < keysList->size(); ++i)
+            {
+                std::cout << "-";
+                for (std::size_t j = 0; j < maxLengths[i]; ++j) std::cout << "-";
+                std::cout << "-+";
+            }
+            std::cout << std::endl;
         }
         else
-            PrintContainerAsTable(RecordsSet, isPrintId, amountOfRecords, keys);
+        {
+            std::cout << "$";
+            for (std::size_t i = 0; i < keysList->size(); ++i)
+            {
+                std::cout << "~";
+                for (std::size_t j = 0; j < maxLengths[i]; ++j) std::cout << "~";
+                std::cout << "~$";
+            }
+            std::cout << std::endl;
+        }
+
+        std::cout << " (" << RecordsSet.size() << " records)" << std::endl;
+   
+
         RecursiveReadWriteMtx.ReadUnlock();
     }
 

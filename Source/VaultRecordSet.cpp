@@ -263,15 +263,16 @@ namespace mvlt
         RecursiveReadWriteMtx.ReadUnlock();
     }
 
-    void VaultRecordSet::PrintAsTable(bool isPrintId, const std::size_t& amountOfRecords, const std::vector<std::string> keys) const noexcept
-    {
+    void VaultRecordSet::PrintAsTable(bool isPrintId, const std::size_t& amountOfRecords, std::string primaryKey, const bool& isReverse,
+            const std::list<std::string> keys) const noexcept
+        {
         RecursiveReadWriteMtx.ReadLock();
 
         // Thread safety because in Vault destructor blocking this RecursiveReadWriteMtx to write
         if (IsParentVaultValid)
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
-            Vault::PrintAsTable(isPrintId, amountOfRecords, keys);
+            Vault::PrintAsTable(isPrintId, amountOfRecords, primaryKey, isReverse, keys);
             ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
         else
