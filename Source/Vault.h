@@ -563,6 +563,11 @@ namespace mvlt
         void PrintAsTable(bool isPrintId = false, const std::size_t& amountOfRecords = -1, std::string primaryKey = "", const bool& isReverse = false,
             const std::list<std::string> keys = {}) const noexcept;
 
+        /// \brief A method for saving data to a table file. The file format is csv
+        /// \param fileName The file name to save the data, the extension must be specified manually
+        /// \return It will return true if it was possible to open the file and write the data, otherwise it will return false
+        bool SaveToFile(const std::string& fileName, const std::string& separator = ",") const noexcept;
+
         /// \brief Default destructor
         ~Vault() noexcept;
 

@@ -33,6 +33,7 @@ set(MVaultHeaders
     ReadWriteMutex.h
 
     Functions/ToString.h
+    Functions/CsvParser.h
     Functions/PrintAsTable.h
     Functions/VaultRecordSetOperations.h
 )
@@ -57,6 +58,7 @@ set(MVaultSource
     ReadWriteMutex.cpp
     VaultRecordSet.cpp
     
+    Functions/CsvParser.cpp
     Functions/PrintAsTable.cpp
     Functions/VaultRecordSetOperations.cpp
 )

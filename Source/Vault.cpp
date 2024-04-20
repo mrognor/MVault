@@ -512,6 +512,54 @@ namespace mvlt
         RecursiveReadWriteMtx.ReadUnlock();
     }
 
+    bool Vault::SaveToFile(const std::string& fileName, const std::string& separator) const noexcept
+    {
+        RecursiveReadWriteMtx.ReadLock();
+
+        // Open or create file to save data
+        std::ofstream csvFile(fileName, std::ios::binary);
+
+        // Checking whether the file was opened successfully
+        if (!csvFile.is_open())
+        {
+            RecursiveReadWriteMtx.ReadUnlock();
+            return false;
+        }
+
+        // C array to store correct new line characters. 
+        const char endOfLine[2] = {13, 10}; // 13 - CR or 0d. 10 - LF or 0a.
+
+        // Save keys to file
+        auto it = KeysOrder.cbegin();
+        csvFile << *it;
+        ++it;
+        for (;it != KeysOrder.cend(); ++it) csvFile << separator << *it;
+        csvFile.write(endOfLine, 2);
+
+        for (const auto& record : RecordsSet)
+        {
+            // Getting the number of items in a record 
+            std::size_t counter = record->Size();
+            for (const auto& recordKeyValue : *record)
+            {
+                // Calling the string formatting function for the csv format
+                csvFile << FormatStringToCsv(recordKeyValue.second.Str());
+
+                // Checking not to write a comma to the end of the line
+                if (counter == 1) break;
+
+                csvFile << separator;
+                --counter;
+            }
+            csvFile.write(endOfLine, 2);
+        }
+
+        csvFile.close();
+
+        RecursiveReadWriteMtx.ReadUnlock();
+        return true;
+    }
+
     Vault::~Vault() noexcept
     {
         for (auto& it : RecordSetsSet)

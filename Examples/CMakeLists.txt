@@ -29,3 +29,6 @@ target_link_libraries(VaultRecordSet MVault)
 
 add_executable(VaultRequests VaultRequests.cpp)
 target_link_libraries(VaultRequests MVault)
+
+add_executable(Csv Csv.cpp)
+target_link_libraries(Csv MVault)
