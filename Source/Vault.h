@@ -563,10 +563,26 @@ namespace mvlt
         void PrintAsTable(bool isPrintId = false, const std::size_t& amountOfRecords = -1, std::string primaryKey = "", const bool& isReverse = false,
             const std::list<std::string> keys = {}) const noexcept;
 
-        /// \brief A method for saving data to a table file. The file format is csv
-        /// \param fileName The file name to save the data, the extension must be specified manually
-        /// \return It will return true if it was possible to open the file and write the data, otherwise it will return false
-        bool SaveToFile(const std::string& fileName, const std::string& separator = ",") const noexcept;
+        /**
+            \brief A method for saving data to a table file. The file format is csv
+
+            \param [in] fileName The file name to save the data, the extension must be specified manually
+            \param [in] separator The symbol that will be used to separate the record elements in the file
+            \param [in] isSaveKey A variable that determines whether to save keys to a file
+
+            \return It will return true if it was possible to open the file and write the data, otherwise it will return false
+        */
+        bool SaveToFile(const std::string& fileName, const std::string& separator = ",", const bool& isSaveKey = true) const noexcept;
+
+        /**
+            \brief A method for reading a csv file and loading data from it into memory
+
+            \param [in] fileName the name of the file to read the data from
+            \param [in] separator The symbol to be used as a data separator in the file
+
+            \return returns true if it was possible to read the file, otherwise it returns false
+        */
+        bool ReadFile(const std::string& fileName, const char& separator = ',') noexcept;
 
         /// \brief Default destructor
         ~Vault() noexcept;

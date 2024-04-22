@@ -155,6 +155,22 @@ namespace mvlt
         }
 
         /**
+            \brief Method for setting data by key
+
+            \param [in] key the key to set the data on
+            \param [in] str the string that will be converted to data
+        */
+        void SetDataFromString(const std::string& key, const std::string& str) noexcept
+        {
+            // Find data iterator
+            auto f = Container.find(key);
+
+            // Checking whether there was such a key in the container
+            if (f != Container.end())
+                f->second.SetDataFromString(str);
+        }
+
+        /**
             \brief Method for getting data from a container using a key
 
             \tparam <T> Any type of data except for c arrays

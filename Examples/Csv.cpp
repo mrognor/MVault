@@ -14,5 +14,8 @@ int main()
     vlt.CreateRecord({ {"id", 3}, {"name", std::string("D")}, {"gender", false} });
     vlt.PrintAsTable();
 
-    vlt.SaveToFile("CsvResult.csv");
+    vlt.SaveToFile("CsvResult.csv", ";", false);
+    vlt.DropData();
+    vlt.ReadFile("CsvResult.csv", ';', false);
+    vlt.PrintAsTable();
 }

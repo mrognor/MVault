@@ -39,6 +39,8 @@ namespace mvlt
                 
                 // Set custom delete function from dataSaver
                 CustomDeleteFunc = dataSaver.CustomDeleteFunc;
+
+                SetDataFromStringFunc = dataSaver.SetDataFromStringFunc;
             }
             else
             {
@@ -48,6 +50,11 @@ namespace mvlt
         }
 
         return *this;
+    }
+
+    bool DataSaver::SetDataFromString(const std::string& data) noexcept
+    {
+        return SetDataFromStringFunc(Ptr, data);
     }
 
     void DataSaver::ResetData() noexcept
@@ -67,6 +74,7 @@ namespace mvlt
         DataType = typeid(void);
         CopyFunc = nullptr;
         ToStringFunc = nullptr;
+        SetDataFromStringFunc = nullptr;
     }
 
     void DataSaver::Swap(DataSaver& dataSaver) noexcept

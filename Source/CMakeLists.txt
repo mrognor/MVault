@@ -34,6 +34,7 @@ set(MVaultHeaders
 
     Functions/ToString.h
     Functions/CsvParser.h
+    Functions/FromString.h
     Functions/PrintAsTable.h
     Functions/VaultRecordSetOperations.h
 )

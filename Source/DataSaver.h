@@ -5,6 +5,7 @@
 #include <typeindex>
 
 #include "Functions/ToString.h"
+#include "Functions/FromString.h"
 
 namespace mvlt
 {
@@ -36,6 +37,9 @@ namespace mvlt
 
         // Pointer to custom delete function. Required to delete data if it is pointer
         void (*CustomDeleteFunc)(const void* ptr) = nullptr;
+
+        // Pointer to function to load data from string to data saver
+        bool (*SetDataFromStringFunc)(void* ptrToStoreDataFromString, const std::string& str) = nullptr;
 
     public:
         /// Default constructor
@@ -84,10 +88,14 @@ namespace mvlt
         /// \tparam <T> Any type of data except for c arrays
         /// \param [in] data data to be stored inside the class
         template <class T>
-        void SetData(const T& data)
+        void SetData(const T& data) noexcept
         {   
             SetData(data, nullptr);
         }
+
+        /// \brief A method for saving data from a string to a DataStorage
+        /// \param [in] data a string with data
+        bool SetDataFromString(const std::string& data) noexcept;
 
         /**
             \brief Template method to save data and custom delete function inside DataSaver
@@ -134,6 +142,12 @@ namespace mvlt
 
             // Set custom delete function from dataSaver
             CustomDeleteFunc = customDeleteFunc;
+
+            // Set new copy from string function
+            SetDataFromStringFunc = [](void* ptrToStoreDataFromString, const std::string& str)
+                {
+                    return FromString(str, *static_cast<T*>(ptrToStoreDataFromString));
+                };
         }
 
         /**

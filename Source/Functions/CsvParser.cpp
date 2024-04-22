@@ -1,30 +1,33 @@
 #include "CsvParser.h"
 
-std::string FormatStringToCsv(const std::string& str)
+namespace mvlt
 {
-    bool isEscapingRequired = false;
-    std::string res;
-    
-    for (const char& symbol : str)
+    std::string FormatStringToCsv(const std::string& str)
     {
-        if (symbol == '"')
+        bool isEscapingRequired = false;
+        std::string res;
+        
+        for (const char& symbol : str)
         {
-            isEscapingRequired = true;
-            res += "\"\"";
-            continue;
+            if (symbol == '"')
+            {
+                isEscapingRequired = true;
+                res += "\"\"";
+                continue;
+            }
+
+            if (symbol == ',')
+                isEscapingRequired = true;
+
+            if (symbol == '\n')
+                isEscapingRequired = true;
+
+            res += symbol;
         }
 
-        if (symbol == ',')
-            isEscapingRequired = true;
-
-        if (symbol == '\n')
-            isEscapingRequired = true;
-
-        res += symbol;
+        if (isEscapingRequired)
+            return "\"" + res + "\"";
+        else
+            return res;
     }
-
-    if (isEscapingRequired)
-        return "\"" + res + "\"";
-    else
-        return res;
 }

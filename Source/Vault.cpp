@@ -512,7 +512,7 @@ namespace mvlt
         RecursiveReadWriteMtx.ReadUnlock();
     }
 
-    bool Vault::SaveToFile(const std::string& fileName, const std::string& separator) const noexcept
+    bool Vault::SaveToFile(const std::string& fileName, const std::string& separator, const bool& isSaveKey) const noexcept
     {
         RecursiveReadWriteMtx.ReadLock();
 
@@ -530,11 +530,14 @@ namespace mvlt
         const char endOfLine[2] = {13, 10}; // 13 - CR or 0d. 10 - LF or 0a.
 
         // Save keys to file
-        auto it = KeysOrder.cbegin();
-        csvFile << *it;
-        ++it;
-        for (;it != KeysOrder.cend(); ++it) csvFile << separator << *it;
-        csvFile.write(endOfLine, 2);
+        if (isSaveKey)
+        {
+            auto it = KeysOrder.cbegin();
+            csvFile << *it;
+            ++it;
+            for (;it != KeysOrder.cend(); ++it) csvFile << separator << *it;
+            csvFile.write(endOfLine, 2);
+        }
 
         for (const auto& record : RecordsSet)
         {
@@ -557,6 +560,136 @@ namespace mvlt
         csvFile.close();
 
         RecursiveReadWriteMtx.ReadUnlock();
+        return true;
+    }
+
+    bool Vault::ReadFile(const std::string& fileName, const char& separator) noexcept
+    {
+        // Open file from end
+        std::ifstream csvFile(fileName, std::ios::ate | std::ios::binary);
+
+        // Checking whether the file was opened successfully
+        if (!csvFile.is_open()) return false;
+
+        // Get file len
+        std::size_t fileLen = csvFile.tellg();
+        csvFile.seekg(0);
+
+        // Return true if it is not data in file or not keys in vault
+        if (fileLen == 0 || KeysOrder.empty()) return true;
+
+        // Read file
+        char* fileData = new char[fileLen];
+        csvFile.read(fileData, fileLen);
+
+        // Is escaping flag
+        bool isEscaping = false;
+
+        // Record pole
+        std::string recordPole;
+
+        // Record to set to it data from file and store in Vault
+        VaultRecord* newRecord = new VaultRecord(RecordTemplate);
+
+        // Iteraror to load keys
+        auto keyOrderIt = KeysOrder.begin();
+
+        RecursiveReadWriteMtx.WriteLock();
+
+        // Iterate over file
+        for (std::size_t i = 0; i < fileLen; ++i)
+        {
+            // New line check. rfc 4180 allows only CRLF but this code support also just LF
+            // If it is still escaping then this is not new record because it is available to store new line symbol in record poles
+            if (!isEscaping && (fileData[i] == 13 || fileData[i] == 10 )) // 13 - CR or 0d. 10 - LF or 0a.
+            {
+                // Set last record pole
+                newRecord->SetDataFromString(*keyOrderIt, recordPole);
+
+                // Move key order it to begin
+                keyOrderIt = KeysOrder.begin();
+
+                // Clear record pole
+                recordPole.clear();
+
+                // Add new record to set
+                RecordsSet.emplace(newRecord);
+
+                // Add new record to every maps inside VaultStructureHashMap
+                for (auto& it : VaultRecordAdders)
+                    it.second(newRecord);
+
+                // Check if it is CRLF.
+                if (i < fileLen - 1 && fileData[i + 1] == 10)
+                    ++i;
+
+                // Check if it is not end of file. 
+                if (i != fileLen - 1)
+                    newRecord = new VaultRecord(RecordTemplate); // Create new record
+                else
+                    newRecord = nullptr; // All records was added
+
+                continue;
+            }
+            
+            // Handle " symbol
+            if (fileData[i] == '"')
+            {
+                // Check if it was escaping
+                if (!isEscaping) 
+                {
+                    // Start escaping
+                    isEscaping = true;
+                    recordPole.clear();
+                    continue;
+                }
+                
+                // Stop escaping check
+                if (i < fileLen - 1 && fileData[i + 1] == '"')
+                {
+                    // Add " to record and skip next symbol
+                    recordPole += '"';
+                    ++i;
+                    continue;
+                }
+                else
+                    isEscaping = false; // Turn off escaping
+                continue;
+            }
+
+            // Handle separator symbol lf not escaping
+            if (fileData[i] == separator && !isEscaping)
+            {
+                // Set new record pole to record
+                newRecord->SetDataFromString(*keyOrderIt, recordPole);
+                ++keyOrderIt;
+                recordPole.clear();
+                continue;
+            }
+            
+            // Add symbol to record pole
+            recordPole += fileData[i];
+        }
+
+        // Check if all records was added
+        if (newRecord != nullptr)
+        {
+            // Check if last record pole was added
+            if (!recordPole.empty())
+                newRecord->SetDataFromString(*keyOrderIt, recordPole);
+
+            // Add new record to set
+            RecordsSet.emplace(newRecord);
+
+            // Add new record to every maps inside VaultStructureHashMap
+            for (auto& it : VaultRecordAdders)
+                it.second(newRecord);
+        }
+
+        RecursiveReadWriteMtx.WriteUnlock();
+
+        delete[] fileData;
+
         return true;
     }
 
