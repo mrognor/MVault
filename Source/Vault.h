@@ -579,10 +579,11 @@ namespace mvlt
 
             \param [in] fileName the name of the file to read the data from
             \param [in] separator The symbol to be used as a data separator in the file
+            \param [in] isLoadKeys Are there any keys in the file
 
             \return returns true if it was possible to read the file, otherwise it returns false
         */
-        bool ReadFile(const std::string& fileName, const char& separator = ',') noexcept;
+        bool ReadFile(const std::string& fileName, const char& separator = ',', const bool& isLoadKeys = true) noexcept;
 
         /// \brief Default destructor
         ~Vault() noexcept;

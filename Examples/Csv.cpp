@@ -2,6 +2,8 @@
 
 int main()
 {
+    std::cout << mvlt::ToString(float(7299.99)) << std::endl;
+    std::cout << std::to_string(float(7299.99)) << std::endl;
     mvlt::Vault vlt;
 
     vlt.AddKey("id", -1);    
@@ -15,7 +17,23 @@ int main()
     vlt.PrintAsTable();
 
     vlt.SaveToFile("CsvResult.csv", ";", false);
-    vlt.DropData();
-    vlt.ReadFile("CsvResult.csv", ';', false);
-    vlt.PrintAsTable();
+    vlt.DropVault();
+
+
+    vlt.AddKey("cpuName", std::string());    
+    vlt.AddKey<float>("price", 0.0);
+    vlt.AddKey("cpuMark", 0);
+    vlt.AddKey<float>("cpuValue", 0.0);    
+    vlt.AddKey("threadMark", 0);
+    vlt.AddKey<float>("threadValue", 0.0);
+    vlt.AddKey("TDP", 0);    
+    vlt.AddKey<float>("powerPerf", 0.0);
+    vlt.AddKey("cores", 0);
+    vlt.AddKey("testDate", 0);
+    vlt.AddKey("socket", std::string());
+    vlt.AddKey("category", std::string());
+
+
+    vlt.ReadFile("CPU_benchmark_v4.csv", ',', true);
+    vlt.PrintAsTable(false, -1, "cpuMark", true);
 }

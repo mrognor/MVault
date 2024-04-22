@@ -33,7 +33,40 @@ namespace mvlt
 
         \return returns a string in csv format
     */
-    std::string FormatStringToCsv(const std::string& str);
+    std::string FormatStringToCsv(const std::string& str) noexcept;
+
+    class CsvParser
+    {
+    private:
+        
+        // Pointer to array with file data
+        char* FileData = nullptr;
+
+        // Current position in file
+        std::size_t ReadingPos = 0;
+
+        // Full file length
+        std::size_t FileLen = 0;
+    public:
+
+        /// \brief The method for opening the file
+        /// \param [in] fileName The name of the file to open
+        /// \return it will return the true if it was possible to open the file otherwise it will return a false
+        bool OpenFile(const std::string& fileName) noexcept;
+
+        /**
+            \brief The method for getting the next entry in the file. It works by analogy with generators in Python
+
+            \param [out] vectorWithNext vector with all fields in the record
+            \param [in] separator the symbol used to separate the records in the file
+
+            \return it will return the true if it was possible to open the file otherwise it will return a false
+        */
+        bool GetNextVector(std::vector<std::string>& vectorWithNext, const char& separator) noexcept;
+
+        /// \brief Default destructor
+        ~CsvParser();
+    };
 
     /**@} */
 }
