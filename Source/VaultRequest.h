@@ -70,5 +70,69 @@ namespace mvlt
 
         /// \brief Default destructor
         ~VaultRequest() noexcept;
+
+        /// \brief Friend operator&&
+        template <VaultRequestType TType>
+        friend VaultRequest operator&& (const VaultRequest& lhs, const VaultRequest& rhs) noexcept;
+
+        /// \brief Friend operator||
+        template <VaultRequestType TType>
+        friend VaultRequest operator|| (const VaultRequest& lhs, const VaultRequest& rhs) noexcept;
     };
+
+    /**
+        \brief Operator&& for requests
+
+        \tparam <LType> Specialization for a specific value with type VaultRequestType in lhs record 
+        \tparam <RType> Specialization for a specific value with type VaultRequestType in rhs record 
+
+        Allows you to simply use && instead of calling And.
+        
+        Instead of writing:
+
+        \code{.cpp}
+        vlt.Request(mvlt::And(mvlt::Less("A", 3), mvlt::Greater("A", 7)), vrs1);
+        \endcode
+
+        You can write like this:
+
+        \code{.cpp}
+        vlt.Request(mvlt::Less("A", 3) && mvlt::Greater("A", 7), vrs1);
+        \endcode
+
+        \param [in] lhs left request value
+        \param [in] rhs right request value
+
+        \return new request equal to VaultRequest<VaultRequestType::And>
+    */
+    template <VaultRequestType LType, VaultRequestType RType>
+    VaultRequest<VaultRequestType::And> operator&& (const VaultRequest<LType>& lhs, const VaultRequest<RType>& rhs) noexcept;
+
+    /**
+        \brief Operator|| for requests
+
+        \tparam <LType> Specialization for a specific value with type VaultRequestType in lhs record 
+        \tparam <RType> Specialization for a specific value with type VaultRequestType in rhs record 
+
+        Allows you to simply use && instead of calling Or.
+        
+        Instead of writing:
+
+        \code{.cpp}
+        vlt.Request(mvlt::Or(mvlt::Less("A", 3), mvlt::Greater("A", 7)), vrs1);
+        \endcode
+
+        You can write like this:
+
+        \code{.cpp}
+        vlt.Request(mvlt::Less("A", 3) || mvlt::Greater("A", 7), vrs1);
+        \endcode
+
+        \param [in] lhs left request value
+        \param [in] rhs right request value
+
+        \return new request equal to VaultRequest<VaultRequestType::Or>
+    */
+    template <VaultRequestType LType, VaultRequestType RType>
+    VaultRequest<VaultRequestType::Or> operator|| (const VaultRequest<LType>& lhs, const VaultRequest<RType>& rhs) noexcept;
 }

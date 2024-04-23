@@ -117,4 +117,16 @@ namespace mvlt
         if (DeleteFunc != nullptr && DataPtr != nullptr)
             DeleteFunc(DataPtr);
     }
+
+    template <VaultRequestType LType, VaultRequestType RType>
+    VaultRequest<VaultRequestType::And> operator&& (const VaultRequest<LType>& lhs, const VaultRequest<RType>& rhs) noexcept
+    {
+        return VaultRequest<VaultRequestType::And>(lhs, rhs);
+    }
+
+    template <VaultRequestType LType, VaultRequestType RType>
+    VaultRequest<VaultRequestType::Or> operator|| (const VaultRequest<LType>& lhs, const VaultRequest<RType>& rhs) noexcept
+    {
+        return VaultRequest<VaultRequestType::Or>(lhs, rhs);
+    }
 }

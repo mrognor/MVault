@@ -14,7 +14,7 @@
     Since the comparison operator and the less operator are defined for the default class, it is not necessary to define them additionally.  
     Let's define the structure for the class of the vector of integers:
 
-    \code{cpp}
+    \code{.cpp}
     template <>
     struct std::hash<std::vector<int>>
     {

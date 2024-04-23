@@ -110,4 +110,12 @@ int main()
     vlt.Request(mvlt::Equal("B", 1), vrs1);
     mvlt::Intersection(vrs1, vrs3, vrs2);
     vrs2.PrintAsTable();
+
+    vrs1.Clear();
+    vlt.Request(mvlt::Greater("A", 3) && mvlt::Less("A", 7) && (mvlt::Equal("B", 4) || mvlt::Equal("B", 6)), vrs1);
+    vrs1.PrintAsTable();
+
+    vrs1.Clear();
+    vlt.Request(mvlt::Equal("A", 1) || mvlt::Equal("A", 7) || mvlt::Equal("A", 5), vrs1);
+    vrs1.PrintAsTable();
 }
