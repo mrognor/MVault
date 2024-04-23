@@ -464,7 +464,7 @@ namespace mvlt
 
         // Print records
         counter = 0;
-        if (primaryKey.empty()) primaryKey = KeysOrder.front();
+        if (primaryKey.empty()) primaryKey = keysList->front();
         SortBy(primaryKey, [&](const VaultRecordRef& record)
             {
                 counter = 0;

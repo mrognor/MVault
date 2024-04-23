@@ -310,6 +310,9 @@ namespace mvlt
         vaultRecordSet.ParentVault = const_cast<Vault*>(this);
         vaultRecordSet.IsParentVaultValid = true;
         
+        // Set proper key order
+        vaultRecordSet.KeysOrder = KeysOrder;
+
         // Copy keys from this to vaultRecordSet
         for (auto& keyCopierIt : VaultKeyCopiers)
             keyCopierIt.second(vaultRecordSet);
@@ -345,8 +348,9 @@ namespace mvlt
             return false;
         }
 
-        // Add key to list with key order
-        KeysOrder.emplace_back(key);
+        // This check required since VaultKeyCopiers hash map and dont save order. KeysOrder set to VaultRecordSet in requests
+        if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
+            KeysOrder.emplace_back(key); // Add key to list with key order
 
         // Add key type to hash map with keys types
         KeysTypes.emplace(key, typeid(T)); 
@@ -712,6 +716,9 @@ namespace mvlt
         vaultRecordSet.ParentVault = const_cast<Vault*>(this);
         vaultRecordSet.IsParentVaultValid = true;
         
+        // Set key proper key order
+        vaultRecordSet.KeysOrder = KeysOrder;
+
         // Copy keys from this to vaultRecordSet
         for (auto& keyCopierIt : VaultKeyCopiers)
             keyCopierIt.second(vaultRecordSet);
