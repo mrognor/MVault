@@ -58,7 +58,7 @@ namespace mvlt
             \param [in] request2 second request
         */
         template <VaultRequestType RequestType1, VaultRequestType RequestType2>
-        VaultRequest(const VaultRequest<RequestType1>& request1, const VaultRequest<RequestType2>& request2) noexcept;
+        VaultRequest(const VaultRequest<RequestType1>& request1, const VaultRequest<RequestType2>& request2);
 
         /**
             \brief Function for requesting data from Vault

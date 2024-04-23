@@ -60,7 +60,6 @@ set(MVaultSource
     VaultRecordSet.cpp
     
     Functions/CsvParser.cpp
-    Functions/PrintAsTable.cpp
     Functions/VaultRecordSetOperations.cpp
 )
 

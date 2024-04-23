@@ -131,7 +131,7 @@ namespace mvlt
         return false;
     }
 
-    CsvParser::~CsvParser()
+    CsvParser::~CsvParser() noexcept
     {
         if (FileData != nullptr) delete[] FileData;
     }

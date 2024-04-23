@@ -35,6 +35,7 @@ namespace mvlt
     */
     std::string FormatStringToCsv(const std::string& str) noexcept;
 
+    /// \brief A class for parsing csv files that provides data in a form similar to generators
     class CsvParser
     {
     private:
@@ -65,7 +66,7 @@ namespace mvlt
         bool GetNextVector(std::vector<std::string>& vectorWithNext, const char& separator) noexcept;
 
         /// \brief Default destructor
-        ~CsvParser();
+        ~CsvParser() noexcept;
     };
 
     /**@} */
