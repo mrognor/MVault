@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include "DataSaver.h"
 #include "DataContainer.h"
 #include "ReadWriteMutex.h"
@@ -41,6 +43,10 @@ namespace mvlt
     typedef VaultRequest<VaultRequestType::Or> Or;
     typedef VaultRequest<VaultRequestType::And> And;
 
+    /// \brief The default request predicate function
+    /// The function accepts VaultRecordRef and returns true. It is needed as a stub for the default parameter in requests. It is never called
+    extern std::function<bool(const VaultRecordRef&)> DefaultRequestPredicat;
+    
     /**
         A simple typedef for HashMap. It is necessary for a more understandable separation of types.
         Represents the internal structure of the Vault.

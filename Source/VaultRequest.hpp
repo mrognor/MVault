@@ -8,19 +8,20 @@ namespace mvlt
 {
     template <VaultRequestType Type>
     template <class T>
-    VaultRequest<Type>::VaultRequest(const std::string& key, const T& keyValue) : Key(key)
+    VaultRequest<Type>::VaultRequest(const std::string& key, const T& keyValue, std::function<bool(const VaultRecordRef&)> requestPredicat) : Key(key), RequestPredicat(requestPredicat)
     {
         DataPtr = static_cast<void*>(new T(keyValue));
 
         // Set Request func
-        DataRequestFunc = [](const std::string& key, Vault* vlt, std::unordered_set<VaultRecord*>& vaultRecordSet, void* beginValue, void* endValue, bool isIncludeBeginKeyValue, bool isIncludeEndKeyValue)
+        DataRequestFunc = [](const std::string& key, Vault* vlt, std::unordered_set<VaultRecord*>& vaultRecordSet, void* beginValue, void* endValue,
+            bool isIncludeBeginKeyValue, bool isIncludeEndKeyValue, std::function<bool(const VaultRecordRef&)> requestPredicat)
         {
             VaultOperationResult res;
             // Simple data request to vlt
             if (endValue == nullptr)
-                res = vlt->RequestRecordsSet(Type, key, *static_cast<T*>(beginValue), *static_cast<T*>(beginValue), vaultRecordSet, false, false, -1);
+                res = vlt->RequestRecordsSet(Type, key, *static_cast<T*>(beginValue), *static_cast<T*>(beginValue), vaultRecordSet, false, false, -1, requestPredicat);
             else
-                res = vlt->RequestRecordsSet(VaultRequestType::Interval, key, *static_cast<T*>(beginValue), *static_cast<T*>(endValue), vaultRecordSet, isIncludeBeginKeyValue, isIncludeEndKeyValue, -1);
+                res = vlt->RequestRecordsSet(VaultRequestType::Interval, key, *static_cast<T*>(beginValue), *static_cast<T*>(endValue), vaultRecordSet, isIncludeBeginKeyValue, isIncludeEndKeyValue, -1, requestPredicat);
         
             // Throw error
             if (!res.IsOperationSuccess) throw res;
@@ -34,7 +35,7 @@ namespace mvlt
 
     template <VaultRequestType Type>
     template <VaultRequestType RequestType1, VaultRequestType RequestType2>
-    VaultRequest<Type>::VaultRequest(const VaultRequest<RequestType1>& request1, const VaultRequest<RequestType2>& request2)
+    VaultRequest<Type>::VaultRequest(const VaultRequest<RequestType1>& request1, const VaultRequest<RequestType2>& request2) noexcept
     {
         // Switch by request type Or or And
         switch (Type)
@@ -68,7 +69,13 @@ namespace mvlt
                 {
                     request1.DataRequestFunc(request1.Key, vlt, vaultRecordSet, request1.DataPtr, request2.DataPtr, 
                         (request1.RequestType == VaultRequestType::GreaterOrEqual),
-                        (request2.RequestType == VaultRequestType::LessOrEqual));
+                        (request2.RequestType == VaultRequestType::LessOrEqual), [&](const VaultRecordRef& ref) 
+                            {
+                                if (request1.RequestPredicat(ref) && request2.RequestPredicat(ref))
+                                    return true;
+                                else
+                                    return false;
+                            });
                 }
                 else // Standart and request
                 {
@@ -102,7 +109,7 @@ namespace mvlt
         case VaultRequestType::Equal:
         case VaultRequestType::GreaterOrEqual:
         case VaultRequestType::Greater:
-            DataRequestFunc(Key, vlt, vaultRecords, DataPtr, nullptr, false, false);
+            DataRequestFunc(Key, vlt, vaultRecords, DataPtr, nullptr, false, false, RequestPredicat);
             break;
         case VaultRequestType::Or:
         case VaultRequestType::And:

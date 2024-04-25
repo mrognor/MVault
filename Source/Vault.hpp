@@ -123,7 +123,7 @@ namespace mvlt
     template <class T>
     VaultOperationResult Vault::RequestRecordsSet(const VaultRequestType& requestType, const std::string& key, const T& beginKeyValue,
         const T& endKeyValue, std::unordered_set<VaultRecord*>& vaultRecords, const bool& isIncludeBeginKeyValue, 
-        const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords) const noexcept
+        const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept
     {
         // Fill res info known at start
         VaultOperationResult res;
@@ -168,7 +168,14 @@ namespace mvlt
                 std::size_t counter = 0;
                 for (auto it = equalRange.first; it != equalRange.second; ++it)
                 {
-                    vaultRecords.emplace(it->second);
+                    // Check if it is not default predicate
+                    if (&requestPredicat != &DefaultRequestPredicat)
+                    {
+                        if (requestPredicat(VaultRecordRef(it->second, const_cast<Vault*>(this))))
+                            vaultRecords.emplace(it->second);
+                    }
+                    else
+                        vaultRecords.emplace(it->second);
                     
                     ++counter;
                     if (counter > amountOfRecords) break;
@@ -277,7 +284,14 @@ namespace mvlt
             std::size_t counter = 0;
             for (auto it = startIt; it != endIt; ++it)
             {
-                vaultRecords.emplace(it->second);
+                // Check if it is not default predicate
+                if (&requestPredicat != &DefaultRequestPredicat)
+                {
+                    if (requestPredicat(VaultRecordRef(it->second, const_cast<Vault*>(this))))
+                        vaultRecords.emplace(it->second);
+                }
+                else
+                    vaultRecords.emplace(it->second);
 
                 ++counter;
                 if (counter >= amountOfRecords) break;
@@ -296,7 +310,7 @@ namespace mvlt
     template <class T>
     VaultOperationResult Vault::RequestRecords(const VaultRequestType& requestType, const std::string& key, const T& beginKeyValue,
         const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue, 
-        const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords) const noexcept
+        const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept
     {
         VaultOperationResult res;
 
@@ -317,7 +331,7 @@ namespace mvlt
         for (auto& keyCopierIt : VaultKeyCopiers)
             keyCopierIt.second(vaultRecordSet);
         
-        res = RequestRecordsSet(requestType, key, beginKeyValue, endKeyValue, vaultRecordSet.RecordsSet, isIncludeBeginKeyValue, isIncludeEndKeyValue, amountOfRecords);
+        res = RequestRecordsSet(requestType, key, beginKeyValue, endKeyValue, vaultRecordSet.RecordsSet, isIncludeBeginKeyValue, isIncludeEndKeyValue, amountOfRecords, requestPredicat);
 
         for (VaultRecord* record : vaultRecordSet.RecordsSet)
         {
@@ -660,43 +674,48 @@ namespace mvlt
     }
 
     template <class T>
-    VaultOperationResult Vault::RequestEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const noexcept
+    VaultOperationResult Vault::RequestEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
+        const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept
     {
-        return RequestRecords(VaultRequestType::Equal, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords);
+        return RequestRecords(VaultRequestType::Equal, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords, requestPredicat);
     }
 
     template <class T>
-    VaultOperationResult Vault::RequestGreater(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const noexcept
+    VaultOperationResult Vault::RequestGreater(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
+        const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept
     {
-        return RequestRecords(VaultRequestType::Greater, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords);
+        return RequestRecords(VaultRequestType::Greater, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords, requestPredicat);
     }
 
     template <class T>
-    VaultOperationResult Vault::RequestGreaterOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const noexcept
+    VaultOperationResult Vault::RequestGreaterOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
+        const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept
     {
-        return RequestRecords(VaultRequestType::GreaterOrEqual, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords);
+        return RequestRecords(VaultRequestType::GreaterOrEqual, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords, requestPredicat);
     }
 
     template <class T>
-    VaultOperationResult Vault::RequestLess(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const noexcept
+    VaultOperationResult Vault::RequestLess(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
+        const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept
     {
-        return RequestRecords(VaultRequestType::Less, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords);
+        return RequestRecords(VaultRequestType::Less, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords, requestPredicat);
     }
 
     template <class T>
-    VaultOperationResult Vault::RequestLessOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords) const noexcept
+    VaultOperationResult Vault::RequestLessOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
+        const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept
     {
-        return RequestRecords(VaultRequestType::LessOrEqual, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords);
+        return RequestRecords(VaultRequestType::LessOrEqual, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords, requestPredicat);
     }
 
     template <class T>
     VaultOperationResult Vault::RequestInterval(const std::string& key, const T& beginKeyValue,
         const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue, 
-        const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords) const noexcept
+        const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept
     {
         return RequestRecords(VaultRequestType::Interval, key, beginKeyValue, 
             endKeyValue, vaultRecordSet, isIncludeBeginKeyValue, isIncludeEndKeyValue, 
-            amountOfRecords);
+            amountOfRecords, requestPredicat);
     }
 
     template <VaultRequestType Type>

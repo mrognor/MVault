@@ -17,7 +17,7 @@ namespace mvlt
         VaultRequestType RequestType = Type;
 
         /// Function for requesting data
-        void (*DataRequestFunc)(const std::string&, Vault*, std::unordered_set<VaultRecord*>&, void*, void*, bool, bool);
+        void (*DataRequestFunc)(const std::string&, Vault*, std::unordered_set<VaultRecord*>&, void*, void*, bool, bool, std::function<bool(const VaultRecordRef&)>);
         
         /// A variable for storing a logical request function
         std::function<void (Vault*, std::unordered_set<VaultRecord*>&)> LogicalRequestFunction;
@@ -30,6 +30,9 @@ namespace mvlt
 
         /// Pointer to Data saved inside Request
         void* DataPtr = nullptr;
+
+        /// Variable to store predicat function
+        std::function<bool(const VaultRecordRef&)> RequestPredicat;
 
     public:
 
@@ -44,9 +47,11 @@ namespace mvlt
 
             \param [in] key requested key
             \param [in] keyValue requested data
+            \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request. 
+            When the function returns true, the record is added, and when false is not added.
         */
         template <class T>
-        VaultRequest(const std::string& key, const T& keyValue);
+        VaultRequest(const std::string& key, const T& keyValue, std::function<bool(const VaultRecordRef&)> requestPredicat = DefaultRequestPredicat);
 
         /**
             \brief Request constructor
@@ -56,9 +61,11 @@ namespace mvlt
 
             \param [in] request1 first request
             \param [in] request2 second request
+            \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request. 
+            When the function returns true, the record is added, and when false is not added.
         */
         template <VaultRequestType RequestType1, VaultRequestType RequestType2>
-        VaultRequest(const VaultRequest<RequestType1>& request1, const VaultRequest<RequestType2>& request2);
+        VaultRequest(const VaultRequest<RequestType1>& request1, const VaultRequest<RequestType2>& request2) noexcept;
 
         /**
             \brief Function for requesting data from Vault

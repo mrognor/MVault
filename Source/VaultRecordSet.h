@@ -33,13 +33,15 @@ namespace mvlt
             \param [in] isIncludeEndKeyValue include endKeyValue in the interval or not
             \param [in] vaultRecordSet A reference to VaultRecordSet
             \param [in] amountOfRecords The number of records requested. By default request all records
-            
+            \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request. 
+            When the function returns true, the record is added, and when false is not added.
+
             \return VaultOperationResult object with RequestRecords result
         */
         template <class T>
         VaultOperationResult RequestRecords(const VaultRequestType& requestType, const std::string& key, const T& beginKeyValue,
             const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue, 
-            const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords) const noexcept;
+            const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept;
     public:
 
         /// Make Vault class friend
@@ -142,11 +144,14 @@ namespace mvlt
             \param [in] keyValue the value of the key to be found
             \param [in] vaultRecordRef A reference to VaultRecordSet
             \param [in] amountOfRecords The number of records requested. By default request all records
-            
+            \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request. 
+            When the function returns true, the record is added, and when false is not added.
+
             \return VaultOperationResult object with RequestRecords result
         */
         template <class T>
-        VaultOperationResult RequestEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords = -1) const noexcept;
+        VaultOperationResult RequestEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
+            const std::size_t& amountOfRecords = -1, const std::function<bool(const VaultRecordRef&)>& requestPredicat = DefaultRequestPredicat) const noexcept;
 
         /**
             \brief A method for getting all records that have a value greater than keyValue stored by the key key
@@ -157,11 +162,14 @@ namespace mvlt
             \param [in] keyValue the value of the key to be found
             \param [in] vaultRecordRef A reference to VaultRecordSet
             \param [in] amountOfRecords The number of records requested. By default request all records
-            
+            \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request. 
+            When the function returns true, the record is added, and when false is not added.
+
             \return VaultOperationResult object with RequestRecords result
         */
         template <class T>
-        VaultOperationResult RequestGreater(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords = -1) const noexcept;
+        VaultOperationResult RequestGreater(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
+            const std::size_t& amountOfRecords = -1, const std::function<bool(const VaultRecordRef&)>& requestPredicat = DefaultRequestPredicat) const noexcept;
 
         /**
             \brief A method for getting all records that have a value greater than or equal to keyValue stored by the key key
@@ -172,11 +180,14 @@ namespace mvlt
             \param [in] keyValue the value of the key to be found
             \param [in] vaultRecordRef A reference to VaultRecordSet
             \param [in] amountOfRecords The number of records requested. By default request all records
-            
+            \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request. 
+            When the function returns true, the record is added, and when false is not added.
+
             \return VaultOperationResult object with RequestRecords result
         */
         template <class T>
-        VaultOperationResult RequestGreaterOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords = -1) const noexcept;
+        VaultOperationResult RequestGreaterOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
+            const std::size_t& amountOfRecords = -1, const std::function<bool(const VaultRecordRef&)>& requestPredicat = DefaultRequestPredicat) const noexcept;
 
         /**
             \brief A method for getting all records that have a value less than keyValue stored by the key key
@@ -187,11 +198,14 @@ namespace mvlt
             \param [in] keyValue the value of the key to be found
             \param [in] vaultRecordRef A reference to VaultRecordSet
             \param [in] amountOfRecords The number of records requested. By default request all records
-            
+            \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request. 
+            When the function returns true, the record is added, and when false is not added.
+
             \return VaultOperationResult object with RequestRecords result
         */
         template <class T>
-        VaultOperationResult RequestLess(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords = -1) const noexcept;
+        VaultOperationResult RequestLess(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
+            const std::size_t& amountOfRecords = -1, const std::function<bool(const VaultRecordRef&)>& requestPredicat = DefaultRequestPredicat) const noexcept;
 
         /**
             \brief A method for getting all records that have a value less than or equal to keyValue stored by the key key
@@ -202,11 +216,14 @@ namespace mvlt
             \param [in] keyValue the value of the key to be found
             \param [in] vaultRecordRef A reference to VaultRecordSet
             \param [in] amountOfRecords The number of records requested. By default request all records
-            
+            \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request. 
+            When the function returns true, the record is added, and when false is not added.
+
             \return VaultOperationResult object with RequestRecords result
         */
         template <class T>
-        VaultOperationResult RequestLessOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, const std::size_t& amountOfRecords = -1) const noexcept;
+        VaultOperationResult RequestLessOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
+            const std::size_t& amountOfRecords = -1, const std::function<bool(const VaultRecordRef&)>& requestPredicat = DefaultRequestPredicat) const noexcept;
 
         /**
             \brief The method for getting the result of the request
@@ -220,13 +237,16 @@ namespace mvlt
             \param [in] isIncludeEndKeyValue include endKeyValue in the interval or not
             \param [in] vaultRecordSet A reference to VaultRecordSet
             \param [in] amountOfRecords The number of records requested. By default request all records
-            
+            \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request. 
+            When the function returns true, the record is added, and when false is not added.
+
             \return VaultOperationResult object with RequestRecords result
         */
         template <class T>
         VaultOperationResult RequestInterval(const std::string& key, const T& beginKeyValue,
             const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue = true, 
-            const bool& isIncludeEndKeyValue = true, const std::size_t& amountOfRecords = -1) const noexcept;
+            const bool& isIncludeEndKeyValue = true, const std::size_t& amountOfRecords = -1,
+            const std::function<bool(const VaultRecordRef&)>& requestPredicat = DefaultRequestPredicat) const noexcept;
         
         /**
             \brief A method for complex requests

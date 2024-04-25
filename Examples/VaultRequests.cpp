@@ -1,9 +1,11 @@
 #include "../Source/MVault.h"
 
+using namespace mvlt;
+
 int main()
 {
-    mvlt::Vault vlt;
-    mvlt::VaultRecordSet vrs1, vrs2, vrs3;
+    Vault vlt;
+    VaultRecordSet vrs1, vrs2, vrs3;
 
     vlt.AddKey("A", -1);
     vlt.AddKey("B", -1);
@@ -63,9 +65,9 @@ int main()
     vrs1.Clear();
     vrs2.Clear();
 
-    vlt.Request(mvlt::Less("A", 2), vrs1);
-    vlt.Request(mvlt::Greater("A", 7), vrs2);
-    vlt.Request(mvlt::Less("B", 5), vrs3);
+    vlt.Request(Less("A", 2), vrs1);
+    vlt.Request(Greater("A", 7), vrs2);
+    vlt.Request(Less("B", 5), vrs3);
 
     vrs1.PrintAsTable();
     vrs2.PrintAsTable();
@@ -77,39 +79,78 @@ int main()
 
     vrs1.PrintAsTable();
 
-    vlt.Request(mvlt::Or(mvlt::Less("A", 3), mvlt::Greater("A", 7)), vrs1);
+    std::cout << "Complex requests" << std::endl;
+    vlt.Request(Or(Less("A", 3), Greater("A", 7)), vrs1);
     vrs1.PrintAsTable();
 
     vrs1.Clear();
-    vlt.Request(mvlt::And(mvlt::Less("A", 3), mvlt::Greater("B", 7)), vrs1);
+    vlt.Request(And(Less("A", 3), Greater("B", 7)), vrs1);
     vrs1.PrintAsTable();
 
     vrs1.Clear();
-    vlt.Request(mvlt::Or(mvlt::And(mvlt::Less("A", 3), mvlt::Greater("B", 7)), mvlt::Equal("A", 0)), vrs1);
+    vlt.Request(Or(And(Less("A", 3), Greater("B", 7)), Equal("A", 0)), vrs1);
     vrs1.PrintAsTable();
 
     vrs1.Clear();
-    vlt.Request(mvlt::And(mvlt::GreaterOrEqual("A", 3), mvlt::Less("A", 7)), vrs1);
+    vlt.Request(And(GreaterOrEqual("A", 3), Less("A", 7)), vrs1);
     vrs1.PrintAsTable();
 
     vrs1.Clear();
-    mvlt::VaultOperationResult res = vlt.Request(mvlt::And(mvlt::GreaterOrEqual("Z", 3), mvlt::Less("A", 7)), vrs1);
+    VaultOperationResult res = vlt.Request(And(GreaterOrEqual("Z", 3), Less("A", 7)), vrs1);
     if (!res.IsOperationSuccess)
         std::cout << res.ResultCodeString() << " Requested key: " << res.Key << std::endl;
 
     vrs1.Clear();
     vrs2.Clear();
     vrs3.Clear();
-    vlt.Request(mvlt::Equal("A", 0), vrs1);
-    vlt.Request(mvlt::Equal("A", 9), vrs2);
-    mvlt::Union(vrs1, vrs2, vrs3);
+    vlt.Request(Equal("A", 0), vrs1);
+    vlt.Request(Equal("A", 9), vrs2);
+    Union(vrs1, vrs2, vrs3);
     vrs3.PrintAsTable();
 
     vrs1.Clear();
     vrs2.Clear();
-    vlt.Request(mvlt::Equal("B", 1), vrs1);
-    mvlt::Intersection(vrs1, vrs3, vrs2);
+    vlt.Request(Equal("B", 1), vrs1);
+    Intersection(vrs1, vrs3, vrs2);
     vrs2.PrintAsTable();
     vrs1.PrintAsTable();
     vrs3.PrintAsTable();
+
+    std::cout << "Predicat" << std::endl;
+    vrs1.Clear();
+    vlt.RequestEqual("A", 0, vrs1);
+    vrs1.PrintAsTable();
+
+    vrs1.Clear();
+    vlt.RequestEqual("A", 0, vrs1, -1, [](const VaultRecordRef& ref)
+        {
+            int B;
+            ref.GetData("B", B);
+            if (B > 0)
+                return true;
+            else
+                return false;
+        });
+
+    vrs1.PrintAsTable();
+
+    vrs1.Clear();
+    vlt.Request(Greater("A", 3, [](const VaultRecordRef& ref)
+        {
+            int B;
+            ref.GetData("B", B);
+            if (B != 6)
+                return true;
+            else
+                return false;
+        }) && Less("A", 7, [](const VaultRecordRef& ref)
+        {
+            int B;
+            ref.GetData("B", B);
+            if (B != 4)
+                return true;
+            else
+                return false;
+        }), vrs1);
+    vrs1.PrintAsTable();
 }
