@@ -153,4 +153,23 @@ int main()
                 return false;
         }), vrs1);
     vrs1.PrintAsTable();
+
+    std::cout << "Files" << std::endl;
+
+    vlt.DropVault();
+
+    vlt.AddKey<std::string>("cpuName", "");
+    vlt.AddKey<float>("price", 0.0);
+    vlt.AddKey<int>("cpuMark", 0);
+    vlt.AddKey<float>("cpuValue", 0.0);
+    vlt.AddKey<int>("threadMark", 0);
+    vlt.AddKey<float>("threadValue", 0.0);
+    vlt.AddKey<int>("TDP", 0);
+    vlt.AddKey<float>("powerPerf", 0.0);
+    vlt.AddKey<int>("cores", 0);
+    vlt.AddKey<int>("testDate", 0);
+    vlt.AddKey<std::string>("socket", "");
+    vlt.AddKey<std::string>("category", "");
+    
+    vlt.PrintAsTable();
 }
