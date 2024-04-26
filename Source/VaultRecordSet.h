@@ -381,6 +381,19 @@ namespace mvlt
         /// \param [in] a a set that contains records that do not need to be removed
         void Intersect(const VaultRecordSet& a) noexcept;
 
+        /**
+            \brief A method for saving data to a table file. The file format is csv
+
+            \param [in] fileName The file name to save the data, the extension must be specified manually
+            \param [in] separator The symbol that will be used to separate the record elements in the file
+            \param [in] isSaveKey A variable that determines whether to save keys to a file
+
+            If parent Vault not valid return false
+            \return It will return true if it was possible to open the file and write the data, otherwise it will return false
+        */
+        bool SaveToFile(const std::string& fileName, const std::string& separator = ",", const bool& isSaveKey = true) const noexcept;
+
+
         /// \brief Destructor
         ~VaultRecordSet() noexcept;
 

@@ -228,6 +228,14 @@ namespace mvlt
     {
         RecursiveReadWriteMtx.WriteLock();
 
+        for (auto& it : RecordSetsSet)
+        {
+            it->RecursiveReadWriteMtx.WriteLock();
+            it->IsParentVaultValid = false;
+            it->RecordsSet.clear();
+            it->RecursiveReadWriteMtx.WriteUnlock();
+        }
+
         // Clear record template
         RecordTemplate.Clear();
 
@@ -256,7 +264,7 @@ namespace mvlt
         VaultKeyCopiers.clear();
 
         // Delete all Records
-        for (auto& it : RecordsSet)
+        for (auto& it : RecordsSet) 
             it->Invalidate();
 
         // Clear RecordsSet

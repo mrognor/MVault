@@ -361,6 +361,23 @@ namespace mvlt
         a.RecursiveReadWriteMtx.ReadUnlock();
     }
 
+    bool VaultRecordSet::SaveToFile(const std::string& fileName, const std::string& separator, const bool& isSaveKey) const noexcept
+    {
+        bool res = false;
+        RecursiveReadWriteMtx.ReadLock();
+
+        // Thread safety because in Vault destructor blocking this RecursiveReadWriteMtx to write
+        if (IsParentVaultValid)
+        {
+            ParentVault->RecursiveReadWriteMtx.ReadLock();
+            res = Vault::SaveToFile(fileName);
+            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
+        }
+
+        RecursiveReadWriteMtx.ReadUnlock();
+        return res;
+    }
+
     VaultRecordSet::~VaultRecordSet() noexcept
     {
         Reset();
