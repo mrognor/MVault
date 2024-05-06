@@ -232,9 +232,11 @@ namespace mvlt
         {
             it->RecursiveReadWriteMtx.WriteLock();
             it->IsParentVaultValid = false;
-            it->RecordsSet.clear();
+            it->Clear();
             it->RecursiveReadWriteMtx.WriteUnlock();
         }
+
+        RecordSetsSet.clear();
 
         // Clear record template
         RecordTemplate.Clear();
@@ -637,6 +639,7 @@ namespace mvlt
         {
             it->RecursiveReadWriteMtx.WriteLock();
             it->IsParentVaultValid = false;
+            it->Clear();
             it->RecursiveReadWriteMtx.WriteUnlock();
         }
 
