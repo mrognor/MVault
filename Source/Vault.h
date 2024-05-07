@@ -64,7 +64,7 @@ namespace mvlt
         // Unordered_map of functions that add a new element to the VaultStructureHashMap
         std::unordered_map<std::string, std::function<void(VaultRecord*)>> VaultRecordAdders;
 
-        // Unordered_map of functions that delete all data from the unordered_map's
+        // Unordered_map of functions which clean up the Vault structure, but do not delete records
         std::unordered_map<std::string, std::function<void()>> VaultRecordClearers;
 
         // Unordered_map of functions that erase record from the unordered_map's

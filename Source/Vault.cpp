@@ -228,15 +228,17 @@ namespace mvlt
     {
         RecursiveReadWriteMtx.WriteLock();
 
-        for (auto& it : RecordSetsSet)
+        // Invalidate VaultRecordSets dependent from records from this
+        for (auto it = RecordSetsSet.begin(); it != RecordSetsSet.end();)
         {
-            it->RecursiveReadWriteMtx.WriteLock();
-            it->IsParentVaultValid = false;
-            it->Clear();
-            it->RecursiveReadWriteMtx.WriteUnlock();
+            auto itToDelete = it;
+            ++it;
+            (*itToDelete)->Reset();
         }
 
-        RecordSetsSet.clear();
+        // Invalidate all records
+        for (auto& it : RecordsSet) 
+            it->Invalidate();
 
         // Clear record template
         RecordTemplate.Clear();
@@ -252,11 +254,11 @@ namespace mvlt
         for (auto& it : VaultMapStructure)
             it.second.ResetData();
 
-        // Clear hash map with keys types
-        KeysTypes.clear();
-
         // Clear VaultMapStructure
         VaultMapStructure.Clear();
+
+        // Clear hash map with keys types
+        KeysTypes.clear();
 
         // Clear all maps with functions
         VaultRecordAdders.clear();
@@ -265,15 +267,15 @@ namespace mvlt
         VaultRecordSorters.clear();
         VaultKeyCopiers.clear();
 
-        // Delete all Records
-        for (auto& it : RecordsSet) 
-            it->Invalidate();
+        // Clear key order 
+        KeysOrder.clear();
 
-        // Clear RecordsSet
+        // Clear set with all invalidated records
         RecordsSet.clear();
 
-        KeysOrder.clear();
-        
+        // Clear set with all VaultRecordSet`s
+        RecordSetsSet.clear();
+
         RecursiveReadWriteMtx.WriteUnlock();
     }
 
@@ -281,23 +283,17 @@ namespace mvlt
     {
         RecursiveReadWriteMtx.WriteLock();
 
-        // Call functions to clear VaultHashMapStructure without
+        // Invalidate VaultRecordSets dependent from records from this
+        for (auto& it : RecordSetsSet)
+            it->Clear();
+
+        // Invalidate all records
+        for (auto& it : RecordsSet) 
+            it->Invalidate();
+        
+        // Clear structure
         for (auto& it : VaultRecordClearers)
             it.second();
-
-        // Delete all Records
-        for (auto& it : RecordsSet)
-        {
-            it->Mtx.lock();
-            for (VaultRecordSet* set : it->dependentVaultRecordSets)
-            {
-                set->RecursiveReadWriteMtx.WriteLock();
-                static_cast<Vault*>(set)->RemoveRecord(it, nullptr);
-                set->RecursiveReadWriteMtx.WriteUnlock();
-            }
-            it->Mtx.unlock();
-            it->Invalidate();
-        }
 
         // Clear RecordsSet
         RecordsSet.clear();
@@ -635,24 +631,6 @@ namespace mvlt
 
     Vault::~Vault() noexcept
     {
-        for (auto& it : RecordSetsSet)
-        {
-            it->RecursiveReadWriteMtx.WriteLock();
-            it->IsParentVaultValid = false;
-            it->Clear();
-            it->RecursiveReadWriteMtx.WriteUnlock();
-        }
-
-        // Clear all records
-        for (auto& it : RecordsSet)
-            it->Invalidate();
-
-        // Clear VaultHashMapStructure
-        for (auto& it : VaultHashMapStructure)
-            it.second.ResetData();
-
-        // Clear VaultMapStructure
-        for (auto& it : VaultMapStructure)
-            it.second.ResetData();
+        DropVault();
     }
 }
