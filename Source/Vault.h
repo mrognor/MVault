@@ -258,6 +258,10 @@ namespace mvlt
         */
         bool GetKeyType(const std::string& key, std::type_index& keyType) const noexcept;
 
+        /// \brief The method for getting all the keys
+        /// \return vector with keys
+        std::vector<std::string> GetKeys() const noexcept;
+
         /// \brief The method for deleting the key
         /// \param [in] key the key to remove
         /// \return Returns true if the key existed, otherwise returns false
@@ -531,10 +535,6 @@ namespace mvlt
         /// \brief Method for getting the number of records
         /// \return number of records
         std::size_t Size() const noexcept;
-
-        /// \brief The method for getting all the keys
-        /// \return vector with keys
-        std::vector<std::string> GetKeys() const noexcept;
 
         /**
             \brief Method for getting sorted records

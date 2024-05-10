@@ -10,7 +10,8 @@ set(CMAKE_CXX_STANDARD 11)
 
 set(TestsHeaders 
     ColorizedPrint.h 
-    Tests.h)
+    Tests.h
+    TestAssert.h)
 
 set(TestsSource
     ColorizedPrint.cpp 
@@ -26,3 +27,6 @@ target_link_libraries(Tests MVault)
 
 add_executable(VaultRecordRefTest VaultRecordRefTest.cpp)
 target_link_libraries(VaultRecordRefTest MVault)
+
+add_executable(SingleThreadedTests ${TestsHeaders} ${TestsSource} SingleThreadedTests.cpp)
+target_link_libraries(SingleThreadedTests MVault)

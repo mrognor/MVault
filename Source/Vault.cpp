@@ -73,6 +73,17 @@ namespace mvlt
         return res;
     }
 
+    std::vector<std::string> Vault::GetKeys() const noexcept
+    {
+        std::vector<std::string> res;
+
+        RecursiveReadWriteMtx.ReadLock();
+        for (const auto& it : VaultMapStructure) res.emplace_back(it.first);
+        RecursiveReadWriteMtx.ReadUnlock();
+
+        return res;
+    }
+
     bool Vault::RemoveKey(const std::string& key) noexcept
     {
         RecursiveReadWriteMtx.WriteLock();
@@ -321,17 +332,6 @@ namespace mvlt
         RecursiveReadWriteMtx.ReadLock();
         res = RecordsSet.size();
         RecursiveReadWriteMtx.ReadUnlock();
-        return res;
-    }
-
-    std::vector<std::string> Vault::GetKeys() const noexcept
-    {
-        std::vector<std::string> res;
-
-        RecursiveReadWriteMtx.ReadLock();
-        for (const auto& it : VaultMapStructure) res.emplace_back(it.first);
-        RecursiveReadWriteMtx.ReadUnlock();
-
         return res;
     }
 
