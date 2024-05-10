@@ -41,16 +41,8 @@ void KeyAddictionTests()
     // Check dynamic key addition
     TEST_ASSERT(vrr1.GetKeys() == vector<string>({"A", "B", "C"}), "The key is not added dynamically to VaultRecordRef");
     TEST_ASSERT(vrs1.GetKeys() == vector<string>({"A", "B", "C"}), "The key is not added dynamically to VaultRecordSet");
-
-    vlt.PrintAsTable();
-    vrs1.PrintAsTable();
-    vrr1.PrintRecord();
-
-    for (auto it : vrs1.GetKeys())
-        std::cout << it << std::endl;
-
     vrs1.GetRecord<std::string>("B", "none", vrr1);
-    vrr1.PrintRecord();
+    TEST_ASSERT(vrr1.IsValid(), "The key is not added dynamically to VaultRecordSet");
 }
 
 int main()

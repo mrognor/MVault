@@ -323,14 +323,14 @@ namespace mvlt
         // Set new parent vault to vaultRecordSet
         vaultRecordSet.ParentVault = const_cast<Vault*>(this);
         vaultRecordSet.IsParentVaultValid = true;
-        
-        // Set proper key order
-        vaultRecordSet.KeysOrder = KeysOrder;
 
         // Copy keys from this to vaultRecordSet
         for (auto& keyCopierIt : VaultKeyCopiers)
             keyCopierIt.second(vaultRecordSet);
         
+        // Set proper key order
+        vaultRecordSet.KeysOrder = KeysOrder;
+
         res = RequestRecordsSet(requestType, key, beginKeyValue, endKeyValue, vaultRecordSet.RecordsSet, isIncludeBeginKeyValue, isIncludeEndKeyValue, amountOfRecords, requestPredicat);
 
         for (VaultRecord* record : vaultRecordSet.RecordsSet)
@@ -362,9 +362,8 @@ namespace mvlt
             return false;
         }
 
-        // This check required since VaultKeyCopiers hash map and dont save order. KeysOrder set to VaultRecordSet in requests
-        if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
-            KeysOrder.emplace_back(key); // Add key to list with key order
+        // Add key to list with key order
+        KeysOrder.emplace_back(key); 
 
         // Add key type to hash map with keys types
         KeysTypes.emplace(key, typeid(T)); 
@@ -475,13 +474,17 @@ namespace mvlt
             }
 
             for (VaultRecordSet* set : RecordSetsSet)
-            {
-                set->RecursiveReadWriteMtx.WriteLock();
                 set->AddKey(key, defaultKeyValue);
-                set->RecursiveReadWriteMtx.WriteUnlock();
+        }
+        else
+        {
+            // Add new data to record set
+            for (auto& it : RecordsSet)
+            {
+                TtoVaultRecordHashMap->emplace(defaultKeyValue, it);
+                TtoVaultRecordMap->emplace(defaultKeyValue, it);
             }
         }
-
         RecursiveReadWriteMtx.WriteUnlock();
         return true;
     }
