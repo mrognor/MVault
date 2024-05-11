@@ -170,6 +170,15 @@ namespace mvlt
         return res;
     }
 
+    bool VaultRecordRef::IsKeyExist(const std::string& key) const noexcept
+    {
+        bool res = false;
+        Mtx.lock();
+        if (Vlt != nullptr) res = Vlt->IsKeyExist(key);
+        Mtx.unlock();
+        return res;
+    }
+
     std::vector<std::string> VaultRecordRef::GetKeys() const noexcept
     {
         std::vector<std::string> res;

@@ -74,8 +74,61 @@ void KeyUpdationTests()
     TEST_ASSERT(A == 0, "Updating the default key value does not work correctly");
 }
 
+void KeyCheckTests()
+{
+    // Create Vault
+    Vault vlt;
+
+    // Create VaultRecordRef
+    VaultRecordRef vrr;
+
+    // Create VaultRecordSet
+    VaultRecordSet vrs;
+
+    // IsKeyExist check on empty
+    TEST_ASSERT(!vlt.IsKeyExist("A"), "Failed key request");
+    TEST_ASSERT(!vrr.IsKeyExist("A"), "Failed key request");
+    TEST_ASSERT(!vrs.IsKeyExist("A"), "Failed key request");
+
+    // Add new key to Vault
+    vlt.AddKey<int>("A", -1);
+
+    // Create new record
+    vrr = vlt.CreateRecord();
+
+    // Request record
+    vlt.RequestEqual("A", -1, vrs);
+
+    // IsKeyExist check on correct data
+    TEST_ASSERT(vlt.IsKeyExist("A"), "Failed key request");
+    TEST_ASSERT(vrr.IsKeyExist("A"), "Failed key request");
+    TEST_ASSERT(vrs.IsKeyExist("A"), "Failed key request");
+        
+    // IsKeyExist check on incorrect data
+    TEST_ASSERT(!vlt.IsKeyExist("B"), "Failed key request");
+    TEST_ASSERT(!vrr.IsKeyExist("B"), "Failed key request");
+    TEST_ASSERT(!vrs.IsKeyExist("B"), "Failed key request");
+
+    // Remove key
+    vlt.RemoveKey("A");
+
+    // IsKeyExist check on incorrect data
+    TEST_ASSERT(!vlt.IsKeyExist("A"), "Failed key request");
+    TEST_ASSERT(!vrr.IsKeyExist("A"), "Failed key request");
+    TEST_ASSERT(!vrs.IsKeyExist("A"), "Failed key request");
+
+    // Add new key
+    vlt.AddKey("A", true);
+
+    // IsKeyExist check on correct data
+    TEST_ASSERT(vlt.IsKeyExist("A"), "Failed key request");
+    TEST_ASSERT(vrr.IsKeyExist("A"), "Failed key request");
+    TEST_ASSERT(vrs.IsKeyExist("A"), "Failed key request");
+}
+
 int main()
 {
     KeyAddictionTests();
     KeyUpdationTests();
+    KeyCheckTests();
 }

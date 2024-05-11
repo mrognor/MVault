@@ -139,6 +139,15 @@ namespace mvlt
         /// \return returns true if the object is valid, otherwise false
         bool IsValid() const noexcept;
 
+        /**
+            \brief The method for getting a default key value
+
+            \param [in] key the name of the key to search for
+
+            \return returns true if the key was found otherwise returns false
+        */
+        bool IsKeyExist(const std::string& key) const noexcept;
+
         /// \brief The method for getting all the keys
         /// If the record is not valid, it will return an empty vector
         /// \return vector with keys
