@@ -575,7 +575,7 @@ namespace mvlt
     {
         // Open and parse file
         CsvParser parser;
-        parser.OpenFile(fileName);
+        if (!parser.OpenFile(fileName)) return false;
 
         // Write lock because new records will be added
         RecursiveReadWriteMtx.WriteLock();
