@@ -22,7 +22,7 @@ namespace mvlt
                 res = vlt->RequestRecordsSet(Type, key, *static_cast<T*>(beginValue), *static_cast<T*>(beginValue), vaultRecordSet, false, false, -1, requestPredicat);
             else
                 res = vlt->RequestRecordsSet(VaultRequestType::Interval, key, *static_cast<T*>(beginValue), *static_cast<T*>(endValue), vaultRecordSet, isIncludeBeginKeyValue, isIncludeEndKeyValue, -1, requestPredicat);
-        
+
             // Throw error
             if (!res.IsOperationSuccess) throw res;
         };

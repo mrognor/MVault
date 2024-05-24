@@ -363,7 +363,8 @@ namespace mvlt
         }
 
         // Add key to list with key order
-        KeysOrder.emplace_back(key); 
+        if(VaultDerivedClass == VaultDerivedClasses::VaultBase)
+            KeysOrder.emplace_back(key);
 
         // Add key type to hash map with keys types
         KeysTypes.emplace(key, typeid(T)); 
@@ -474,7 +475,10 @@ namespace mvlt
             }
 
             for (VaultRecordSet* set : RecordSetsSet)
+            {
                 set->AddKey(key, defaultKeyValue);
+                set->KeysOrder.emplace_back(key);
+            }
         }
         else
         {

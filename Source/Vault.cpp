@@ -134,11 +134,7 @@ namespace mvlt
                 it->EraseData(key);
 
             for (VaultRecordSet* set : RecordSetsSet)
-            {
-                set->RecursiveReadWriteMtx.WriteLock();
                 set->RemoveKey(key);
-                set->RecursiveReadWriteMtx.WriteUnlock();
-            }
         }
 
         RecursiveReadWriteMtx.WriteUnlock();
@@ -393,7 +389,17 @@ namespace mvlt
 
         if (VaultMapStructure.Size() == 0)
         {
-            std::cout << "Vault does not contain keys!" << std::endl;
+            switch (VaultDerivedClass)
+            {
+            case VaultDerivedClasses::VaultBase:
+                std::cout << "Vault does not contain keys!" << std::endl;
+                break;
+
+            case VaultDerivedClasses::VaultRecordSetDerived:
+                std::cout << "VaultRecordSet does not contain keys!" << std::endl;
+                break;
+            }
+
             std::cout << " (" << RecordsSet.size() << " records)" << std::endl;
             RecursiveReadWriteMtx.ReadUnlock();
             return;
