@@ -48,5 +48,25 @@ namespace mvlt
         /// \brief Function for getting a text description of the operation result
         /// \return Operation description string
         std::string ResultCodeString() const noexcept;
+
+        /**
+            \brief Friend comparison operator
+
+            \param [in] resA first object to compare
+            \param [in] resB second object to compare
+
+            \return true if objects equal otherwise return false
+        */
+        friend bool operator== (const VaultOperationResult& resA, const VaultOperationResult& resB) noexcept;
     };
+
+    /**
+        \brief VaultOperationResult comparison operator
+
+        \param [in] resA first object to compare
+        \param [in] resB second object to compare
+
+        \return true if objects equal otherwise return false
+    */
+    bool operator== (const VaultOperationResult& resA, const VaultOperationResult& resB) noexcept;
 }

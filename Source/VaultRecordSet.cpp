@@ -23,6 +23,7 @@ namespace mvlt
             VaultDerivedClass = VaultDerivedClasses::VaultRecordSetDerived;
             ParentVault = other.ParentVault;
             IsParentVaultValid = true;
+            KeysOrder = other.KeysOrder;
 
             for (auto& keyCopierIt : other.VaultKeyCopiers)
                 keyCopierIt.second(*this);

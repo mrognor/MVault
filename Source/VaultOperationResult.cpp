@@ -26,4 +26,11 @@ namespace mvlt
             return "A record with this key value was not found.";
         }
     }
+
+    bool operator== (const VaultOperationResult& resA, const VaultOperationResult& resB) noexcept
+    {
+        return (resA.IsOperationSuccess == resB.IsOperationSuccess) & (resA.ResultCode == resB.ResultCode) &
+            (resA.Key == resB.Key) & (resA.RequestedType == resB.RequestedType) & 
+            (resA.SavedType == resB.SavedType);
+    }
 }

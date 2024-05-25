@@ -126,9 +126,119 @@ void KeyCheckTests()
     TEST_ASSERT(vrs.IsKeyExist("A"), "Failed key request");
 }
 
+void RecordCreationTests()
+{
+    // Create Vault
+    Vault vlt;
+
+    // Create VaultRecordRef
+    VaultRecordRef vrr;
+
+    // Create variable to compare results
+    VaultOperationResult res;
+    res.IsOperationSuccess = true;
+    res.RequestedType = typeid(int);
+    res.SavedType = typeid(int);
+    res.ResultCode = VaultOperationResultCode::Success;
+
+    // Add new keys to Vault
+    vlt.AddKey<int>("A", -1);
+    vlt.AddKey<int>("B", -1);
+    vlt.AddKey<int>("C", -1);
+    vlt.AddKey<int>("D", -1);
+
+    // Create new records
+    vlt.CreateRecord();
+    
+    // Check vault size
+    TEST_ASSERT(vlt.Size() == 1, "Record was not created!");
+
+    // Check record creation
+    res.Key = "A";
+    TEST_ASSERT(vlt.GetRecord("A", -1, vrr) == res, "Record was not created correct!");
+    res.Key = "B";
+    TEST_ASSERT(vlt.GetRecord("B", -1, vrr) == res, "Record was not created correct!");
+    res.Key = "C";
+    TEST_ASSERT(vlt.GetRecord("C", -1, vrr) == res, "Record was not created correct!");
+    res.Key = "D";
+    TEST_ASSERT(vlt.GetRecord("D", -1, vrr) == res, "Record was not created correct!");
+
+    // Erase record
+    vlt.EraseRecord(vrr);
+
+    // Create 10 new records
+    for (int i = 0; i < 10; ++i)
+        vlt.CreateRecord({ {"A", i}, {"B", i * 10}, {"C", i * 100}, {"D", i * 1000}});
+
+    // Check vault size
+    TEST_ASSERT(vlt.Size() == 10, "Records was not created!");
+
+    // Check all records
+    for (int i = 0; i < 10; ++i)
+    {
+        // Set recordId
+        vlt.GetRecord("A", i, vrr);
+        std::string recordId = vrr.GetRecordUniqueId();
+
+        // Check i * 10
+        vlt.GetRecord("B", i * 10, vrr);
+        TEST_ASSERT(recordId == vrr.GetRecordUniqueId(), "Record was not created correct!");
+
+        // Check i * 100
+        vlt.GetRecord("C", i * 100, vrr);
+        TEST_ASSERT(recordId == vrr.GetRecordUniqueId(), "Record was not created correct!");
+
+        // Check i * 1000
+        vlt.GetRecord("D", i * 1000, vrr);
+        TEST_ASSERT(recordId == vrr.GetRecordUniqueId(), "Record was not created correct!");
+    }
+}
+
+void RecordUpdationTests()
+{
+    // Create Vault
+    Vault vlt;
+
+    // Create VaultRecordRef
+    VaultRecordRef vrr;
+
+    // Create VaultRecordSet
+    VaultRecordSet vrs;
+
+    // Add new keys to Vault
+    vlt.AddKey<int>("A", -1);
+    vlt.AddKey<int>("B", -1);
+
+    // Create new record
+    vrr = vlt.CreateRecord();
+    std::string recordId = vrr.GetRecordUniqueId();
+
+    vlt.PrintAsTable();
+
+    // Request record
+    vlt.Request(Equal("A", -1), vrs);
+
+    vrs.PrintAsTable();
+    // Update data
+    vrr.SetData("A", 0);
+    
+    // Check vault after updation
+    vlt.GetRecord("A", 0, vrr);
+    TEST_ASSERT(recordId == vrr.GetRecordUniqueId(), "Record updation failed");
+
+    // Check VaultRecordSet after updation
+    vrs.GetRecord("A", 0, vrr);
+    TEST_ASSERT(recordId == vrr.GetRecordUniqueId(), "Record updation failed");    
+    
+    vlt.PrintAsTable();
+    vrs.PrintAsTable(true);
+}
+
 int main()
 {
     KeyAddictionTests();
     KeyUpdationTests();
     KeyCheckTests();
+    RecordCreationTests();
+    RecordUpdationTests();
 }
