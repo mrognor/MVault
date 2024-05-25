@@ -35,5 +35,5 @@ int main()
 
 
     vlt.ReadFile("CPU_benchmark_v4.csv", ',', true);
-    vlt.PrintAsTable(false, -1, "cpuMark", true);
+    vlt.PrintAsTable(false, 10, "cpuMark", true);
 }
