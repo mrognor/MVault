@@ -200,38 +200,48 @@ void RecordUpdationTests()
     Vault vlt;
 
     // Create VaultRecordRef
-    VaultRecordRef vrr;
+    VaultRecordRef vrr1, vrr2;
 
     // Create VaultRecordSet
-    VaultRecordSet vrs;
+    VaultRecordSet vrs1, vrs2;
 
     // Add new keys to Vault
     vlt.AddKey<int>("A", -1);
-    vlt.AddKey<int>("B", -1);
+    vlt.AddKey<int>("B", 1);
 
     // Create new record
-    vrr = vlt.CreateRecord();
-    std::string recordId = vrr.GetRecordUniqueId();
+    vrr1 = vlt.CreateRecord();
+    std::string recordId = vrr1.GetRecordUniqueId();
 
-    vlt.PrintAsTable();
+    // Fill sets
+    vlt.Request(Equal("A", -1), vrs1);
+    vlt.Request(Equal("B", 1), vrs2);
 
-    // Request record
-    vlt.Request(Equal("A", -1), vrs);
+    // Set second ref
+    vrr2 = vrr1;
 
-    vrs.PrintAsTable();
     // Update data
-    vrr.SetData("A", 0);
-    
+    vrr1.SetData("A", 0);
+    vrr2.SetData("B", 0);
+
+    // Check ref
+    int a, b;
+    vrr1.GetData("B", b);
+    TEST_ASSERT(b == 0, "Record updation failed");
+    vrr2.GetData("A", a);
+    TEST_ASSERT(a == 0, "Record updation failed");
+
     // Check vault after updation
-    vlt.GetRecord("A", 0, vrr);
-    TEST_ASSERT(recordId == vrr.GetRecordUniqueId(), "Record updation failed");
+    vlt.GetRecord("A", 0, vrr1);
+    TEST_ASSERT(recordId == vrr1.GetRecordUniqueId(), "Record updation failed");
 
     // Check VaultRecordSet after updation
-    vrs.GetRecord("A", 0, vrr);
-    TEST_ASSERT(recordId == vrr.GetRecordUniqueId(), "Record updation failed");    
-    
-    vlt.PrintAsTable();
-    vrs.PrintAsTable(true);
+    vrs1.GetRecord("B", 0, vrr1);
+    TEST_ASSERT(recordId == vrr1.GetRecordUniqueId(), "Record updation failed");
+
+    // Check VaultRecordSet after updation
+    vrs2.GetRecord("B", 0, vrr2);
+    TEST_ASSERT(recordId == vrr2.GetRecordUniqueId(), "Record updation failed");
 }
 
 int main()

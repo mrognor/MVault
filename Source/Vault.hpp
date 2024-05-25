@@ -104,12 +104,12 @@ namespace mvlt
         // It is required since VaultRecordSet child of Vault and may also call this method
         if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
         {
-            // Update data inside VaultRecord pointer inside VaultRecordRef and Vault
-            dataRecord->SetData(key, data);
-        
             // Update all dependent VaultRecordSets structures
             for (VaultRecordSet* vaultRecordSet : dataRecord->dependentVaultRecordSets)
                 vaultRecordSet->SetDataToRecord(dataRecord, key, data);
+
+            // Update data inside VaultRecord pointer inside VaultRecordRef and Vault
+            dataRecord->SetData(key, data);
         }
 
         res.IsOperationSuccess = true;
@@ -319,6 +319,10 @@ namespace mvlt
         // Save vaultRecordSet
         if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
             RecordSetsSet.emplace(&vaultRecordSet);
+
+        // Remove old data from vaultRecordSet
+        if (vaultRecordSet.ParentVault != this) vaultRecordSet.Reset();
+        else vaultRecordSet.Clear();
 
         // Set new parent vault to vaultRecordSet
         vaultRecordSet.ParentVault = const_cast<Vault*>(this);
@@ -737,6 +741,10 @@ namespace mvlt
         // Save vaultRecordSet
         if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
             RecordSetsSet.emplace(&vaultRecordSet);
+
+        // Remove old data from vaultRecordSet
+        if (vaultRecordSet.ParentVault != this) vaultRecordSet.Reset();
+        else vaultRecordSet.Clear();
 
         // Set new parent vault to vaultRecordSet
         vaultRecordSet.ParentVault = const_cast<Vault*>(this);

@@ -56,7 +56,7 @@ namespace mvlt
         bool OpenFile(const std::string& fileName) noexcept;
 
         /**
-            \brief The method for getting the next entry in the file. It works by analogy with generators in Python
+            \brief The method for getting the next record in the file. It works by analogy with generators in Python
 
             \param [out] vectorWithNext vector with all fields in the record
             \param [in] separator the symbol used to separate the records in the file
