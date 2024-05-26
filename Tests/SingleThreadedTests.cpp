@@ -1,6 +1,7 @@
 #include "../Source/MVault.h"
 
 #include "TestAssert.h"
+#include <vector>
 
 using namespace mvlt;
 using namespace std;
@@ -244,6 +245,108 @@ void RecordUpdationTests()
     TEST_ASSERT(recordId == vrr2.GetRecordUniqueId(), "Record updation failed");
 }
 
+void RecordDeletionTests()
+{
+    // Create Vault
+    Vault vlt;
+
+    // Create VaultRecordRef
+    VaultRecordRef vrr1, vrr2;
+
+    // Create VaultRecordSet
+    VaultRecordSet vrs1, vrs2;
+
+    // Add new keys to Vault
+    vlt.AddKey<int>("A", -1);
+    vlt.AddKey<int>("B", 1);
+
+    // Create record
+    vrr1 = vlt.CreateRecord();
+
+    // Copy ref
+    vrr2 = vrr1;
+
+    // Request set
+    vlt.Request(Equal("A", -1), vrs1);
+    
+    // Copy set
+    vrs2 = vrs1;
+
+    // Remove record
+    vlt.EraseRecord(vrr1);
+
+    // Check all objects after erasing record
+    TEST_ASSERT(vlt.Size() == 0, "Record deletion failed");
+    TEST_ASSERT(vrr1.IsValid() == false, "Record deletion failed");
+    TEST_ASSERT(vrr2.IsValid() == false, "Record deletion failed");
+    TEST_ASSERT(vrs1.Size() == 0, "Record deletion failed");
+    TEST_ASSERT(vrs2.Size() == 0, "Record deletion failed");
+}
+
+void DropsTests()
+{
+    // Create Vault
+    Vault vlt;
+
+    // Create VaultRecordRef
+    VaultRecordRef vrr1, vrr2;
+
+    // Create VaultRecordSet
+    VaultRecordSet vrs1, vrs2;
+
+    // Add new keys to Vault
+    vlt.AddKey<int>("A", -1);
+    vlt.AddKey<int>("B", 1);
+
+    // Create record
+    vrr1 = vlt.CreateRecord();
+
+    // Copy ref
+    vrr2 = vrr1;
+
+    // Request set
+    vlt.Request(Equal("A", -1), vrs1);
+    
+    // Copy set
+    vrs2 = vrs1;
+
+    // Drop data
+    vlt.DropData();
+
+    // Check all objects after drop data
+    TEST_ASSERT(vlt.GetKeys() == vector<string>({"A", "B"}), "Drop data failed")
+    TEST_ASSERT(vlt.Size() == 0, "Drop data failed");
+    TEST_ASSERT(vrr1.IsValid() == false, "Drop data failed");
+    TEST_ASSERT(vrr2.IsValid() == false, "Drop data failed");
+    TEST_ASSERT(vrs1.Size() == 0, "Drop data failed");
+    TEST_ASSERT(vrs2.Size() == 0, "Drop data failed");
+
+    // Create record
+    vrr1 = vlt.CreateRecord();
+
+    // Copy ref
+    vrr2 = vrr1;
+
+    // Request set
+    vlt.Request(Equal("A", -1), vrs1);
+    
+    // Copy set
+    vrs2 = vrs1;
+
+    // Drop data
+    vlt.DropVault();
+
+    // Check all objects after drop vault
+    TEST_ASSERT(vlt.GetKeys() == vector<string>(), "Drop vault failed")
+    TEST_ASSERT(vlt.Size() == 0, "Drop vault failed");
+    TEST_ASSERT(vrr1.IsValid() == false, "Drop vault failed");
+    TEST_ASSERT(vrr2.IsValid() == false, "Drop vault failed");
+    TEST_ASSERT(vrs1.Size() == 0, "Drop vault failed");
+    TEST_ASSERT(vrs2.Size() == 0, "Drop vault failed");
+    TEST_ASSERT(vrs1.GetIsParentVaultValid() == false, "Drop vault failed");
+    TEST_ASSERT(vrs2.GetIsParentVaultValid() == false, "Drop vault failed");
+}
+
 int main()
 {
     KeyAddictionTests();
@@ -251,4 +354,6 @@ int main()
     KeyCheckTests();
     RecordCreationTests();
     RecordUpdationTests();
+    RecordDeletionTests();
+    DropsTests();
 }
