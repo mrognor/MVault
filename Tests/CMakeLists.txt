@@ -8,25 +8,18 @@ endif()
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(TestsHeaders 
-    ColorizedPrint.h 
-    Tests.h
-    TestAssert.h)
+set(TestsHeaders ColorizedPrint.h TestAssert.h)
 
-set(TestsSource
-    ColorizedPrint.cpp 
-    MultithreadingTest.cpp 
-    Bench.cpp)
-
-project(Tests)
+set(TestsSource ColorizedPrint.cpp)
 
 include_directories(../Source)	
 
-add_executable(Tests ${TestsHeaders} ${TestsSource} Tests.cpp)
-target_link_libraries(Tests MVault)
+project(Scenarios)
 
-add_executable(VaultRecordRefTest VaultRecordRefTest.cpp)
-target_link_libraries(VaultRecordRefTest MVault)
+add_executable(Scenarios ${TestsHeaders} ${TestsSource} Scenarios.cpp)
+target_link_libraries(Scenarios MVault)
 
-add_executable(SingleThreadedTests ${TestsHeaders} ${TestsSource} SingleThreadedTests.cpp)
-target_link_libraries(SingleThreadedTests MVault)
+project(VaultUnitTest)
+
+add_executable(VaultUnitTest ${TestsHeaders} ${TestsSource} UnitTests/Vault.cpp)
+target_link_libraries(VaultUnitTest MVault)
