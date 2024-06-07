@@ -126,6 +126,69 @@ void Vault_GetKeys_Test()
     TEST_ASSERT(keys == vector<string>({"A", "B", "C", "D", "E", "F", "G"}), "Failed to get vault keys");
 }
 
+void Vault_RemoveKey_Test()
+{
+    Vault vlt;
+    std::vector<std::string> keys;
+
+    vlt.AddKey("A", -1);
+    vlt.AddKey("B", -1);
+    vlt.AddKey("C", -1);
+
+    vlt.CreateRecord();
+
+    // Check keys
+    keys = vlt.GetKeys();
+    TEST_ASSERT(keys == vector<string>({"A", "B", "C"}), "Failed to set vault keys");
+
+    vlt.RemoveKey("B");
+
+    // Check keys
+    keys = vlt.GetKeys();
+    TEST_ASSERT(keys == vector<string>({"A", "C"}), "Failed to set vault keys");
+}
+
+void Vault_CreateRecord_Test()
+{
+    Vault vlt;
+
+    vlt.AddKey("A", -1);
+    vlt.AddKey("B", '0');
+    vlt.AddKey("C", true);
+
+    // Empty create record overload
+    for (int i = 0; i < 10; ++i) vlt.CreateRecord();
+    
+    // Check vault size
+    TEST_ASSERT(vlt.Size() == 10, "Failed to create records");
+
+    vlt.DropData();
+
+    // Create record with vector of params
+    for (int i = 0; i < 10; ++i) vlt.CreateRecord({ {"A", i}, {"B", static_cast<char>('A' + i)} });
+
+    for (int i = 0; i < 10; ++i)
+    {
+        VaultRecordRef vrr;
+        vlt.GetRecord("A", i, vrr);
+        char c;
+        vrr.GetData("B", c);
+        TEST_ASSERT(c == static_cast<char>('A' + i), "Failed to create record");
+    }
+
+    vlt.DropData();
+
+    // Create record with record ref and vector of params
+    for (int i = 0; i < 10; ++i)
+    {
+        VaultRecordRef vrr;
+        vlt.CreateRecord(vrr, { {"A", i}, {"B", static_cast<char>('A' + i)} });
+        char c;
+        vrr.GetData("B", c);
+        TEST_ASSERT(c == static_cast<char>('A' + i), "Failed to create record");
+    }
+}
+
 int main()
 {
     Vault_AddKey_Test();
@@ -134,4 +197,6 @@ int main()
     Vault_GetKeyValue_Test();
     Vault_GetKeyType_Test();
     Vault_GetKeys_Test();
+    Vault_RemoveKey_Test();
+    Vault_CreateRecord_Test();
 }

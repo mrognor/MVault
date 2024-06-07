@@ -117,5 +117,16 @@ namespace mvlt
     template <>
     inline std::string ToString(const float& data) noexcept { return std::to_string(data); }
 
+    /**       
+        \brief Specialization of the ToString method for the float type
+
+        \tparam <char> char variable
+        \param [in] data the variable to be converted to a string
+
+        \return string with one char 
+    */
+    template <>
+    inline std::string ToString(const char& data) noexcept { return std::string(1, data); }
+
     /**@} */
 }
