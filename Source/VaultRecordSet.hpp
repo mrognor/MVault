@@ -262,7 +262,7 @@ namespace mvlt
         if (IsParentVaultValid)
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
-            Vault::SortBy(key, func, isReverse, amountOfRecords);
+            Vault::SortBy(key, std::move(func), isReverse, amountOfRecords);
             ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
 

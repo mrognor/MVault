@@ -2,8 +2,6 @@
 
 int main()
 {
-    std::cout << mvlt::ToString(float(7299.99)) << std::endl;
-    std::cout << std::to_string(float(7299.99)) << std::endl;
     mvlt::Vault vlt;
 
     vlt.AddKey("id", -1);    

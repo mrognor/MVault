@@ -189,6 +189,59 @@ void Vault_CreateRecord_Test()
     }
 }
 
+void Vault_GetRecord_Test()
+{
+    Vault vlt;
+    VaultRecordRef vrr;
+    VaultOperationResult res;
+
+    vlt.AddKey("A", -1);
+    vlt.AddKey("B", '0');
+    vlt.AddKey("C", true);
+
+    // Correct get record on empty vault
+    res = vlt.GetRecord("A", 0, vrr);
+    TEST_ASSERT(!vrr.IsValid(), "Error on record creation") 
+    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongValue, "Error on record creation");
+
+    // Incorrect get record on empty vault
+    res = vlt.GetRecord("A", 0, vrr); // Wrong value
+    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongValue, "Error on get result");
+    res = vlt.GetRecord("D", 0, vrr); // Wrong key
+    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongKey, "Error on get result");
+    res = vlt.GetRecord("A", std::string(), vrr); // Wrong key type
+    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongType, "Error on get result");
+
+    vlt.CreateRecord();
+    
+    // Correct get record
+    res = vlt.GetRecord("A", -1, vrr);
+    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::Success, "Error on record creation");
+
+    // Incorrect get record
+    res = vlt.GetRecord("A", 0, vrr); // Wrong value
+    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongValue, "Error on get result");
+    res = vlt.GetRecord("D", 0, vrr); // Wrong key
+    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongKey, "Error on get result");
+    res = vlt.GetRecord("A", std::string(), vrr); // Wrong key type
+    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongType, "Error on get result");
+
+    // Create records with vector of params
+    for (int i = 0; i < 10; ++i) vlt.CreateRecord({ {"A", i}, {"B", static_cast<char>('A' + i)} });
+
+    // Check records
+    for (int i = 0; i < 10; ++i)
+    {
+        VaultRecordRef vrr;
+        vlt.GetRecord("A", i, vrr);
+        char c;
+        vrr.GetData("B", c);
+        TEST_ASSERT(c == static_cast<char>('A' + i), "Failed to create record");
+    }
+
+    vlt.PrintAsTable();
+}
+
 int main()
 {
     Vault_AddKey_Test();
@@ -199,4 +252,5 @@ int main()
     Vault_GetKeys_Test();
     Vault_RemoveKey_Test();
     Vault_CreateRecord_Test();
+    Vault_GetRecord_Test();
 }
