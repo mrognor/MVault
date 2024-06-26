@@ -303,6 +303,66 @@ void Vault_GetRecords_Test()
     TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongType, "Error on get result");
 }
 
+void Vault_RequestEqual_Tests()
+{
+    Vault vlt;
+    VaultRecordRef vrr;
+    VaultOperationResult res;
+    VaultRecordSet vrs;
+
+    vlt.AddKey("A", -1);
+    vlt.AddKey("B", -1);
+    vlt.AddKey<std::string>("C", "-1");
+
+    // Correct get records on empty vault
+    res = vlt.RequestEqual("A", -1, vrs);
+    TEST_ASSERT(vrs.Size() == 0, "Error on record creation") 
+    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::Success, "Error on record creation");
+
+    res = vlt.RequestEqual("D", 0, vrs); // Wrong key
+    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongKey, "Error on get result");
+    res = vlt.RequestEqual("A", std::string(), vrs); // Wrong key type
+    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongType, "Error on get result");
+
+    // Fill vault
+    for (int i = 0; i < 10; ++i) vlt.CreateRecord({ {"A", i}, {"C", std::to_string(10 - i)}});
+
+    // Simple requests
+    res = vlt.RequestEqual<std::string>("C", "2", vrs);
+    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::Success, "Error on record request");
+    TEST_ASSERT(vrs.Size() == 1, "Error on record request");
+
+    res = vlt.RequestEqual("B", -1, vrs);
+    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::Success, "Error on record request");
+    TEST_ASSERT(vrs.Size() == 10, "Error on record request");
+
+    // Request 0 records
+    res = vlt.RequestEqual("B", -1, vrs, 0);
+    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::Success, "Error on record request");
+    TEST_ASSERT(vrs.Size() == 0, "Error on record request");
+
+    // Request 2 records
+    res = vlt.RequestEqual("B", -1, vrs, 2);
+    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::Success, "Error on record request");
+    TEST_ASSERT(vrs.Size() == 2, "Error on record request");
+
+    // Predicat test. B == -1 and A = stoi(C)
+    res = vlt.RequestEqual("B", -1, vrs, -1, [](const VaultRecordRef& ref)
+        {
+            int a; std::string c;
+            ref.GetData("A", a);
+            ref.GetData("C", c);
+            if (a == stoi(c)) return true;
+            else return false;
+        });
+    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::Success, "Error on record request");
+    TEST_ASSERT(vrs.Size() == 1, "Error on record request");
+    vrs.GetRecord("B", -1, vrr);
+    int n;
+    vrr.GetData("A", n);
+    TEST_ASSERT(n == 5, "Failed to make reques");
+}
+
 int main()
 {
     Vault_AddKey_Test();
@@ -315,4 +375,5 @@ int main()
     Vault_CreateRecord_Test();
     Vault_GetRecord_Test();
     Vault_GetRecords_Test();
+    Vault_RequestEqual_Tests();
 }
