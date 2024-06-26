@@ -151,6 +151,7 @@ void Vault_RemoveKey_Test()
 void Vault_CreateRecord_Test()
 {
     Vault vlt;
+    VaultOperationResult res;
 
     vlt.AddKey("A", -1);
     vlt.AddKey("B", '0');
@@ -187,6 +188,28 @@ void Vault_CreateRecord_Test()
         vrr.GetData("B", c);
         TEST_ASSERT(c == static_cast<char>('A' + i), "Failed to create record");
     }
+
+    // Incorrect creations
+    res = vlt.CreateRecord({ {"D", 1} });
+    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongKey, "Failed to create record");
+    res = vlt.CreateRecord({ {"A", 'a'} });
+    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongType, "Failed to create record");
+
+    vlt.PrintAsTable();
+    std::cout << "Is it correct to create record with error in params list" << std::endl;
+
+    res = vlt.CreateRecord({ {"A", 1}, {"D", 1} });
+    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongKey, "Failed to create record");
+    res = vlt.CreateRecord({ {"A", 1}, {"A", 'a'} });
+    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongType, "Failed to create record");
+
+    vlt.PrintAsTable();
+
+    // Third method overload
+    VaultRecordRef vrr1, vrr2;
+    vlt.CreateRecord(vrr1, {{"A", 100}});
+    vlt.GetRecord("A", 100, vrr2);
+    TEST_ASSERT(vrr1.GetRecordUniqueId() == vrr2.GetRecordUniqueId(), "Failed to create record");
 }
 
 void Vault_GetRecord_Test()
@@ -204,9 +227,6 @@ void Vault_GetRecord_Test()
     TEST_ASSERT(!vrr.IsValid(), "Error on record creation") 
     TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongValue, "Error on record creation");
 
-    // Incorrect get record on empty vault
-    res = vlt.GetRecord("A", 0, vrr); // Wrong value
-    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongValue, "Error on get result");
     res = vlt.GetRecord("D", 0, vrr); // Wrong key
     TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongKey, "Error on get result");
     res = vlt.GetRecord("A", std::string(), vrr); // Wrong key type
@@ -218,7 +238,6 @@ void Vault_GetRecord_Test()
     res = vlt.GetRecord("A", -1, vrr);
     TEST_ASSERT(res.ResultCode == VaultOperationResultCode::Success, "Error on record creation");
 
-    // Incorrect get record
     res = vlt.GetRecord("A", 0, vrr); // Wrong value
     TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongValue, "Error on get result");
     res = vlt.GetRecord("D", 0, vrr); // Wrong key
@@ -238,8 +257,50 @@ void Vault_GetRecord_Test()
         vrr.GetData("B", c);
         TEST_ASSERT(c == static_cast<char>('A' + i), "Failed to create record");
     }
+}
 
-    vlt.PrintAsTable();
+void Vault_GetRecords_Test()
+{
+    Vault vlt;
+    VaultRecordRef vrr;
+    VaultOperationResult res;
+    std::vector<VaultRecordRef> vec;
+
+    vlt.AddKey("A", -1);
+    vlt.AddKey("B", '0');
+    vlt.AddKey("C", true);
+
+    // Correct get records on empty vault
+    res = vlt.GetRecords("A", 0, vec);
+    TEST_ASSERT(vec.size() == 0, "Error on record creation") 
+    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongValue, "Error on record creation");
+
+    res = vlt.GetRecords("D", 0, vec); // Wrong key
+    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongKey, "Error on get result");
+    res = vlt.GetRecords("A", std::string(), vec); // Wrong key type
+    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongType, "Error on get result");
+
+    // Fill vault
+    for (int i = 0; i < 10; ++i) vlt.CreateRecord({ {"A", i}, });
+
+    // Get reqords
+    vlt.GetRecords("B", '0', vec);
+
+    for (int i = 0; i < 10; ++i)
+    {
+        int n;
+        res = vec[i].GetData("A", n);
+        TEST_ASSERT(res.ResultCode == VaultOperationResultCode::Success, "Error on get records");
+    }
+
+    // Get only 2 records
+    vlt.GetRecords("B", '0', vec, 2);
+    TEST_ASSERT(vec.size() == 2, "Wrong vec size");
+
+    res = vlt.GetRecords("D", 0, vec); // Wrong key
+    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongKey, "Error on get result");
+    res = vlt.GetRecords("A", std::string(), vec); // Wrong key type
+    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongType, "Error on get result");
 }
 
 int main()
@@ -253,4 +314,5 @@ int main()
     Vault_RemoveKey_Test();
     Vault_CreateRecord_Test();
     Vault_GetRecord_Test();
+    Vault_GetRecords_Test();
 }

@@ -636,6 +636,8 @@ namespace mvlt
         res.Key = key;
         res.RequestedType = typeid(T);
 
+        recordsRefs.clear();
+
         RecursiveReadWriteMtx.ReadLock();
 
         // If key not exist
