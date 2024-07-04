@@ -174,6 +174,9 @@ namespace mvlt
 
         RecursiveReadWriteMtx.WriteLock();
 
+        // Variable to check params vec correctness
+        bool isCorrectParams = true;
+
         // Create new record
         VaultRecord* newData = new VaultRecord(RecordTemplate);
 
@@ -204,6 +207,7 @@ namespace mvlt
                     res.IsOperationSuccess = false;
                     res.SavedType = it.second.GetDataType();
                     res.ResultCode = VaultOperationResultCode::WrongType;
+                    isCorrectParams = false;
                     break;
                 }
             }
@@ -213,18 +217,24 @@ namespace mvlt
                 res.SavedType = typeid(void);
                 res.RequestedType = typeid(void);
                 res.ResultCode = VaultOperationResultCode::WrongKey;
+                isCorrectParams = false;
                 break;
             }
         }
 
-        // Add new record to set
-        RecordsSet.emplace(newData);
+        // If param vec correct than add new record
+        if (isCorrectParams)
+        {
+            // Add new record to set
+            RecordsSet.emplace(newData);
 
-        // Add new record to every maps inside VaultStructureHashMap
-        for (auto& it : VaultRecordAdders)
-            it.second(newData);
+            // Add new record to every maps inside VaultStructureHashMap
+            for (auto& it : VaultRecordAdders)
+                it.second(newData);
 
-        vaultRecordRef.SetRecord(newData, this);
+            vaultRecordRef.SetRecord(newData, this);
+        }
+        else delete newData;
 
         RecursiveReadWriteMtx.WriteUnlock();
 

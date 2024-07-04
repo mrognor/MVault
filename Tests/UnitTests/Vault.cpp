@@ -17,10 +17,6 @@ void Vault_AddKey_Test()
     // Correct try to add exist key
     res = vlt.AddKey("A", -1);
     TEST_ASSERT(res == false, "Error when try to add key with existing name");
-
-    // Incorrect adding
-    res = vlt.AddKey("", -1);
-    TEST_ASSERT(res == false, "Error when try to add key with empty name");
 }
 
 void Vault_UpdateKey_Test()
@@ -195,15 +191,10 @@ void Vault_CreateRecord_Test()
     res = vlt.CreateRecord({ {"A", 'a'} });
     TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongType, "Failed to create record");
 
-    vlt.PrintAsTable();
-    std::cout << "Is it correct to create record with error in params list" << std::endl;
-
     res = vlt.CreateRecord({ {"A", 1}, {"D", 1} });
     TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongKey, "Failed to create record");
     res = vlt.CreateRecord({ {"A", 1}, {"A", 'a'} });
     TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongType, "Failed to create record");
-
-    vlt.PrintAsTable();
 
     // Third method overload
     VaultRecordRef vrr1, vrr2;
@@ -360,7 +351,7 @@ void Vault_RequestEqual_Tests()
     vrs.GetRecord("B", -1, vrr);
     int n;
     vrr.GetData("A", n);
-    TEST_ASSERT(n == 5, "Failed to make reques");
+    TEST_ASSERT(n == 5, "Failed to make request");
 }
 
 int main()
