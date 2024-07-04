@@ -286,6 +286,8 @@ namespace mvlt
             std::size_t counter = 0;
             for (auto it = startIt; it != endIt; ++it)
             {
+                if (counter >= amountOfRecords) break;
+
                 // Check if it is not default predicate
                 if (&requestPredicat != &DefaultRequestPredicat)
                 {
@@ -296,7 +298,6 @@ namespace mvlt
                     vaultRecords.emplace(it->second);
 
                 ++counter;
-                if (counter >= amountOfRecords) break;
             }
         }
 
