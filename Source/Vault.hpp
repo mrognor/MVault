@@ -235,8 +235,9 @@ namespace mvlt
                         while(endIt != TtoVaultRecordMap->begin() && endIt->first == endKeyValue)
                             --endIt;
                         
-                        // Increase iterator to add later last element in vaultRecords 
-                        ++endIt;
+                        // Increase iterator to add later last element in vaultRecords
+                        if (endIt != TtoVaultRecordMap->begin())
+                            ++endIt;
                     }
                 };
 

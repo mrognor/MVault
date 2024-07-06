@@ -482,7 +482,7 @@ namespace mvlt
             const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue = true, 
             const bool& isIncludeEndKeyValue = true, const std::size_t& amountOfRecords = -1,
             const std::function<bool(const VaultRecordRef&)>& requestPredicat = DefaultRequestPredicat) const noexcept;
-        
+
         /**
             \brief A method for complex requests
 
@@ -491,7 +491,7 @@ namespace mvlt
         */
         template <VaultRequestType Type>
         VaultOperationResult Request(const VaultRequest<Type>&& request, VaultRecordSet& vaultRecordSet) const;
-        
+
         /// \brief A method for deleting all data and keys
         void DropVault() noexcept;
 
