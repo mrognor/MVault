@@ -8,80 +8,65 @@ using namespace std;
 void Vault_AddKey_Test()
 {
     Vault vlt;
-    bool res;
 
     // Correct add new key
-    res = vlt.AddKey("A", -1);
-    TEST_ASSERT(res == true, "Failed to add new key");
+    TEST_ASSERT(vlt.AddKey("A", -1) == true, "Failed to add new key");
 
     // Correct try to add exist key
-    res = vlt.AddKey("A", -1);
-    TEST_ASSERT(res == false, "Error when try to add key with existing name");
+    TEST_ASSERT(vlt.AddKey("A", -1) == false, "Error when try to add key with existing name");
 }
 
 void Vault_UpdateKey_Test()
 {
     Vault vlt;
-    VaultOperationResult res;
 
     vlt.AddKey("A", -1);
     vlt.AddKey<std::string>("B", "none");
 
     // Correct key update
-    res = vlt.UpdateKey("A", 0);
-    TEST_ASSERT(res.IsOperationSuccess == true, "Failed to update key");
+    TEST_ASSERT(vlt.UpdateKey("A", 0).IsOperationSuccess == true, "Failed to update key");
 
     // Wrong key update
-    res = vlt.UpdateKey("C", -1);
-    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongKey, "Cannot update not existing key");
+    TEST_ASSERT(vlt.UpdateKey("C", -1).ResultCode == VaultOperationResultCode::WrongKey, "Cannot update not existing key");
 
     // Wrong key type
-    res = vlt.UpdateKey("B", -1);
-    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongType, "Cannot set incorrect type to new key value");
+    TEST_ASSERT(vlt.UpdateKey("B", -1).ResultCode == VaultOperationResultCode::WrongType, "Cannot set incorrect type to new key value");
 }
 
 void Vault_IsKeyExist_Test()
 {
     Vault vlt;
-    bool res;
 
     vlt.AddKey("A", -1);
 
     // Exist key check
-    res = vlt.IsKeyExist("A");
-    TEST_ASSERT(res == true, "Exist key check failed");
+    TEST_ASSERT(vlt.IsKeyExist("A") == true, "Exist key check failed");
     
     // Not exist key check
-    res = vlt.IsKeyExist("B");
-    TEST_ASSERT(res == false, "Not exist key check failed");
+    TEST_ASSERT(vlt.IsKeyExist("B") == false, "Not exist key check failed");
 }
 
 void Vault_GetKeyValue_Test()
 {
     Vault vlt;
-    VaultOperationResult res;
     int keyValue;
     std::string wrongKeyValue;
 
     vlt.AddKey("A", -1);
 
     // Correct get
-    res = vlt.GetKeyValue("A", keyValue);
-    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::Success, "Failed to get proper key value");
+    TEST_ASSERT(vlt.GetKeyValue("A", keyValue).ResultCode == VaultOperationResultCode::Success, "Failed to get proper key value");
 
     // Not existed key
-    res = vlt.GetKeyValue("B", keyValue);
-    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongKey, "Failed to get not existed key value");
+    TEST_ASSERT(vlt.GetKeyValue("B", keyValue).ResultCode == VaultOperationResultCode::WrongKey, "Failed to get not existed key value");
 
     // Vrong value type
-    res = vlt.GetKeyValue("A", wrongKeyValue);
-    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongType, "Failed to get key value with wrong type");
+    TEST_ASSERT(vlt.GetKeyValue("A", wrongKeyValue).ResultCode == VaultOperationResultCode::WrongType, "Failed to get key value with wrong type");
 }
 
 void Vault_GetKeyType_Test()
 {
     Vault vlt;
-    bool res;
     std::type_index type = typeid(void);
 
     vlt.AddKey("A", -1);
@@ -91,8 +76,7 @@ void Vault_GetKeyType_Test()
     TEST_ASSERT(type == typeid(int), "Failed to get key type");
 
     // Get not existed key
-    res = vlt.GetKeyType("B", type);
-    TEST_ASSERT(res == false, "Failed to get not existed key type");
+    TEST_ASSERT(vlt.GetKeyType("B", type) == false, "Failed to get not existed key type");
 }
 
 void Vault_GetKeys_Test()
@@ -147,7 +131,6 @@ void Vault_RemoveKey_Test()
 void Vault_CreateRecord_Test()
 {
     Vault vlt;
-    VaultOperationResult res;
 
     vlt.AddKey("A", -1);
     vlt.AddKey("B", '0');
@@ -186,15 +169,11 @@ void Vault_CreateRecord_Test()
     }
 
     // Incorrect creations
-    res = vlt.CreateRecord({ {"D", 1} });
-    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongKey, "Failed to create record");
-    res = vlt.CreateRecord({ {"A", 'a'} });
-    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongType, "Failed to create record");
+    TEST_ASSERT(vlt.CreateRecord({ {"D", 1} }).ResultCode == VaultOperationResultCode::WrongKey, "Failed to create record");
+    TEST_ASSERT(vlt.CreateRecord({ {"A", 'a'} }).ResultCode == VaultOperationResultCode::WrongType, "Failed to create record");
 
-    res = vlt.CreateRecord({ {"A", 1}, {"D", 1} });
-    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongKey, "Failed to create record");
-    res = vlt.CreateRecord({ {"A", 1}, {"A", 'a'} });
-    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongType, "Failed to create record");
+    TEST_ASSERT(vlt.CreateRecord({ {"A", 1}, {"D", 1} }).ResultCode == VaultOperationResultCode::WrongKey, "Failed to create record");
+    TEST_ASSERT(vlt.CreateRecord({ {"A", 1}, {"A", 'a'} }).ResultCode == VaultOperationResultCode::WrongType, "Failed to create record");
 
     // Third method overload
     VaultRecordRef vrr1, vrr2;
@@ -207,34 +186,31 @@ void Vault_GetRecord_Test()
 {
     Vault vlt;
     VaultRecordRef vrr;
-    VaultOperationResult res;
 
     vlt.AddKey("A", -1);
     vlt.AddKey("B", '0');
     vlt.AddKey("C", true);
 
     // Correct get record on empty vault
-    res = vlt.GetRecord("A", 0, vrr);
     TEST_ASSERT(!vrr.IsValid(), "Error on record creation") 
-    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongValue, "Error on record creation");
+    TEST_ASSERT(vlt.GetRecord("A", 0, vrr).ResultCode == VaultOperationResultCode::WrongValue, "Error on record creation");
 
-    res = vlt.GetRecord("D", 0, vrr); // Wrong key
-    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongKey, "Error on get result");
-    res = vlt.GetRecord("A", std::string(), vrr); // Wrong key type
-    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongType, "Error on get result");
+    // Wrong key
+    TEST_ASSERT(vlt.GetRecord("D", 0, vrr).ResultCode == VaultOperationResultCode::WrongKey, "Error on get result");
+    // Wrong key type
+    TEST_ASSERT(vlt.GetRecord("A", std::string(), vrr).ResultCode == VaultOperationResultCode::WrongType, "Error on get result");
 
     vlt.CreateRecord();
     
     // Correct get record
-    res = vlt.GetRecord("A", -1, vrr);
-    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::Success, "Error on record creation");
+    TEST_ASSERT(vlt.GetRecord("A", -1, vrr).ResultCode == VaultOperationResultCode::Success, "Error on record creation");
 
-    res = vlt.GetRecord("A", 0, vrr); // Wrong value
-    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongValue, "Error on get result");
-    res = vlt.GetRecord("D", 0, vrr); // Wrong key
-    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongKey, "Error on get result");
-    res = vlt.GetRecord("A", std::string(), vrr); // Wrong key type
-    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongType, "Error on get result");
+    // Wrong value
+    TEST_ASSERT(vlt.GetRecord("A", 0, vrr).ResultCode == VaultOperationResultCode::WrongValue, "Error on get result");
+    // Wrong key
+    TEST_ASSERT(vlt.GetRecord("D", 0, vrr).ResultCode == VaultOperationResultCode::WrongKey, "Error on get result");
+    // Wrong key type
+    TEST_ASSERT(vlt.GetRecord("A", std::string(), vrr).ResultCode == VaultOperationResultCode::WrongType, "Error on get result");
 
     // Create records with vector of params
     for (int i = 0; i < 10; ++i) vlt.CreateRecord({ {"A", i}, {"B", static_cast<char>('A' + i)} });
@@ -254,7 +230,6 @@ void Vault_GetRecords_Test()
 {
     Vault vlt;
     VaultRecordRef vrr;
-    VaultOperationResult res;
     std::vector<VaultRecordRef> vec;
 
     vlt.AddKey("A", -1);
@@ -262,14 +237,13 @@ void Vault_GetRecords_Test()
     vlt.AddKey("C", true);
 
     // Correct get records on empty vault
-    res = vlt.GetRecords("A", 0, vec);
     TEST_ASSERT(vec.size() == 0, "Error on record creation") 
-    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongValue, "Error on record creation");
+    TEST_ASSERT(vlt.GetRecords("A", 0, vec).ResultCode == VaultOperationResultCode::WrongValue, "Error on record creation");
 
-    res = vlt.GetRecords("D", 0, vec); // Wrong key
-    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongKey, "Error on get result");
-    res = vlt.GetRecords("A", std::string(), vec); // Wrong key type
-    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongType, "Error on get result");
+    // Wrong key
+    TEST_ASSERT(vlt.GetRecords("D", 0, vec).ResultCode == VaultOperationResultCode::WrongKey, "Error on get result");
+    // Wrong key type
+    TEST_ASSERT(vlt.GetRecords("A", std::string(), vec).ResultCode == VaultOperationResultCode::WrongType, "Error on get result");
 
     // Fill vault
     for (int i = 0; i < 10; ++i) vlt.CreateRecord({ {"A", i}, });
@@ -280,25 +254,23 @@ void Vault_GetRecords_Test()
     for (int i = 0; i < 10; ++i)
     {
         int n;
-        res = vec[i].GetData("A", n);
-        TEST_ASSERT(res.ResultCode == VaultOperationResultCode::Success, "Error on get records");
+        TEST_ASSERT(vec[i].GetData("A", n).ResultCode == VaultOperationResultCode::Success, "Error on get records");
     }
 
     // Get only 2 records
     vlt.GetRecords("B", '0', vec, 2);
     TEST_ASSERT(vec.size() == 2, "Wrong vec size");
 
-    res = vlt.GetRecords("D", 0, vec); // Wrong key
-    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongKey, "Error on get result");
-    res = vlt.GetRecords("A", std::string(), vec); // Wrong key type
-    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongType, "Error on get result");
+    // Wrong key
+    TEST_ASSERT(vlt.GetRecords("D", 0, vec).ResultCode == VaultOperationResultCode::WrongKey, "Error on get result");
+    // Wrong key type
+    TEST_ASSERT(vlt.GetRecords("A", std::string(), vec).ResultCode == VaultOperationResultCode::WrongType, "Error on get result");
 }
 
 void Vault_Request_Tests()
 {
     Vault vlt;
     VaultRecordRef vrr;
-    VaultOperationResult res;
     VaultRecordSet vrs;
 
     vlt.AddKey("A", -1);
@@ -306,15 +278,14 @@ void Vault_Request_Tests()
     vlt.AddKey<std::string>("C", "-1");
 
     // Correct request on empty vault
-    res = vlt.Request(Equal("A", -1), vrs);
     TEST_ASSERT(vrs.Size() == 0, "Error on record creation") 
-    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::Success, "Error on record creation");
+    TEST_ASSERT(vlt.Request(Equal("A", -1), vrs).ResultCode == VaultOperationResultCode::Success, "Error on record creation");
 
     // Incorrect requests
-    res = vlt.Request(Equal("D", -1), vrs); // Wrong key
-    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongKey, "Error on get result");
-    res = vlt.Request(Equal("A", std::string()), vrs); // Wrong key type
-    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::WrongType, "Error on get result");
+    // Wrong key
+    TEST_ASSERT(vlt.Request(Equal("D", -1), vrs).ResultCode == VaultOperationResultCode::WrongKey, "Error on get result");
+    // Wrong key type
+    TEST_ASSERT(vlt.Request(Equal("A", std::string()), vrs).ResultCode == VaultOperationResultCode::WrongType, "Error on get result");
 
     // Fill vault
     vlt.CreateRecord({ {"A", 0}, {"C", std::to_string(10)}});
@@ -325,106 +296,106 @@ void Vault_Request_Tests()
 
     // Equal
     {
-        res = vlt.Request(Equal("A", 2), vrs);
+        vlt.Request(Equal("A", 2), vrs);
         TEST_ASSERT(vrs.Size() == 1, "Error on record request");
 
-        res = vlt.Request(Equal("B", -1), vrs);
+        vlt.Request(Equal("B", -1), vrs);
         TEST_ASSERT(vrs.Size() == 12, "Error on record request");
 
-        res = vlt.Request(Equal("C", std::string("a")), vrs);
+        vlt.Request(Equal("C", std::string("a")), vrs);
         TEST_ASSERT(vrs.Size() == 0, "Error on record request");
     }
 
     // Less
     {
-        res = vlt.Request(Less("A", 1), vrs);
+        vlt.Request(Less("A", 1), vrs);
         TEST_ASSERT(vrs.Size() == 2, "Error on record request");
 
-        res = vlt.Request(Less("A", 0), vrs);
+        vlt.Request(Less("A", 0), vrs);
         TEST_ASSERT(vrs.Size() == 0, "Error on record request");
 
-        res = vlt.Request(Less("A", 15), vrs);
+        vlt.Request(Less("A", 15), vrs);
         TEST_ASSERT(vrs.Size() == 12, "Error on record request");
 
-        res = vlt.Request(Less("A", 10), vrs);
+        vlt.Request(Less("A", 10), vrs);
         TEST_ASSERT(vrs.Size() == 12, "Error on record request");
 
-        res = vlt.Request(Less("A", 9), vrs);
+        vlt.Request(Less("A", 9), vrs);
         TEST_ASSERT(vrs.Size() == 10, "Error on record request");
 
-        res = vlt.Request(Less("B", 1), vrs);
+        vlt.Request(Less("B", 1), vrs);
         TEST_ASSERT(vrs.Size() == 12, "Error on record request");
 
-        res = vlt.Request(Less("B", -2), vrs);
+        vlt.Request(Less("B", -2), vrs);
         TEST_ASSERT(vrs.Size() == 0, "Error on record request");
     }
 
     // LessOrEqual
     {
-        res = vlt.Request(LessOrEqual("A", 1), vrs);
+        vlt.Request(LessOrEqual("A", 1), vrs);
         TEST_ASSERT(vrs.Size() == 3, "Error on record request");
 
-        res = vlt.Request(LessOrEqual("A", 0), vrs);
+        vlt.Request(LessOrEqual("A", 0), vrs);
         TEST_ASSERT(vrs.Size() == 2, "Error on record request");
 
-        res = vlt.Request(LessOrEqual("A", 15), vrs);
+        vlt.Request(LessOrEqual("A", 15), vrs);
         TEST_ASSERT(vrs.Size() == 12, "Error on record request");
 
-        res = vlt.Request(LessOrEqual("A", 9), vrs);
+        vlt.Request(LessOrEqual("A", 9), vrs);
         TEST_ASSERT(vrs.Size() == 12, "Error on record request");
 
-        res = vlt.Request(LessOrEqual("B", 1), vrs);
+        vlt.Request(LessOrEqual("B", 1), vrs);
         TEST_ASSERT(vrs.Size() == 12, "Error on record request");
 
-        res = vlt.Request(LessOrEqual("B", -1), vrs);
+        vlt.Request(LessOrEqual("B", -1), vrs);
         TEST_ASSERT(vrs.Size() == 12, "Error on record request");
 
-        res = vlt.Request(LessOrEqual("B", -2), vrs);
+        vlt.Request(LessOrEqual("B", -2), vrs);
         TEST_ASSERT(vrs.Size() == 0, "Error on record request");
     }
 
     // Greater
     {
-        res = vlt.Request(Greater("A", 8), vrs);
+        vlt.Request(Greater("A", 8), vrs);
         TEST_ASSERT(vrs.Size() == 2, "Error on record request");
 
-        res = vlt.Request(Greater("A", 9), vrs);
+        vlt.Request(Greater("A", 9), vrs);
         TEST_ASSERT(vrs.Size() == 0, "Error on record request");
 
-        res = vlt.Request(Greater("A", -1), vrs);
+        vlt.Request(Greater("A", -1), vrs);
         TEST_ASSERT(vrs.Size() == 12, "Error on record request");
 
-        res = vlt.Request(Greater("A", 0), vrs);
+        vlt.Request(Greater("A", 0), vrs);
         TEST_ASSERT(vrs.Size() == 10, "Error on record request");
 
-        res = vlt.Request(Greater("B", -1), vrs);
+        vlt.Request(Greater("B", -1), vrs);
         TEST_ASSERT(vrs.Size() == 0, "Error on record request");
 
-        res = vlt.Request(Greater("B", -2), vrs);
+        vlt.Request(Greater("B", -2), vrs);
         TEST_ASSERT(vrs.Size() == 12, "Error on record request");
     }
 
     // GreaterOrEqual
     {
-        res = vlt.Request(GreaterOrEqual("A", 8), vrs);
+        vlt.Request(GreaterOrEqual("A", 8), vrs);
         TEST_ASSERT(vrs.Size() == 3, "Error on record request");
 
-        res = vlt.Request(GreaterOrEqual("A", 9), vrs);
+        vlt.Request(GreaterOrEqual("A", 9), vrs);
         TEST_ASSERT(vrs.Size() == 2, "Error on record request");
 
-        res = vlt.Request(GreaterOrEqual("A", -1), vrs);
+        vlt.Request(GreaterOrEqual("A", -1), vrs);
         TEST_ASSERT(vrs.Size() == 12, "Error on record request");
 
-        res = vlt.Request(GreaterOrEqual("A", 0), vrs);
+        vlt.Request(GreaterOrEqual("A", 0), vrs);
         TEST_ASSERT(vrs.Size() == 12, "Error on record request");
 
-        res = vlt.Request(GreaterOrEqual("B", 0), vrs);
+        vlt.Request(GreaterOrEqual("B", 0), vrs);
         TEST_ASSERT(vrs.Size() == 0, "Error on record request");
 
-        res = vlt.Request(GreaterOrEqual("B", -1), vrs);
+        vlt.Request(GreaterOrEqual("B", -1), vrs);
         TEST_ASSERT(vrs.Size() == 12, "Error on record request");
 
-        res = vlt.Request(GreaterOrEqual("B", -2), vrs);
+        vlt.Request(GreaterOrEqual("B", -2), vrs);
         TEST_ASSERT(vrs.Size() == 12, "Error on record request");
     }
 
@@ -483,15 +454,14 @@ void Vault_Request_Tests()
     }
 
     // Request 0 records
-    res = vlt.RequestEqual("B", -1, vrs, 0);
-    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::Success, "Error on record request");
+    TEST_ASSERT(vlt.RequestEqual("B", -1, vrs, 0).ResultCode == VaultOperationResultCode::Success, "Error on record request");
     TEST_ASSERT(vrs.Size() == 0, "Error on record request");
 
     // Request 2 records
-    res = vlt.RequestEqual("B", -1, vrs, 2);
-    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::Success, "Error on record request");
+    TEST_ASSERT(vlt.RequestEqual("B", -1, vrs, 2).ResultCode == VaultOperationResultCode::Success, "Error on record request");
     TEST_ASSERT(vrs.Size() == 2, "Error on record request");
 
+    VaultOperationResult res;
     // Predicat test. B == -1 and A = stoi(C)
     res = vlt.RequestEqual("B", -1, vrs, -1, [](const VaultRecordRef& ref)
         {
@@ -509,6 +479,134 @@ void Vault_Request_Tests()
     TEST_ASSERT(n == 5, "Failed to make request");
 }
 
+void Vault_DropVault_Tests()
+{
+    Vault vlt;
+
+    vlt.AddKey("A", -1);
+    vlt.AddKey("B", '0');
+    vlt.AddKey("C", true);
+
+    // Fill vault
+    for (int i = 0; i < 10; ++i) vlt.CreateRecord({ {"A", i} });
+
+    vlt.DropVault();
+
+    TEST_ASSERT(vlt.GetKeys().size() == 0, "Failed to drop vault");
+    TEST_ASSERT(vlt.Size() == 0, "Failed to drop vault");
+}
+
+void Vault_DropData_Tests()
+{
+    Vault vlt;
+
+    vlt.AddKey("A", -1);
+    vlt.AddKey("B", '0');
+    vlt.AddKey("C", true);
+
+    // Fill vault
+    for (int i = 0; i < 10; ++i) vlt.CreateRecord({ {"A", i} });
+
+    vlt.DropData();
+
+    TEST_ASSERT(vlt.GetKeys().size() == 3, "Failed to drop vault");
+    TEST_ASSERT(vlt.Size() == 0, "Failed to drop vault");
+}
+
+void Vault_EraseRecord_Test()
+{
+    // VaultRecordRef overload
+    Vault vlt;
+    VaultRecordRef vrr;
+
+    // Erase empty record
+    TEST_ASSERT(vlt.EraseRecord(vrr) == false, "Failed to erase record");
+
+    vlt.AddKey("A", -1);
+
+    // Fill vault
+    for (int i = 0; i < 10; ++i) vlt.CreateRecord({ {"A", i} });
+
+    vlt.GetRecord("A", 0, vrr);
+    TEST_ASSERT(vlt.EraseRecord(vrr), "Failed to erase record");
+    TEST_ASSERT(vlt.Size() == 9, "Failed to erase record");
+    
+    TEST_ASSERT(vlt.EraseRecord(vrr) == false, "Failed to erase record");
+
+    vlt.GetRecord("A", 1, vrr);
+    vrr.Reset();
+    TEST_ASSERT(vlt.EraseRecord(vrr) == false, "Failed to delete record");
+    TEST_ASSERT(vlt.Size() == 9, "Failed to erase record");
+
+    // Key and value overload
+
+    // Incorrect erasing
+    // Wrong key
+    TEST_ASSERT(vlt.EraseRecord("B", 1).ResultCode == VaultOperationResultCode::WrongKey, "Error on erase");
+    // Wrong key type
+    TEST_ASSERT(vlt.EraseRecord("A", 2.9).ResultCode == VaultOperationResultCode::WrongType, "Error on erase");
+
+    // No value erasing
+    TEST_ASSERT(vlt.EraseRecord("A", 0).ResultCode == VaultOperationResultCode::WrongValue, "Error on erase");
+
+    // Correct erasing
+    for (int i = 1; i < 10; ++i)
+        TEST_ASSERT(vlt.EraseRecord("A", i).ResultCode == VaultOperationResultCode::Success, "Error on erase");
+
+    vlt.CreateRecord();
+    vlt.CreateRecord();
+
+    vlt.EraseRecord("A", -1);
+    TEST_ASSERT(vlt.Size() == 1, "Failed to erase record");
+}
+
+void Vault_EraseRecords_Test()
+{
+    Vault vlt;
+    VaultRecordRef vrr;
+
+    vlt.AddKey("A", -1);
+
+    // Wrong key
+    TEST_ASSERT(vlt.EraseRecord("B", 1).ResultCode == VaultOperationResultCode::WrongKey, "Error on erase");
+    // Wrong key type
+    TEST_ASSERT(vlt.EraseRecord("A", 2.9).ResultCode == VaultOperationResultCode::WrongType, "Error on erase");
+    // No value erasing
+    TEST_ASSERT(vlt.EraseRecord("A", 0).ResultCode == VaultOperationResultCode::WrongValue, "Error on erase");
+
+    // Fill vault
+    for (int i = 0; i < 10; ++i) vlt.CreateRecord();
+    vlt.CreateRecord({ {"A", 1} });
+
+    // Erase 2 records
+    TEST_ASSERT(vlt.EraseRecords("A", -1, 2).ResultCode == VaultOperationResultCode::Success, "Failed to erase records");
+    TEST_ASSERT(vlt.Size() == 9, "Failed to erase records");
+
+    // Erase all zero records
+    TEST_ASSERT(vlt.EraseRecords("A", -1).ResultCode == VaultOperationResultCode::Success, "Failed to erase records");
+    TEST_ASSERT(vlt.Size() == 1, "Failed to erase records");
+}
+
+void Vault_Size_Test()
+{
+    Vault vlt;
+    VaultRecordRef vrr;
+
+    vlt.AddKey<std::size_t>("A", -1);
+
+    for (std::size_t i = 1; i < 11; ++i)
+    {
+        vlt.CreateRecord({ {"A", i} });
+        TEST_ASSERT(vlt.Size() == i, "Failed to create record");
+    }
+
+    for (std::size_t i = 10; i > 0; --i)
+    {
+        vlt.EraseRecord("A", i);
+        TEST_ASSERT(vlt.Size() == i - 1, "Failed to create record");
+    }
+}
+
 int main()
 {
     Vault_AddKey_Test();
@@ -522,4 +620,9 @@ int main()
     Vault_GetRecord_Test();
     Vault_GetRecords_Test();
     Vault_Request_Tests();
+    Vault_DropVault_Tests();
+    Vault_DropData_Tests();
+    Vault_EraseRecord_Test();
+    Vault_EraseRecords_Test();
+    Vault_Size_Test();
 }

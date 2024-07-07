@@ -903,6 +903,9 @@ namespace mvlt
         auto equalRange = TtoVaultRecordHashMap->equal_range(keyValue);
         if (equalRange.first != TtoVaultRecordHashMap->end())
         {
+            res.IsOperationSuccess = true;
+            res.ResultCode = VaultOperationResultCode::Success;
+
             std::size_t counter = 0;
             for (auto it = equalRange.first; it != equalRange.second;)
             {
