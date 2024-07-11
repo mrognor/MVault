@@ -56,10 +56,17 @@ namespace mvlt
         /// \brief Operator assignment
         VaultRecordSet& operator=(const VaultRecordSet& other) noexcept;
         
+        /// Making operator comparison function friendly
+        friend bool operator==(const VaultRecordSet& a, const VaultRecordSet& b);
+
         /// \brief Method for checking the validity of the parent Vault
         /// \return true if it is valid, otherwise false
         bool GetIsParentVaultValid() const noexcept;
 
+        /// \brief Method for getting parent vault unique id
+        /// \return id or null in case invalid parent
+        std::string GetParentVaultUniqueId() const noexcept;
+    
         /**
             \brief The method for getting a default key value
 
@@ -393,7 +400,6 @@ namespace mvlt
         */
         bool SaveToFile(const std::string& fileName, const std::string& separator = ",", const bool& isSaveKey = true) const noexcept;
 
-
         /// \brief Destructor
         ~VaultRecordSet() noexcept;
 
@@ -403,4 +409,14 @@ namespace mvlt
         /// Making Intersection function friendly
         friend void Intersection(const VaultRecordSet& a, const VaultRecordSet& b, VaultRecordSet& res) noexcept;
     };
+
+    /**
+        \brief Friend comparison operator
+            
+        \param [in] a first set to compare
+        \param [in] b second set to compare
+        
+        \return true if a equal b, false otherwise
+    */
+    bool operator==(const VaultRecordSet& a, const VaultRecordSet& b);
 }

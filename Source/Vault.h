@@ -188,7 +188,10 @@ namespace mvlt
         /// Making the VaultRequest class friendly so that it has access to the internal members of the Vault class
         template <VaultRequestType Type>
         friend class VaultRequest;
-         
+
+        /// Making VaultRecordSet operator comparison function friendly
+        friend bool operator==(const VaultRecordSet& a, const VaultRecordSet& b);
+
         /// \brief Default constructor
         Vault() noexcept;
 

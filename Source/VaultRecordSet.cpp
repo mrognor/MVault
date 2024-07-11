@@ -59,6 +59,22 @@ namespace mvlt
         return res;
     }
 
+    std::string VaultRecordSet::GetParentVaultUniqueId() const noexcept
+    {
+        std::stringstream ss;
+
+        RecursiveReadWriteMtx.ReadLock();
+
+        if (IsParentVaultValid)
+            ss << ParentVault;
+        else
+            ss << "null";
+
+        RecursiveReadWriteMtx.ReadUnlock();
+        
+        return ss.str();
+    }
+
     bool VaultRecordSet::IsKeyExist(const std::string& key) const noexcept
     {
         bool res = false;
@@ -382,5 +398,21 @@ namespace mvlt
     VaultRecordSet::~VaultRecordSet() noexcept
     {
         Reset();
+    }
+
+
+    bool operator==(const VaultRecordSet& a, const VaultRecordSet& b)
+    {
+        bool res = false;
+        a.RecursiveReadWriteMtx.ReadLock();
+        b.RecursiveReadWriteMtx.ReadLock();
+
+        if (a.ParentVault == b.ParentVault && a.RecordsSet == b.RecordsSet)
+            res = true;
+
+        b.RecursiveReadWriteMtx.ReadUnlock();
+        a.RecursiveReadWriteMtx.ReadUnlock();
+
+        return res;
     }
 }
