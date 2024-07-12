@@ -1,11 +1,12 @@
 #pragma once
 
+#include <cstdint>
 #include <iostream>
 
 #if defined WIN32 || defined _WIN64
 #include <Windows.h>
 
-enum ConsoleTextColor
+enum class ConsoleTextColor : std::uint8_t
 {
     Default = 7,
     Blue = 1,
@@ -25,7 +26,7 @@ enum ConsoleTextColor
 };
 #else
 
-enum ConsoleTextColor
+enum class ConsoleTextColor : std::uint8_t
 {
     Default = 33,
     Blue = 34,
