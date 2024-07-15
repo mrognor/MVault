@@ -607,6 +607,18 @@ void Vault_Size_Test()
     }
 }
 
+void Vault_Destructor_Test()
+{
+    Vault* vlt = new Vault;
+
+    vlt->AddKey("A", -1);
+    vlt->CreateRecord();
+
+    delete vlt;
+    vlt = new Vault;
+    delete vlt;
+}
+
 int main()
 {
     Vault_AddKey_Test();
@@ -625,4 +637,5 @@ int main()
     Vault_EraseRecord_Test();
     Vault_EraseRecords_Test();
     Vault_Size_Test();
+    Vault_Destructor_Test();
 }

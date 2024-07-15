@@ -23,3 +23,8 @@ project(VaultUnitTest)
 
 add_executable(VaultUnitTest ${TestsHeaders} ${TestsSource} UnitTests/Vault.cpp)
 target_link_libraries(VaultUnitTest MVault)
+
+project(VaultRecordSetUnitTest)
+
+add_executable(VaultRecordSetUnitTest ${TestsHeaders} ${TestsSource} UnitTests/VaultRecordSet.cpp)
+target_link_libraries(VaultRecordSetUnitTest MVault)
