@@ -103,6 +103,88 @@ void VaultRecordSet_GetParentVaultUniqueId_Test()
     TEST_ASSERT(vrs.GetParentVaultUniqueId() != "null", "Failed to request vault record set");
 }
 
+void VaultRecordSet_IsKeyExist_Test()
+{
+    Vault vlt;
+
+    VaultRecordSet vrs;
+
+    TEST_ASSERT(vrs.IsKeyExist("A") == false, "Exist key check failed");
+
+    vlt.AddKey("A", -1);
+    vlt.CreateRecord();
+
+    vlt.Request(Equal("A", -1), vrs);
+
+    // Exist key check
+    TEST_ASSERT(vrs.IsKeyExist("A") == true, "Exist key check failed");
+    
+    // Not exist key check
+    TEST_ASSERT(vrs.IsKeyExist("B") == false, "Not exist key check failed");
+
+    // Dynamic key add
+    vlt.AddKey("B", -1);
+
+    TEST_ASSERT(vrs.IsKeyExist("B") == true, "Exist key check failed");
+}
+
+void VaultRecordSet_GetKeyValue_Test()
+{
+    Vault vlt;
+    int keyValue;
+    std::string wrongKeyValue;
+    VaultRecordSet vrs;
+
+    // Non assigned set get
+    TEST_ASSERT(vrs.GetKeyValue("A", keyValue).ResultCode == VaultOperationResultCode::ParentVaultNotValid, "Failed to get proper key value");
+
+    vlt.AddKey("A", -1);
+    vlt.CreateRecord();
+
+    vlt.Request(Equal("A", -1), vrs);
+
+    // Correct get
+    TEST_ASSERT(vrs.GetKeyValue("A", keyValue).ResultCode == VaultOperationResultCode::Success, "Failed to get proper key value");
+
+    // Not existed key
+    TEST_ASSERT(vrs.GetKeyValue("B", keyValue).ResultCode == VaultOperationResultCode::WrongKey, "Failed to get not existed key value");
+
+    // Vrong value type
+    TEST_ASSERT(vrs.GetKeyValue("A", wrongKeyValue).ResultCode == VaultOperationResultCode::WrongType, "Failed to get key value with wrong type");
+
+    // Dynamic key add
+    vlt.AddKey("B", -1);
+
+    TEST_ASSERT(vrs.GetKeyValue("B", keyValue).ResultCode == VaultOperationResultCode::Success, "Failed to get not existed key value");
+}
+
+void VaultRecordSet_GetKeyType_Test()
+{
+    Vault vlt;
+    std::type_index type = typeid(void);
+    VaultRecordSet vrs;
+
+    TEST_ASSERT(vrs.GetKeyType("A", type) == false, "Failed to get not existed key type");
+
+    vlt.AddKey("A", -1);
+
+    vlt.CreateRecord();
+
+    vlt.Request(Equal("A", -1), vrs);
+
+    // Correct get
+    vrs.GetKeyType("A", type);
+    TEST_ASSERT(type == typeid(int), "Failed to get key type");
+
+    // Get not existed key
+    TEST_ASSERT(vrs.GetKeyType("B", type) == false, "Failed to get not existed key type");
+
+    // Dynamic key add
+    vlt.AddKey("B", -1);
+
+    TEST_ASSERT(vrs.GetKeyType("B", type) == true, "Failed to get not existed key type");
+}
+
 int main()
 {
     VaultRecordSet_CopyConstructor_Test();
@@ -110,4 +192,7 @@ int main()
     VaultRecordSet_OperatorComparison_Test();
     VaultRecordSet_GetIsParentVaultValid_Test();
     VaultRecordSet_GetParentVaultUniqueId_Test();
+    VaultRecordSet_IsKeyExist_Test();
+    VaultRecordSet_GetKeyValue_Test();
+    VaultRecordSet_GetKeyType_Test();
 }
