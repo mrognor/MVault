@@ -185,6 +185,26 @@ void VaultRecordSet_GetKeyType_Test()
     TEST_ASSERT(vrs.GetKeyType("B", type) == true, "Failed to get not existed key type");
 }
 
+void VaultRecordSet_AddRecord_Test()
+{
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultRecordRef vrf;
+
+    TEST_ASSERT(vrs.AddRecord(vrf).ResultCode == VaultOperationResultCode::ParentVaultNotValid, "Failed to add record");
+
+    vlt.AddKey("A", -1);
+    vrf = vlt.CreateRecord();
+
+    TEST_ASSERT(vrs.AddRecord(vrf).ResultCode == VaultOperationResultCode::ParentVaultNotValid, "Failed to add record");
+
+    vlt.Request(Equal("A", -1), vrs);
+
+    vrs.Clear();
+
+    TEST_ASSERT(vrs.AddRecord(vrf).ResultCode == VaultOperationResultCode::Success, "Failed to add record");
+}
+
 int main()
 {
     VaultRecordSet_CopyConstructor_Test();
@@ -195,4 +215,5 @@ int main()
     VaultRecordSet_IsKeyExist_Test();
     VaultRecordSet_GetKeyValue_Test();
     VaultRecordSet_GetKeyType_Test();
+    VaultRecordSet_AddRecord_Test();
 }

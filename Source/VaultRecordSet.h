@@ -83,8 +83,6 @@ namespace mvlt
 
             \param [in] key the name of the key to search for
             \param [in] defaultKeyValue the value of the key
-
-            \return returns false if the parent vault invalid or the key was not found otherwise returns true
         */
         template <class T>
         VaultOperationResult GetKeyValue(const std::string& key, T& defaultKeyValue) const noexcept;
@@ -99,13 +97,12 @@ namespace mvlt
         */
         bool GetKeyType(const std::string& key, std::type_index& keyType) const noexcept;
 
-        /// \brief Method for adding a record to VaultRecordSet
-        /// \param [in] recordRef A constant reference pointing to a record
-        void AddRecord(const VaultRecordRef& recordRef) noexcept;
-
-        /// \brief Method for adding a recordы to VaultRecordSet
-        /// \param [in] recordRef A constant reference indicating a vector with refs
-        void AddRecords(const std::vector<VaultRecordRef> recordsRefs) noexcept;
+        /**
+            \brief Method for adding a record to VaultRecordSet
+            
+            \param [in] recordRef A constant reference pointing to a record
+        */
+        VaultOperationResult AddRecord(const VaultRecordRef& recordRef) noexcept;
 
         /**
             \brief The method for getting a reference to the data inside Vault
@@ -362,7 +359,7 @@ namespace mvlt
 
         /// \brief A method for displaying the contents of a Vault on the screen
         /// \param [in] amountOfRecords The number of records to be printed. The default value is -1, which means that all entries will be output
-        void PrintVault(const std::size_t& amountOfRecords = -1) const noexcept;
+        void PrintSet(const std::size_t& amountOfRecords = -1) const noexcept;
         
         /**
             \brief A method for displaying the contents of a Vault as a table on the screen

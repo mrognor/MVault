@@ -109,43 +109,20 @@ namespace mvlt
         return res;
     }
 
-    void VaultRecordSet::AddRecord(const VaultRecordRef& recordRef) noexcept
+    VaultOperationResult VaultRecordSet::AddRecord(const VaultRecordRef& recordRef) noexcept
     {
+        VaultOperationResult res;
+
         RecursiveReadWriteMtx.WriteLock();
 
         // Thread safety because in Vault destructor blocking this RecursiveReadWriteMtx to write
         if (IsParentVaultValid)
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
+            recordRef.ReadLock();
 
-            // Add pointer to record from recordRef to this
-            RecordsSet.emplace(recordRef.DataRecord);
-
-            // Add pointer to record from recordRef to this::vaultRecordRef structure
-            for (auto& adder : VaultRecordAdders)
-                adder.second(recordRef.DataRecord);
-
-            // Lock VaultRecord to thread safety add new dependent VaultRecordSet
-            recordRef.DataRecord->Mtx.lock();
-            recordRef.DataRecord->dependentVaultRecordSets.emplace(this);
-            recordRef.DataRecord->Mtx.unlock();
-
-            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
-        }
-
-        RecursiveReadWriteMtx.WriteUnlock();
-    }
-
-    void VaultRecordSet::AddRecords(const std::vector<VaultRecordRef> recordsRefs) noexcept
-    {
-        RecursiveReadWriteMtx.WriteLock();
-
-        // Thread safety because in Vault destructor blocking this RecursiveReadWriteMtx to write
-        if (IsParentVaultValid)
-        {
-            ParentVault->RecursiveReadWriteMtx.ReadLock();
-
-            for (auto& recordRef : recordsRefs)
+            // Check if vault record ref depends on same vault as this
+            if (recordRef.Vlt == ParentVault)
             {
                 // Add pointer to record from recordRef to this
                 RecordsSet.emplace(recordRef.DataRecord);
@@ -158,12 +135,28 @@ namespace mvlt
                 recordRef.DataRecord->Mtx.lock();
                 recordRef.DataRecord->dependentVaultRecordSets.emplace(this);
                 recordRef.DataRecord->Mtx.unlock();
-            }
 
+                res.IsOperationSuccess = true;
+                res.ResultCode = VaultOperationResultCode::Success;
+            }
+            else 
+            {
+                res.IsOperationSuccess = false;
+                res.ResultCode = VaultOperationResultCode::ParentVaultNotMatch;
+            }
+            
+            recordRef.ReadUnlock();
             ParentVault->RecursiveReadWriteMtx.ReadUnlock();
+        }
+        else 
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::ParentVaultNotValid;
         }
 
         RecursiveReadWriteMtx.WriteUnlock();
+
+        return res;
     }
 
     void VaultRecordSet::Reset() noexcept
@@ -263,7 +256,7 @@ namespace mvlt
         return res;
     }
 
-    void VaultRecordSet::PrintVault(const std::size_t& amountOfRecords) const noexcept
+    void VaultRecordSet::PrintSet(const std::size_t& amountOfRecords) const noexcept
     {
         RecursiveReadWriteMtx.ReadLock();
 
