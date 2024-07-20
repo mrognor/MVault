@@ -122,27 +122,38 @@ namespace mvlt
             recordRef.ReadLock();
 
             // Check if vault record ref depends on same vault as this
-            if (recordRef.Vlt == ParentVault)
+            if (recordRef.Vlt == ParentVault && recordRef.IsValid())
             {
                 // Add pointer to record from recordRef to this
-                RecordsSet.emplace(recordRef.DataRecord);
+                std::pair<decltype(RecordsSet.begin()), bool> emplaceRes = RecordsSet.emplace(recordRef.DataRecord);
+                
+                if (emplaceRes.second)
+                {
+                    // Add pointer to record from recordRef to this::vaultRecordRef structure
+                    for (auto& adder : VaultRecordAdders)
+                        adder.second(recordRef.DataRecord);
 
-                // Add pointer to record from recordRef to this::vaultRecordRef structure
-                for (auto& adder : VaultRecordAdders)
-                    adder.second(recordRef.DataRecord);
+                    // Lock VaultRecord to thread safety add new dependent VaultRecordSet
+                    recordRef.DataRecord->Mtx.lock();
+                    recordRef.DataRecord->dependentVaultRecordSets.emplace(this);
+                    recordRef.DataRecord->Mtx.unlock();
 
-                // Lock VaultRecord to thread safety add new dependent VaultRecordSet
-                recordRef.DataRecord->Mtx.lock();
-                recordRef.DataRecord->dependentVaultRecordSets.emplace(this);
-                recordRef.DataRecord->Mtx.unlock();
-
-                res.IsOperationSuccess = true;
-                res.ResultCode = VaultOperationResultCode::Success;
+                    res.IsOperationSuccess = true;
+                    res.ResultCode = VaultOperationResultCode::Success;
+                }
+                else
+                {
+                    res.IsOperationSuccess = false;
+                    res.ResultCode = VaultOperationResultCode::RecordAlredyInSet;
+                }
             }
             else 
             {
                 res.IsOperationSuccess = false;
-                res.ResultCode = VaultOperationResultCode::ParentVaultNotMatch;
+                if (!recordRef.IsValid())
+                    res.ResultCode = VaultOperationResultCode::VaultRecordRefNotValid;
+                else
+                    res.ResultCode = VaultOperationResultCode::ParentVaultNotMatch;
             }
             
             recordRef.ReadUnlock();

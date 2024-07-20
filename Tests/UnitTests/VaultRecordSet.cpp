@@ -203,6 +203,7 @@ void VaultRecordSet_AddRecord_Test()
     vrs.Clear();
 
     TEST_ASSERT(vrs.AddRecord(vrf).ResultCode == VaultOperationResultCode::Success, "Failed to add record");
+    TEST_ASSERT(vrs.AddRecord(vrf).ResultCode == VaultOperationResultCode::RecordAlredyInSet, "Failed to add record");
 }
 
 int main()

@@ -1,4 +1,4 @@
-# Navigate to Build dir
+# Navigate to root dir
 cd $(dirname "$0")
 cd ..
 
