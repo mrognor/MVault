@@ -155,7 +155,7 @@ namespace mvlt
         */
         template <class T>
         VaultOperationResult RequestEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
-            const std::size_t& amountOfRecords = -1, const std::function<bool(const VaultRecordRef&)>& requestPredicat = DefaultRequestPredicat) const noexcept;
+            const std::size_t& amountOfRecords = -1, const std::function<bool(const VaultRecordRef&)>& requestPredicat = DefaultRequestPredicat) const;
 
         /**
             \brief A method for getting all records that have a value greater than keyValue stored by the key key
@@ -173,7 +173,7 @@ namespace mvlt
         */
         template <class T>
         VaultOperationResult RequestGreater(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
-            const std::size_t& amountOfRecords = -1, const std::function<bool(const VaultRecordRef&)>& requestPredicat = DefaultRequestPredicat) const noexcept;
+            const std::size_t& amountOfRecords = -1, const std::function<bool(const VaultRecordRef&)>& requestPredicat = DefaultRequestPredicat) const;
 
         /**
             \brief A method for getting all records that have a value greater than or equal to keyValue stored by the key key
@@ -191,7 +191,7 @@ namespace mvlt
         */
         template <class T>
         VaultOperationResult RequestGreaterOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
-            const std::size_t& amountOfRecords = -1, const std::function<bool(const VaultRecordRef&)>& requestPredicat = DefaultRequestPredicat) const noexcept;
+            const std::size_t& amountOfRecords = -1, const std::function<bool(const VaultRecordRef&)>& requestPredicat = DefaultRequestPredicat) const;
 
         /**
             \brief A method for getting all records that have a value less than keyValue stored by the key key
@@ -209,7 +209,7 @@ namespace mvlt
         */
         template <class T>
         VaultOperationResult RequestLess(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
-            const std::size_t& amountOfRecords = -1, const std::function<bool(const VaultRecordRef&)>& requestPredicat = DefaultRequestPredicat) const noexcept;
+            const std::size_t& amountOfRecords = -1, const std::function<bool(const VaultRecordRef&)>& requestPredicat = DefaultRequestPredicat) const;
 
         /**
             \brief A method for getting all records that have a value less than or equal to keyValue stored by the key key
@@ -227,7 +227,7 @@ namespace mvlt
         */
         template <class T>
         VaultOperationResult RequestLessOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
-            const std::size_t& amountOfRecords = -1, const std::function<bool(const VaultRecordRef&)>& requestPredicat = DefaultRequestPredicat) const noexcept;
+            const std::size_t& amountOfRecords = -1, const std::function<bool(const VaultRecordRef&)>& requestPredicat = DefaultRequestPredicat) const;
 
         /**
             \brief The method for getting the result of the request
@@ -250,7 +250,7 @@ namespace mvlt
         VaultOperationResult RequestInterval(const std::string& key, const T& beginKeyValue,
             const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue = true, 
             const bool& isIncludeEndKeyValue = true, const std::size_t& amountOfRecords = -1,
-            const std::function<bool(const VaultRecordRef&)>& requestPredicat = DefaultRequestPredicat) const noexcept;
+            const std::function<bool(const VaultRecordRef&)>& requestPredicat = DefaultRequestPredicat) const;
         
         /**
             \brief A method for complex requests
@@ -259,7 +259,7 @@ namespace mvlt
             \param [in] vaultRecordSet Set, to save the query result
         */
         template <VaultRequestType Type>
-        VaultOperationResult Request(const VaultRequest<Type>&& request, VaultRecordSet& vaultRecordSet) const noexcept;
+        VaultOperationResult Request(const VaultRequest<Type>&& request, VaultRecordSet& vaultRecordSet) const;
 
         /// \brief Resets the object to its initial state
         void Reset() noexcept;
