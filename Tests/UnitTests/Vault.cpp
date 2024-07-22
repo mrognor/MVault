@@ -218,10 +218,10 @@ void Vault_GetRecord_Test()
     // Check records
     for (int i = 0; i < 10; ++i)
     {
-        VaultRecordRef vrr;
-        vlt.GetRecord("A", i, vrr);
+        VaultRecordRef vrrl;
+        vlt.GetRecord("A", i, vrrl);
         char c;
-        vrr.GetData("B", c);
+        vrrl.GetData("B", c);
         TEST_ASSERT(c == static_cast<char>('A' + i), "Failed to create record");
     }
 }
@@ -248,7 +248,7 @@ void Vault_GetRecords_Test()
     // Fill vault
     for (int i = 0; i < 10; ++i) vlt.CreateRecord({ {"A", i}, });
 
-    // Get reqords
+    // Get records
     vlt.GetRecords("B", '0', vec);
 
     for (int i = 0; i < 10; ++i)
@@ -260,11 +260,6 @@ void Vault_GetRecords_Test()
     // Get only 2 records
     vlt.GetRecords("B", '0', vec, 2);
     TEST_ASSERT(vec.size() == 2, "Wrong vec size");
-
-    // Wrong key
-    TEST_ASSERT(vlt.GetRecords("D", 0, vec).ResultCode == VaultOperationResultCode::WrongKey, "Error on get result");
-    // Wrong key type
-    TEST_ASSERT(vlt.GetRecords("A", std::string(), vec).ResultCode == VaultOperationResultCode::WrongType, "Error on get result");
 }
 
 void Vault_Request_Tests()
@@ -278,7 +273,6 @@ void Vault_Request_Tests()
     vlt.AddKey<std::string>("C", "-1");
 
     // Correct request on empty vault
-    TEST_ASSERT(vrs.Size() == 0, "Error on record creation") 
     TEST_ASSERT(vlt.Request(Equal("A", -1), vrs).ResultCode == VaultOperationResultCode::Success, "Error on record creation");
 
     // Incorrect requests

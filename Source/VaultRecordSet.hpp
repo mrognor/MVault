@@ -22,7 +22,7 @@ namespace mvlt
             // Save vaultRecordSet
             ParentVault->RecordSetsSet.emplace(&vaultRecordSet);
 
-            res = Vault::RequestRecords(requestType, key, beginKeyValue, endKeyValue, vaultRecordSet, false, false, amountOfRecords, requestPredicat);
+            res = Vault::RequestRecords(requestType, key, beginKeyValue, endKeyValue, vaultRecordSet, isIncludeBeginKeyValue, isIncludeEndKeyValue, amountOfRecords, requestPredicat);
             vaultRecordSet.ParentVault = ParentVault;
 
             ParentVault->RecursiveReadWriteMtx.ReadUnlock();
@@ -102,7 +102,7 @@ namespace mvlt
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
 
-            res = Vault::GetRecords(key, keyValue, recordsRefs);
+            res = Vault::GetRecords(key, keyValue, recordsRefs, amountOfRecords);
             for (VaultRecordRef& ref: recordsRefs)
                 ref.Vlt = ParentVault;
             
