@@ -527,6 +527,176 @@ void VaultRecordSet_Request_Tests()
     TEST_ASSERT(n == 5, "Failed to make request");
 }
 
+void VaultRecordSet_Reset_Tests()
+{
+    Vault vlt;
+    VaultRecordSet vrs;
+
+    vlt.AddKey("A", -1);
+    vlt.AddKey("B", '0');
+    vlt.AddKey("C", true);
+
+    // Fill vault
+    for (int i = 0; i < 10; ++i) vlt.CreateRecord({ {"A", i} });
+
+    vrs.Request(Equal("B", '0'), vrs);
+    vrs.Reset();
+
+    TEST_ASSERT(vrs.GetIsParentVaultValid() == false, "Failed to drop vault record set");
+    TEST_ASSERT(vrs.GetKeys().size() == 0, "Failed to drop vault record set");
+    TEST_ASSERT(vrs.Size() == 0, "Failed to drop vault record set");
+}
+
+void VaultRecordSet_Clear_Tests()
+{
+    Vault vlt;
+    VaultRecordSet vrs;
+
+    vlt.AddKey("A", -1);
+    vlt.AddKey("B", '0');
+    vlt.AddKey("C", true);
+
+    // Fill vault
+    for (int i = 0; i < 10; ++i) vlt.CreateRecord({ {"A", i} });
+
+    vrs.Request(Equal("B", '0'), vrs);
+    vrs.Clear();
+
+    TEST_ASSERT(vrs.GetIsParentVaultValid() == true, "Failed to drop vault record set");
+    TEST_ASSERT(vrs.GetKeys().size() == 3, "Failed to drop vault record set");
+    TEST_ASSERT(vrs.Size() == 0, "Failed to drop vault record set");
+}
+
+void VaultRecordSet_RemoveRecord_Test()
+{
+    // VaultRecordRef overload
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultRecordRef vrr;
+
+    // Check no parent set
+    TEST_ASSERT(vrs.RemoveRecord("A", -1).ResultCode == VaultOperationResultCode::ParentVaultNotValid, "Failed to erase record");
+
+    // Erase empty record
+    TEST_ASSERT(vrs.RemoveRecord(vrr) == false, "Failed to erase record");
+
+    vlt.AddKey("A", -1);
+    vlt.AddKey("T", 0);
+
+    // Fill vault
+    for (int i = 0; i < 10; ++i) vlt.CreateRecord({ {"A", i} });
+
+    vlt.Request(Equal("T", 0), vrs);
+    vlt.GetRecord("A", 0, vrr);
+
+    TEST_ASSERT(vrs.RemoveRecord(vrr), "Failed to erase record");
+    TEST_ASSERT(vrs.Size() == 9, "Failed to erase record");
+    
+    TEST_ASSERT(vrs.RemoveRecord(vrr) == false, "Failed to erase record");
+
+    vrs.GetRecord("A", 1, vrr);
+    vrr.Reset();
+    TEST_ASSERT(vrs.RemoveRecord(vrr) == false, "Failed to delete record");
+    TEST_ASSERT(vrs.Size() == 9, "Failed to erase record");
+
+    // Key and value overload
+
+    // Incorrect erasing
+    // Wrong key
+    TEST_ASSERT(vrs.RemoveRecord("B", 1).ResultCode == VaultOperationResultCode::WrongKey, "Error on erase");
+    // Wrong key type
+    TEST_ASSERT(vrs.RemoveRecord("A", 2.9).ResultCode == VaultOperationResultCode::WrongType, "Error on erase");
+
+    // No value erasing
+    TEST_ASSERT(vrs.RemoveRecord("A", 0).ResultCode == VaultOperationResultCode::WrongValue, "Error on erase");
+
+    // Correct erasing
+    for (int i = 1; i < 10; ++i)
+        TEST_ASSERT(vrs.RemoveRecord("A", i).ResultCode == VaultOperationResultCode::Success, "Error on erase");
+
+    vlt.DropData();
+
+    vrs.AddRecord(vlt.CreateRecord());
+    vrs.AddRecord(vlt.CreateRecord());
+
+    vlt.EraseRecord("A", -1);
+    TEST_ASSERT(vrs.Size() == 1, "Failed to erase record");
+    vrs.RemoveRecord("A", -1);
+    TEST_ASSERT(vrs.Size() == 0, "Failed to erase record");
+}
+
+void VaultRecordSet_RemoveRecords_Test()
+{
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultRecordRef vrr;
+
+    // Check no parent set
+    TEST_ASSERT(vrs.RemoveRecords("A", -1).ResultCode == VaultOperationResultCode::ParentVaultNotValid, "Failed to erase record");
+
+    vlt.AddKey("A", -1);
+    vlt.Request(Equal("A", -1), vrs);
+
+    // Wrong key
+    TEST_ASSERT(vrs.RemoveRecords("B", 1).ResultCode == VaultOperationResultCode::WrongKey, "Error on erase");
+    // Wrong key type
+    TEST_ASSERT(vrs.RemoveRecords("A", 2.9).ResultCode == VaultOperationResultCode::WrongType, "Error on erase");
+    // No value erasing
+    TEST_ASSERT(vrs.RemoveRecords("A", 0).ResultCode == VaultOperationResultCode::WrongValue, "Error on erase");
+
+    // Fill vault
+    for (int i = 0; i < 10; ++i) vlt.CreateRecord();
+    vlt.CreateRecord({ {"A", 1} });
+
+    vlt.Request(Equal("A", -1) || Equal("A", 1), vrs);
+
+    // Erase 2 records
+    TEST_ASSERT(vrs.RemoveRecords("A", -1, 2).ResultCode == VaultOperationResultCode::Success, "Failed to erase records");
+    TEST_ASSERT(vrs.Size() == 9, "Failed to erase records");
+
+    // Erase all records
+    TEST_ASSERT(vrs.RemoveRecords("A", -1).ResultCode == VaultOperationResultCode::Success, "Failed to erase records");
+    TEST_ASSERT(vrs.Size() == 1, "Failed to erase records");
+}
+
+void VaultRecordSet_Size_Test()
+{
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultRecordRef vrr;
+
+    vlt.AddKey<std::size_t>("A", -1);
+
+    for (std::size_t i = 1; i < 11; ++i)
+    {
+        vlt.CreateRecord();
+        vlt.Request(Equal("A", -1), vrs);
+        TEST_ASSERT(vrs.Size() == i, "Failed to create record");
+    }
+
+    for (std::size_t i = 10; i > 0; --i)
+    {
+        vrs.RemoveRecord("A", i);
+        TEST_ASSERT(vrs.Size() == i - 1, "Failed to create record");
+    }
+}
+
+void VaultRecordSet_Destructor_Test()
+{
+    Vault vlt;
+
+    vlt.AddKey("A", -1);
+    vlt.CreateRecord();
+
+    VaultRecordSet* vrs = new VaultRecordSet;
+
+    vlt.Request(Equal("A", -1), *vrs);
+
+    delete vrs;
+    vrs = new VaultRecordSet;
+    delete vrs;
+}
+
 int main()
 {
     VaultRecordSet_CopyConstructor_Test();
@@ -541,4 +711,8 @@ int main()
     VaultRecordSet_GetRecord_Test();
     VaultRecordSet_GetRecords_Test();
     VaultRecordSet_Request_Tests();
+    VaultRecordSet_Reset_Tests();
+    VaultRecordSet_RemoveRecord_Test();
+    VaultRecordSet_RemoveRecords_Test();
+    VaultRecordSet_Destructor_Test();
 }

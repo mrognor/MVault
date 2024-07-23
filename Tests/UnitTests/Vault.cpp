@@ -562,11 +562,11 @@ void Vault_EraseRecords_Test()
     vlt.AddKey("A", -1);
 
     // Wrong key
-    TEST_ASSERT(vlt.EraseRecord("B", 1).ResultCode == VaultOperationResultCode::WrongKey, "Error on erase");
+    TEST_ASSERT(vlt.EraseRecords("B", 1).ResultCode == VaultOperationResultCode::WrongKey, "Error on erase");
     // Wrong key type
-    TEST_ASSERT(vlt.EraseRecord("A", 2.9).ResultCode == VaultOperationResultCode::WrongType, "Error on erase");
+    TEST_ASSERT(vlt.EraseRecords("A", 2.9).ResultCode == VaultOperationResultCode::WrongType, "Error on erase");
     // No value erasing
-    TEST_ASSERT(vlt.EraseRecord("A", 0).ResultCode == VaultOperationResultCode::WrongValue, "Error on erase");
+    TEST_ASSERT(vlt.EraseRecords("A", 0).ResultCode == VaultOperationResultCode::WrongValue, "Error on erase");
 
     // Fill vault
     for (int i = 0; i < 10; ++i) vlt.CreateRecord();
@@ -576,7 +576,7 @@ void Vault_EraseRecords_Test()
     TEST_ASSERT(vlt.EraseRecords("A", -1, 2).ResultCode == VaultOperationResultCode::Success, "Failed to erase records");
     TEST_ASSERT(vlt.Size() == 9, "Failed to erase records");
 
-    // Erase all zero records
+    // Erase all records
     TEST_ASSERT(vlt.EraseRecords("A", -1).ResultCode == VaultOperationResultCode::Success, "Failed to erase records");
     TEST_ASSERT(vlt.Size() == 1, "Failed to erase records");
 }
