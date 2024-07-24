@@ -1,6 +1,6 @@
-#include "../../Source/MVault.h"
+#include "../Source/MVault.h"
 
-#include "../TestAssert.h"
+#include "MTests/TestAssert.h"
 
 using namespace mvlt;
 using namespace std;
