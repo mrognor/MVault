@@ -76,7 +76,7 @@ namespace mvlt
         bool operator==(const VaultRecordRef& other) const noexcept;
 
         /// \brief A method for obtaining a unique record identifier
-        ///  Important. Two VaultRecordRef objects pointing to the same record will return the same value. Invalid record will return null
+        /// Important. Two VaultRecordRef objects pointing to the same record will return the same value. Invalid record will return null
         /// \return the unique identifier of the record
         std::string GetRecordUniqueId() const noexcept;
 

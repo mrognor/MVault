@@ -361,6 +361,10 @@ namespace mvlt
     template <class T>
     bool Vault::AddKey(const std::string& key, const T& defaultKeyValue) noexcept
     {
+        static_assert(!std::is_array<T>::value, "It is not possible to use a c array as a key. \n\
+            If you want to use a string as a key, you must specialize the function with a string. Like this: \n\
+            AddKey<std::string>(\"Key\", \"Value\") or AddKey(\"Key\", std::string(\"Value\"))");
+
         RecursiveReadWriteMtx.WriteLock();
 
         // If the key was added earlier, then it must be deleted

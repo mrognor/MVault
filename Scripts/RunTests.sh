@@ -18,3 +18,6 @@ echo "Start Vault unit tests"
 
 echo "Start VaultRecordSet unit tests"
 ./VaultRecordSetUnitTest
+
+echo "Start VaultRecordRef unit tests"
+./VaultRecordRefUnitTest
