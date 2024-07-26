@@ -151,7 +151,7 @@ namespace mvlt
             {
                 res.IsOperationSuccess = false;
                 if (!recordRef.IsValid())
-                    res.ResultCode = VaultOperationResultCode::VaultRecordRefNotValid;
+                    res.ResultCode = VaultOperationResultCode::DataRecordNotValid;
                 else
                     res.ResultCode = VaultOperationResultCode::ParentVaultNotMatch;
             }

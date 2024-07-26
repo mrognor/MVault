@@ -16,8 +16,7 @@ namespace mvlt
     /// \brief Enum with all error handling codes
     enum class VaultOperationResultCode
     {
-        RecordAlredyInSet = -7,      ///< This code is returned when trying to add an record to the set when it is already in it
-        VaultRecordRefNotValid = -6, ///< This code is returned when trying to perform an operation with an invalid record
+        RecordAlredyInSet = -6,      ///< This code is returned when trying to add an record to the set when it is already in it
         ParentVaultNotMatch = -5,    ///< This code is returned during operations on VaultRecordSet when objects depend on different Vaults
         ParentVaultNotValid = -4,    ///< This code is returned when calling VaultRecordSet operations when the parent Vault is not valid
         DataRecordNotValid = -3,     ///< This code is returned when data is requested from the VaultRecordRef and the record it refers to is not valid

@@ -131,30 +131,59 @@ namespace mvlt
         return res;
     }
                 
-    bool VaultRecordRef::GetDataAsString(const std::string& key, std::string& str) const noexcept
+    VaultOperationResult VaultRecordRef::GetDataAsString(const std::string& key, std::string& str) const noexcept
     {
-        bool res = false;
+        // Fill res info known at start
+        VaultOperationResult res;
+        res.Key = key;
+        res.RequestedType = typeid(std::string);
 
         Mtx.lock();
         
-        if (DataRecord != nullptr)
+        if (DataRecord == nullptr)
         {
-            // DataRecord lock Mtx to lock VaultRecord::Invalidate in Vault destructor.
-            // It is necessary to prevent Vault::RecursiveReadWriteMtx from deletion 
-            DataRecord->Mtx.lock();
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::DataRecordNotValid;
 
-            // Check if Vault still accessable
-            if (DataRecord->GetIsValid())
-            {
-                Vlt->RecursiveReadWriteMtx.ReadLock();
+            Mtx.unlock();
+            return res;
+        }
 
-                res = DataRecord->GetDataAsString(key, str);
+        // DataRecord lock Mtx to lock VaultRecord::Invalidate in Vault destructor.
+        // It is necessary to prevent Vault::RecursiveReadWriteMtx from deletion 
+        DataRecord->Mtx.lock();
 
-                Vlt->RecursiveReadWriteMtx.ReadUnlock();
-            }
+        // Check if Vault still accessable
+        if (!DataRecord->GetIsValid())
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::DataRecordNotValid;
 
             DataRecord->Mtx.unlock();
+            Mtx.unlock();
+            return res;
         }
+
+        Vlt->RecursiveReadWriteMtx.ReadLock();
+
+        // If key not exist
+        if(!Vlt->GetKeyType(key, res.SavedType))
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::WrongKey;
+
+            Vlt->RecursiveReadWriteMtx.ReadUnlock();
+            DataRecord->Mtx.unlock();
+            Mtx.unlock();
+            return res;
+        }
+
+        DataRecord->GetDataAsString(key, str);
+        res.IsOperationSuccess = true;
+        res.ResultCode = VaultOperationResultCode::Success;
+
+        Vlt->RecursiveReadWriteMtx.ReadUnlock();
+        DataRecord->Mtx.unlock();
 
         Mtx.unlock();
 

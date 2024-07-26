@@ -130,9 +130,9 @@ namespace mvlt
             It uses the ToString function inside. If it is not defined for the type, 
             then the str will be an empty string.
 
-            \return Returns false if the key was not found, and otherwise returns true.
+            \return VaultOperationResult object with GetDataAsString result.
         */ 
-        bool GetDataAsString(const std::string& key, std::string& str) const noexcept;
+        VaultOperationResult GetDataAsString(const std::string& key, std::string& str) const noexcept;
 
         /// \brief A function to check the validity of a class object
         /// An object may no longer be valid if the record it refers to has been deleted

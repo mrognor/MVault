@@ -141,15 +141,124 @@ void VaultRecordRef_SetData_Test()
 
     TEST_ASSERT(a == 0, "Failed to set data in vault record ref");
     TEST_ASSERT(b == "B", "Failed to set data in vault record ref");
+}
 
-    vlt.AddKey("A", "A");
+void VaultRecordRef_GetData_Test()
+{
+    Vault vlt;
+    VaultRecordRef vrr;
+    VaultOperationResult res;
+
+    // Invalid ref
+    TEST_ASSERT(vrr.GetData("A", res).ResultCode == VaultOperationResultCode::DataRecordNotValid, "Failed to get data from vault record ref");
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey<std::string>("B","null");
+
+    vrr = vlt.CreateRecord();
+
+    // Valid get
+    int i; std::string s;
+    vrr.GetData("A", i);
+    TEST_ASSERT(i == 0, "Failed to get data from vault record ref");
+    vrr.GetData("B", s);
+    TEST_ASSERT(s == "null", "Failed to get data from vault record ref");
+
+    // Invalid get
+    TEST_ASSERT(vrr.GetData("C", i).ResultCode == VaultOperationResultCode::WrongKey, "Failed to get data from vault record ref");
+    TEST_ASSERT(vrr.GetData("B", i).ResultCode == VaultOperationResultCode::WrongType, "Failed to get data from vault record ref");
+}
+
+void VaultRecordRef_GetDataAsString_Test()
+{
+    Vault vlt;
+    VaultRecordRef vrr;
+
+    std::string s;
+
+    // Invalid ref
+    TEST_ASSERT(vrr.GetDataAsString("A", s).ResultCode == VaultOperationResultCode::DataRecordNotValid, "Failed to get data as string from vault record ref");
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey<std::string>("B","null");
+
+    vrr = vlt.CreateRecord();
+
+    // Valid get
+    vrr.GetDataAsString("A", s);
+    TEST_ASSERT(s == "0", "Failed to get data as string from vault record ref");
+    vrr.GetDataAsString("B", s);
+    TEST_ASSERT(s == "null", "Failed to get data as string from vault record ref");
+
+    // Invalid get
+    TEST_ASSERT(vrr.GetDataAsString("C", s).ResultCode == VaultOperationResultCode::WrongKey, "Failed to get data as string from vault record ref");
+}
+
+void VaultRecordRef_IsValid_Test()
+{
+    Vault vlt;
+    VaultRecordRef vrr;
+
+    // Invalid ref
+    TEST_ASSERT(vrr.IsValid() == false, "Failed to get is valid from vault record ref");
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey<std::string>("B","null");
+
+    vrr = vlt.CreateRecord();
+
+    // Valid ref
+    TEST_ASSERT(vrr.IsValid() == true, "Failed to get is valid from vault record ref");
+}
+
+void VaultRecordRef_GetKeys_Test()
+{
+    Vault vlt;
+    VaultRecordRef vrr;
+
+    // Invalid ref
+    TEST_ASSERT(vrr.GetKeys().size() == 0, "Failed to get keys from vault record ref");
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey<std::string>("B","null");
+
+    vrr = vlt.CreateRecord();
+
+    // Valid ref
+    std::vector<std::string> v = {"A", "B"};
+    TEST_ASSERT(vrr.GetKeys() == v, "Failed to get is valid from vault record ref");
+}
+
+void VaultRecordRef_Reset_Test()
+{
+    Vault vlt;
+    VaultRecordRef vrr;
+
+    // Invalid ref
+    vrr.Reset();
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey<std::string>("B","null");
+
+    vrr = vlt.CreateRecord();
+
+    // Valid ref
+    TEST_ASSERT(vrr.IsValid() == true, "Failed to reset vault record ref");
+    vrr.Reset();
+    TEST_ASSERT(vrr.IsValid() == false, "Failed to reset vault record ref");
+    vrr.Reset();
 }
 
 int main()
 {
     VaultRecordRef_CopyConstructor_Test();
     VaultRecordRef_OperatorAssignment_Test();
-    VaultRecordRef_OperatorComparison_Test();
+    VaultRecordRef_OperatorComparison_Test();   
     VaultRecordRef_GetRecordUniqueId_Test();
     VaultRecordRef_SetData_Test();
+    VaultRecordRef_GetData_Test();
+    VaultRecordRef_GetDataAsString_Test();
+    VaultRecordRef_IsValid_Test();
+    VaultRecordRef_GetKeys_Test();
+    VaultRecordRef_Reset_Test();
 }

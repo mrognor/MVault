@@ -10,13 +10,13 @@ namespace mvlt
     VaultOperationResult VaultRecordRef::SetData(const std::string& key, const T& data) noexcept
     {
         VaultOperationResult res;
+        res.Key = key;
+        res.RequestedType = typeid(T);
 
         Mtx.lock();
 
         if (DataRecord == nullptr)
         {
-            res.Key = key;
-            res.RequestedType = typeid(T);
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::DataRecordNotValid;
 
@@ -31,8 +31,6 @@ namespace mvlt
         // Check if Vault still accessable
         if (!DataRecord->GetIsValid())
         {
-            res.Key = key;
-            res.RequestedType = typeid(T);
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::DataRecordNotValid;
 
@@ -64,8 +62,6 @@ namespace mvlt
 
         if (DataRecord == nullptr)
         {
-            res.Key = key;
-            res.RequestedType = typeid(T);
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::DataRecordNotValid;
 
@@ -80,8 +76,6 @@ namespace mvlt
         // Check if Vault still accessable
         if (!DataRecord->GetIsValid())
         {
-            res.Key = key;
-            res.RequestedType = typeid(T);
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::DataRecordNotValid;
 
