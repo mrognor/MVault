@@ -38,9 +38,9 @@ namespace mvlt
                     adder.second(record);
 
                 // Lock VaultRecord to thread safety add new dependent VaultRecordSet
-                record->Mtx.lock();
+                record->VaultRecordMutex.lock();
                 record->dependentVaultRecordSets.emplace(this);
-                record->Mtx.unlock();
+                record->VaultRecordMutex.unlock();
             }
 
             RecursiveReadWriteMtx.WriteUnlock();
@@ -125,18 +125,18 @@ namespace mvlt
             if (recordRef.Vlt == ParentVault && recordRef.IsValid())
             {
                 // Add pointer to record from recordRef to this
-                std::pair<decltype(RecordsSet.begin()), bool> emplaceRes = RecordsSet.emplace(recordRef.DataRecord);
+                std::pair<decltype(RecordsSet.begin()), bool> emplaceRes = RecordsSet.emplace(recordRef.VaultRecordPtr);
                 
                 if (emplaceRes.second)
                 {
                     // Add pointer to record from recordRef to this::vaultRecordRef structure
                     for (auto& adder : VaultRecordAdders)
-                        adder.second(recordRef.DataRecord);
+                        adder.second(recordRef.VaultRecordPtr);
 
                     // Lock VaultRecord to thread safety add new dependent VaultRecordSet
-                    recordRef.DataRecord->Mtx.lock();
-                    recordRef.DataRecord->dependentVaultRecordSets.emplace(this);
-                    recordRef.DataRecord->Mtx.unlock();
+                    recordRef.VaultRecordPtr->VaultRecordMutex.lock();
+                    recordRef.VaultRecordPtr->dependentVaultRecordSets.emplace(this);
+                    recordRef.VaultRecordPtr->VaultRecordMutex.unlock();
 
                     res.IsOperationSuccess = true;
                     res.ResultCode = VaultOperationResultCode::Success;
@@ -196,9 +196,9 @@ namespace mvlt
         // Remove this from records
         for (VaultRecord* record : RecordsSet)
         {
-            record->Mtx.lock();
+            record->VaultRecordMutex.lock();
             record->dependentVaultRecordSets.erase(this);
-            record->Mtx.unlock();
+            record->VaultRecordMutex.unlock();
         }
 
         // Clear structure

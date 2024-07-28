@@ -348,9 +348,9 @@ namespace mvlt
                 adder.second(record);
 
             // Lock VaultRecord to thread safety add new dependent VaultRecordSet
-            record->Mtx.lock();
+            record->VaultRecordMutex.lock();
             record->dependentVaultRecordSets.emplace(&vaultRecordSet);
-            record->Mtx.unlock();
+            record->VaultRecordMutex.unlock();
         }
 
         vaultRecordSet.RecursiveReadWriteMtx.WriteUnlock();
@@ -587,7 +587,7 @@ namespace mvlt
         res.Key = key;
         res.RequestedType = typeid(T);
 
-        vaultRecordRef.Mtx.lock();
+        vaultRecordRef.VaultRecordRefMutex.lock();
         RecursiveReadWriteMtx.ReadLock();
 
         // If key not exist
@@ -596,7 +596,7 @@ namespace mvlt
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongKey;
             RecursiveReadWriteMtx.ReadUnlock();
-            vaultRecordRef.Mtx.unlock();
+            vaultRecordRef.VaultRecordRefMutex.unlock();
             return res;
         }
 
@@ -606,7 +606,7 @@ namespace mvlt
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongType;
             RecursiveReadWriteMtx.ReadUnlock();
-            vaultRecordRef.Mtx.unlock();
+            vaultRecordRef.VaultRecordRefMutex.unlock();
             return res;
         }
 
@@ -632,7 +632,7 @@ namespace mvlt
         }
 
         RecursiveReadWriteMtx.ReadUnlock();
-        vaultRecordRef.Mtx.unlock();
+        vaultRecordRef.VaultRecordRefMutex.unlock();
         return res;
     }
 
@@ -779,9 +779,9 @@ namespace mvlt
                     adder.second(record);
 
                 // Lock VaultRecord to thread safety add new dependent VaultRecordSet
-                record->Mtx.lock();
+                record->VaultRecordMutex.lock();
                 record->dependentVaultRecordSets.emplace(&vaultRecordSet);
-                record->Mtx.unlock();
+                record->VaultRecordMutex.unlock();
             }
         }
         catch(VaultOperationResult result) // Catch complex request errors
@@ -844,14 +844,14 @@ namespace mvlt
             // It is not deleting when RemoveRecord called from VaultRecordSet
             if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
             {
-                tmpRec->Mtx.lock();
+                tmpRec->VaultRecordMutex.lock();
                 for (VaultRecordSet* set : tmpRec->dependentVaultRecordSets)
                 {
                     set->RecursiveReadWriteMtx.WriteLock();
                     static_cast<Vault*>(set)->RemoveRecord(tmpRec, nullptr);
                     set->RecursiveReadWriteMtx.WriteUnlock();
                 }
-                tmpRec->Mtx.unlock();
+                tmpRec->VaultRecordMutex.unlock();
 
                 tmpRec->Invalidate();
             }
@@ -929,14 +929,14 @@ namespace mvlt
                 // It is not deleting when RemoveRecord called from VaultRecordSet
                 if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
                 {
-                    tmpRec->Mtx.lock();
+                    tmpRec->VaultRecordMutex.lock();
                     for (VaultRecordSet* set : tmpRec->dependentVaultRecordSets)
                     {
                         set->RecursiveReadWriteMtx.WriteLock();
                         static_cast<Vault*>(set)->RemoveRecord(tmpRec, nullptr);
                         set->RecursiveReadWriteMtx.WriteUnlock();
                     }
-                    tmpRec->Mtx.unlock();
+                    tmpRec->VaultRecordMutex.unlock();
                     tmpRec->Invalidate();
                 }
                 

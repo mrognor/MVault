@@ -20,41 +20,41 @@ namespace mvlt
     {
         if (&other != this)
         {
-            Mtx.lock();
-            other.Mtx.lock();
+            VaultRecordRefMutex.lock();
+            other.VaultRecordRefMutex.lock();
 
-            if (other.DataRecord != nullptr)
+            if (other.VaultRecordPtr != nullptr)
             {
-                other.DataRecord->Mtx.lock();
+                other.VaultRecordPtr->VaultRecordMutex.lock();
                 
-                VaultRecord* oldVaultRecord = DataRecord;
+                VaultRecord* oldVaultRecord = VaultRecordPtr;
 
-                if (other.DataRecord->GetIsValid())
+                if (other.VaultRecordPtr->GetIsValid())
                 {
-                    if (other.DataRecord != nullptr) other.DataRecord->AddRef();
+                    if (other.VaultRecordPtr != nullptr) other.VaultRecordPtr->AddRef();
 
-                    DataRecord = other.DataRecord;
+                    VaultRecordPtr = other.VaultRecordPtr;
                     Vlt = other.Vlt;
                 }
                 else 
                 {
                     Vlt = nullptr;
-                    DataRecord = nullptr;
+                    VaultRecordPtr = nullptr;
                 }
                 
-                other.DataRecord->Mtx.unlock();
+                other.VaultRecordPtr->VaultRecordMutex.unlock();
 
                 if (oldVaultRecord != nullptr) oldVaultRecord->RemoveRef();
             }
             else 
             {
-                if (DataRecord != nullptr) DataRecord->RemoveRef();
+                if (VaultRecordPtr != nullptr) VaultRecordPtr->RemoveRef();
                 Vlt = nullptr;
-                DataRecord = nullptr;
+                VaultRecordPtr = nullptr;
             }
 
-            other.Mtx.unlock();
-            Mtx.unlock();
+            other.VaultRecordRefMutex.unlock();
+            VaultRecordRefMutex.unlock();
         }
         
         return *this;
@@ -64,12 +64,12 @@ namespace mvlt
     {
         bool res;
 
-        Mtx.lock();
-        other.Mtx.lock();
+        VaultRecordRefMutex.lock();
+        other.VaultRecordRefMutex.lock();
 
         if (IsValid())
         {
-            res = (DataRecord == other.DataRecord);
+            res = (VaultRecordPtr == other.VaultRecordPtr);
         }
         else
         {
@@ -77,39 +77,39 @@ namespace mvlt
             else res = true;
         }
 
-        other.Mtx.unlock();
-        Mtx.unlock();
+        other.VaultRecordRefMutex.unlock();
+        VaultRecordRefMutex.unlock();
 
         return res;
     }
 
     void VaultRecordRef::SetRecord(VaultRecord* vaultRecord, Vault* vlt) noexcept
     {
-        Mtx.lock();
+        VaultRecordRefMutex.lock();
         vlt->RecursiveReadWriteMtx.ReadLock();
 
         if (vaultRecord != nullptr) vaultRecord->AddRef();
-        if (DataRecord != nullptr) DataRecord->RemoveRef();
+        if (VaultRecordPtr != nullptr) VaultRecordPtr->RemoveRef();
 
-        DataRecord = vaultRecord;
+        VaultRecordPtr = vaultRecord;
         Vlt = vlt;
 
         vlt->RecursiveReadWriteMtx.ReadUnlock();
-        Mtx.unlock();
+        VaultRecordRefMutex.unlock();
     }
 
     std::string VaultRecordRef::GetRecordUniqueId() const noexcept
     {
         std::stringstream ss;
 
-        Mtx.lock();
+        VaultRecordRefMutex.lock();
 
         if (IsValid())
-            ss << DataRecord;
+            ss << VaultRecordPtr;
         else
             ss << "null";
 
-        Mtx.unlock();
+        VaultRecordRefMutex.unlock();
         
         return ss.str();
     }
@@ -117,7 +117,7 @@ namespace mvlt
     VaultOperationResult VaultRecordRef::SetData(const std::vector<std::pair<std::string, VaultParamInput>>& params) noexcept
     {
         VaultOperationResult res;
-        Mtx.lock();
+        VaultRecordRefMutex.lock();
 
         // Copy data from function parametrs
         for (const auto& paramsIt : params)
@@ -126,7 +126,7 @@ namespace mvlt
             if (!res.IsOperationSuccess) break;
         }
 
-        Mtx.unlock();
+        VaultRecordRefMutex.unlock();
 
         return res;
     }
@@ -138,29 +138,29 @@ namespace mvlt
         res.Key = key;
         res.RequestedType = typeid(std::string);
 
-        Mtx.lock();
+        VaultRecordRefMutex.lock();
         
-        if (DataRecord == nullptr)
+        if (VaultRecordPtr == nullptr)
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::DataRecordNotValid;
 
-            Mtx.unlock();
+            VaultRecordRefMutex.unlock();
             return res;
         }
 
-        // DataRecord lock Mtx to lock VaultRecord::Invalidate in Vault destructor.
+        // VaultRecordPtr lock VaultRecordRefMutex to lock VaultRecord::Invalidate in Vault destructor.
         // It is necessary to prevent Vault::RecursiveReadWriteMtx from deletion 
-        DataRecord->Mtx.lock();
+        VaultRecordPtr->VaultRecordMutex.lock();
 
         // Check if Vault still accessable
-        if (!DataRecord->GetIsValid())
+        if (!VaultRecordPtr->GetIsValid())
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::DataRecordNotValid;
 
-            DataRecord->Mtx.unlock();
-            Mtx.unlock();
+            VaultRecordPtr->VaultRecordMutex.unlock();
+            VaultRecordRefMutex.unlock();
             return res;
         }
 
@@ -173,19 +173,19 @@ namespace mvlt
             res.ResultCode = VaultOperationResultCode::WrongKey;
 
             Vlt->RecursiveReadWriteMtx.ReadUnlock();
-            DataRecord->Mtx.unlock();
-            Mtx.unlock();
+            VaultRecordPtr->VaultRecordMutex.unlock();
+            VaultRecordRefMutex.unlock();
             return res;
         }
 
-        DataRecord->GetDataAsString(key, str);
+        VaultRecordPtr->GetDataAsString(key, str);
         res.IsOperationSuccess = true;
         res.ResultCode = VaultOperationResultCode::Success;
 
         Vlt->RecursiveReadWriteMtx.ReadUnlock();
-        DataRecord->Mtx.unlock();
+        VaultRecordPtr->VaultRecordMutex.unlock();
 
-        Mtx.unlock();
+        VaultRecordRefMutex.unlock();
 
         return res;
     }
@@ -193,18 +193,18 @@ namespace mvlt
     bool VaultRecordRef::IsValid() const noexcept
     {
         bool res = false;
-        Mtx.lock();
-        if (DataRecord != nullptr) res = DataRecord->GetIsValid();
-        Mtx.unlock();
+        VaultRecordRefMutex.lock();
+        if (VaultRecordPtr != nullptr) res = VaultRecordPtr->GetIsValid();
+        VaultRecordRefMutex.unlock();
         return res;
     }
 
     bool VaultRecordRef::IsKeyExist(const std::string& key) const noexcept
     {
         bool res = false;
-        Mtx.lock();
+        VaultRecordRefMutex.lock();
         if (Vlt != nullptr) res = Vlt->IsKeyExist(key);
-        Mtx.unlock();
+        VaultRecordRefMutex.unlock();
         return res;
     }
 
@@ -212,16 +212,16 @@ namespace mvlt
     {
         std::vector<std::string> res;
 
-        Mtx.lock();
+        VaultRecordRefMutex.lock();
 
-        if (DataRecord != nullptr)
+        if (VaultRecordPtr != nullptr)
         {
-            // DataRecord lock Mtx to lock VaultRecord::Invalidate in Vault destructor.
+            // VaultRecordPtr lock VaultRecordRefMutex to lock VaultRecord::Invalidate in Vault destructor.
             // It is necessary to prevent Vault::RecursiveReadWriteMtx from deletion 
-            DataRecord->Mtx.lock();
+            VaultRecordPtr->VaultRecordMutex.lock();
 
             // Check if Vault still accessable
-            if (DataRecord->GetIsValid())
+            if (VaultRecordPtr->GetIsValid())
             {
                 Vlt->RecursiveReadWriteMtx.ReadLock();
 
@@ -230,35 +230,35 @@ namespace mvlt
                 Vlt->RecursiveReadWriteMtx.ReadUnlock();
             }
 
-            DataRecord->Mtx.unlock();
+            VaultRecordPtr->VaultRecordMutex.unlock();
         }
 
-        Mtx.unlock();
+        VaultRecordRefMutex.unlock();
 
         return res;
     }
 
     void VaultRecordRef::PrintRecord() const noexcept
     {
-        Mtx.lock();
+        VaultRecordRefMutex.lock();
 
-        if (DataRecord != nullptr)
+        if (VaultRecordPtr != nullptr)
         {
-            // DataRecord lock Mtx to lock VaultRecord::Invalidate in Vault destructor.
+            // VaultRecordPtr lock VaultRecordRefMutex to lock VaultRecord::Invalidate in Vault destructor.
             // It is necessary to prevent Vault::RecursiveReadWriteMtx from deletion 
-            DataRecord->Mtx.lock();
+            VaultRecordPtr->VaultRecordMutex.lock();
 
             // Check if Vault still accessable
-            if (DataRecord->GetIsValid())
+            if (VaultRecordPtr->GetIsValid())
             {
                 Vlt->RecursiveReadWriteMtx.ReadLock();
 
-                std::cout << "Vault record " << DataRecord << ":" << std::endl;
+                std::cout << "Vault record " << VaultRecordPtr << ":" << std::endl;
 
                 for (const auto& keyPair : Vlt->VaultHashMapStructure)
                 {
                     DataSaver dataSaver;
-                    DataRecord->GetDataSaver(keyPair.first, dataSaver);
+                    VaultRecordPtr->GetDataSaver(keyPair.first, dataSaver);
                 
                     std::cout << "\t" << keyPair.first << " = " << dataSaver.Str() << std::endl;
                 }
@@ -267,60 +267,60 @@ namespace mvlt
             }
             else std::cout << "VaultRecordRef not valid!" << std::endl;
 
-            DataRecord->Mtx.unlock();
+            VaultRecordPtr->VaultRecordMutex.unlock();
         }
         else std::cout << "VaultRecordRef not valid!" << std::endl;
         
-        Mtx.unlock();
+        VaultRecordRefMutex.unlock();
     }
 
     void VaultRecordRef::Reset() noexcept
     {
-        Mtx.lock();
+        VaultRecordRefMutex.lock();
 
-        if (DataRecord != nullptr)
-            DataRecord->RemoveRef();
+        if (VaultRecordPtr != nullptr)
+            VaultRecordPtr->RemoveRef();
         
-        DataRecord = nullptr;
+        VaultRecordPtr = nullptr;
         Vlt = nullptr;
 
-        Mtx.unlock();
+        VaultRecordRefMutex.unlock();
     }
 
     void VaultRecordRef::ReadLock() const noexcept
     {
-        Mtx.lock();
+        VaultRecordRefMutex.lock();
 
-        if (DataRecord != nullptr)
+        if (VaultRecordPtr != nullptr)
         {
-            // DataRecord lock Mtx to lock VaultRecord::Invalidate in Vault destructor.
+            // VaultRecordPtr lock VaultRecordRefMutex to lock VaultRecord::Invalidate in Vault destructor.
             // It is necessary to prevent Vault::RecursiveReadWriteMtx from deletion 
-            DataRecord->Mtx.lock();
+            VaultRecordPtr->VaultRecordMutex.lock();
 
             Vlt->RecursiveReadWriteMtx.ReadLock();
         }
 
-        Mtx.unlock();
+        VaultRecordRefMutex.unlock();
     }
 
     void VaultRecordRef::ReadUnlock() const noexcept
     {
-        Mtx.lock();
+        VaultRecordRefMutex.lock();
 
-        if (DataRecord != nullptr)
+        if (VaultRecordPtr != nullptr)
         {
-            // DataRecord lock Mtx to lock VaultRecord::Invalidate in Vault destructor.
+            // VaultRecordPtr lock VaultRecordRefMutex to lock VaultRecord::Invalidate in Vault destructor.
             // It is necessary to prevent Vault::RecursiveReadWriteMtx from deletion 
-            DataRecord->Mtx.lock();
+            VaultRecordPtr->VaultRecordMutex.lock();
 
             Vlt->RecursiveReadWriteMtx.ReadUnlock();
         }
 
-        Mtx.unlock();
+        VaultRecordRefMutex.unlock();
     }
         
     VaultRecordRef::~VaultRecordRef() noexcept
     {
-        if (DataRecord != nullptr) DataRecord->RemoveRef();
+        if (VaultRecordPtr != nullptr) VaultRecordPtr->RemoveRef();
     }
 }

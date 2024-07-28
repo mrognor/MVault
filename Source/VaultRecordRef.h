@@ -24,12 +24,12 @@ namespace mvlt
         Vault* Vlt = nullptr;
 
         // Pointer to VaultRecord inside Vault
-        VaultRecord* DataRecord = nullptr;
+        VaultRecord* VaultRecordPtr = nullptr;
 
         // This mutex is necessary because VaultRecucrsiveReadWriteMtx provides thread safety for Vault, but not for a specific VaultRecordRef object. 
         // For example, the GetRecord method or the comparison operator change the contents of VaultRecordRef, 
         // but there is no point in calling them to block Vault for writing
-        mutable std::recursive_mutex Mtx;
+        mutable std::recursive_mutex VaultRecordRefMutex;
 
         /**
             \brief The method for binding RecordRef to Record 

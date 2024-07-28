@@ -9,26 +9,26 @@ namespace mvlt
         IsValid = true;
         RefCounter = 0;
 
-        other.Mtx.lock();
+        other.VaultRecordMutex.lock();
         for (const auto& containerIt : other.Container)
             Container.emplace(containerIt);
-        other.Mtx.unlock();
+        other.VaultRecordMutex.unlock();
     }
 
     void VaultRecord::AddRef() noexcept
     {
-        Mtx.lock();
+        VaultRecordMutex.lock();
         if (IsValid) ++RefCounter;
-        Mtx.unlock();
+        VaultRecordMutex.unlock();
     }
 
     void VaultRecord::RemoveRef() noexcept
     {
         bool isEnd = false;
-        Mtx.lock();
+        VaultRecordMutex.lock();
         --RefCounter;
         if (!IsValid && RefCounter == 0) isEnd = true;
-        Mtx.unlock();
+        VaultRecordMutex.unlock();
 
         if (isEnd) delete this;
     }
@@ -36,10 +36,10 @@ namespace mvlt
     void VaultRecord::Invalidate() noexcept
     {
         bool isEnd = false;
-        Mtx.lock();
+        VaultRecordMutex.lock();
         IsValid = false;
         if (RefCounter == 0) isEnd = true;
-        Mtx.unlock();
+        VaultRecordMutex.unlock();
 
         if (isEnd) delete this;
     }
@@ -47,9 +47,9 @@ namespace mvlt
     bool VaultRecord::GetIsValid() noexcept
     {
         bool res;
-        Mtx.lock();
+        VaultRecordMutex.lock();
         res = IsValid;
-        Mtx.unlock();
+        VaultRecordMutex.unlock();
         return res;
     }
 }

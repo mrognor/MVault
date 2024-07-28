@@ -13,39 +13,39 @@ namespace mvlt
         res.Key = key;
         res.RequestedType = typeid(T);
 
-        Mtx.lock();
+        VaultRecordRefMutex.lock();
 
-        if (DataRecord == nullptr)
+        if (VaultRecordPtr == nullptr)
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::DataRecordNotValid;
 
-            Mtx.unlock();
+            VaultRecordRefMutex.unlock();
             return res;
         }
 
-        // DataRecord lock Mtx to lock VaultRecord::Invalidate in Vault destructor.
+        // VaultRecordPtr lock VaultRecordRefMutex to lock VaultRecord::Invalidate in Vault destructor.
         // It is necessary to prevent Vault::RecursiveReadWriteMtx from deletion 
-        DataRecord->Mtx.lock();
+        VaultRecordPtr->VaultRecordMutex.lock();
 
         // Check if Vault still accessable
-        if (!DataRecord->GetIsValid())
+        if (!VaultRecordPtr->GetIsValid())
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::DataRecordNotValid;
 
-            DataRecord->Mtx.unlock();
-            Mtx.unlock();
+            VaultRecordPtr->VaultRecordMutex.unlock();
+            VaultRecordRefMutex.unlock();
             return res;
         }
 
         Vlt->RecursiveReadWriteMtx.WriteLock();
 
-        res = Vlt->SetDataToRecord(DataRecord, key, data);
+        res = Vlt->SetDataToRecord(VaultRecordPtr, key, data);
 
         Vlt->RecursiveReadWriteMtx.WriteUnlock();
-        DataRecord->Mtx.unlock();
-        Mtx.unlock();
+        VaultRecordPtr->VaultRecordMutex.unlock();
+        VaultRecordRefMutex.unlock();
 
         return res;
     }
@@ -58,29 +58,29 @@ namespace mvlt
         res.Key = key;
         res.RequestedType = typeid(T);
 
-        Mtx.lock();        
+        VaultRecordRefMutex.lock();        
 
-        if (DataRecord == nullptr)
+        if (VaultRecordPtr == nullptr)
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::DataRecordNotValid;
 
-            Mtx.unlock();
+            VaultRecordRefMutex.unlock();
             return res;
         }
 
-        // DataRecord lock Mtx to lock VaultRecord::Invalidate in Vault destructor.
+        // VaultRecordPtr lock VaultRecordRefMutex to lock VaultRecord::Invalidate in Vault destructor.
         // It is necessary to prevent Vault::RecursiveReadWriteMtx from deletion 
-        DataRecord->Mtx.lock();
+        VaultRecordPtr->VaultRecordMutex.lock();
 
         // Check if Vault still accessable
-        if (!DataRecord->GetIsValid())
+        if (!VaultRecordPtr->GetIsValid())
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::DataRecordNotValid;
 
-            DataRecord->Mtx.unlock();
-            Mtx.unlock();
+            VaultRecordPtr->VaultRecordMutex.unlock();
+            VaultRecordRefMutex.unlock();
             return res;
         }
 
@@ -93,8 +93,8 @@ namespace mvlt
             res.ResultCode = VaultOperationResultCode::WrongKey;
 
             Vlt->RecursiveReadWriteMtx.ReadUnlock();
-            DataRecord->Mtx.unlock();
-            Mtx.unlock();
+            VaultRecordPtr->VaultRecordMutex.unlock();
+            VaultRecordRefMutex.unlock();
             return res;
         }
 
@@ -105,18 +105,18 @@ namespace mvlt
             res.ResultCode = VaultOperationResultCode::WrongType;
 
             Vlt->RecursiveReadWriteMtx.ReadUnlock();
-            DataRecord->Mtx.unlock();
-            Mtx.unlock();
+            VaultRecordPtr->VaultRecordMutex.unlock();
+            VaultRecordRefMutex.unlock();
             return res;
         }
 
-        DataRecord->GetData(key, data);
+        VaultRecordPtr->GetData(key, data);
         res.IsOperationSuccess = true;
         res.ResultCode = VaultOperationResultCode::Success;
 
         Vlt->RecursiveReadWriteMtx.ReadUnlock();
-        DataRecord->Mtx.unlock();
-        Mtx.unlock();
+        VaultRecordPtr->VaultRecordMutex.unlock();
+        VaultRecordRefMutex.unlock();
 
         return res;
     }

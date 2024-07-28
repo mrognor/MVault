@@ -28,7 +28,7 @@ namespace mvlt
         {
             recordToErase->Invalidate();
 
-            recordToErase->Mtx.lock();
+            recordToErase->VaultRecordMutex.lock();
             for (VaultRecordSet* set : recordToErase->dependentVaultRecordSets)
             {
                 set->RecursiveReadWriteMtx.WriteLock();
@@ -36,7 +36,7 @@ namespace mvlt
                 static_cast<Vault*>(set)->RemoveRecord(recordToErase, nullptr);
                 set->RecursiveReadWriteMtx.WriteUnlock();
             }
-            recordToErase->Mtx.unlock();
+            recordToErase->VaultRecordMutex.unlock();
 
         }
 
@@ -322,13 +322,13 @@ namespace mvlt
     {
         bool res;
 
-        recordRefToErase.Mtx.lock();
+        recordRefToErase.VaultRecordRefMutex.lock();
         RecursiveReadWriteMtx.WriteLock();
 
-        RemoveRecord(recordRefToErase.DataRecord, &res);
+        RemoveRecord(recordRefToErase.VaultRecordPtr, &res);
 
         RecursiveReadWriteMtx.WriteUnlock();
-        recordRefToErase.Mtx.unlock();
+        recordRefToErase.VaultRecordRefMutex.unlock();
         return res;
     }
 
