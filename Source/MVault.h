@@ -2,7 +2,6 @@
 #include "VaultRecord.h"
 #include "VaultRequest.h"
 #include "VaultRecordRef.h"
-#include "VaultFunctions.h"
 #include "VaultRecordSet.h"
 #include "VaultParamInput.h"
 #include "VaultOperationResult.h"
