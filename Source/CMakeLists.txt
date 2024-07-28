@@ -23,7 +23,6 @@ set(MVaultHeaders
     VaultRecord.h
     VaultRequest.h
     VaultRecordRef.h
-    VaultFunctions.h
     VaultRecordSet.h
     VaultParamInput.h
     VaultOperationResult.h

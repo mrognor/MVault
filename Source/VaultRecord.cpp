@@ -10,8 +10,8 @@ namespace mvlt
         RefCounter = 0;
 
         other.Mtx.lock();
-        for (const auto& it : other.Container)
-            Container.emplace(it);
+        for (const auto& containerIt : other.Container)
+            Container.emplace(containerIt);
         other.Mtx.unlock();
     }
 

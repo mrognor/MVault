@@ -63,9 +63,9 @@ namespace mvlt
     {
         bool res = true;
         RecursiveReadWriteMtx.ReadLock();
-        auto f = KeysTypes.find(key);
-        if (f != KeysTypes.end())
-            keyType = f->second;
+        auto findResIt = KeysTypes.find(key);
+        if (findResIt != KeysTypes.end())
+            keyType = findResIt->second;
         else
             res = false;
 
@@ -78,7 +78,7 @@ namespace mvlt
         std::vector<std::string> res;
 
         RecursiveReadWriteMtx.ReadLock();
-        for (const auto& it : VaultMapStructure) res.emplace_back(it.first);
+        for (const auto& vaultMapStructureIt : VaultMapStructure) res.emplace_back(vaultMapStructureIt.first);
         RecursiveReadWriteMtx.ReadUnlock();
 
         return res;
@@ -102,11 +102,11 @@ namespace mvlt
         KeysTypes.erase(foundedKeyInHashMapIt);
 
         // Remove key from list with key order
-        for (auto it = KeysOrder.begin(); it != KeysOrder.end(); ++it)
+        for (auto keysOrderIt = KeysOrder.begin(); keysOrderIt != KeysOrder.end(); ++keysOrderIt)
         {
-            if (key == *it)
+            if (key == *keysOrderIt)
             {
-                KeysOrder.erase(it);
+                KeysOrder.erase(keysOrderIt);
                 break;
             }
         }
@@ -130,8 +130,8 @@ namespace mvlt
         if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
         {
             // Erase key data from all records
-            for (auto& it : RecordsSet)
-                it->EraseData(key);
+            for (const auto& recordsSetIt : RecordsSet)
+                recordsSetIt->EraseData(key);
 
             for (VaultRecordSet* set : RecordSetsSet)
                 set->RemoveKey(key);
@@ -152,8 +152,8 @@ namespace mvlt
         RecordsSet.emplace(newData);
 
         // Add new record to every maps inside VaultStructureHashMap
-        for (auto& it : VaultRecordAdders)
-            it.second(newData);
+        for (const auto& vaultRecordAddersIt : VaultRecordAdders)
+            vaultRecordAddersIt.second(newData);
 
         VaultRecordRef res(newData, this);
 
@@ -180,32 +180,32 @@ namespace mvlt
         // Create new record
         VaultRecord* newData = new VaultRecord(RecordTemplate);
 
-        for (const auto& it : params)
+        for (const auto& paramsIt : params)
         {
             DataSaver ds;
 
-            res.Key = it.first;
-            res.RequestedType = it.second.GetDataType();
+            res.Key = paramsIt.first;
+            res.RequestedType = paramsIt.second.GetDataType();
 
             // Check if key exist in record template
-            if (newData->GetDataSaver(it.first, ds))
+            if (newData->GetDataSaver(paramsIt.first, ds))
             {
-                res.RequestedType = KeysTypes.find(it.first)->second;
+                res.RequestedType = KeysTypes.find(paramsIt.first)->second;
 
                 // Check if type in params match type in record template
-                if (ds.GetDataType() == it.second.GetDataType())
+                if (ds.GetDataType() == paramsIt.second.GetDataType())
                 {
-                    it.second.SetDataToRecord(it.first, newData);
+                    paramsIt.second.SetDataToRecord(paramsIt.first, newData);
 
                     // If key in record template and key tipy match type in param
                     res.IsOperationSuccess = true;
-                    res.SavedType = it.second.GetDataType();
+                    res.SavedType = paramsIt.second.GetDataType();
                     res.ResultCode = VaultOperationResultCode::Success;
                 }
                 else
                 {   // If the type in param not match type in record template
                     res.IsOperationSuccess = false;
-                    res.SavedType = it.second.GetDataType();
+                    res.SavedType = paramsIt.second.GetDataType();
                     res.ResultCode = VaultOperationResultCode::WrongType;
                     isCorrectParams = false;
                     break;
@@ -229,8 +229,8 @@ namespace mvlt
             RecordsSet.emplace(newData);
 
             // Add new record to every maps inside VaultStructureHashMap
-            for (auto& it : VaultRecordAdders)
-                it.second(newData);
+            for (const auto& vaultRecordAddersIt : VaultRecordAdders)
+                vaultRecordAddersIt.second(newData);
 
             vaultRecordRef.SetRecord(newData, this);
         }
@@ -246,30 +246,30 @@ namespace mvlt
         RecursiveReadWriteMtx.WriteLock();
 
         // Invalidate VaultRecordSets dependent from records from this
-        for (auto it = RecordSetsSet.begin(); it != RecordSetsSet.end();)
+        for (auto recordSetsSetIt = RecordSetsSet.begin(); recordSetsSetIt != RecordSetsSet.end();)
         {
-            auto itToDelete = it;
-            ++it;
+            auto itToDelete = recordSetsSetIt;
+            ++recordSetsSetIt;
             (*itToDelete)->Reset();
         }
 
         // Invalidate all records
-        for (auto& it : RecordsSet) 
-            it->Invalidate();
+        for (const auto& recordsSetIt : RecordsSet) 
+            recordsSetIt->Invalidate();
 
         // Clear record template
         RecordTemplate.Clear();
 
         // Delete all unordered maps inside VaultHashMapStructure
-        for (auto& it : VaultHashMapStructure)
-            it.second.ResetData();
+        for (auto& vaultHashMapStructureIt : VaultHashMapStructure)
+            vaultHashMapStructureIt.second.ResetData();
 
         // Clear VaultHashMapStructure
         VaultHashMapStructure.Clear();
 
         // Delete all maps inside VaultMapStructure
-        for (auto& it : VaultMapStructure)
-            it.second.ResetData();
+        for (auto& vaultMapStructureIt : VaultMapStructure)
+            vaultMapStructureIt.second.ResetData();
 
         // Clear VaultMapStructure
         VaultMapStructure.Clear();
@@ -301,16 +301,16 @@ namespace mvlt
         RecursiveReadWriteMtx.WriteLock();
 
         // Invalidate VaultRecordSets dependent from records from this
-        for (auto& it : RecordSetsSet)
-            it->Clear();
+        for (const auto& recordSetsSetIt : RecordSetsSet)
+            recordSetsSetIt->Clear();
 
         // Invalidate all records
-        for (auto& it : RecordsSet) 
-            it->Invalidate();
+        for (const auto& recordsSetIt : RecordsSet) 
+            recordsSetIt->Invalidate();
         
         // Clear structure
-        for (auto& it : VaultRecordClearers)
-            it.second();
+        for (const auto& vaultRecordClearersIt : VaultRecordClearers)
+            vaultRecordClearersIt.second();
 
         // Clear RecordsSet
         RecordsSet.clear();
@@ -348,10 +348,10 @@ namespace mvlt
 
         RecursiveReadWriteMtx.ReadLock();
 
-        auto f = VaultRecordSorters.find(key);
-        if (f != VaultRecordSorters.end())
+        auto findResIt = VaultRecordSorters.find(key);
+        if (findResIt != VaultRecordSorters.end())
         {
-            f->second([&](const VaultRecordRef& vaultRecordRef)
+            findResIt->second([&](const VaultRecordRef& vaultRecordRef)
                 {
                     if (counter >= amountOfRecords) return false;
 
@@ -556,10 +556,10 @@ namespace mvlt
         // Save keys to file
         if (isSaveKey)
         {
-            auto it = KeysOrder.cbegin();
-            csvFile << *it;
-            ++it;
-            for (;it != KeysOrder.cend(); ++it) csvFile << separator << *it;
+            auto keysOrderIt = KeysOrder.cbegin();
+            csvFile << *keysOrderIt;
+            ++keysOrderIt;
+            for (;keysOrderIt != KeysOrder.cend(); ++keysOrderIt) csvFile << separator << *keysOrderIt;
             csvFile.write(endOfLine, 2);
         }
 
@@ -634,8 +634,8 @@ namespace mvlt
             RecordsSet.emplace(newRecord);
 
             // Add new record to every maps inside VaultStructureHashMap
-            for (auto& it : VaultRecordAdders)
-                it.second(newRecord);
+            for (const auto& vaultRecordAddersIt : VaultRecordAdders)
+                vaultRecordAddersIt.second(newRecord);
 
             record.clear();
         }

@@ -24,9 +24,9 @@ namespace mvlt
         {
             if (data.size() == 0) return "{}";
             std::string res = "{}";
-            for (const int& it : data)
+            for (const int& dataIt : data)
             {
-                res += std::to_string(it) + ", ";
+                res += std::to_string(dataIt) + ", ";
             }
 
             res.pop_back();

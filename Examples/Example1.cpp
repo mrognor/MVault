@@ -18,10 +18,9 @@ std::string mvlt::ToString(const std::vector<int>& data)  noexcept
 {
     if (data.size() == 0) return "{}";
     std::string res = "{";
-    for (const int& it : data)
-    {
-        res += std::to_string(it) + ", ";
-    }
+    for (const int& dataIt : data)
+        res += std::to_string(dataIt) + ", ";
+
 
     res.pop_back();
     res.pop_back();

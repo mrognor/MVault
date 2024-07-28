@@ -65,12 +65,12 @@ namespace mvlt
         auto FirstAndLastIteratorsWithKeyOnHashMap = TtoVaultRecordHashMap->equal_range(oldData);
 
         // Iterate over all data records with oldData key
-        for (auto& it = FirstAndLastIteratorsWithKeyOnHashMap.first; it != FirstAndLastIteratorsWithKeyOnHashMap.second; ++it)
+        for (auto& pairIt = FirstAndLastIteratorsWithKeyOnHashMap.first; pairIt != FirstAndLastIteratorsWithKeyOnHashMap.second; ++pairIt)
         {
             // Find required data record
-            if (it->second == dataRecord)
+            if (pairIt->second == dataRecord)
             {
-                TtoVaultRecordHashMap->erase(it);
+                TtoVaultRecordHashMap->erase(pairIt);
                 break;
             }
         }
@@ -86,12 +86,12 @@ namespace mvlt
         auto FirstAndLastIteratorsWithKeyOnMap = TtoVaultRecordMap->equal_range(oldData);
 
         // Iterate over all data records with oldData key
-        for (auto& it = FirstAndLastIteratorsWithKeyOnMap.first; it != FirstAndLastIteratorsWithKeyOnMap.second; ++it)
+        for (auto& pairIt = FirstAndLastIteratorsWithKeyOnMap.first; pairIt != FirstAndLastIteratorsWithKeyOnMap.second; ++pairIt)
         {
             // Find required data record
-            if (it->second == dataRecord)
+            if (pairIt->second == dataRecord)
             {
-                TtoVaultRecordMap->erase(it);
+                TtoVaultRecordMap->erase(pairIt);
                 break;
             }
         }
@@ -166,7 +166,7 @@ namespace mvlt
             if (equalRange.first != TtoVaultRecordHashMap->end())
             {
                 std::size_t counter = 0;
-                for (auto it = equalRange.first; it != equalRange.second; ++it)
+                for (auto equalRangeIt = equalRange.first; equalRangeIt != equalRange.second; ++equalRangeIt)
                 {
                     // Check added records count
                     if (counter >= amountOfRecords) break;
@@ -174,11 +174,11 @@ namespace mvlt
                     // Check if it is not default predicate
                     if (&requestPredicat != &DefaultRequestPredicat)
                     {
-                        if (requestPredicat(VaultRecordRef(it->second, const_cast<Vault*>(this))))
-                            vaultRecords.emplace(it->second);
+                        if (requestPredicat(VaultRecordRef(equalRangeIt->second, const_cast<Vault*>(this))))
+                            vaultRecords.emplace(equalRangeIt->second);
                     }
                     else
-                        vaultRecords.emplace(it->second);
+                        vaultRecords.emplace(equalRangeIt->second);
                     
                     ++counter;
                 }
@@ -206,11 +206,11 @@ namespace mvlt
                         return;
                         
                     // Iterate to the next value
-                    for (auto it = startIt; it != TtoVaultRecordMap->end(); ++it)
+                    for (auto TtoVaultRecordMapIt = startIt; TtoVaultRecordMapIt != TtoVaultRecordMap->end(); ++TtoVaultRecordMapIt)
                     {
-                        if (it->first != startIt->first) 
+                        if (TtoVaultRecordMapIt->first != startIt->first) 
                         {
-                            startIt = it;
+                            startIt = TtoVaultRecordMapIt;
                             flag = true;
                             break;
                         }
@@ -285,18 +285,18 @@ namespace mvlt
             }
 
             std::size_t counter = 0;
-            for (auto it = startIt; it != endIt; ++it)
+            for (auto TtoVaultRecordMapIt = startIt; TtoVaultRecordMapIt != endIt; ++TtoVaultRecordMapIt)
             {
                 if (counter >= amountOfRecords) break;
 
                 // Check if it is not default predicate
                 if (&requestPredicat != &DefaultRequestPredicat)
                 {
-                    if (requestPredicat(VaultRecordRef(it->second, const_cast<Vault*>(this))))
-                        vaultRecords.emplace(it->second);
+                    if (requestPredicat(VaultRecordRef(TtoVaultRecordMapIt->second, const_cast<Vault*>(this))))
+                        vaultRecords.emplace(TtoVaultRecordMapIt->second);
                 }
                 else
-                    vaultRecords.emplace(it->second);
+                    vaultRecords.emplace(TtoVaultRecordMapIt->second);
 
                 ++counter;
             }
@@ -431,11 +431,11 @@ namespace mvlt
                 auto FirstAndLastIteratorsWithKeyOnHashMap = TtoVaultRecordHashMap->equal_range(recordTData);
 
                 // Find newRecord and erase it from TtoVaultRecordHashMap
-                for (auto& it = FirstAndLastIteratorsWithKeyOnHashMap.first; it != FirstAndLastIteratorsWithKeyOnHashMap.second; ++it)
+                for (auto pairIt = FirstAndLastIteratorsWithKeyOnHashMap.first; pairIt != FirstAndLastIteratorsWithKeyOnHashMap.second; ++pairIt)
                 {
-                    if (it->second == newRecord)
+                    if (pairIt->second == newRecord)
                     {
-                        TtoVaultRecordHashMap->erase(it);
+                        TtoVaultRecordHashMap->erase(pairIt);
                         break;
                     }
                 }
@@ -443,11 +443,11 @@ namespace mvlt
                 // Find all elements on map with recordTData value
                 auto FirstAndLastIteratorsWithKeyOnMap = TtoVaultRecordMap->equal_range(recordTData);
                 // Find newRecord and erase it from TtoVaultRecordHashMap
-                for (auto& it = FirstAndLastIteratorsWithKeyOnMap.first; it != FirstAndLastIteratorsWithKeyOnMap.second; ++it)
+                for (auto pairIt = FirstAndLastIteratorsWithKeyOnMap.first; pairIt != FirstAndLastIteratorsWithKeyOnMap.second; ++pairIt)
                 {
-                    if (it->second == newRecord)
+                    if (pairIt->second == newRecord)
                     {
-                        TtoVaultRecordMap->erase(it);
+                        TtoVaultRecordMap->erase(pairIt);
                         break;
                     }
                 }
@@ -458,14 +458,14 @@ namespace mvlt
         {
             if (!isReverse)
             {
-                for (const auto& it : *TtoVaultRecordMap)
-                    if(!functionToSortedData(VaultRecordRef(it.second, this)))
+                for (const auto& TtoVaultRecordMapIt : *TtoVaultRecordMap)
+                    if(!functionToSortedData(VaultRecordRef(TtoVaultRecordMapIt.second, this)))
                         break;
             }
             else
             {
-                for (auto it = TtoVaultRecordMap->rbegin(); it != TtoVaultRecordMap->rend(); ++it)
-                    if(!functionToSortedData(VaultRecordRef(it->second, this)))
+                for (auto TtoVaultRecordMapIt = TtoVaultRecordMap->rbegin(); TtoVaultRecordMapIt != TtoVaultRecordMap->rend(); ++TtoVaultRecordMapIt)
+                    if(!functionToSortedData(VaultRecordRef(TtoVaultRecordMapIt->second, this)))
                         break;
             }
         });
@@ -479,11 +479,11 @@ namespace mvlt
         if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
         {
             // Add new data to record set
-            for (auto& it : RecordsSet)
+            for (const auto& recordsSetIt : RecordsSet)
             {
-                it->SetData(key, defaultKeyValue);
-                TtoVaultRecordHashMap->emplace(defaultKeyValue, it);
-                TtoVaultRecordMap->emplace(defaultKeyValue, it);
+                recordsSetIt->SetData(key, defaultKeyValue);
+                TtoVaultRecordHashMap->emplace(defaultKeyValue, recordsSetIt);
+                TtoVaultRecordMap->emplace(defaultKeyValue, recordsSetIt);
             }
 
             for (VaultRecordSet* set : RecordSetsSet)
@@ -495,10 +495,10 @@ namespace mvlt
         else
         {
             // Add new data to record set
-            for (auto& it : RecordsSet)
+            for (const auto& recordsSetIt : RecordsSet)
             {
-                TtoVaultRecordHashMap->emplace(defaultKeyValue, it);
-                TtoVaultRecordMap->emplace(defaultKeyValue, it);
+                TtoVaultRecordHashMap->emplace(defaultKeyValue, recordsSetIt);
+                TtoVaultRecordMap->emplace(defaultKeyValue, recordsSetIt);
             }
         }
         RecursiveReadWriteMtx.WriteUnlock();
@@ -677,10 +677,10 @@ namespace mvlt
         if (equalRange.first != TtoVaultRecordHashMap->end())
         {
             std::size_t counter = 0;
-            for (auto it = equalRange.first; it != equalRange.second; ++it)
+            for (auto equalRangeIt = equalRange.first; equalRangeIt != equalRange.second; ++equalRangeIt)
             {
                 ++counter;
-                recordsRefs.emplace_back(VaultRecordRef(it->second, const_cast<Vault*>(this)));
+                recordsRefs.emplace_back(VaultRecordRef(equalRangeIt->second, const_cast<Vault*>(this)));
                 if (counter >= amountOfRecords) break;
             }
         }
@@ -911,15 +911,15 @@ namespace mvlt
             res.ResultCode = VaultOperationResultCode::Success;
 
             std::size_t counter = 0;
-            for (auto it = equalRange.first; it != equalRange.second;)
+            for (auto equalRangeIt = equalRange.first; equalRangeIt != equalRange.second;)
             {
                 // Save next iterator
-                auto next = it;
-                ++next;
+                auto nextIt = equalRangeIt;
+                ++nextIt;
 
                 ++counter;
 
-                VaultRecord* tmpRec = it->second;
+                VaultRecord* tmpRec = equalRangeIt->second;
                 for (auto& eraser : VaultRecordErasers)
                     eraser.second(tmpRec);
 
@@ -942,7 +942,7 @@ namespace mvlt
                 
                 if (counter >= amountOfRecords) break;
                 
-                it = next;
+                equalRangeIt = nextIt;
             }
         }
         else
@@ -962,8 +962,8 @@ namespace mvlt
 
         RecursiveReadWriteMtx.ReadLock();
         
-        auto f = VaultRecordSorters.find(key);
-        if (f != VaultRecordSorters.end())
+        auto findResIt = VaultRecordSorters.find(key);
+        if (findResIt != VaultRecordSorters.end())
         {
             VaultRecordSorters.find(key)->second([&](const VaultRecordRef& vaultRecordRef)
                 {

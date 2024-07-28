@@ -98,7 +98,7 @@ int main()
     else
     {
         std::cout << "\t\tSuccess! Requested records: ";
-        for (const auto& it : records) std::cout << it.GetRecordUniqueId() << " ";
+        for (const mvlt::VaultRecordRef& refIt : records) std::cout << refIt.GetRecordUniqueId() << " ";
         std::cout << std::endl;
     }
 

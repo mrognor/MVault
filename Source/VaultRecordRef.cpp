@@ -120,9 +120,9 @@ namespace mvlt
         Mtx.lock();
 
         // Copy data from function parametrs
-        for (auto& it : params)
+        for (const auto& paramsIt : params)
         {
-            res = it.second.SetDataToRef(it.first, *this);
+            res = paramsIt.second.SetDataToRef(paramsIt.first, *this);
             if (!res.IsOperationSuccess) break;
         }
 
@@ -225,7 +225,7 @@ namespace mvlt
             {
                 Vlt->RecursiveReadWriteMtx.ReadLock();
 
-                for (const auto& it : Vlt->VaultMapStructure) res.emplace_back(it.first);
+                for (const auto& vaultMapStructureIt : Vlt->VaultMapStructure) res.emplace_back(vaultMapStructureIt.first);
 
                 Vlt->RecursiveReadWriteMtx.ReadUnlock();
             }

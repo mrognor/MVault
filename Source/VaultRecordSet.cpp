@@ -202,8 +202,8 @@ namespace mvlt
         }
 
         // Clear structure
-        for (auto& it : VaultRecordClearers)
-            it.second();
+        for (const auto& vaultRecordClearersIt : VaultRecordClearers)
+            vaultRecordClearersIt.second();
 
         // No need to delete each record because it is RecordSet and records will be delete in original vault
         RecordsSet.clear();
@@ -340,13 +340,13 @@ namespace mvlt
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
 
-            for (auto it = RecordsSet.begin(); it != RecordsSet.end();)
+            for (auto recordsSetIt = RecordsSet.begin(); recordsSetIt != RecordsSet.end();)
             {
                 // if found record in a then delete it here
-                if (a.RecordsSet.find(*it) != a.RecordsSet.end())
-                    it = Vault::RemoveRecord(*it, nullptr);
+                if (a.RecordsSet.find(*recordsSetIt) != a.RecordsSet.end())
+                    recordsSetIt = Vault::RemoveRecord(*recordsSetIt, nullptr);
                 else
-                    ++it;
+                    ++recordsSetIt;
             }
 
             ParentVault->RecursiveReadWriteMtx.ReadUnlock();
@@ -366,13 +366,13 @@ namespace mvlt
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
 
-            for (auto it = RecordsSet.begin(); it != RecordsSet.end();)
+            for (auto recordsSetIt = RecordsSet.begin(); recordsSetIt != RecordsSet.end();)
             {
                 // if not found record in a then delete it here
-                if (a.RecordsSet.find(*it) == a.RecordsSet.end())
-                    it = Vault::RemoveRecord(*it, nullptr);
+                if (a.RecordsSet.find(*recordsSetIt) == a.RecordsSet.end())
+                    recordsSetIt = Vault::RemoveRecord(*recordsSetIt, nullptr);
                 else
-                    ++it;
+                    ++recordsSetIt;
             }
 
             ParentVault->RecursiveReadWriteMtx.ReadUnlock();

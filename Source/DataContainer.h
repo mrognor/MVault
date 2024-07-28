@@ -125,13 +125,13 @@ namespace mvlt
         void SetData(const std::string& key, const T& data, F&& deleteFunc) noexcept
         {
             // Find data iterator
-            auto f = Container.find(key);
+            auto findResIt = Container.find(key);
 
             // Checking whether there was such a key in the container
-            if (f == Container.end())
+            if (findResIt == Container.end())
                 AddData(key, data, deleteFunc); // Adding data to the container if there was no key
             else
-                f->second.SetData(data, deleteFunc); // Setting new data for the key if it was already in the container
+                findResIt->second.SetData(data, deleteFunc); // Setting new data for the key if it was already in the container
         }
 
         /**
@@ -145,13 +145,13 @@ namespace mvlt
         void SetDataFromDataSaver(const std::string& key, const DataSaver& dataSaver) noexcept
         {
             // Find data iterator
-            auto f = Container.find(key);
+            auto findResIt = Container.find(key);
 
             // Checking whether there was such a key in the container
-            if (f == Container.end())
+            if (findResIt == Container.end())
                 AddDataFromDataSaver(key, dataSaver); // Adding data to the container if there was no key
             else
-                f->second = dataSaver; // Setting new data for the key if it was already in the container
+                findResIt->second = dataSaver; // Setting new data for the key if it was already in the container
         }
 
         /**
@@ -163,11 +163,11 @@ namespace mvlt
         void SetDataFromString(const std::string& key, const std::string& str) noexcept
         {
             // Find data iterator
-            auto f = Container.find(key);
+            auto findResIt = Container.find(key);
 
             // Checking whether there was such a key in the container
-            if (f != Container.end())
-                f->second.SetDataFromString(str);
+            if (findResIt != Container.end())
+                findResIt->second.SetDataFromString(str);
         }
 
         /**
@@ -184,11 +184,11 @@ namespace mvlt
         template <class T>
         bool GetData(const std::string& key, T& data) const noexcept
         {
-            auto f = Container.find(key);
-            if (f == Container.end())
+            auto findResIt = Container.find(key);
+            if (findResIt == Container.end())
                 return false;
 
-            f->second.GetData(data);
+            findResIt->second.GetData(data);
             return true;
         }
 
@@ -203,11 +203,11 @@ namespace mvlt
         */ 
         bool GetDataSaver(const std::string& key, DataSaver& dataSaver) const noexcept
         {
-            auto f = Container.find(key);
-            if (f == Container.end())
+            auto findResIt = Container.find(key);
+            if (findResIt == Container.end())
                 return false;
 
-            dataSaver = f->second;
+            dataSaver = findResIt->second;
             return true;
         }
         
@@ -222,11 +222,11 @@ namespace mvlt
         */ 
         bool GetDataAsString(const std::string& key, std::string& str) const noexcept
         {
-            auto f = Container.find(key);
-            if (f == Container.end())
+            auto findResIt = Container.find(key);
+            if (findResIt == Container.end())
                 return false;
 
-            str = f->second.Str();
+            str = findResIt->second.Str();
             return true;
         }
 
@@ -247,11 +247,11 @@ namespace mvlt
         */
         void EraseData(const std::string& key) noexcept
         {
-            auto f = Container.find(key);
-            if (f != Container.end())
+            auto findResIt = Container.find(key);
+            if (findResIt != Container.end())
             {
-                f->second.ResetData();
-                Container.erase(f);
+                findResIt->second.ResetData();
+                Container.erase(findResIt);
             }
         }
 
