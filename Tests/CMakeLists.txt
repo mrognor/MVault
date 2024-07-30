@@ -8,9 +8,9 @@ endif()
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(TestsHeaders MTests/ColorizedPrint.h MTests/TestAssert.h)
+set(TestsHeaders MTests/ColorizedPrint.h MTests/TestAssert.h MTests/Starter.h)
 
-set(TestsSource MTests/ColorizedPrint.cpp)
+set(TestsSource MTests/ColorizedPrint.cpp MTests/Starter.cpp)
 
 include_directories(../Source)
 
@@ -33,3 +33,8 @@ project(VaultRecordRefUnitTest)
 
 add_executable(VaultRecordRefUnitTest ${TestsHeaders} ${TestsSource} VaultRecordRefUnitTest.cpp)
 target_link_libraries(VaultRecordRefUnitTest MVault)
+
+project(VaultRecordRefMpTest)
+
+add_executable(VaultRecordRefMpTest ${TestsHeaders} ${TestsSource} VaultRecordRefMpTest.cpp)
+target_link_libraries(VaultRecordRefMpTest MVault)

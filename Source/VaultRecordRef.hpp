@@ -20,6 +20,7 @@ namespace mvlt
             return res;
         }
 
+        Vlt->RecursiveReadWriteMtx.WriteLock();
         VaultRecordPtr->VaultRecordMutex.lock();
 
         // Check if Vault still accessable
@@ -29,15 +30,14 @@ namespace mvlt
             res.ResultCode = VaultOperationResultCode::DataRecordNotValid;
 
             VaultRecordPtr->VaultRecordMutex.unlock();
+            Vlt->RecursiveReadWriteMtx.WriteUnlock();
             return res;
         }
 
-        Vlt->RecursiveReadWriteMtx.WriteLock();
-
         res = Vlt->SetDataToRecord(VaultRecordPtr, key, data);
 
-        Vlt->RecursiveReadWriteMtx.WriteUnlock();
         VaultRecordPtr->VaultRecordMutex.unlock();
+        Vlt->RecursiveReadWriteMtx.WriteUnlock();
 
         return res;
     }
