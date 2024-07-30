@@ -119,7 +119,6 @@ namespace mvlt
         if (IsParentVaultValid)
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
-            recordRef.ReadLock();
 
             // Check if vault record ref depends on same vault as this
             if (recordRef.Vlt == ParentVault && recordRef.IsValid())
@@ -155,8 +154,7 @@ namespace mvlt
                 else
                     res.ResultCode = VaultOperationResultCode::ParentVaultNotMatch;
             }
-            
-            recordRef.ReadUnlock();
+
             ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
         else 

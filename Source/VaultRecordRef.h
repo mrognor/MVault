@@ -26,11 +26,6 @@ namespace mvlt
         // Pointer to VaultRecord inside Vault
         VaultRecord* VaultRecordPtr = nullptr;
 
-        // This mutex is necessary because VaultRecucrsiveReadWriteMtx provides thread safety for Vault, but not for a specific VaultRecordRef object. 
-        // For example, the GetRecord method or the comparison operator change the contents of VaultRecordRef, 
-        // but there is no point in calling them to block Vault for writing
-        mutable std::recursive_mutex VaultRecordRefMutex;
-
         /**
             \brief The method for binding RecordRef to Record 
             
@@ -158,37 +153,6 @@ namespace mvlt
         
         /// \brief A method for decoupling a class object from record. Reset class object to default state
         void Reset() noexcept;
-
-        /**
-            \brief A method for locking record
-            This method prevents the deletion of an record from the Vault
-            If the record is not valid, then the method will not do anything
-
-            Usage example:
-            \code{.cpp}
-            Vault vlt;
-            vlt.AddKey<std::size_t>("Id", 0);
-            vlt.AddKey<std::vector<int>>("Friends", std::vector<int>());
-
-            ...
-
-            std::vector<int> friends;
-            VaultRecordRef vltrr = vlt.GetRecord("Friends", friends);
-
-            // Lock so that another thread cannot change the vector
-            vltrr.ReadLock();
-
-            for (const int& friend : friends)
-                std::cout << friend << std::endl;
-
-            vltrr.ReadUnlock();
-            
-            \endcode
-        */
-        void ReadLock() const noexcept;
-
-        /// \brief A method for unlocking record
-        void ReadUnlock() const noexcept;
 
         /// \brief Default destructor
         ~VaultRecordRef() noexcept;

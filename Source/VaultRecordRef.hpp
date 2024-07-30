@@ -13,19 +13,13 @@ namespace mvlt
         res.Key = key;
         res.RequestedType = typeid(T);
 
-        VaultRecordRefMutex.lock();
-
         if (VaultRecordPtr == nullptr)
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::DataRecordNotValid;
-
-            VaultRecordRefMutex.unlock();
             return res;
         }
 
-        // VaultRecordPtr lock VaultRecordRefMutex to lock VaultRecord::Invalidate in Vault destructor.
-        // It is necessary to prevent Vault::RecursiveReadWriteMtx from deletion 
         VaultRecordPtr->VaultRecordMutex.lock();
 
         // Check if Vault still accessable
@@ -35,7 +29,6 @@ namespace mvlt
             res.ResultCode = VaultOperationResultCode::DataRecordNotValid;
 
             VaultRecordPtr->VaultRecordMutex.unlock();
-            VaultRecordRefMutex.unlock();
             return res;
         }
 
@@ -45,7 +38,6 @@ namespace mvlt
 
         Vlt->RecursiveReadWriteMtx.WriteUnlock();
         VaultRecordPtr->VaultRecordMutex.unlock();
-        VaultRecordRefMutex.unlock();
 
         return res;
     }
@@ -58,19 +50,15 @@ namespace mvlt
         res.Key = key;
         res.RequestedType = typeid(T);
 
-        VaultRecordRefMutex.lock();        
 
         if (VaultRecordPtr == nullptr)
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::DataRecordNotValid;
 
-            VaultRecordRefMutex.unlock();
             return res;
         }
 
-        // VaultRecordPtr lock VaultRecordRefMutex to lock VaultRecord::Invalidate in Vault destructor.
-        // It is necessary to prevent Vault::RecursiveReadWriteMtx from deletion 
         VaultRecordPtr->VaultRecordMutex.lock();
 
         // Check if Vault still accessable
@@ -80,7 +68,6 @@ namespace mvlt
             res.ResultCode = VaultOperationResultCode::DataRecordNotValid;
 
             VaultRecordPtr->VaultRecordMutex.unlock();
-            VaultRecordRefMutex.unlock();
             return res;
         }
 
@@ -94,7 +81,6 @@ namespace mvlt
 
             Vlt->RecursiveReadWriteMtx.ReadUnlock();
             VaultRecordPtr->VaultRecordMutex.unlock();
-            VaultRecordRefMutex.unlock();
             return res;
         }
 
@@ -106,7 +92,6 @@ namespace mvlt
 
             Vlt->RecursiveReadWriteMtx.ReadUnlock();
             VaultRecordPtr->VaultRecordMutex.unlock();
-            VaultRecordRefMutex.unlock();
             return res;
         }
 
@@ -116,7 +101,6 @@ namespace mvlt
 
         Vlt->RecursiveReadWriteMtx.ReadUnlock();
         VaultRecordPtr->VaultRecordMutex.unlock();
-        VaultRecordRefMutex.unlock();
 
         return res;
     }

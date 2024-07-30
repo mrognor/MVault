@@ -322,13 +322,12 @@ namespace mvlt
     {
         bool res;
 
-        recordRefToErase.VaultRecordRefMutex.lock();
         RecursiveReadWriteMtx.WriteLock();
 
         RemoveRecord(recordRefToErase.VaultRecordPtr, &res);
 
         RecursiveReadWriteMtx.WriteUnlock();
-        recordRefToErase.VaultRecordRefMutex.unlock();
+
         return res;
     }
 

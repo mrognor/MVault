@@ -587,7 +587,6 @@ namespace mvlt
         res.Key = key;
         res.RequestedType = typeid(T);
 
-        vaultRecordRef.VaultRecordRefMutex.lock();
         RecursiveReadWriteMtx.ReadLock();
 
         // If key not exist
@@ -596,7 +595,6 @@ namespace mvlt
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongKey;
             RecursiveReadWriteMtx.ReadUnlock();
-            vaultRecordRef.VaultRecordRefMutex.unlock();
             return res;
         }
 
@@ -606,7 +604,6 @@ namespace mvlt
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongType;
             RecursiveReadWriteMtx.ReadUnlock();
-            vaultRecordRef.VaultRecordRefMutex.unlock();
             return res;
         }
 
@@ -632,7 +629,6 @@ namespace mvlt
         }
 
         RecursiveReadWriteMtx.ReadUnlock();
-        vaultRecordRef.VaultRecordRefMutex.unlock();
         return res;
     }
 
