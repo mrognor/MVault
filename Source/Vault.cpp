@@ -30,10 +30,8 @@ namespace mvlt
             recordToErase->VaultRecordMutex.lock();
             for (VaultRecordSet* set : recordToErase->dependentVaultRecordSets)
             {
-                set->RecursiveReadWriteMtx.WriteLock();
                 // "If" before this line will not called because type saved in VaultDerivedClass variable
                 static_cast<Vault*>(set)->RemoveRecord(recordToErase, nullptr);
-                set->RecursiveReadWriteMtx.WriteUnlock();
             }
             recordToErase->VaultRecordMutex.unlock();
 

@@ -318,8 +318,6 @@ namespace mvlt
     {
         VaultOperationResult res;
 
-        vaultRecordSet.RecursiveReadWriteMtx.WriteLock();
-
         // Save vaultRecordSet
         if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
             RecordSetsSet.emplace(&vaultRecordSet);
@@ -353,8 +351,6 @@ namespace mvlt
             record->VaultRecordMutex.unlock();
         }
 
-        vaultRecordSet.RecursiveReadWriteMtx.WriteUnlock();
-        
         return res;
     }
 
@@ -742,8 +738,6 @@ namespace mvlt
         res.IsOperationSuccess = true;
         res.ResultCode = VaultOperationResultCode::Success;
 
-        vaultRecordSet.RecursiveReadWriteMtx.WriteLock();
-
         // Save vaultRecordSet
         if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
             RecordSetsSet.emplace(&vaultRecordSet);
@@ -786,8 +780,6 @@ namespace mvlt
             res = result;
         }
 
-        vaultRecordSet.RecursiveReadWriteMtx.WriteUnlock();
-        
         return res;
     }
 
@@ -843,9 +835,7 @@ namespace mvlt
                 tmpRec->VaultRecordMutex.lock();
                 for (VaultRecordSet* set : tmpRec->dependentVaultRecordSets)
                 {
-                    set->RecursiveReadWriteMtx.WriteLock();
                     static_cast<Vault*>(set)->RemoveRecord(tmpRec, nullptr);
-                    set->RecursiveReadWriteMtx.WriteUnlock();
                 }
                 tmpRec->VaultRecordMutex.unlock();
 
@@ -928,9 +918,7 @@ namespace mvlt
                     tmpRec->VaultRecordMutex.lock();
                     for (VaultRecordSet* set : tmpRec->dependentVaultRecordSets)
                     {
-                        set->RecursiveReadWriteMtx.WriteLock();
                         static_cast<Vault*>(set)->RemoveRecord(tmpRec, nullptr);
-                        set->RecursiveReadWriteMtx.WriteUnlock();
                     }
                     tmpRec->VaultRecordMutex.unlock();
                     tmpRec->Invalidate();

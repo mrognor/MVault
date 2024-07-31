@@ -4,25 +4,12 @@ namespace mvlt
 {
     void Union(const VaultRecordSet& a, const VaultRecordSet& b, VaultRecordSet& res) noexcept
     {
-        a.RecursiveReadWriteMtx.ReadLock();
-        b.RecursiveReadWriteMtx.ReadLock();
-        res.RecursiveReadWriteMtx.WriteLock();
-
         res = a;
         res.Join(b);
-
-        res.RecursiveReadWriteMtx.WriteUnlock();
-        b.RecursiveReadWriteMtx.ReadUnlock();
-        a.RecursiveReadWriteMtx.ReadUnlock();
     }
 
     void Intersection(const VaultRecordSet& a, const VaultRecordSet& b, VaultRecordSet& res) noexcept
     {
-        a.RecursiveReadWriteMtx.ReadLock();
-        b.RecursiveReadWriteMtx.ReadLock();
-        res.RecursiveReadWriteMtx.WriteLock();
-
-        // Thread safety because in Vault destructor blocking this RecursiveReadWriteMtx to write
         if (a.IsParentVaultValid)
         {
             a.ParentVault->RecursiveReadWriteMtx.ReadLock();
@@ -69,9 +56,5 @@ namespace mvlt
 
             a.ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
-
-        res.RecursiveReadWriteMtx.WriteUnlock();
-        b.RecursiveReadWriteMtx.ReadUnlock();
-        a.RecursiveReadWriteMtx.ReadUnlock();
     }
 }

@@ -86,6 +86,8 @@ namespace mvlt
         // List to store keys order
         std::list<std::string> KeysOrder;
 
+        // Recursive mutex for thread safety
+        mutable RecursiveReadWriteMutex RecursiveReadWriteMtx;
     protected:
 
         /// \brief Enum for storing the object type during inheritance
@@ -103,9 +105,6 @@ namespace mvlt
 
         /// \brief Unordered set with all VaultRecordSet pointers
         mutable std::unordered_set<VaultRecordSet*> RecordSetsSet;
-
-        /// \brief Recursive mutex for thread safety
-        mutable RecursiveReadWriteMutex RecursiveReadWriteMtx;
 
         /**
             \brief Method for setting a new value in VaultRecord and Vault

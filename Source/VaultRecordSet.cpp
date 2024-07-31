@@ -17,9 +17,6 @@ namespace mvlt
     {
         if (&other != this)
         {
-            other.RecursiveReadWriteMtx.ReadLock();
-            RecursiveReadWriteMtx.WriteLock();
-
             VaultDerivedClass = VaultDerivedClasses::VaultRecordSetDerived;
             ParentVault = other.ParentVault;
             IsParentVaultValid = true;
@@ -42,9 +39,6 @@ namespace mvlt
                 record->dependentVaultRecordSets.emplace(this);
                 record->VaultRecordMutex.unlock();
             }
-
-            RecursiveReadWriteMtx.WriteUnlock();
-            other.RecursiveReadWriteMtx.ReadUnlock();
         }
 
         return *this;
@@ -52,25 +46,17 @@ namespace mvlt
 
     bool VaultRecordSet::GetIsParentVaultValid() const noexcept
     {
-        bool res;
-        RecursiveReadWriteMtx.ReadLock();
-        res = IsParentVaultValid;
-        RecursiveReadWriteMtx.ReadUnlock();
-        return res;
+        return IsParentVaultValid;
     }
 
     std::string VaultRecordSet::GetParentVaultUniqueId() const noexcept
     {
         std::stringstream ss;
 
-        RecursiveReadWriteMtx.ReadLock();
-
         if (IsParentVaultValid)
             ss << ParentVault;
         else
             ss << "null";
-
-        RecursiveReadWriteMtx.ReadUnlock();
         
         return ss.str();
     }
@@ -78,17 +64,10 @@ namespace mvlt
     bool VaultRecordSet::IsKeyExist(const std::string& key) const noexcept
     {
         bool res = false;
-        RecursiveReadWriteMtx.ReadLock();
 
-        // Thread safety because in Vault destructor blocking this RecursiveReadWriteMtx to write
         if (IsParentVaultValid)
-        {
-            ParentVault->RecursiveReadWriteMtx.ReadLock();
-            res = Vault::IsKeyExist(key);
-            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
-        }
+            res = ParentVault->IsKeyExist(key);
 
-        RecursiveReadWriteMtx.ReadUnlock();
         return res;
     }
 
@@ -113,9 +92,6 @@ namespace mvlt
     {
         VaultOperationResult res;
 
-        RecursiveReadWriteMtx.WriteLock();
-
-        // Thread safety because in Vault destructor blocking this RecursiveReadWriteMtx to write
         if (IsParentVaultValid)
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
@@ -163,15 +139,11 @@ namespace mvlt
             res.ResultCode = VaultOperationResultCode::ParentVaultNotValid;
         }
 
-        RecursiveReadWriteMtx.WriteUnlock();
-
         return res;
     }
 
     void VaultRecordSet::Reset() noexcept
     {
-        RecursiveReadWriteMtx.WriteLock();
-
         if (IsParentVaultValid)
         {
             ParentVault->RecursiveReadWriteMtx.WriteLock();
@@ -183,14 +155,10 @@ namespace mvlt
             ParentVault = nullptr;
             IsParentVaultValid = false;
         }
-
-        RecursiveReadWriteMtx.WriteUnlock();
     }
 
     void VaultRecordSet::Clear() noexcept
     {
-        RecursiveReadWriteMtx.WriteLock();
-
         // Remove this from records
         for (VaultRecord* record : RecordsSet)
         {
@@ -205,8 +173,6 @@ namespace mvlt
 
         // No need to delete each record because it is RecordSet and records will be delete in original vault
         RecordsSet.clear();
-
-        RecursiveReadWriteMtx.WriteUnlock();
     }
 
     bool VaultRecordSet::RemoveRecord(const VaultRecordRef& recordRefToErase) noexcept
@@ -217,9 +183,7 @@ namespace mvlt
     std::size_t VaultRecordSet::Size() const noexcept
     {
         std::size_t res = 0;
-        RecursiveReadWriteMtx.ReadLock();
 
-        // Thread safety because in Vault destructor blocking this RecursiveReadWriteMtx to write
         if (IsParentVaultValid)
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
@@ -227,33 +191,23 @@ namespace mvlt
             ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
 
-        RecursiveReadWriteMtx.ReadUnlock();
         return res;
     }
 
     std::vector<std::string> VaultRecordSet::GetKeys() const noexcept
     {
         std::vector<std::string> res;
-        RecursiveReadWriteMtx.ReadLock();
 
-        // Thread safety because in Vault destructor blocking this RecursiveReadWriteMtx to write
         if (IsParentVaultValid)
-        {
-            ParentVault->RecursiveReadWriteMtx.ReadLock();
-            res = Vault::GetKeys();
-            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
-        }
+            res = ParentVault->GetKeys();
 
-        RecursiveReadWriteMtx.ReadUnlock();
         return res;
     }
 
     std::vector<VaultRecordRef> VaultRecordSet::GetSortedRecords(const std::string& key, const bool& isReverse, const std::size_t& amountOfRecords) const noexcept
     {
         std::vector<VaultRecordRef> res;
-        RecursiveReadWriteMtx.ReadLock();
 
-        // Thread safety because in Vault destructor blocking this RecursiveReadWriteMtx to write
         if (IsParentVaultValid)
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
@@ -261,15 +215,11 @@ namespace mvlt
             ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
 
-        RecursiveReadWriteMtx.ReadUnlock();
         return res;
     }
 
     void VaultRecordSet::PrintSet(const std::size_t& amountOfRecords) const noexcept
     {
-        RecursiveReadWriteMtx.ReadLock();
-
-        // Thread safety because in Vault destructor blocking this RecursiveReadWriteMtx to write
         if (IsParentVaultValid)
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
@@ -278,16 +228,11 @@ namespace mvlt
         }
         else
             std::cout << "The parent Vault is not valid!" << std::endl;
-
-        RecursiveReadWriteMtx.ReadUnlock();
     }
 
     void VaultRecordSet::PrintAsTable(bool isPrintId, const std::size_t& amountOfRecords, std::string primaryKey, const bool& isReverse,
             const std::list<std::string> keys) const noexcept
         {
-        RecursiveReadWriteMtx.ReadLock();
-
-        // Thread safety because in Vault destructor blocking this RecursiveReadWriteMtx to write
         if (IsParentVaultValid)
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
@@ -296,16 +241,10 @@ namespace mvlt
         }
         else
             std::cout << "The parent Vault is not valid!" << std::endl;
-
-        RecursiveReadWriteMtx.ReadUnlock();
     }
 
     void VaultRecordSet::Join(const VaultRecordSet& a) noexcept
     {
-        a.RecursiveReadWriteMtx.ReadLock();
-        RecursiveReadWriteMtx.WriteLock();
-
-        // Thread safety because in Vault destructor blocking this RecursiveReadWriteMtx to write
         if (IsParentVaultValid && a.IsParentVaultValid)
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
@@ -323,17 +262,10 @@ namespace mvlt
 
             ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
-
-        RecursiveReadWriteMtx.WriteUnlock();
-        a.RecursiveReadWriteMtx.ReadUnlock();
     }
 
     void VaultRecordSet::Exclude(const VaultRecordSet& a) noexcept
     {
-        a.RecursiveReadWriteMtx.ReadLock();
-        RecursiveReadWriteMtx.WriteLock();
-
-        // Thread safety because in Vault destructor blocking this RecursiveReadWriteMtx to write
         if (IsParentVaultValid && a.IsParentVaultValid)
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
@@ -349,17 +281,10 @@ namespace mvlt
 
             ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
-
-        RecursiveReadWriteMtx.WriteUnlock();
-        a.RecursiveReadWriteMtx.ReadUnlock();
     }
 
     void VaultRecordSet::Intersect(const VaultRecordSet& a) noexcept
     {
-        a.RecursiveReadWriteMtx.ReadLock();
-        RecursiveReadWriteMtx.WriteLock();
-
-        // Thread safety because in Vault destructor blocking this RecursiveReadWriteMtx to write
         if (IsParentVaultValid && a.IsParentVaultValid)
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
@@ -375,17 +300,12 @@ namespace mvlt
 
             ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
-
-        RecursiveReadWriteMtx.WriteUnlock();
-        a.RecursiveReadWriteMtx.ReadUnlock();
     }
 
     bool VaultRecordSet::SaveToFile(const std::string& fileName, const std::string& separator, const bool& isSaveKey) const noexcept
     {
         bool res = false;
-        RecursiveReadWriteMtx.ReadLock();
 
-        // Thread safety because in Vault destructor blocking this RecursiveReadWriteMtx to write
         if (IsParentVaultValid)
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
@@ -393,7 +313,6 @@ namespace mvlt
             ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
 
-        RecursiveReadWriteMtx.ReadUnlock();
         return res;
     }
 
@@ -406,14 +325,10 @@ namespace mvlt
     bool operator==(const VaultRecordSet& a, const VaultRecordSet& b)
     {
         bool res = false;
-        a.RecursiveReadWriteMtx.ReadLock();
-        b.RecursiveReadWriteMtx.ReadLock();
 
+        /// \todo Потокобезопасность
         if (a.ParentVault == b.ParentVault && a.RecordsSet == b.RecordsSet)
             res = true;
-
-        b.RecursiveReadWriteMtx.ReadUnlock();
-        a.RecursiveReadWriteMtx.ReadUnlock();
 
         return res;
     }
