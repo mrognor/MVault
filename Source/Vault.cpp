@@ -8,12 +8,11 @@ namespace mvlt
 {
     std::unordered_set<VaultRecord*>::iterator Vault::RemoveRecord(VaultRecord* recordToErase, bool* wasDeleted) noexcept
     {
-        RecursiveReadWriteMtx.WriteLock();
+        WriteLock<RecursiveReadWriteMutex> Lock(RecursiveReadWriteMtx);
 
         std::unordered_set<VaultRecord*>::iterator dataIt = RecordsSet.find(recordToErase);
         if (dataIt == RecordsSet.end())
         {
-            RecursiveReadWriteMtx.WriteUnlock();
             if (wasDeleted != nullptr) *wasDeleted = false;
             return dataIt;
         }
@@ -40,7 +39,6 @@ namespace mvlt
 
         }
 
-        RecursiveReadWriteMtx.WriteUnlock();
         if (wasDeleted != nullptr) *wasDeleted = true;
         return dataIt;
     }
