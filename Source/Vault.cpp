@@ -8,7 +8,7 @@ namespace mvlt
 {
     std::unordered_set<VaultRecord*>::iterator Vault::RemoveRecord(VaultRecord* recordToErase, bool* wasDeleted) noexcept
     {
-        WriteLock<RecursiveReadWriteMutex> Lock(RecursiveReadWriteMtx);
+        WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
 
         std::unordered_set<VaultRecord*>::iterator dataIt = RecordsSet.find(recordToErase);
         if (dataIt == RecordsSet.end())
@@ -49,23 +49,22 @@ namespace mvlt
     bool Vault::IsKeyExist(const std::string& key) const noexcept
     {
         bool res;
-        RecursiveReadWriteMtx.ReadLock();
+        ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
         res = RecordTemplate.IsData(key);
-        RecursiveReadWriteMtx.ReadUnlock();
         return res;
     }
 
     bool Vault::GetKeyType(const std::string& key, std::type_index& keyType) const noexcept
     {
         bool res = true;
-        RecursiveReadWriteMtx.ReadLock();
+        ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
+
         auto findResIt = KeysTypes.find(key);
         if (findResIt != KeysTypes.end())
             keyType = findResIt->second;
         else
             res = false;
 
-        RecursiveReadWriteMtx.ReadUnlock();
         return res;
     }
 
@@ -73,26 +72,22 @@ namespace mvlt
     {
         std::vector<std::string> res;
 
-        RecursiveReadWriteMtx.ReadLock();
+        ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
         for (const auto& vaultMapStructureIt : VaultMapStructure) res.emplace_back(vaultMapStructureIt.first);
-        RecursiveReadWriteMtx.ReadUnlock();
 
         return res;
     }
 
     bool Vault::RemoveKey(const std::string& key) noexcept
     {
-        RecursiveReadWriteMtx.WriteLock();
+        WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
 
         // Find key in hash map
         auto foundedKeyInHashMapIt = KeysTypes.find(key);
 
         // If key was not find return false
         if (foundedKeyInHashMapIt == KeysTypes.end())
-        {
-            RecursiveReadWriteMtx.WriteUnlock();
             return false;
-        }
 
         // Remove key from hash map with keys types
         KeysTypes.erase(foundedKeyInHashMapIt);
@@ -133,14 +128,12 @@ namespace mvlt
                 set->RemoveKey(key);
         }
 
-        RecursiveReadWriteMtx.WriteUnlock();
-
         return true;
     }
 
     VaultRecordRef Vault::CreateRecord() noexcept
     {
-        RecursiveReadWriteMtx.WriteLock();
+        WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
 
         // Create new record
         VaultRecord* newData = new VaultRecord(RecordTemplate);
@@ -152,8 +145,6 @@ namespace mvlt
             vaultRecordAddersIt.second(newData);
 
         VaultRecordRef res(newData, this);
-
-        RecursiveReadWriteMtx.WriteUnlock();
 
         return res;
     }
@@ -168,7 +159,7 @@ namespace mvlt
     {
         VaultOperationResult res;
 
-        RecursiveReadWriteMtx.WriteLock();
+        WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
 
         // Variable to check params vec correctness
         bool isCorrectParams = true;
@@ -232,14 +223,12 @@ namespace mvlt
         }
         else delete newData;
 
-        RecursiveReadWriteMtx.WriteUnlock();
-
         return res;
     }
 
     void Vault::DropVault() noexcept
     {
-        RecursiveReadWriteMtx.WriteLock();
+        WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
 
         // Invalidate VaultRecordSets dependent from records from this
         for (auto recordSetsSetIt = RecordSetsSet.begin(); recordSetsSetIt != RecordSetsSet.end();)
@@ -288,13 +277,11 @@ namespace mvlt
 
         // Clear set with all VaultRecordSet`s
         RecordSetsSet.clear();
-
-        RecursiveReadWriteMtx.WriteUnlock();
     }
 
     void Vault::DropData() noexcept
     {
-        RecursiveReadWriteMtx.WriteLock();
+        WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
 
         // Invalidate VaultRecordSets dependent from records from this
         for (const auto& recordSetsSetIt : RecordSetsSet)
@@ -310,19 +297,15 @@ namespace mvlt
 
         // Clear RecordsSet
         RecordsSet.clear();
-
-        RecursiveReadWriteMtx.WriteUnlock();
     }
 
     bool Vault::EraseRecord(const VaultRecordRef& recordRefToErase) noexcept
     {
         bool res;
 
-        RecursiveReadWriteMtx.WriteLock();
+        WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
 
         RemoveRecord(recordRefToErase.VaultRecordPtr, &res);
-
-        RecursiveReadWriteMtx.WriteUnlock();
 
         return res;
     }
@@ -330,9 +313,10 @@ namespace mvlt
     std::size_t Vault::Size() const noexcept
     {
         std::size_t res;
-        RecursiveReadWriteMtx.ReadLock();
+        WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
+
         res = RecordsSet.size();
-        RecursiveReadWriteMtx.ReadUnlock();
+
         return res;
     }
 
@@ -341,7 +325,7 @@ namespace mvlt
         std::vector<VaultRecordRef> res;
         std::size_t counter = 0;
 
-        RecursiveReadWriteMtx.ReadLock();
+        ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
 
         auto findResIt = VaultRecordSorters.find(key);
         if (findResIt != VaultRecordSorters.end())
@@ -356,14 +340,12 @@ namespace mvlt
                 }, isReverse);
         }
 
-        RecursiveReadWriteMtx.ReadUnlock();
-
         return res;
     }
 
     void Vault::PrintVault(const std::size_t& amountOfRecords) const noexcept
     {
-        RecursiveReadWriteMtx.ReadLock();
+        ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
 
         std::vector<std::string> keys = GetKeys();
         std::size_t counter = 0;
@@ -383,14 +365,12 @@ namespace mvlt
             ++counter;
             if (counter == amountOfRecords) break;
         }
-
-        RecursiveReadWriteMtx.ReadUnlock();
     }
 
     void Vault::PrintAsTable(bool isPrintId, const std::size_t& amountOfRecords, std::string primaryKey, const bool& isReverse,
         const std::list<std::string> keys) const noexcept
     {
-        RecursiveReadWriteMtx.ReadLock();
+        ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
 
         if (VaultMapStructure.Size() == 0)
         {
@@ -406,7 +386,6 @@ namespace mvlt
             }
 
             std::cout << " (" << RecordsSet.size() << " records)" << std::endl;
-            RecursiveReadWriteMtx.ReadUnlock();
             return;
         }
 
@@ -526,14 +505,11 @@ namespace mvlt
         }
 
         std::cout << " (" << RecordsSet.size() << " records)" << std::endl;
-   
-
-        RecursiveReadWriteMtx.ReadUnlock();
     }
 
     bool Vault::SaveToFile(const std::string& fileName, const std::string& separator, const bool& isSaveKey) const noexcept
     {
-        RecursiveReadWriteMtx.ReadLock();
+        ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
 
         // Open or create file to save data
         std::ofstream csvFile(fileName, std::ios::binary);
@@ -541,7 +517,6 @@ namespace mvlt
         // Checking whether the file was opened successfully
         if (!csvFile.is_open())
         {
-            RecursiveReadWriteMtx.ReadUnlock();
             return false;
         }
 
@@ -578,7 +553,6 @@ namespace mvlt
 
         csvFile.close();
 
-        RecursiveReadWriteMtx.ReadUnlock();
         return true;
     }
 
@@ -589,7 +563,7 @@ namespace mvlt
         if (!parser.OpenFile(fileName)) return false;
 
         // Write lock because new records will be added
-        RecursiveReadWriteMtx.WriteLock();
+        WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
 
         std::vector<std::string> keys;
 
@@ -634,8 +608,6 @@ namespace mvlt
 
             record.clear();
         }
-
-        RecursiveReadWriteMtx.WriteUnlock();
 
         return true;
     }

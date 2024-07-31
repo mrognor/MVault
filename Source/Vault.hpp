@@ -24,14 +24,13 @@ namespace mvlt
         std::multimap<T, VaultRecord*>* TtoVaultRecordMap = nullptr;
 
         // Lock Vault to write
-        RecursiveReadWriteMtx.WriteLock();
+        WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
 
         // Check if dataRecord valid
         if (dataRecord == nullptr || !dataRecord->GetIsValid())
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::DataRecordNotValid;
-            RecursiveReadWriteMtx.WriteUnlock();
             return res;
         }
 
@@ -40,7 +39,6 @@ namespace mvlt
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongKey;
-            RecursiveReadWriteMtx.WriteUnlock();
             return res;
         }
 
@@ -49,7 +47,6 @@ namespace mvlt
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongType;
-            RecursiveReadWriteMtx.WriteUnlock();
             return res;
         }
 
@@ -115,8 +112,6 @@ namespace mvlt
         res.IsOperationSuccess = true;
         res.ResultCode = VaultOperationResultCode::Success;
 
-        // Unlock Vault
-        RecursiveReadWriteMtx.WriteUnlock();
         return res;
     }
 
@@ -130,15 +125,13 @@ namespace mvlt
         res.Key = key;
         res.RequestedType = typeid(T);
         
-        RecursiveReadWriteMtx.ReadLock();
+        ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
 
         // If key not exist
         if(!GetKeyType(key, res.SavedType))
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongKey;
-            RecursiveReadWriteMtx.ReadUnlock();
-
             return res;
         }
 
@@ -147,8 +140,6 @@ namespace mvlt
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongType;
-            RecursiveReadWriteMtx.ReadUnlock();
-
             return res;
         }
         
@@ -302,8 +293,6 @@ namespace mvlt
             }
         }
 
-        RecursiveReadWriteMtx.ReadUnlock();
-
         res.ResultCode = VaultOperationResultCode::Success;
         res.SavedType = res.RequestedType;
         res.IsOperationSuccess = true;
@@ -361,14 +350,11 @@ namespace mvlt
             If you want to use a string as a key, you must specialize the function with a string. Like this: \n\
             AddKey<std::string>(\"Key\", \"Value\") or AddKey(\"Key\", std::string(\"Value\"))");
 
-        RecursiveReadWriteMtx.WriteLock();
+        WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
 
         // If the key was added earlier, then it must be deleted
         if (KeysTypes.find(key) != KeysTypes.end())
-        {
-            RecursiveReadWriteMtx.WriteUnlock();
             return false;
-        }
 
         // Add key to list with key order
         if(VaultDerivedClass == VaultDerivedClasses::VaultBase)
@@ -497,7 +483,7 @@ namespace mvlt
                 TtoVaultRecordMap->emplace(defaultKeyValue, recordsSetIt);
             }
         }
-        RecursiveReadWriteMtx.WriteUnlock();
+
         return true;
     }
 
@@ -508,13 +494,12 @@ namespace mvlt
         res.Key = key;
         res.RequestedType = typeid(defaultKeyValue);
         
-        RecursiveReadWriteMtx.WriteLock();
+        WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
 
         // If the key was not added earlier, then it can not be updated
         std::unordered_map<std::string, std::type_index>::iterator keyTypeIt = KeysTypes.find(key);
         if (keyTypeIt == KeysTypes.end())
         {
-            RecursiveReadWriteMtx.WriteUnlock();
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongKey;
             return res;
@@ -523,7 +508,6 @@ namespace mvlt
         // Check it is trying to set coorect type 
         if (res.RequestedType != keyTypeIt->second)
         {
-            RecursiveReadWriteMtx.WriteUnlock();
             res.RequestedType = keyTypeIt->second;
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongType;
@@ -532,8 +516,6 @@ namespace mvlt
 
         // Change data in template
         RecordTemplate.SetData(key, defaultKeyValue);
-
-        RecursiveReadWriteMtx.WriteUnlock();
 
         return res;
     }
@@ -545,14 +527,13 @@ namespace mvlt
         res.Key = key;
         res.RequestedType = typeid(T);
 
-        RecursiveReadWriteMtx.ReadLock();
+        ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
 
         // If key not exist
         if(!GetKeyType(key, res.SavedType))
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongKey;
-            RecursiveReadWriteMtx.ReadUnlock();
             return res;
         }
 
@@ -561,7 +542,6 @@ namespace mvlt
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongType;
-            RecursiveReadWriteMtx.ReadUnlock();
             return res;
         }
 
@@ -571,7 +551,6 @@ namespace mvlt
         res.ResultCode = VaultOperationResultCode::Success;
         res.SavedType = res.RequestedType;
 
-        RecursiveReadWriteMtx.ReadUnlock();
         return res;
     }
 
@@ -583,14 +562,13 @@ namespace mvlt
         res.Key = key;
         res.RequestedType = typeid(T);
 
-        RecursiveReadWriteMtx.ReadLock();
+        ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
 
         // If key not exist
         if(!GetKeyType(key, res.SavedType))
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongKey;
-            RecursiveReadWriteMtx.ReadUnlock();
             return res;
         }
 
@@ -599,7 +577,6 @@ namespace mvlt
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongType;
-            RecursiveReadWriteMtx.ReadUnlock();
             return res;
         }
 
@@ -624,7 +601,6 @@ namespace mvlt
             res.ResultCode = VaultOperationResultCode::WrongValue;
         }
 
-        RecursiveReadWriteMtx.ReadUnlock();
         return res;
     }
 
@@ -638,14 +614,13 @@ namespace mvlt
 
         recordsRefs.clear();
 
-        RecursiveReadWriteMtx.ReadLock();
+        ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
 
         // If key not exist
         if(!GetKeyType(key, res.SavedType))
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongKey;
-            RecursiveReadWriteMtx.ReadUnlock();
             return res;
         }
 
@@ -654,7 +629,6 @@ namespace mvlt
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongType;
-            RecursiveReadWriteMtx.ReadUnlock();
             return res;
         }
 
@@ -682,7 +656,6 @@ namespace mvlt
             res.ResultCode = VaultOperationResultCode::WrongValue;
         }
 
-        RecursiveReadWriteMtx.ReadUnlock();
         return res;
     }
 
@@ -791,14 +764,13 @@ namespace mvlt
         res.Key = key;
         res.RequestedType = typeid(T);
 
-        RecursiveReadWriteMtx.ReadLock();
+        ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
 
         // If key not exist
         if(!GetKeyType(key, res.SavedType))
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongKey;
-            RecursiveReadWriteMtx.ReadUnlock();
             return res;
         }
 
@@ -807,7 +779,6 @@ namespace mvlt
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongType;
-            RecursiveReadWriteMtx.ReadUnlock();
             return res;
         }
 
@@ -851,7 +822,6 @@ namespace mvlt
             res.ResultCode = VaultOperationResultCode::WrongValue;
         }
 
-        RecursiveReadWriteMtx.ReadUnlock();
         return res;
     }
 
@@ -863,14 +833,13 @@ namespace mvlt
         res.Key = key;
         res.RequestedType = typeid(T);
 
-        RecursiveReadWriteMtx.ReadLock();
+        ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
 
         // If key not exist
         if(!GetKeyType(key, res.SavedType))
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongKey;
-            RecursiveReadWriteMtx.ReadUnlock();
             return res;
         }
 
@@ -879,7 +848,6 @@ namespace mvlt
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongType;
-            RecursiveReadWriteMtx.ReadUnlock();
             return res;
         }
 
@@ -935,7 +903,6 @@ namespace mvlt
             res.ResultCode = VaultOperationResultCode::WrongValue;
         }
 
-        RecursiveReadWriteMtx.ReadUnlock();
         return res;
     }
 
@@ -944,7 +911,7 @@ namespace mvlt
     {
         std::size_t counter = 0;
 
-        RecursiveReadWriteMtx.ReadLock();
+        ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
         
         auto findResIt = VaultRecordSorters.find(key);
         if (findResIt != VaultRecordSorters.end())
@@ -959,6 +926,5 @@ namespace mvlt
                     return true;
                 }, isReverse);
         }
-        RecursiveReadWriteMtx.ReadUnlock();
     }
 }
