@@ -51,9 +51,9 @@ namespace mvlt
         /**
             \brief Template method for adding a new data to the container.
 
-            \tparam <T> Any type of data except for c arrays
-
             Wrapper over emplace std container
+
+            \tparam <T> Any type of data except for c arrays
 
             \param [in] key key for storing the data
             \param [in] data data to store in container
@@ -67,11 +67,11 @@ namespace mvlt
         /**
             \brief Template method for adding a new data to the container and a function to delete this data
 
+            Wrapper over emplace std container
+
             \tparam <T> Any type of data except for c arrays
             \tparam <F> Function pointer or lambda function
 
-            Wrapper over emplace std container
-            
             \param [in] key key for storing the data
             \param [in] data data to store in container
             \param [in] deleteFunc function to delete data
@@ -96,10 +96,9 @@ namespace mvlt
         /**
             \brief Method for changing the value of a data inside a container using a key
 
-            \tparam <T> Any type of data except for c arrays
-
             If there was no data with such a key, it will be created
 
+            \tparam <T> Any type of data except for c arrays
             \param [in] key the key whose value needs to be changed
             \param [in] data new key value
         */
@@ -112,10 +111,10 @@ namespace mvlt
         /**
             \brief Method for changing the value of a data inside a container using a key
 
+            If there was no data with such a key, it will be created
+
             \tparam <T> Any type of data except for c arrays
             \tparam <F> Function pointer or lambda function
-
-            If there was no data with such a key, it will be created
 
             \param [in] key the key whose value needs to be changed
             \param [in] data new key value
@@ -230,9 +229,13 @@ namespace mvlt
             return true;
         }
 
-        /// \brief A method for checking whether data with such a key is in the container
-        /// \param [in] key key to find in container
-        /// \return Returns false if the key was not found, and otherwise returns true.
+        /**
+            \brief A method for checking whether data with such a key is in the container
+
+            \param [in] key key to find in container
+
+            \return Returns false if the key was not found, and otherwise returns true.
+        */
         bool IsData(const std::string& key) const noexcept
         {
             return Container.find(key) != Container.end();
@@ -255,15 +258,21 @@ namespace mvlt
             }
         }
 
-        /// \brief Method for clear all data inside container
-        /// Note that if pointers were stored in the container, they must be cleaned manually
+        /**
+            \brief Method for clear all data inside container
+
+            Note that if pointers were stored in the container, they must be cleaned manually
+        */
         void Clear() noexcept
         {
             Container.clear();
         }
 
-        /// \brief Method for getting the container size
-        /// \return Container size
+        /**
+            \brief Method for getting the container size
+
+            \return Container size
+        */
         std::size_t Size() const noexcept
         {
             return Container.size();

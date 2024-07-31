@@ -110,7 +110,7 @@ namespace mvlt
         /**
             \brief Method for setting a new value in VaultRecord and Vault
             
-            \tparam T - any type except c arrays
+            \tparam <T> - any type except c arrays
 
             \param [in] dataRecord pointer to VaultRecord inside Vault
             \param [in] key key to set data
@@ -263,17 +263,27 @@ namespace mvlt
         */
         bool GetKeyType(const std::string& key, std::type_index& keyType) const noexcept;
 
-        /// \brief The method for getting all the keys
-        /// \return vector with keys
+        /**
+            \brief The method for getting all the keys
+
+            \return vector with keys
+        */
         std::vector<std::string> GetKeys() const noexcept;
 
-        /// \brief The method for deleting the key
-        /// \param [in] key the key to remove
-        /// \return Returns true if the key existed, otherwise returns false
+        /**
+            \brief The method for deleting the key
+
+            \param [in] key the key to remove
+
+            \return Returns true if the key existed, otherwise returns false
+        */
         bool RemoveKey(const std::string& key) noexcept;
 
-        /// \brief Method to create new VaultRecord. A record will be created by copying RecordTemplate.
-        /// \return ref to new record 
+        /**
+            \brief Method to create new VaultRecord. A record will be created by copying RecordTemplate.
+            
+            \return ref to new record 
+        */
         VaultRecordRef CreateRecord() noexcept;
 
         /**
@@ -503,9 +513,11 @@ namespace mvlt
         /// \brief A method for deleting all data, but keeping all keys
         void DropData() noexcept;
 
-        /// \brief Method for deleting a record from a Vault
-        /// \param [in] recordRefToErase the reference to the record that needs to be deleted
-        /// \return Returns true if the record existed and was successfully deleted, otherwise it returns false
+        /**
+            \brief Method for deleting a record from a Vault
+            \param [in] recordRefToErase the reference to the record that needs to be deleted
+            \return Returns true if the record existed and was successfully deleted, otherwise it returns false
+        */
         bool EraseRecord(const VaultRecordRef& recordRefToErase) noexcept;
 
         /**
@@ -537,8 +549,10 @@ namespace mvlt
         template <class T>
         VaultOperationResult EraseRecords(const std::string& key, const T& keyValue, const std::size_t& amountOfRecords = -1) noexcept;
 
-        /// \brief Method for getting the number of records
-        /// \return number of records
+        /**
+            \brief Method for getting the number of records
+            \return number of records
+        */
         std::size_t Size() const noexcept;
 
         /**
@@ -574,8 +588,10 @@ namespace mvlt
         template<class F>
         void SortBy(const std::string& key, const F&& func, const bool& isReverse = false, const std::size_t& amountOfRecords = -1) const noexcept;
 
-        /// \brief A method for displaying the contents of a Vault on the screen
-        /// \param [in] amountOfRecords The number of records to be printed. The default value is -1, which means that all entries will be output
+        /**
+            \brief A method for displaying the contents of a Vault on the screen
+            \param [in] amountOfRecords The number of records to be printed. The default value is -1, which means that all entries will be output
+        */
         void PrintVault(const std::size_t& amountOfRecords = -1) const noexcept;
         
         /**

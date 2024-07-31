@@ -59,12 +59,18 @@ namespace mvlt
         /// Making operator comparison function friendly
         friend bool operator==(const VaultRecordSet& a, const VaultRecordSet& b);
 
-        /// \brief Method for checking the validity of the parent Vault
-        /// \return true if it is valid, otherwise false
+        /**
+            \brief Method for checking the validity of the parent Vault
+            
+            \return true if it is valid, otherwise false
+        */
         bool GetIsParentVaultValid() const noexcept;
 
-        /// \brief Method for getting parent vault unique id
-        /// \return id or null in case invalid parent
+        /**
+            \brief Method for getting parent vault unique id
+            
+            \return id or null in case invalid parent
+        */
         std::string GetParentVaultUniqueId() const noexcept;
     
         /**
@@ -264,9 +270,12 @@ namespace mvlt
         /// \brief Resets the object to its initial state
         void Reset() noexcept;
 
-        /// \brief Clear VaultRecordSet
-        /// Remove all references to records from the Vault Request Result, 
-        /// but the records themselves in the original Vault will not be changed
+        /**
+            \brief Clear VaultRecordSet
+            
+            Remove all references to records from the Vault Request Result, 
+            but the records themselves in the original Vault will not be changed
+        */
         void Clear() noexcept;
 
         /**
@@ -313,14 +322,22 @@ namespace mvlt
         template <class T>
         VaultOperationResult RemoveRecords(const std::string& key, const T& keyValue, const std::size_t& amountOfRecords = -1) noexcept;
 
-        /// \brief Method for getting the number of records
-        /// If the parent Vault is not valid, it will return 0
-        /// \return number of records
+        /**
+            \brief Method for getting the number of records
+            
+            If the parent Vault is not valid, it will return 0
+            
+            \return number of records
+        */
         std::size_t Size() const noexcept;
 
-        /// \brief The method for getting all the keys
-        /// If the parent Vault is not valid, it will return an empty vector
-        /// \return vector with keys
+        /**
+            \brief The method for getting all the keys
+            
+            If the parent Vault is not valid, it will return an empty vector
+            
+            \return vector with keys
+        */
         std::vector<std::string> GetKeys() const noexcept;
 
         /**
@@ -357,8 +374,11 @@ namespace mvlt
         template<class F>
         void SortBy(const std::string& key, const F&& func, const bool& isReverse = false, const std::size_t& amountOfRecords = -1) const noexcept;
 
-        /// \brief A method for displaying the contents of a Vault on the screen
-        /// \param [in] amountOfRecords The number of records to be printed. The default value is -1, which means that all entries will be output
+        /**
+            \brief A method for displaying the contents of a Vault on the screen
+            
+            \param [in] amountOfRecords The number of records to be printed. The default value is -1, which means that all entries will be output
+        */
         void PrintSet(const std::size_t& amountOfRecords = -1) const noexcept;
         
         /**
@@ -373,16 +393,25 @@ namespace mvlt
         void PrintAsTable(bool isPrintId = false, const std::size_t& amountOfRecords = -1, std::string primaryKey = "", const bool& isReverse = false,
             const std::list<std::string> keys = {}) const noexcept;
 
-        /// \brief A method for adding all records from a to this
-        /// \param [in] a the set from which the recordings will be added
+        /**
+            \brief A method for adding all records from a to this
+            
+            \param [in] a the set from which the recordings will be added
+        */
         void Join(const VaultRecordSet& a) noexcept;
 
-        /// \brief A method for deleting all records from this that are also in a
-        /// \param [in] a the record set that contains the records to remove
+        /**
+            \brief A method for deleting all records from this that are also in a
+            
+            \param [in] a the record set that contains the records to remove
+        */
         void Exclude(const VaultRecordSet& a) noexcept;
         
-        /// \brief A method to delete all records from this that are not in a
-        /// \param [in] a a set that contains records that do not need to be removed
+        /**
+            \brief A method to delete all records from this that are not in a
+            
+            \param [in] a a set that contains records that do not need to be removed
+        */
         void Intersect(const VaultRecordSet& a) noexcept;
 
         /**

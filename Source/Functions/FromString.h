@@ -20,6 +20,7 @@ namespace mvlt
         you can specialize this function for each required type.
 
         \tparam <T> Any type of data
+
         \param [in] stringToCopyDataFrom the string to be converted to type T
         \param [out] data the variable where the converted string will be written
 
@@ -32,6 +33,7 @@ namespace mvlt
         \brief FromString specialization for working with std::string
 
         \tparam <std::string> string as a type
+
         \param [in] stringToCopyDataFrom the string to be converted to type std::string
         \param [out] data the variable where the converted string will be written
 
@@ -52,6 +54,7 @@ namespace mvlt
         If the string is not true or false, the function returns false.
 
         \tparam <bool> bool as a type
+
         \param [in] stringToCopyDataFrom the string to be converted to type bool
         \param [out] data the variable where the converted string will be written
 
@@ -77,6 +80,7 @@ namespace mvlt
         \brief FromString specialization for working with int
         
         \tparam <int> int as a type
+
         \param [in] stringToCopyDataFrom the string to be converted to type int
         \param [out] data the variable where the converted string will be written
 
@@ -115,6 +119,7 @@ namespace mvlt
         \brief FromString specialization for working with float
         
         \tparam <float> float as a type
+
         \param [in] stringToCopyDataFrom the string to be converted to type float
         \param [out] data the variable where the converted string will be written
 

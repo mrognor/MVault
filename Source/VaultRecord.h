@@ -55,8 +55,10 @@ namespace mvlt
         /// \brief A method to indicate that the record is no longer valid and is not inside Vault
         void Invalidate() noexcept;
 
-        /// \brief A method for checking whether a record is inside a Vault
-        /// \return returns the validity of the record
+        /**
+            \brief A method for checking whether a record is inside a Vault
+            \return returns the validity of the record
+        */
         bool GetIsValid() noexcept;
     };
 }

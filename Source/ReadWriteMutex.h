@@ -89,8 +89,11 @@ namespace mvlt
         */
         void WriteLock() noexcept;
 
-        /// \brief A method for unlocking a section of code for writing
-        /// Note that if the write unlock is called inside the read lock, then this will be equivalent to unlocking for writing and then locking for reading.
+        /**
+            \brief A method for unlocking a section of code for writing
+
+            Note that if the write unlock is called inside the read lock, then this will be equivalent to unlocking for writing and then locking for reading.
+        */
         void WriteUnlock() noexcept;
     };
 

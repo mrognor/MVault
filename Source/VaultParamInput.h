@@ -9,8 +9,11 @@
 
 namespace mvlt
 {
-    /// \brief A class for transferring data to the Vault
-    /// It is used for multiple data additions when creating a record in Vault and for multiple data changes when setting data in VaultRecordRef
+    /**
+        \brief A class for transferring data to the Vault
+        
+        It is used for multiple data additions when creating a record in Vault and for multiple data changes when setting data in VaultRecordRef
+    */
     class VaultParamInput
     {
     private:
@@ -34,9 +37,11 @@ namespace mvlt
         */
         VaultOperationResult SetDataToRef(const std::string& key, VaultRecordRef& refToSetData) const noexcept;
 
-        /// \brief Method for setting key data in VaultRecord
-        /// \param [in] key data key
-        /// \param [in] recordToSetData pointer to VaultRecord
+        /**
+            \brief Method for setting key data in VaultRecord
+            \param [in] key data key
+            \param [in] recordToSetData pointer to VaultRecord
+        */
         void SetDataToRecord(const std::string& key, VaultRecord* recordToSetData) const noexcept;
 
     public:
@@ -47,14 +52,21 @@ namespace mvlt
         /// Making the VaultRecordRef class friendly so that it has access to the internal members of the VaultParamInput class
         friend VaultRecordRef;
         
-        /// \brief A template constructor that accepts a variable to store inside VaultParamInput
-        /// \tparam <T> Any type of data except for c arrays
-        /// \param [in] data data to be stored inside VaultParamInput
+        /**
+            \brief A template constructor that accepts a variable to store inside VaultParamInput
+            
+            \tparam <T> Any type of data except for c arrays
+            
+            \param [in] data data to be stored inside VaultParamInput
+        */
         template <class T>
         VaultParamInput(const T& data) noexcept;
 
-        /// \brief A method for getting the type of saved data.
-        /// \return std::type_index object with saved data type
+        /**
+            \brief A method for getting the type of saved data.
+            
+            \return std::type_index object with saved data type
+        */
         std::type_index GetDataType() const noexcept;
     };
 }

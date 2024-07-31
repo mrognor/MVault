@@ -50,9 +50,13 @@ namespace mvlt
         std::size_t FileLen = 0;
     public:
 
-        /// \brief The method for opening the file
-        /// \param [in] fileName The name of the file to open
-        /// \return it will return the true if it was possible to open the file otherwise it will return a false
+        /**
+            \brief The method for opening the file
+
+            \param [in] fileName The name of the file to open
+
+            \return it will return the true if it was possible to open the file otherwise it will return a false
+        */
         bool OpenFile(const std::string& fileName) noexcept;
 
         /**

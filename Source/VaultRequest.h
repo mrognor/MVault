@@ -6,8 +6,11 @@
 
 namespace mvlt
 {
-    /// \brief A class for requests to Vault
-    /// \tparam <VaultRequestType> type of the request
+    /**
+        \brief A class for requests to Vault
+        
+        \tparam <VaultRequestType> type of the request
+    */
     template <VaultRequestType Type>
     class VaultRequest 
     {

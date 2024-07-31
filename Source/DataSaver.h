@@ -42,16 +42,23 @@ namespace mvlt
         bool (*SetDataFromStringFunc)(void* ptrToStoreDataFromString, const std::string& str) = nullptr;
 
     public:
-        /// Default constructor
+        /// \brief Default constructor
         DataSaver() noexcept;
 
-        /// \brief Copy constructor
-        /// \param [in] dataSaver object to be copied
+        /**
+            \brief Copy constructor
+
+            \param [in] dataSaver object to be copied
+        */
         DataSaver(const DataSaver& dataSaver) noexcept;
 
-        /// \brief A template constructor that accepts a variable to store inside DataSaver
-        /// \tparam <T> Any type of data except for c arrays
-        /// \param [in] data data to be stored inside DataSaver
+        /**
+            \brief A template constructor that accepts a variable to store inside DataSaver
+
+            \tparam <T> Any type of data except for c arrays
+
+            \param [in] data data to be stored inside DataSaver
+        */
         template<class T>
         DataSaver(const T& data) noexcept : DataType(typeid(void))
         {
@@ -84,17 +91,24 @@ namespace mvlt
         */
         DataSaver& operator=(const DataSaver& dataSaver) noexcept;
         
-        /// \brief Template method to save data inside DataSaver
-        /// \tparam <T> Any type of data except for c arrays
-        /// \param [in] data data to be stored inside the class
+        /**
+            \brief Template method to save data inside DataSaver
+
+            \tparam <T> Any type of data except for c arrays
+
+            \param [in] data data to be stored inside the class
+        */
         template <class T>
         void SetData(const T& data) noexcept
         {   
             SetData(data, nullptr);
         }
 
-        /// \brief A method for saving data from a string to a DataStorage
-        /// \param [in] data a string with data
+        /**
+            \brief A method for saving data from a string to a DataStorage
+
+            \param [in] data a string with data
+        */
         bool SetDataFromString(const std::string& data) noexcept;
 
         /**
@@ -179,23 +193,36 @@ namespace mvlt
             return true;
         }
 
-        /// \brief Resets the object to its initial state.
-        /// If deleteFunc was set, it will be called
+        /**
+            \brief Resets the object to its initial state.
+
+            If deleteFunc was set, it will be called
+        */
         void ResetData() noexcept;
 
-        /// \brief Swap data between 2 DataSavers
-        /// \param [in, out] dataSaver dataSaver from where the data will be copied to this and where the data from this will be written
+        /**
+            \brief Swap data between 2 DataSavers
+
+            \param [in, out] dataSaver dataSaver from where the data will be copied to this and where the data from this will be written
+        */
         void Swap(DataSaver& dataSaver) noexcept;
 
-        /// \brief A method for getting a string that represents data inside a class object
-        /// Used ToString function. 
-        /// \return A string of data
+        /**
+            \brief A method for getting a string that represents data inside a class object
+
+            Used ToString function.
+
+            \return A string of data
+        */
         std::string Str() const noexcept;
 
-        /// \brief A method for getting the type of saved data.
-        /// \return std::type_index object with saved data type
+        /**
+            \brief A method for getting the type of saved data.
+
+            \return std::type_index object with saved data type
+        */
         std::type_index GetDataType() const noexcept;
-        
+
         /// \brief Default destructor
         ~DataSaver() noexcept;
     };

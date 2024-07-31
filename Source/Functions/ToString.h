@@ -65,6 +65,7 @@ namespace mvlt
         you can specialize this function for each required type.
 
         \tparam <T> Any type of data
+
         \param [in] data the variable to be converted to a string
 
         \return This function returns an empty string. 
@@ -77,6 +78,7 @@ namespace mvlt
         \brief Specialization of the ToString method for the int type
 
         \tparam <int> integer variable
+
         \param [in] data the variable to be converted to a string
 
         \return result of std::to_string function
@@ -88,6 +90,7 @@ namespace mvlt
         \brief Specialization of the ToString method for the bool type
 
         \tparam <bool> boolean variable
+
         \param [in] data the variable to be converted to a string
 
         \return string with true if data true, otherwise retutn string with false
@@ -99,6 +102,7 @@ namespace mvlt
         \brief Specialization of the ToString method for the std::string type
 
         \tparam <std::string> string variable
+
         \param [in] data the variable to be converted to a string
 
         \return data
@@ -110,6 +114,7 @@ namespace mvlt
         \brief Specialization of the ToString method for the float type
 
         \tparam <float> float variable
+
         \param [in] data the variable to be converted to a string
 
         \return result of std::to_string function
@@ -121,6 +126,7 @@ namespace mvlt
         \brief Specialization of the ToString method for the float type
 
         \tparam <char> char variable
+
         \param [in] data the variable to be converted to a string
 
         \return string with one char 

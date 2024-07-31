@@ -4,6 +4,19 @@
 
 namespace mvlt 
 {
+    void VaultRecordRef::SetRecord(VaultRecord* vaultRecord, Vault* vlt) noexcept
+    {
+        vlt->RecursiveReadWriteMtx.ReadLock();
+
+        if (vaultRecord != nullptr) vaultRecord->AddRef();
+        if (VaultRecordPtr != nullptr) VaultRecordPtr->RemoveRef();
+
+        VaultRecordPtr = vaultRecord;
+        Vlt = vlt;
+
+        vlt->RecursiveReadWriteMtx.ReadUnlock();
+    }
+
     VaultRecordRef::VaultRecordRef() noexcept {}
 
     VaultRecordRef::VaultRecordRef(VaultRecord* vaultRecord, Vault* vlt) noexcept
@@ -69,19 +82,6 @@ namespace mvlt
         }
 
         return res;
-    }
-
-    void VaultRecordRef::SetRecord(VaultRecord* vaultRecord, Vault* vlt) noexcept
-    {
-        vlt->RecursiveReadWriteMtx.ReadLock();
-
-        if (vaultRecord != nullptr) vaultRecord->AddRef();
-        if (VaultRecordPtr != nullptr) VaultRecordPtr->RemoveRef();
-
-        VaultRecordPtr = vaultRecord;
-        Vlt = vlt;
-
-        vlt->RecursiveReadWriteMtx.ReadUnlock();
     }
 
     std::string VaultRecordRef::GetRecordUniqueId() const noexcept
