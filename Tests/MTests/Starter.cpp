@@ -1,10 +1,11 @@
 #include "Starter.h"
 
-Starter::Starter(std::size_t delay) noexcept : Delay(delay) {}
+Starter::Starter(const std::size_t& threshold) noexcept : Threshold(threshold) {}
 
 void Starter::Wait() noexcept
 {
     std::mutex Mtx;
     std::unique_lock<std::mutex> Lk(Mtx);
-    Cv.wait_for(Lk, std::chrono::microseconds(Delay));
+    std::uniform_int_distribution<int> dist(0, Threshold);
+    Cv.wait_for(Lk, std::chrono::nanoseconds(Threshold));
 }
