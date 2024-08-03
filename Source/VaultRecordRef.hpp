@@ -20,7 +20,7 @@ namespace mvlt
             return res;
         }
 
-        WriteLock<RecursiveReadWriteMutex> Lk(Vlt->RecursiveReadWriteMtx);
+        WriteLock<RecursiveReadWriteMutex> Lock(Vlt->RecursiveReadWriteMtx);
         VaultRecordPtr->VaultRecordMutex.lock();
 
         // Check if Vault still accessable

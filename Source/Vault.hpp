@@ -125,6 +125,7 @@ namespace mvlt
         res.Key = key;
         res.RequestedType = typeid(T);
         
+        // Lock Vault to read
         ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
 
         // If key not exist
@@ -307,6 +308,9 @@ namespace mvlt
     {
         VaultOperationResult res;
 
+        // Lock Vault to read
+        ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
+
         // Save vaultRecordSet
         if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
             RecordSetsSet.emplace(&vaultRecordSet);
@@ -350,6 +354,7 @@ namespace mvlt
             If you want to use a string as a key, you must specialize the function with a string. Like this: \n\
             AddKey<std::string>(\"Key\", \"Value\") or AddKey(\"Key\", std::string(\"Value\"))");
 
+        // Lock Vault to write
         WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
 
         // If the key was added earlier, then it must be deleted
@@ -493,7 +498,8 @@ namespace mvlt
         VaultOperationResult res;
         res.Key = key;
         res.RequestedType = typeid(defaultKeyValue);
-        
+
+        // Lock Vault to write
         WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
 
         // If the key was not added earlier, then it can not be updated
@@ -527,6 +533,7 @@ namespace mvlt
         res.Key = key;
         res.RequestedType = typeid(T);
 
+        // Lock Vault to read
         ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
 
         // If key not exist
@@ -562,6 +569,7 @@ namespace mvlt
         res.Key = key;
         res.RequestedType = typeid(T);
 
+        // Lock Vault to read
         ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
 
         // If key not exist
@@ -614,6 +622,7 @@ namespace mvlt
 
         recordsRefs.clear();
 
+        // Lock Vault to read
         ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
 
         // If key not exist
@@ -711,6 +720,9 @@ namespace mvlt
         res.IsOperationSuccess = true;
         res.ResultCode = VaultOperationResultCode::Success;
 
+        // Lock Vault to read
+        ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
+
         // Save vaultRecordSet
         if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
             RecordSetsSet.emplace(&vaultRecordSet);
@@ -764,7 +776,8 @@ namespace mvlt
         res.Key = key;
         res.RequestedType = typeid(T);
 
-        ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
+        // Lock Vault to write
+        WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
 
         // If key not exist
         if(!GetKeyType(key, res.SavedType))
@@ -833,7 +846,8 @@ namespace mvlt
         res.Key = key;
         res.RequestedType = typeid(T);
 
-        ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
+        // Lock Vault to write
+        WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
 
         // If key not exist
         if(!GetKeyType(key, res.SavedType))
@@ -911,6 +925,7 @@ namespace mvlt
     {
         std::size_t counter = 0;
 
+        // Lock Vault to read
         ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
         
         auto findResIt = VaultRecordSorters.find(key);

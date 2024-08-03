@@ -8,6 +8,7 @@ namespace mvlt
 {
     std::unordered_set<VaultRecord*>::iterator Vault::RemoveRecord(VaultRecord* recordToErase, bool* wasDeleted) noexcept
     {
+        // Lock Vault to write
         WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
 
         std::unordered_set<VaultRecord*>::iterator dataIt = RecordsSet.find(recordToErase);
@@ -133,6 +134,7 @@ namespace mvlt
 
     VaultRecordRef Vault::CreateRecord() noexcept
     {
+        // Lock Vault to write
         WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
 
         // Create new record
@@ -159,6 +161,7 @@ namespace mvlt
     {
         VaultOperationResult res;
 
+        // Lock Vault to write
         WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
 
         // Variable to check params vec correctness
@@ -228,6 +231,7 @@ namespace mvlt
 
     void Vault::DropVault() noexcept
     {
+        // Lock Vault to write
         WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
 
         // Invalidate VaultRecordSets dependent from records from this
@@ -281,6 +285,7 @@ namespace mvlt
 
     void Vault::DropData() noexcept
     {
+        // Lock Vault to write
         WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
 
         // Invalidate VaultRecordSets dependent from records from this
@@ -313,7 +318,7 @@ namespace mvlt
     std::size_t Vault::Size() const noexcept
     {
         std::size_t res;
-        WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
+        ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
 
         res = RecordsSet.size();
 
@@ -325,6 +330,7 @@ namespace mvlt
         std::vector<VaultRecordRef> res;
         std::size_t counter = 0;
 
+        // Lock Vault to read
         ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
 
         auto findResIt = VaultRecordSorters.find(key);
@@ -345,6 +351,7 @@ namespace mvlt
 
     void Vault::PrintVault(const std::size_t& amountOfRecords) const noexcept
     {
+        // Lock Vault to read
         ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
 
         std::vector<std::string> keys = GetKeys();
@@ -370,6 +377,7 @@ namespace mvlt
     void Vault::PrintAsTable(bool isPrintId, const std::size_t& amountOfRecords, std::string primaryKey, const bool& isReverse,
         const std::list<std::string> keys) const noexcept
     {
+        // Lock Vault to read
         ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
 
         if (VaultMapStructure.Size() == 0)
@@ -509,6 +517,7 @@ namespace mvlt
 
     bool Vault::SaveToFile(const std::string& fileName, const std::string& separator, const bool& isSaveKey) const noexcept
     {
+        // Lock Vault to read
         ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
 
         // Open or create file to save data
