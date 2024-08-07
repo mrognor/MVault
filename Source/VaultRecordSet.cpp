@@ -3,6 +3,11 @@
 
 namespace mvlt
 {
+    std::unordered_set<VaultRecord *>::iterator VaultRecordSet::RemoveRecord(VaultRecord* recordToErase, bool* wasDeleted) noexcept
+    {
+        return Vault::RemoveRecord(recordToErase, wasDeleted);
+    }
+
     VaultRecordSet::VaultRecordSet() noexcept 
     {
         VaultDerivedClass = VaultDerivedClasses::VaultRecordSetDerived;
@@ -35,9 +40,7 @@ namespace mvlt
                     adder.second(record);
 
                 // Lock VaultRecord to thread safety add new dependent VaultRecordSet
-                record->VaultRecordMutex.lock();
-                record->dependentVaultRecordSets.emplace(this);
-                record->VaultRecordMutex.unlock();
+                record->AddToDependentSets(this);
             }
         }
 
@@ -109,9 +112,7 @@ namespace mvlt
                         adder.second(recordRef.VaultRecordPtr);
 
                     // Lock VaultRecord to thread safety add new dependent VaultRecordSet
-                    recordRef.VaultRecordPtr->VaultRecordMutex.lock();
-                    recordRef.VaultRecordPtr->dependentVaultRecordSets.emplace(this);
-                    recordRef.VaultRecordPtr->VaultRecordMutex.unlock();
+                    recordRef.VaultRecordPtr->AddToDependentSets(this);
 
                     res.IsOperationSuccess = true;
                     res.ResultCode = VaultOperationResultCode::Success;
@@ -161,11 +162,7 @@ namespace mvlt
     {
         // Remove this from records
         for (VaultRecord* record : RecordsSet)
-        {
-            record->VaultRecordMutex.lock();
-            record->dependentVaultRecordSets.erase(this);
-            record->VaultRecordMutex.unlock();
-        }
+            record->EraseDependentSet(this);
 
         // Clear structure
         for (const auto& vaultRecordClearersIt : VaultRecordClearers)
@@ -274,7 +271,7 @@ namespace mvlt
             {
                 // if found record in a then delete it here
                 if (a.RecordsSet.find(*recordsSetIt) != a.RecordsSet.end())
-                    recordsSetIt = Vault::RemoveRecord(*recordsSetIt, nullptr);
+                    recordsSetIt = RemoveRecord(*recordsSetIt, nullptr);
                 else
                     ++recordsSetIt;
             }
@@ -293,7 +290,7 @@ namespace mvlt
             {
                 // if not found record in a then delete it here
                 if (a.RecordsSet.find(*recordsSetIt) == a.RecordsSet.end())
-                    recordsSetIt = Vault::RemoveRecord(*recordsSetIt, nullptr);
+                    recordsSetIt = RemoveRecord(*recordsSetIt, nullptr);
                 else
                     ++recordsSetIt;
             }

@@ -59,6 +59,34 @@ namespace mvlt
             \brief A method for checking whether a record is inside a Vault
             \return returns the validity of the record
         */
-        bool GetIsValid() noexcept;
+        bool GetIsValid() const noexcept;
+
+        /// \brief A method for removing record from all dependent VaultRecordSets
+        void RemoveFromDependentSets() noexcept;
+
+        /**
+            \brief A method for adding an record to a vaultRecordSet and adding a vaultRecordSet to dependent sets
+
+            \param [in] vaultRecordSet new dependent VaultRecordSet
+        */
+        void AddToDependentSets(VaultRecordSet* vaultRecordSet) noexcept;
+
+        /**
+            \brief A method for erasing an record from a vaultRecordSet and erasing a vaultRecordSet from dependent sets
+
+            \param [in] vaultRecordSet dependent VaultRecordSet to erase
+        */
+        void EraseDependentSet(VaultRecordSet* vaultRecordSet) noexcept;
+
+        /**
+            \brief A method for updating the position of a record within all dependencies
+
+            \tparam <T> Any type of data except for c arrays
+
+            \param [in] key changed data key
+            \param [in] data changed data
+        */
+        template<class T>
+        void UpdateDependentSets(const std::string& key, const T& data) noexcept;
     };
 }

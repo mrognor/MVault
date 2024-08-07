@@ -2,6 +2,8 @@
 
 #include "Vault.h"
 #include "VaultRecordSet.h"
+
+#include "VaultRecord.hpp"
 #include "VaultParamInput.hpp"
 
 // This file contains an implementation of the Vault template methods
@@ -101,9 +103,8 @@ namespace mvlt
         // It is required since VaultRecordSet child of Vault and may also call this method
         if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
         {
-            // Update all dependent VaultRecordSets structures
-            for (VaultRecordSet* vaultRecordSet : dataRecord->dependentVaultRecordSets)
-                vaultRecordSet->SetDataToRecord(dataRecord, key, data);
+            // Update all dependent VaultRecordSets
+            dataRecord->UpdateDependentSets(key, data);
 
             // Update data inside VaultRecord pointer inside VaultRecordRef and Vault
             dataRecord->SetData(key, data);
@@ -337,11 +338,8 @@ namespace mvlt
             // Add pointer to record from this to vaultRecordSet structure
             for (auto& adder : vaultRecordSet.VaultRecordAdders)
                 adder.second(record);
-
-            // Lock VaultRecord to thread safety add new dependent VaultRecordSet
-            record->VaultRecordMutex.lock();
-            record->dependentVaultRecordSets.emplace(&vaultRecordSet);
-            record->VaultRecordMutex.unlock();
+            
+            record->AddToDependentSets(&vaultRecordSet);
         }
 
         return res;
@@ -754,9 +752,7 @@ namespace mvlt
                     adder.second(record);
 
                 // Lock VaultRecord to thread safety add new dependent VaultRecordSet
-                record->VaultRecordMutex.lock();
-                record->dependentVaultRecordSets.emplace(&vaultRecordSet);
-                record->VaultRecordMutex.unlock();
+                record->AddToDependentSets(&vaultRecordSet);
             }
         }
         catch(VaultOperationResult result) // Catch complex request errors
@@ -816,13 +812,7 @@ namespace mvlt
             // It is not deleting when RemoveRecord called from VaultRecordSet
             if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
             {
-                tmpRec->VaultRecordMutex.lock();
-                for (VaultRecordSet* set : tmpRec->dependentVaultRecordSets)
-                {
-                    static_cast<Vault*>(set)->RemoveRecord(tmpRec, nullptr);
-                }
-                tmpRec->VaultRecordMutex.unlock();
-
+                tmpRec->RemoveFromDependentSets();
                 tmpRec->Invalidate();
             }
 
@@ -897,12 +887,7 @@ namespace mvlt
                 // It is not deleting when RemoveRecord called from VaultRecordSet
                 if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
                 {
-                    tmpRec->VaultRecordMutex.lock();
-                    for (VaultRecordSet* set : tmpRec->dependentVaultRecordSets)
-                    {
-                        static_cast<Vault*>(set)->RemoveRecord(tmpRec, nullptr);
-                    }
-                    tmpRec->VaultRecordMutex.unlock();
+                    tmpRec->RemoveFromDependentSets();
                     tmpRec->Invalidate();
                 }
                 

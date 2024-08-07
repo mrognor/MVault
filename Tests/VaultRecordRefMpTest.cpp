@@ -68,7 +68,6 @@ void VaultRecordRef_GetData_Test()
 
         th1.join();
         th2.join();
-        std::cout << i << std::endl;
         vlt.RemoveKey("B");
     }
 }

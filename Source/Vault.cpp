@@ -26,16 +26,9 @@ namespace mvlt
 
         if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
         {
+            // In VaultRecordSet "if" before this line will not called because type saved in VaultDerivedClass variable
+            recordToErase->RemoveFromDependentSets();
             recordToErase->Invalidate();
-
-            recordToErase->VaultRecordMutex.lock();
-            for (VaultRecordSet* set : recordToErase->dependentVaultRecordSets)
-            {
-                // "If" before this line will not called because type saved in VaultDerivedClass variable
-                static_cast<Vault*>(set)->RemoveRecord(recordToErase, nullptr);
-            }
-            recordToErase->VaultRecordMutex.unlock();
-
         }
 
         if (wasDeleted != nullptr) *wasDeleted = true;

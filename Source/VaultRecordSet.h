@@ -42,10 +42,25 @@ namespace mvlt
         VaultOperationResult RequestRecords(const VaultRequestType& requestType, const std::string& key, const T& beginKeyValue,
             const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue, 
             const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept;
+
+        /**
+            \brief Method for removing a record from a Vault
+
+            This method allows you to remove a record from VaultRecord set without deletion in Vault
+
+            \param [in] recordToErase the reference to the record that needs to be deleted
+            \param [out] wasDeleted indicates whether the record has been deleted
+            
+            \return Returns an iterator to the RecordSet element immediately following the one being deleted. If the element to be deleted is not found, it returns RecordSet->end()
+        */
+        std::unordered_set<VaultRecord *>::iterator RemoveRecord(VaultRecord* recordToErase, bool* wasDeleted) noexcept;
     public:
 
         /// Make Vault class friend
         friend Vault;
+
+        /// Make VaultRecord class friend
+        friend VaultRecord;
 
         /// \brief Default constructor
         VaultRecordSet() noexcept;

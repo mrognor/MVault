@@ -69,7 +69,7 @@ namespace mvlt
             return res;
         }
 
-        Vlt->RecursiveReadWriteMtx.ReadLock();
+        ReadLock<RecursiveReadWriteMutex> readLock(Vlt->RecursiveReadWriteMtx);
 
         // If key not exist
         if(!Vlt->GetKeyType(key, res.SavedType))
@@ -77,7 +77,6 @@ namespace mvlt
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongKey;
 
-            Vlt->RecursiveReadWriteMtx.ReadUnlock();
             VaultRecordPtr->VaultRecordMutex.unlock();
             return res;
         }
@@ -88,7 +87,6 @@ namespace mvlt
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongType;
 
-            Vlt->RecursiveReadWriteMtx.ReadUnlock();
             VaultRecordPtr->VaultRecordMutex.unlock();
             return res;
         }
@@ -97,7 +95,6 @@ namespace mvlt
         res.IsOperationSuccess = true;
         res.ResultCode = VaultOperationResultCode::Success;
 
-        Vlt->RecursiveReadWriteMtx.ReadUnlock();
         VaultRecordPtr->VaultRecordMutex.unlock();
 
         return res;

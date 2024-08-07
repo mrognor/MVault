@@ -123,7 +123,7 @@ namespace mvlt
         /**
             \brief Method for removing a record from a Vault
 
-            This method allows you to remove a record with or without deletion
+            This method allows you to remove a record
 
             \param [in] recordToErase the reference to the record that needs to be deleted
             \param [out] wasDeleted indicates whether the record has been deleted

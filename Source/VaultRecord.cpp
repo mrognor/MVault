@@ -1,4 +1,5 @@
 #include "VaultRecord.h"
+#include "VaultRecord.hpp"
 
 namespace mvlt
 {
@@ -44,12 +45,35 @@ namespace mvlt
         if (isEnd) delete this;
     }
 
-    bool VaultRecord::GetIsValid() noexcept
+    bool VaultRecord::GetIsValid() const noexcept
     {
         bool res;
         VaultRecordMutex.lock();
         res = IsValid;
         VaultRecordMutex.unlock();
         return res;
+    }
+
+    void VaultRecord::RemoveFromDependentSets() noexcept
+    {
+        VaultRecordMutex.lock();
+        for (VaultRecordSet* set : dependentVaultRecordSets)
+            set->RemoveRecord(this, nullptr);
+
+        VaultRecordMutex.unlock();
+    }
+
+    void VaultRecord::AddToDependentSets(VaultRecordSet* vaultRecordSet) noexcept
+    {
+        VaultRecordMutex.lock();
+        dependentVaultRecordSets.emplace(vaultRecordSet);
+        VaultRecordMutex.unlock();
+    }
+
+    void VaultRecord::EraseDependentSet(VaultRecordSet* vaultRecordSet) noexcept
+    {
+        VaultRecordMutex.lock();
+        dependentVaultRecordSets.erase(vaultRecordSet);
+        VaultRecordMutex.unlock();
     }
 }
