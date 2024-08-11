@@ -35,26 +35,11 @@ namespace mvlt
         {
             if (other.VaultRecordPtr != nullptr)
             {
-                other.VaultRecordPtr->VaultRecordMutex.lock();
-                
-                VaultRecord* oldVaultRecord = VaultRecordPtr;
+                if (VaultRecordPtr != nullptr) VaultRecordPtr->RemoveRef();
 
-                if (other.VaultRecordPtr->GetIsValid())
-                {
-                    other.VaultRecordPtr->AddRef();
-
-                    VaultRecordPtr = other.VaultRecordPtr;
-                    Vlt = other.Vlt;
-                }
-                else 
-                {
-                    Vlt = nullptr;
-                    VaultRecordPtr = nullptr;
-                }
-                
-                other.VaultRecordPtr->VaultRecordMutex.unlock();
-
-                if (oldVaultRecord != nullptr) oldVaultRecord->RemoveRef();
+                other.VaultRecordPtr->AddRef();
+                VaultRecordPtr = other.VaultRecordPtr;
+                Vlt = other.Vlt;
             }
             else 
             {
@@ -100,6 +85,8 @@ namespace mvlt
     {
         VaultOperationResult res;
 
+        WriteLock<RecursiveReadWriteMutex> writeLock(Vlt->RecursiveReadWriteMtx);
+
         // Copy data from function parametrs
         for (const auto& paramsIt : params)
         {
@@ -125,37 +112,27 @@ namespace mvlt
             return res;
         }
 
-        VaultRecordPtr->VaultRecordMutex.lock();
+        ReadLock<RecursiveReadWriteMutex> readLock(Vlt->RecursiveReadWriteMtx);
 
         // Check if Vault still accessable
         if (!VaultRecordPtr->GetIsValid())
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::DataRecordNotValid;
-
-            VaultRecordPtr->VaultRecordMutex.unlock();
             return res;
         }
-
-        Vlt->RecursiveReadWriteMtx.ReadLock();
 
         // If key not exist
         if(!Vlt->GetKeyType(key, res.SavedType))
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongKey;
-
-            Vlt->RecursiveReadWriteMtx.ReadUnlock();
-            VaultRecordPtr->VaultRecordMutex.unlock();
             return res;
         }
 
         VaultRecordPtr->GetDataAsString(key, str);
         res.IsOperationSuccess = true;
         res.ResultCode = VaultOperationResultCode::Success;
-
-        Vlt->RecursiveReadWriteMtx.ReadUnlock();
-        VaultRecordPtr->VaultRecordMutex.unlock();
 
         return res;
     }
@@ -184,19 +161,9 @@ namespace mvlt
 
         if (VaultRecordPtr != nullptr)
         {
-            VaultRecordPtr->VaultRecordMutex.lock();
-
             // Check if Vault still accessable
             if (VaultRecordPtr->GetIsValid())
-            {
-                Vlt->RecursiveReadWriteMtx.ReadLock();
-
-                for (const auto& vaultMapStructureIt : Vlt->VaultMapStructure) res.emplace_back(vaultMapStructureIt.first);
-
-                Vlt->RecursiveReadWriteMtx.ReadUnlock();
-            }
-
-            VaultRecordPtr->VaultRecordMutex.unlock();
+                res = std::move(Vlt->GetKeys());
         }
 
         return res;

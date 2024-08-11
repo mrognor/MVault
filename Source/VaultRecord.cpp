@@ -19,7 +19,7 @@ namespace mvlt
     void VaultRecord::AddRef() noexcept
     {
         VaultRecordMutex.lock();
-        if (IsValid) ++RefCounter;
+        ++RefCounter;
         VaultRecordMutex.unlock();
     }
 

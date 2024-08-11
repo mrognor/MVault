@@ -21,21 +21,16 @@ namespace mvlt
         }
 
         WriteLock<RecursiveReadWriteMutex> Lock(Vlt->RecursiveReadWriteMtx);
-        VaultRecordPtr->VaultRecordMutex.lock();
 
         // Check if Vault still accessable
         if (!VaultRecordPtr->GetIsValid())
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::DataRecordNotValid;
-
-            VaultRecordPtr->VaultRecordMutex.unlock();
             return res;
         }
 
         res = Vlt->SetDataToRecord(VaultRecordPtr, key, data);
-
-        VaultRecordPtr->VaultRecordMutex.unlock();
 
         return res;
     }
@@ -57,27 +52,21 @@ namespace mvlt
             return res;
         }
 
-        VaultRecordPtr->VaultRecordMutex.lock();
+        ReadLock<RecursiveReadWriteMutex> readLock(Vlt->RecursiveReadWriteMtx);
 
         // Check if Vault still accessable
         if (!VaultRecordPtr->GetIsValid())
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::DataRecordNotValid;
-
-            VaultRecordPtr->VaultRecordMutex.unlock();
             return res;
         }
-
-        ReadLock<RecursiveReadWriteMutex> readLock(Vlt->RecursiveReadWriteMtx);
 
         // If key not exist
         if(!Vlt->GetKeyType(key, res.SavedType))
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongKey;
-
-            VaultRecordPtr->VaultRecordMutex.unlock();
             return res;
         }
 
@@ -86,17 +75,12 @@ namespace mvlt
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongType;
-
-            VaultRecordPtr->VaultRecordMutex.unlock();
             return res;
         }
 
         VaultRecordPtr->GetData(key, data);
         res.IsOperationSuccess = true;
         res.ResultCode = VaultOperationResultCode::Success;
-
-        VaultRecordPtr->VaultRecordMutex.unlock();
-
         return res;
     }
 }

@@ -66,6 +66,10 @@ void VaultRecordRef_OperatorComparison_Test()
 
     TEST_ASSERT(vrr1 == vrr2, "Failed to compare vault record ref");
 
+    vrr1 = vlt.CreateRecord();
+
+    TEST_ASSERT(!(vrr1 == vrr2), "Failed to compare vault record ref");
+
     vrr2.Reset();
 
     TEST_ASSERT(!(vrr1 == vrr2), "Failed to compare vault record ref");
