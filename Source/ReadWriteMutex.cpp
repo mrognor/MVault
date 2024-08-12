@@ -8,92 +8,126 @@ namespace mvlt
         IsCondVarWaiting.store(false);
     }
 
+    void ReadWriteMutex::Disable() noexcept
+    {
+        IsActive = false;
+    }
+
     void ReadWriteMutex::ReadLock() noexcept
     {
-        WriteMutex.lock();
-        ReadMutex.lock();
-        ReadCounter.fetch_add(1);
-        ReadMutex.unlock();
-        WriteMutex.unlock();
+        if (IsActive)
+        {
+            WriteMutex.lock();
+            ReadMutex.lock();
+            ReadCounter.fetch_add(1);
+            ReadMutex.unlock();
+            WriteMutex.unlock();
+        }
     }
 
     void ReadWriteMutex::ReadUnlock() noexcept
     {
-        ReadMutex.lock();
-        ReadCounter.fetch_sub(1);
+        if (IsActive)
+        {
+            ReadMutex.lock();
+            ReadCounter.fetch_sub(1);
 
-        if (ReadCounter.load() == 0)
-            while (IsCondVarWaiting.load()) Cv.notify_all();
-        
-        ReadMutex.unlock();
+            if (ReadCounter.load() == 0)
+                while (IsCondVarWaiting.load()) Cv.notify_all();
+            
+            ReadMutex.unlock();
+        }
     }
 
     void ReadWriteMutex::WriteLock() noexcept
     {
-        std::mutex mtx;
-        std::unique_lock<std::mutex> lk(mtx);
+        if (IsActive)
+        {
+            std::mutex mtx;
+            std::unique_lock<std::mutex> lk(mtx);
 
-        WriteMutex.lock();
-        
-        IsCondVarWaiting.store(true);
+            WriteMutex.lock();
+            
+            IsCondVarWaiting.store(true);
 
-        if (ReadCounter > 0) Cv.wait(lk);
-        
-        IsCondVarWaiting.store(false);
+            if (ReadCounter > 0) Cv.wait(lk);
+            
+            IsCondVarWaiting.store(false);
+        }
     }
 
     void ReadWriteMutex::WriteUnlock() noexcept
     {
-        WriteMutex.unlock();
+        if (IsActive)
+        {
+            WriteMutex.unlock();
+        }
     }
 
     thread_local std::size_t LocalThreadReadLockCounter = 0;
     thread_local std::size_t LocalThreadWriteLockCounter = 0;
 
+    void RecursiveReadWriteMutex::Disable() noexcept
+    {
+        IsActive = false;
+    }
+
     void RecursiveReadWriteMutex::ReadLock() noexcept
     {
-        if (LocalThreadWriteLockCounter == 0)
+        if (IsActive)
         {
-            if (LocalThreadReadLockCounter == 0)
-                Rwmx.ReadLock();
+            if (LocalThreadWriteLockCounter == 0)
+            {
+                if (LocalThreadReadLockCounter == 0)
+                    Rwmx.ReadLock();
 
-            ++LocalThreadReadLockCounter;
+                ++LocalThreadReadLockCounter;
+            }
         }
     }
 
     void RecursiveReadWriteMutex::ReadUnlock() noexcept
     {
-        if (LocalThreadWriteLockCounter == 0)
+        if (IsActive)
         {
-            if (LocalThreadReadLockCounter == 1)
-                Rwmx.ReadUnlock();
-            
-            --LocalThreadReadLockCounter;
+            if (LocalThreadWriteLockCounter == 0)
+            {
+                if (LocalThreadReadLockCounter == 1)
+                    Rwmx.ReadUnlock();
+                
+                --LocalThreadReadLockCounter;
+            }
         }
     }
 
     void RecursiveReadWriteMutex::WriteLock() noexcept
     {
-        if (LocalThreadWriteLockCounter == 0)
+        if (IsActive)
         {
-            if (LocalThreadReadLockCounter > 0)
-                Rwmx.ReadUnlock();
-            
-            Rwmx.WriteLock();
-        }
+            if (LocalThreadWriteLockCounter == 0)
+            {
+                if (LocalThreadReadLockCounter > 0)
+                    Rwmx.ReadUnlock();
+                
+                Rwmx.WriteLock();
+            }
 
-        ++LocalThreadWriteLockCounter;
+            ++LocalThreadWriteLockCounter;
+        }
     }
 
 
     void RecursiveReadWriteMutex::WriteUnlock() noexcept
     {
-        if (LocalThreadWriteLockCounter == 1)
+        if (IsActive)
         {
-            Rwmx.WriteUnlock();
-            if (LocalThreadReadLockCounter > 0)
-                Rwmx.ReadLock();
+            if (LocalThreadWriteLockCounter == 1)
+            {
+                Rwmx.WriteUnlock();
+                if (LocalThreadReadLockCounter > 0)
+                    Rwmx.ReadLock();
+            }
+            --LocalThreadWriteLockCounter;
         }
-        --LocalThreadWriteLockCounter;
     }
 }

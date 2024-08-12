@@ -23,9 +23,15 @@ namespace mvlt
         std::atomic_int ReadCounter;
         std::atomic_bool IsCondVarWaiting;
         std::condition_variable Cv;
+
+        // A variable for switching the operation of the mutex. It is needed so that you can disable the mutex during inheritance
+        bool IsActive = true;
     public:
         /// \brief Default constructor
         ReadWriteMutex() noexcept;
+
+        /// \brief A function to disable the mutex. It is needed so that you can disable the mutex during inheritance
+        void Disable() noexcept;
 
         /**
             \brief A method for locking a section of code for reading
@@ -64,7 +70,13 @@ namespace mvlt
     {
     private:
         ReadWriteMutex Rwmx;
+
+        // A variable for switching the operation of the mutex. It is needed so that you can disable the mutex during inheritance
+        bool IsActive = true;
     public:
+
+        /// \brief A function to disable the mutex. It is needed so that you can disable the mutex during inheritance
+        void Disable() noexcept;
 
         /**
             \brief A method for locking a section of code for reading

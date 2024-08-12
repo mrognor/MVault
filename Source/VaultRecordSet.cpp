@@ -11,6 +11,7 @@ namespace mvlt
     VaultRecordSet::VaultRecordSet() noexcept 
     {
         VaultDerivedClass = VaultDerivedClasses::VaultRecordSetDerived;
+        RecursiveReadWriteMtx.Disable();
     }
 
     VaultRecordSet::VaultRecordSet(const VaultRecordSet& other) noexcept
@@ -42,6 +43,8 @@ namespace mvlt
                 // Lock VaultRecord to thread safety add new dependent VaultRecordSet
                 record->AddToDependentSets(this);
             }
+
+            RecursiveReadWriteMtx.Disable();
         }
 
         return *this;
