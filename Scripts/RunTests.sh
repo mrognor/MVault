@@ -9,7 +9,7 @@ make -j
 
 cd Tests
 
-#Launch tests
+# Launch tests
 echo "Start scenarios"
 ./Scenarios
 
