@@ -8,7 +8,7 @@
 using namespace mvlt;
 using namespace std;
 
-void VaultRecordRef_OperatorAssignment_Test()
+void VaultRecordRef_Copy_Test()
 {
     Vault vlt;
 
@@ -403,7 +403,7 @@ void VaultRecordRef_Destructor_Test()
 
 int main()
 {
-    VaultRecordRef_OperatorAssignment_Test();
+    VaultRecordRef_Copy_Test();
     VaultRecordRef_OperatorComparison_Test();
     VaultRecordRef_GetRecordUniqueId_Test();
     VaultRecordRef_SetData_Test();
