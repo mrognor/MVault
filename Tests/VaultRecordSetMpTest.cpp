@@ -12,14 +12,16 @@ void VaultRecordSet_Copy_Test()
 {
     Vault vlt;
 
+    vlt.AddKey("A", -1);
+
     for (int i = 0; i < 1000; ++i)
     {
-        vlt.AddKey("A", -1);
         for (int j = 0; j < 1000; ++j)
             vlt.CreateRecord({{"A", j}});
 
-        VaultRecordSet vrs1, vrs2;
+        VaultRecordSet vrs1, vrs2, vrs3;
         vlt.RequestLess("A", i, vrs1);
+        vlt.RequestGreater("A", i, vrs2);
 
         Starter starter;
 
@@ -32,18 +34,25 @@ void VaultRecordSet_Copy_Test()
         std::thread th2([&]()
         {
             starter.Wait();
-            VaultRecordSet vrs(vrs1);
+            vrs3 = vrs1;
         });
 
         std::thread th3([&]()
         {
             starter.Wait();
-            vlt.DropVault();
+            VaultRecordSet vrs(vrs1);
+        });
+
+        std::thread th4([&]()
+        {
+            starter.Wait();
+            vlt.DropData();
         });
 
         th1.join();
         th2.join();
         th3.join();
+        th4.join();
     }
 }
 

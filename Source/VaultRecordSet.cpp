@@ -8,6 +8,32 @@ namespace mvlt
         return Vault::RemoveRecord(recordToErase, wasDeleted);
     }
 
+    void VaultRecordSet::CopySet(const VaultRecordSet& other) noexcept
+    {
+        WriteLock<RecursiveReadWriteMutex> writeLock(other.ParentVault->RecursiveReadWriteMtx);
+
+        VaultDerivedClass = VaultDerivedClasses::VaultRecordSetDerived;
+        ParentVault = other.ParentVault;
+        KeysOrder = other.KeysOrder;
+
+        for (auto& keyCopierIt : other.VaultKeyCopiers)
+            keyCopierIt.second(*this);
+
+        other.ParentVault->RecordSetsSet.emplace(this);
+
+        for (VaultRecord* record : other.RecordsSet)
+        {
+            RecordsSet.emplace(record);
+
+            for (auto& adder : VaultRecordAdders)
+                adder.second(record);
+
+            record->AddToDependentSets(this);
+        }
+
+        RecursiveReadWriteMtx.Disable();
+    }
+
     VaultRecordSet::VaultRecordSet() noexcept 
     {
         VaultDerivedClass = VaultDerivedClasses::VaultRecordSetDerived;
@@ -16,35 +42,17 @@ namespace mvlt
 
     VaultRecordSet::VaultRecordSet(const VaultRecordSet& other) noexcept
     {
-        *this = other;
+        if (&other != this && other.GetIsParentVaultValid())
+            CopySet(other);
     }
 
     VaultRecordSet& VaultRecordSet::operator=(const VaultRecordSet& other) noexcept
     {
         if (&other != this)
         {
-            VaultDerivedClass = VaultDerivedClasses::VaultRecordSetDerived;
-            ParentVault = other.ParentVault;
-            IsParentVaultValid = true;
-            KeysOrder = other.KeysOrder;
-
-            for (auto& keyCopierIt : other.VaultKeyCopiers)
-                keyCopierIt.second(*this);
-
-            other.ParentVault->RecordSetsSet.emplace(this);
-
-            for (VaultRecord* record : other.RecordsSet)
-            {
-                RecordsSet.emplace(record);
-
-                for (auto& adder : VaultRecordAdders)
-                    adder.second(record);
-
-                // Lock VaultRecord to thread safety add new dependent VaultRecordSet
-                record->AddToDependentSets(this);
-            }
-
-            RecursiveReadWriteMtx.Disable();
+            Reset();
+            if (other.GetIsParentVaultValid())
+                CopySet(other);
         }
 
         return *this;
@@ -52,14 +60,14 @@ namespace mvlt
 
     bool VaultRecordSet::GetIsParentVaultValid() const noexcept
     {
-        return IsParentVaultValid;
+        return ParentVault != nullptr;
     }
 
     std::string VaultRecordSet::GetParentVaultUniqueId() const noexcept
     {
         std::stringstream ss;
 
-        if (IsParentVaultValid)
+        if (GetIsParentVaultValid())
             ss << ParentVault;
         else
             ss << "null";
@@ -71,7 +79,7 @@ namespace mvlt
     {
         bool res = false;
 
-        if (IsParentVaultValid)
+        if (GetIsParentVaultValid())
             res = ParentVault->IsKeyExist(key);
 
         return res;
@@ -83,7 +91,7 @@ namespace mvlt
         RecursiveReadWriteMtx.ReadLock();
 
         // Thread safety because in Vault destructor blocking this RecursiveReadWriteMtx to write
-        if (IsParentVaultValid)
+        if (GetIsParentVaultValid())
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
             res = Vault::GetKeyType(key, keyType);
@@ -98,7 +106,7 @@ namespace mvlt
     {
         VaultOperationResult res;
 
-        if (IsParentVaultValid)
+        if (GetIsParentVaultValid())
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
 
@@ -148,7 +156,7 @@ namespace mvlt
 
     void VaultRecordSet::Reset() noexcept
     {
-        if (IsParentVaultValid)
+        if (GetIsParentVaultValid())
         {
             ParentVault->RecursiveReadWriteMtx.WriteLock();
             Clear();
@@ -157,7 +165,6 @@ namespace mvlt
             ParentVault->RecordSetsSet.erase(this);
             ParentVault->RecursiveReadWriteMtx.WriteUnlock();
             ParentVault = nullptr;
-            IsParentVaultValid = false;
         }
     }
 
@@ -184,7 +191,7 @@ namespace mvlt
     {
         std::size_t res = 0;
 
-        if (IsParentVaultValid)
+        if (GetIsParentVaultValid())
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
             res = Vault::Size();
@@ -198,7 +205,7 @@ namespace mvlt
     {
         std::vector<std::string> res;
 
-        if (IsParentVaultValid)
+        if (GetIsParentVaultValid())
             res = ParentVault->GetKeys();
 
         return res;
@@ -208,7 +215,7 @@ namespace mvlt
     {
         std::vector<VaultRecordRef> res;
 
-        if (IsParentVaultValid)
+        if (GetIsParentVaultValid())
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
             res = Vault::GetSortedRecords(key, isReverse, amountOfRecords);
@@ -220,7 +227,7 @@ namespace mvlt
 
     void VaultRecordSet::PrintSet(const std::size_t& amountOfRecords) const noexcept
     {
-        if (IsParentVaultValid)
+        if (GetIsParentVaultValid())
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
             Vault::PrintVault(amountOfRecords);
@@ -233,7 +240,7 @@ namespace mvlt
     void VaultRecordSet::PrintAsTable(bool isPrintId, const std::size_t& amountOfRecords, std::string primaryKey, const bool& isReverse,
             const std::list<std::string> keys) const noexcept
         {
-        if (IsParentVaultValid)
+        if (GetIsParentVaultValid())
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
             Vault::PrintAsTable(isPrintId, amountOfRecords, primaryKey, isReverse, keys);
@@ -245,7 +252,7 @@ namespace mvlt
 
     void VaultRecordSet::Join(const VaultRecordSet& a) noexcept
     {
-        if (IsParentVaultValid && a.IsParentVaultValid)
+        if (GetIsParentVaultValid() && a.GetIsParentVaultValid())
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
 
@@ -266,7 +273,7 @@ namespace mvlt
 
     void VaultRecordSet::Exclude(const VaultRecordSet& a) noexcept
     {
-        if (IsParentVaultValid && a.IsParentVaultValid)
+        if (GetIsParentVaultValid() && a.GetIsParentVaultValid())
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
 
@@ -285,7 +292,7 @@ namespace mvlt
 
     void VaultRecordSet::Intersect(const VaultRecordSet& a) noexcept
     {
-        if (IsParentVaultValid && a.IsParentVaultValid)
+        if (GetIsParentVaultValid() && a.GetIsParentVaultValid())
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
 
@@ -306,7 +313,7 @@ namespace mvlt
     {
         bool res = false;
 
-        if (IsParentVaultValid)
+        if (GetIsParentVaultValid())
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
             res = Vault::SaveToFile(fileName);

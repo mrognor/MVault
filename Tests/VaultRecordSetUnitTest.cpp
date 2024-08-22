@@ -8,7 +8,7 @@ using namespace std;
 void VaultRecordSet_CopyConstructor_Test()
 {
     Vault vlt;
-    VaultRecordSet vrs1;
+    VaultRecordSet vrs1, vrs2;
 
     vlt.AddKey("A", 1);
     vlt.AddKey<std::string>("B", "");
@@ -18,9 +18,13 @@ void VaultRecordSet_CopyConstructor_Test()
 
     vlt.Request(Greater("A", 3) && Less("A", 7), vrs1);
 
-    VaultRecordSet vrs2(vrs1);
+    VaultRecordSet vrs3(vrs1);
 
-    TEST_ASSERT(vrs2 == vrs1, "Failed to copy vault record set");
+    // Copy empty
+    VaultRecordSet vrs4(vrs2);
+
+    TEST_ASSERT(vrs3 == vrs1, "Failed to copy vault record set");
+    TEST_ASSERT(vrs4 == vrs2, "Failed to copy vault record set");
 }
 
 void VaultRecordSet_OperatorAssignment_Test()

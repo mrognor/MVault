@@ -10,12 +10,11 @@ namespace mvlt
 
     void Intersection(const VaultRecordSet& a, const VaultRecordSet& b, VaultRecordSet& res) noexcept
     {
-        if (a.IsParentVaultValid)
+        if (a.GetIsParentVaultValid())
         {
             a.ParentVault->RecursiveReadWriteMtx.ReadLock();
 
             res.ParentVault = a.ParentVault;
-            res.IsParentVaultValid = true;
             
             for (auto& keyCopierIt : a.VaultKeyCopiers)
                 keyCopierIt.second(res);

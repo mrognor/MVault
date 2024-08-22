@@ -322,7 +322,6 @@ namespace mvlt
 
         // Set new parent vault to vaultRecordSet
         vaultRecordSet.ParentVault = const_cast<Vault*>(this);
-        vaultRecordSet.IsParentVaultValid = true;
 
         // Copy keys from this to vaultRecordSet
         for (auto& keyCopierIt : VaultKeyCopiers)
@@ -731,7 +730,6 @@ namespace mvlt
 
         // Set new parent vault to vaultRecordSet
         vaultRecordSet.ParentVault = const_cast<Vault*>(this);
-        vaultRecordSet.IsParentVaultValid = true;
         
         // Set key proper key order
         vaultRecordSet.KeysOrder = KeysOrder;

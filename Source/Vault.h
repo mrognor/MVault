@@ -506,7 +506,11 @@ namespace mvlt
         template <VaultRequestType Type>
         VaultOperationResult Request(const VaultRequest<Type>&& request, VaultRecordSet& vaultRecordSet) const;
 
-        /// \brief A method for deleting all data and keys
+        /**
+            \brief A method for deleting all data and keys
+        
+            \warning This method is not thread-safe! Call it only if you are sure that other threads are not working with VaultRecordSet or VaultRecordRef received from Vault
+        */
         void DropVault() noexcept;
 
         /// \brief A method for deleting all data, but keeping all keys

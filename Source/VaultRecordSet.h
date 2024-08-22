@@ -17,9 +17,6 @@ namespace mvlt
         // Pointer to parent Vault
         Vault* ParentVault = nullptr;
 
-        // Variable to store parent vault state
-        bool IsParentVaultValid = false;
-
         /**
             \brief The method for getting the result of the request
 
@@ -54,6 +51,14 @@ namespace mvlt
             \return Returns an iterator to the RecordSet element immediately following the one being deleted. If the element to be deleted is not found, it returns RecordSet->end()
         */
         std::unordered_set<VaultRecord *>::iterator RemoveRecord(VaultRecord* recordToErase, bool* wasDeleted) noexcept;
+
+        /**
+            \brief An internal method for copying objects
+
+            \param [in] other object to copy
+        */
+        void CopySet(const VaultRecordSet& other) noexcept;
+
     public:
 
         /// Make Vault class friend
@@ -65,10 +70,18 @@ namespace mvlt
         /// \brief Default constructor
         VaultRecordSet() noexcept;
 
-        /// \brief Copy constructor
+        /**
+            \brief Copy constructor
+
+            \param [in] other object to copy
+        */
         VaultRecordSet(const VaultRecordSet& other) noexcept;
 
-        /// \brief Operator assignment
+        /**
+            \brief Operator assignment
+
+            \param [in] other object to copy
+        */
         VaultRecordSet& operator=(const VaultRecordSet& other) noexcept;
         
         /// Making operator comparison function friendly

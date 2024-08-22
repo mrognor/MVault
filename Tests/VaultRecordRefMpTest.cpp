@@ -16,8 +16,8 @@ void VaultRecordRef_Copy_Test()
         
     for (int i = 0; i < 1000; ++i)
     {
-        VaultRecordRef vrr1, vrr2, vrr3;
-        vrr1 = vrr2 = vlt.CreateRecord();
+        VaultRecordRef vrr1, vrr2, vrr3, vrr4;
+        vrr1 = vrr2 = vrr3 = vlt.CreateRecord();
 
         Starter starter;
 
@@ -30,10 +30,16 @@ void VaultRecordRef_Copy_Test()
         std::thread th2([&]()
         {
             starter.Wait();
+            vrr4 = vrr1;
+        });
+    
+        std::thread th3([&]()
+        {
+            starter.Wait();
             VaultRecordRef vrr(vrr1);
         });
 
-        std::thread th3([&]()
+        std::thread th4([&]()
         {
             starter.Wait();
             vlt.EraseRecord(vrr2);
@@ -42,6 +48,7 @@ void VaultRecordRef_Copy_Test()
         th1.join();
         th2.join();
         th3.join();
+        th4.join();
     }
 }
 

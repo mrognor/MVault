@@ -11,7 +11,7 @@ namespace mvlt
     {
         VaultOperationResult res;
 
-        if (IsParentVaultValid)
+        if (GetIsParentVaultValid())
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
 
@@ -42,7 +42,7 @@ namespace mvlt
     {
         VaultOperationResult res;
 
-        if (IsParentVaultValid)
+        if (GetIsParentVaultValid())
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
             res = Vault::GetKeyValue(key, defaultKeyValue);
@@ -64,7 +64,7 @@ namespace mvlt
     {
         VaultOperationResult res;
 
-        if (IsParentVaultValid)
+        if (GetIsParentVaultValid())
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
 
@@ -89,7 +89,7 @@ namespace mvlt
     {
         VaultOperationResult res;
 
-        if (IsParentVaultValid)
+        if (GetIsParentVaultValid())
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
 
@@ -161,7 +161,7 @@ namespace mvlt
     {
         VaultOperationResult res;
 
-        if (IsParentVaultValid)
+        if (GetIsParentVaultValid())
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
 
@@ -190,7 +190,7 @@ namespace mvlt
     {
         VaultOperationResult res;
 
-        if (IsParentVaultValid)
+        if (GetIsParentVaultValid())
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
 
@@ -214,7 +214,7 @@ namespace mvlt
     {
         VaultOperationResult res;
 
-        if (IsParentVaultValid)
+        if (GetIsParentVaultValid())
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
 
@@ -236,7 +236,7 @@ namespace mvlt
     template<class F>
     void VaultRecordSet::SortBy(const std::string& key, const F&& func, const bool& isReverse, const std::size_t& amountOfRecords) const noexcept
     {
-        if (IsParentVaultValid)
+        if (GetIsParentVaultValid())
         {
             ParentVault->RecursiveReadWriteMtx.ReadLock();
             Vault::SortBy(key, std::move(func), isReverse, amountOfRecords);
