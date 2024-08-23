@@ -336,7 +336,7 @@ namespace mvlt
 
             If there was an error in one of the parameters, the function will stop at this parameter and return an error for this parameter.
             
-            \return VaultOperationResult object with GetData result
+            \return VaultOperationResult object with CreateRecord result
         */
         VaultOperationResult CreateRecord(const std::vector<std::pair<std::string, VaultParamInput>>& params) noexcept;
 
@@ -347,7 +347,7 @@ namespace mvlt
             \param [in] vaultRecordRef The reference to the VaultRecordRef to which the new record will be assigned
             \param [in] params a vector of pairs with data to be put in the Vault
 
-            \return VaultOperationResult object with GetData result
+            \return VaultOperationResult object with CreateRecord result
         */
         VaultOperationResult CreateRecord(VaultRecordRef& vaultRecordRef, const std::vector<std::pair<std::string, VaultParamInput>>& params) noexcept;
 
