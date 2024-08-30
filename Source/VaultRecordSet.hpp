@@ -13,7 +13,7 @@ namespace mvlt
 
         if (GetIsParentVaultValid())
         {
-            ParentVault->RecursiveReadWriteMtx.ReadLock();
+            ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
 
             // \todo Replace to reset to clear keys 
             vaultRecordSet.Clear();
@@ -23,8 +23,6 @@ namespace mvlt
 
             res = Vault::RequestRecords(requestType, key, beginKeyValue, endKeyValue, vaultRecordSet, isIncludeBeginKeyValue, isIncludeEndKeyValue, amountOfRecords, requestPredicat);
             vaultRecordSet.ParentVault = ParentVault;
-
-            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
         else 
         {
@@ -44,9 +42,8 @@ namespace mvlt
 
         if (GetIsParentVaultValid())
         {
-            ParentVault->RecursiveReadWriteMtx.ReadLock();
+            ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
             res = Vault::GetKeyValue(key, defaultKeyValue);
-            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
         else 
         {
@@ -66,12 +63,10 @@ namespace mvlt
 
         if (GetIsParentVaultValid())
         {
-            ParentVault->RecursiveReadWriteMtx.ReadLock();
+            ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
 
             res = Vault::GetRecord(key, keyValue, vaultRecordRef);
             vaultRecordRef.Vlt = ParentVault;
-            
-            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
         else 
         {
@@ -91,13 +86,11 @@ namespace mvlt
 
         if (GetIsParentVaultValid())
         {
-            ParentVault->RecursiveReadWriteMtx.ReadLock();
+            ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
 
             res = Vault::GetRecords(key, keyValue, recordsRefs, amountOfRecords);
             for (VaultRecordRef& ref: recordsRefs)
                 ref.Vlt = ParentVault;
-            
-            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
         else 
         {
@@ -163,7 +156,7 @@ namespace mvlt
 
         if (GetIsParentVaultValid())
         {
-            ParentVault->RecursiveReadWriteMtx.ReadLock();
+            ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
 
             // \todo Replace to reset to clear keys 
             vaultRecordSet.Clear();
@@ -173,8 +166,6 @@ namespace mvlt
 
             res = Vault::Request(std::move(request), vaultRecordSet);
             vaultRecordSet.ParentVault = ParentVault;
-
-            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
         else 
         {
@@ -192,11 +183,8 @@ namespace mvlt
 
         if (GetIsParentVaultValid())
         {
-            ParentVault->RecursiveReadWriteMtx.ReadLock();
-
+            ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
             res = Vault::EraseRecord(key, keyValue);
-
-            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
         else 
         {
@@ -216,11 +204,8 @@ namespace mvlt
 
         if (GetIsParentVaultValid())
         {
-            ParentVault->RecursiveReadWriteMtx.ReadLock();
-
+            ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
             res = Vault::EraseRecords(key, keyValue, amountOfRecords);
-
-            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
         else 
         {
@@ -238,9 +223,8 @@ namespace mvlt
     {
         if (GetIsParentVaultValid())
         {
-            ParentVault->RecursiveReadWriteMtx.ReadLock();
+            ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
             Vault::SortBy(key, std::move(func), isReverse, amountOfRecords);
-            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
     }
 }

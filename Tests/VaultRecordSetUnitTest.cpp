@@ -66,6 +66,7 @@ void VaultRecordSet_GetIsParentVaultValid_Test()
 {
     Vault* vlt = new Vault;
     VaultRecordSet vrs;
+    TEST_ASSERT(vrs.GetIsParentVaultValid() == false, "Failed to create set");
 
     vlt->AddKey("A", -1);
     vlt->CreateRecord();
@@ -627,6 +628,11 @@ void VaultRecordSet_RemoveRecord_Test()
     TEST_ASSERT(vrs.Size() == 1, "Failed to erase record");
     vrs.RemoveRecord("A", -1);
     TEST_ASSERT(vrs.Size() == 0, "Failed to erase record");
+
+    vrr = vlt.CreateRecord();
+    vrs.AddRecord(vrr);
+    vlt.EraseRecord("A", -1);
+    vlt.EraseRecord(vrr);
 }
 
 void VaultRecordSet_RemoveRecords_Test()

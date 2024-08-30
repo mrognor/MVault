@@ -24,3 +24,6 @@ echo "Start VaultRecordRef unit tests"
 
 echo "Start VaultRecordRef multi-threading tests"
 ./VaultRecordRefMpTest
+
+echo "Start VaultRecordSet multi-threading tests"
+./VaultRecordSetMpTest

@@ -88,17 +88,13 @@ namespace mvlt
     bool VaultRecordSet::GetKeyType(const std::string& key, std::type_index& keyType) const noexcept
     {
         bool res = false;
-        RecursiveReadWriteMtx.ReadLock();
 
-        // Thread safety because in Vault destructor blocking this RecursiveReadWriteMtx to write
         if (GetIsParentVaultValid())
         {
-            ParentVault->RecursiveReadWriteMtx.ReadLock();
+            ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
             res = Vault::GetKeyType(key, keyType);
-            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
 
-        RecursiveReadWriteMtx.ReadUnlock();
         return res;
     }
 
@@ -108,7 +104,7 @@ namespace mvlt
 
         if (GetIsParentVaultValid())
         {
-            ParentVault->RecursiveReadWriteMtx.ReadLock();
+            ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
 
             // Check if vault record ref depends on same vault as this
             if (recordRef.Vlt == ParentVault && recordRef.IsValid())
@@ -142,8 +138,6 @@ namespace mvlt
                 else
                     res.ResultCode = VaultOperationResultCode::ParentVaultNotMatch;
             }
-
-            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
         else 
         {
@@ -158,12 +152,11 @@ namespace mvlt
     {
         if (GetIsParentVaultValid())
         {
-            ParentVault->RecursiveReadWriteMtx.WriteLock();
+            WriteLock<RecursiveReadWriteMutex> writeLock(ParentVault->RecursiveReadWriteMtx);
             Clear();
             Vault::DropVault();
 
             ParentVault->RecordSetsSet.erase(this);
-            ParentVault->RecursiveReadWriteMtx.WriteUnlock();
             ParentVault = nullptr;
         }
     }
@@ -184,6 +177,9 @@ namespace mvlt
 
     bool VaultRecordSet::RemoveRecord(const VaultRecordRef& recordRefToErase) noexcept
     {
+        if (!GetIsParentVaultValid()) return false;
+        
+        ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
         return Vault::EraseRecord(recordRefToErase);
     }
 
@@ -193,9 +189,8 @@ namespace mvlt
 
         if (GetIsParentVaultValid())
         {
-            ParentVault->RecursiveReadWriteMtx.ReadLock();
+            ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
             res = Vault::Size();
-            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
 
         return res;
@@ -217,9 +212,8 @@ namespace mvlt
 
         if (GetIsParentVaultValid())
         {
-            ParentVault->RecursiveReadWriteMtx.ReadLock();
+            ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
             res = Vault::GetSortedRecords(key, isReverse, amountOfRecords);
-            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
 
         return res;
@@ -229,9 +223,8 @@ namespace mvlt
     {
         if (GetIsParentVaultValid())
         {
-            ParentVault->RecursiveReadWriteMtx.ReadLock();
+            ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
             Vault::PrintVault(amountOfRecords);
-            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
         else
             std::cout << "The parent Vault is not valid!" << std::endl;
@@ -242,9 +235,8 @@ namespace mvlt
         {
         if (GetIsParentVaultValid())
         {
-            ParentVault->RecursiveReadWriteMtx.ReadLock();
+            ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
             Vault::PrintAsTable(isPrintId, amountOfRecords, primaryKey, isReverse, keys);
-            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
         else
             std::cout << "The parent Vault is not valid!" << std::endl;
@@ -254,7 +246,7 @@ namespace mvlt
     {
         if (GetIsParentVaultValid() && a.GetIsParentVaultValid())
         {
-            ParentVault->RecursiveReadWriteMtx.ReadLock();
+            ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
 
             for (VaultRecord* record : a.RecordsSet)
             {
@@ -266,8 +258,6 @@ namespace mvlt
                         adder.second(record);
                 }
             }
-
-            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
     }
 
@@ -275,7 +265,7 @@ namespace mvlt
     {
         if (GetIsParentVaultValid() && a.GetIsParentVaultValid())
         {
-            ParentVault->RecursiveReadWriteMtx.ReadLock();
+            ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
 
             for (auto recordsSetIt = RecordsSet.begin(); recordsSetIt != RecordsSet.end();)
             {
@@ -285,8 +275,6 @@ namespace mvlt
                 else
                     ++recordsSetIt;
             }
-
-            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
     }
 
@@ -294,7 +282,7 @@ namespace mvlt
     {
         if (GetIsParentVaultValid() && a.GetIsParentVaultValid())
         {
-            ParentVault->RecursiveReadWriteMtx.ReadLock();
+            ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
 
             for (auto recordsSetIt = RecordsSet.begin(); recordsSetIt != RecordsSet.end();)
             {
@@ -304,8 +292,6 @@ namespace mvlt
                 else
                     ++recordsSetIt;
             }
-
-            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
     }
 
@@ -315,9 +301,8 @@ namespace mvlt
 
         if (GetIsParentVaultValid())
         {
-            ParentVault->RecursiveReadWriteMtx.ReadLock();
+            ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
             res = Vault::SaveToFile(fileName);
-            ParentVault->RecursiveReadWriteMtx.ReadUnlock();
         }
 
         return res;
@@ -333,7 +318,6 @@ namespace mvlt
     {
         bool res = false;
 
-        /// \todo Потокобезопасность
         if (a.ParentVault == b.ParentVault && a.RecordsSet == b.RecordsSet)
             res = true;
 
