@@ -561,6 +561,10 @@ namespace mvlt
     template <class T>
     VaultOperationResult Vault::GetRecord(const std::string& key, const T& keyValue, VaultRecordRef& vaultRecordRef) const noexcept
     {
+        static_assert(!std::is_array<T>::value, "It is not possible to use a c array as a key value. \n\
+            If you want to use a string as a key, you must specialize the function with a string. Like this: \n\
+            AddKey<std::string>(\"Key\", \"Value\") or AddKey(\"Key\", std::string(\"Value\"))");
+
         // Fill res info known at start
         VaultOperationResult res;
         res.Key = key;
@@ -612,6 +616,10 @@ namespace mvlt
     template <class T>
     VaultOperationResult Vault::GetRecords(const std::string& key, const T& keyValue, std::vector<VaultRecordRef>& recordsRefs, const std::size_t& amountOfRecords) const noexcept
     {
+        static_assert(!std::is_array<T>::value, "It is not possible to use a c array as a key value. \n\
+            If you want to use a string as a key, you must specialize the function with a string. Like this: \n\
+            AddKey<std::string>(\"Key\", \"Value\") or AddKey(\"Key\", std::string(\"Value\"))");
+
         // Fill res info known at start
         VaultOperationResult res;
         res.Key = key;
