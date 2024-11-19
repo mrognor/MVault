@@ -1,6 +1,5 @@
 # Run tests to cretae coverage data
 cd $(dirname "$0")
-# ./RunTests.sh
 
 # Navigate to root dir
 cd ..
@@ -17,6 +16,8 @@ cp -r Build/Source/CMakeFiles/MVault.dir/Functions/*.gcda Coverage/Vault
 
 # Create coverage html
 lcov -t "VaultCoverage" -o VaultCoverage.info -c -d Coverage/Vault --demangle-cpp
+
+
 genhtml -o Coverage/Vault VaultCoverage.info
 rm VaultCoverage.info
 

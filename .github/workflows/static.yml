@@ -27,30 +27,34 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Pages
-        uses: actions/configure-pages@v3
+        uses: actions/configure-pages@v5
 
-      # Install Doxygen
-      - name: Install Doxygen
-        run: sudo apt install doxygen && doxygen --version
+      - name: Install packages
+        run: sudo apt-get update && sudo apt-get upgrade && sudo DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install doxygen graphviz lcov cmake
 
-      - name: Install Graphviz
-        run: sudo apt install graphviz
-      
-      # Create documentation
       - name: Create documentation
         run: ./Docs/Gendoc.sh
 
+      - name: Run tests
+        run: ./Scripts/RunTests.sh
+
+      - name: Test coverage
+        run: ./Scripts/TestCoverage.sh
+
+      - name: Move coverage artifact
+        run: mv ./Coverage ./Docs/Generated/html
+
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v3
         with:
           # Upload documentation
           path: './Docs/Generated/html/'
           
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v4
