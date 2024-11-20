@@ -1,4 +1,5 @@
-Full documentation available [here](https://mrognor.github.io/MVault/index.html)
+Full documentation available [here](https://mrognor.github.io/MVault/index.html)  
+Test coverage available [here](https://mrognor.github.io/MVault/Coverage/CodeCoverage.html)
 
 # Configure project
 Cmake is used to configure the project. It is called via the **Configure** script. 
