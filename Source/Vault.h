@@ -6,6 +6,7 @@
 
 #include "VaultClasses.h"
 
+#include "Map.h"
 #include "VaultRecord.h"
 #include "VaultRequest.h"
 #include "VaultRecordRef.h"
@@ -36,8 +37,7 @@ namespace mvlt
         VaultRecord RecordTemplate;
 
         /*
-            A simple typedef for HashMap. It is necessary for a more understandable separation of types.
-            Represents the internal structure of the Vault.
+            Hash map to store records
             A string with the name of the key is used as the key. All keys are the same as in Vault.
             The value stores a pointer to std::unordered_multimap<T, VaultRecord*>.
             The key type is same as the Vault key value type.
@@ -45,11 +45,10 @@ namespace mvlt
 
             Such a complex structure is needed to quickly, in O(1), search for each key with any type.
         */
-        mutable VaultStructureHashMap VaultHashMapStructure;
+        mutable DataHashMap VaultHashMapStructure;
 
         /*
-            A simple typedef for Map. It is necessary for a more understandable separation of types.
-            Represents the internal structure of the Vault.
+            Map to store records
             A string with the name of the key is used as the key. All keys are the same as in Vault.
             The value stores a pointer to std::multimap<T, VaultRecord*>.
             The key type is same as the Vault key value type.
@@ -58,7 +57,7 @@ namespace mvlt
             Such a complex structure is necessary in order to quickly, in O(log n), 
             find a set of elements that meet a certain requirement, for example, more than a certain value or less than this value
         */
-        mutable VaultStructureMap VaultMapStructure;
+        mutable DataMap VaultMapStructure;
 
         // Unordered map with keys names and their types
         std::unordered_map<std::string, std::type_index> KeysTypes;

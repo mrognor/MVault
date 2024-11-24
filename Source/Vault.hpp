@@ -17,13 +17,11 @@ namespace mvlt
         res.Key = key;
         res.RequestedType = typeid(T);
 
-        // A pointer for storing a std::unordered_multimap in which a template data type is used as a key, 
-        // and a pointer to the DataHashMap is used as a value
-        std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
+        // A pointer for storing a hash table with T type key and vault record as value
+        UnorderedMap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
 
-        // A pointer for storing a std::multimap in which a template data type is used as a key, 
-        // and a pointer to the DataHashMap is used as a value
-        std::multimap<T, VaultRecord*>* TtoVaultRecordMap = nullptr;
+        // A pointer for storing a binary tree with T type key and vault record as value
+        Map<T, VaultRecord*>* TtoVaultRecordMap = nullptr;
 
         // Lock Vault to write
         WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
@@ -61,42 +59,42 @@ namespace mvlt
         dataRecord->GetData(key, oldData);
 
         // Remove oldData from TtoVaultRecordHashMap from VaultHashMapStructure
-        auto FirstAndLastIteratorsWithKeyOnHashMap = TtoVaultRecordHashMap->equal_range(oldData);
+        auto FirstAndLastIteratorsWithKeyOnHashMap = TtoVaultRecordHashMap->EqualRange(oldData);
 
         // Iterate over all data records with oldData key
         for (auto& pairIt = FirstAndLastIteratorsWithKeyOnHashMap.first; pairIt != FirstAndLastIteratorsWithKeyOnHashMap.second; ++pairIt)
         {
             // Find required data record
-            if (pairIt->second == dataRecord)
+            if ((*pairIt).second == dataRecord)
             {
-                TtoVaultRecordHashMap->erase(pairIt);
+                TtoVaultRecordHashMap->Erase((*pairIt).first);
                 break;
             }
         }
 
         // Add new data to TtoVaultRecordHashMap to Vault VaultHashMapStructure
-        TtoVaultRecordHashMap->emplace(data, dataRecord);
+        TtoVaultRecordHashMap->Emplace(data, dataRecord);
 
 
         // Get std::multimap with T key and VaultRecord* value
         VaultMapStructure.GetData(key, TtoVaultRecordMap);
 
         // Remove oldData from TtoVaultRecordMap from VaultMapStructure
-        auto FirstAndLastIteratorsWithKeyOnMap = TtoVaultRecordMap->equal_range(oldData);
+        auto FirstAndLastIteratorsWithKeyOnMap = TtoVaultRecordMap->EqualRange(oldData);
 
         // Iterate over all data records with oldData key
         for (auto& pairIt = FirstAndLastIteratorsWithKeyOnMap.first; pairIt != FirstAndLastIteratorsWithKeyOnMap.second; ++pairIt)
         {
             // Find required data record
-            if (pairIt->second == dataRecord)
+            if ((*pairIt).second == dataRecord)
             {
-                TtoVaultRecordMap->erase(pairIt);
+                TtoVaultRecordMap->Erase((*pairIt).first);
                 break;
             }
         }
 
         // Add new data to TtoVaultRecordMap to Vault VaultMapStructure
-        TtoVaultRecordMap->emplace(data, dataRecord);
+        TtoVaultRecordMap->Emplace(data, dataRecord);
 
 
         // Check if this method was original called. That mean that this method called not from next if statement.
@@ -149,14 +147,14 @@ namespace mvlt
         if (requestType == VaultRequestType::Equal)
         {
             // Pointer to store hash map inside VaultStructureHashMap
-            std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
+            UnorderedMap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
 
             // Get hash map
             VaultHashMapStructure.GetData(key, TtoVaultRecordHashMap);
             
             // Pair with begin and end iterator with T type and beginKeyValue value
-            auto equalRange = TtoVaultRecordHashMap->equal_range(beginKeyValue);
-            if (equalRange.first != TtoVaultRecordHashMap->end())
+            auto equalRange = TtoVaultRecordHashMap->EqualRange(beginKeyValue);
+            if (equalRange.first != TtoVaultRecordHashMap->End())
             {
                 std::size_t counter = 0;
                 for (auto equalRangeIt = equalRange.first; equalRangeIt != equalRange.second; ++equalRangeIt)
@@ -167,11 +165,11 @@ namespace mvlt
                     // Check if it is not default predicate
                     if (&requestPredicat != &DefaultRequestPredicat)
                     {
-                        if (requestPredicat(VaultRecordRef(equalRangeIt->second, const_cast<Vault*>(this))))
-                            vaultRecords.emplace(equalRangeIt->second);
+                        if (requestPredicat(VaultRecordRef((*equalRangeIt).second, const_cast<Vault*>(this))))
+                            vaultRecords.emplace((*equalRangeIt).second);
                     }
                     else
-                        vaultRecords.emplace(equalRangeIt->second);
+                        vaultRecords.emplace((*equalRangeIt).second);
                     
                     ++counter;
                 }
@@ -180,28 +178,28 @@ namespace mvlt
         else 
         {
             // Pointer to store map inside VaultStructureHashMap
-            std::multimap<T, VaultRecord*>* TtoVaultRecordMap = nullptr;
+            Map<T, VaultRecord*>* TtoVaultRecordMap = nullptr;
 
             // Get map
             VaultMapStructure.GetData(key, TtoVaultRecordMap);
             
             // Iterator to set it in switch
-            decltype(TtoVaultRecordMap->end()) startIt, endIt;
+            decltype(TtoVaultRecordMap->End()) startIt, endIt;
 
             // Lambda function for finding greater value iterator
             auto findGreater = [&]()
                 {
                     bool flag = false;
-                    startIt = TtoVaultRecordMap->lower_bound(beginKeyValue);
+                    startIt = TtoVaultRecordMap->LowerBound(beginKeyValue);
 
                     // If it is not beginKeyValue in map and it is value bigger than beginKeyValue in map
-                    if (startIt != TtoVaultRecordMap->end() && startIt->first > beginKeyValue)
+                    if (startIt != TtoVaultRecordMap->End() && (*startIt).first > beginKeyValue)
                         return;
                         
                     // Iterate to the next value
-                    for (auto TtoVaultRecordMapIt = startIt; TtoVaultRecordMapIt != TtoVaultRecordMap->end(); ++TtoVaultRecordMapIt)
+                    for (auto TtoVaultRecordMapIt = startIt; TtoVaultRecordMapIt != TtoVaultRecordMap->End(); ++TtoVaultRecordMapIt)
                     {
-                        if (TtoVaultRecordMapIt->first != startIt->first) 
+                        if ((*TtoVaultRecordMapIt).first != (*startIt).first) 
                         {
                             startIt = TtoVaultRecordMapIt;
                             flag = true;
@@ -210,26 +208,26 @@ namespace mvlt
                     }
                 
                     // Check if it is any record with key value greater than beginKeyValue 
-                    if (!flag) startIt = TtoVaultRecordMap->end();
+                    if (!flag) startIt = TtoVaultRecordMap->End();
                 };
 
             // Lambda function for finding less value iterator
             auto findLess = [&]()
                 {
-                    endIt = TtoVaultRecordMap->upper_bound(endKeyValue);
+                    endIt = TtoVaultRecordMap->UpperBound(endKeyValue);
 
                     // Check if TtoVaultRecordMap size not zero and endIt not last iterator
-                    if (endIt != TtoVaultRecordMap->begin() && TtoVaultRecordMap->size() > 0)
+                    if (endIt != TtoVaultRecordMap->Begin() && TtoVaultRecordMap->Size() > 0)
                     {
                         // Upper bound return next iterator with value greater then endKeyValue
                         --endIt;
 
                         // Iterate to previous value
-                        while(endIt != TtoVaultRecordMap->begin() && endIt->first == endKeyValue)
+                        while(endIt != (*TtoVaultRecordMap).Begin() && (*endIt).first == endKeyValue)
                             --endIt;
                         
                         // Increase iterator to add later last element in vaultRecords
-                        if (endIt != TtoVaultRecordMap->begin())
+                        if (endIt != TtoVaultRecordMap->Begin())
                             ++endIt;
                     }
                 };
@@ -238,36 +236,36 @@ namespace mvlt
             switch (requestType) 
             {
             case VaultRequestType::GreaterOrEqual:
-                startIt = TtoVaultRecordMap->lower_bound(beginKeyValue);
-                endIt = TtoVaultRecordMap->end();
+                startIt = TtoVaultRecordMap->LowerBound(beginKeyValue);
+                endIt = TtoVaultRecordMap->End();
                 break;
             
             case VaultRequestType::Greater:
                 findGreater();
-                endIt = TtoVaultRecordMap->end();
+                endIt = TtoVaultRecordMap->End();
                 break;
             
             case VaultRequestType::Less:
-                startIt = TtoVaultRecordMap->begin();
+                startIt = TtoVaultRecordMap->Begin();
                 findLess();
                 break;
             
             case VaultRequestType::LessOrEqual:
-                startIt = TtoVaultRecordMap->begin();
-                endIt = TtoVaultRecordMap->upper_bound(beginKeyValue);
+                startIt = TtoVaultRecordMap->Begin();
+                endIt = TtoVaultRecordMap->UpperBound(beginKeyValue);
                 break;
             
             case VaultRequestType::Interval:
                 if (beginKeyValue > endKeyValue || (beginKeyValue == endKeyValue && (isIncludeBeginKeyValue == false || isIncludeEndKeyValue == false)))
                 {
-                    startIt = TtoVaultRecordMap->end();
-                    endIt = TtoVaultRecordMap->end();
+                    startIt = TtoVaultRecordMap->End();
+                    endIt = TtoVaultRecordMap->End();
                     break;
                 }
 
-                if(isIncludeBeginKeyValue) startIt = TtoVaultRecordMap->lower_bound(beginKeyValue);
+                if(isIncludeBeginKeyValue) startIt = TtoVaultRecordMap->LowerBound(beginKeyValue);
                 else findGreater();
-                if(isIncludeEndKeyValue) endIt = TtoVaultRecordMap->upper_bound(endKeyValue);
+                if(isIncludeEndKeyValue) endIt = TtoVaultRecordMap->UpperBound(endKeyValue);
                 else findLess();
                 break;
 
@@ -285,11 +283,11 @@ namespace mvlt
                 // Check if it is not default predicate
                 if (&requestPredicat != &DefaultRequestPredicat)
                 {
-                    if (requestPredicat(VaultRecordRef(TtoVaultRecordMapIt->second, const_cast<Vault*>(this))))
-                        vaultRecords.emplace(TtoVaultRecordMapIt->second);
+                    if (requestPredicat(VaultRecordRef((*TtoVaultRecordMapIt).second, const_cast<Vault*>(this))))
+                        vaultRecords.emplace((*TtoVaultRecordMapIt).second);
                 }
                 else
-                    vaultRecords.emplace(TtoVaultRecordMapIt->second);
+                    vaultRecords.emplace((*TtoVaultRecordMapIt).second);
 
                 ++counter;
             }
@@ -369,18 +367,18 @@ namespace mvlt
         RecordTemplate.SetData(key, defaultKeyValue);
 
         // Create new hash map to store data with template T key
-        std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = new std::unordered_multimap<T, VaultRecord*>;
+        UnorderedMap<T, VaultRecord*>* TtoVaultRecordHashMap = new UnorderedMap<T, VaultRecord*>(true);
         VaultHashMapStructure.SetData(key, TtoVaultRecordHashMap, [](const void* ptr)
             {
-                delete* (std::unordered_multimap<T, VaultRecord*>**)ptr;
+                delete* (UnorderedMap<T, VaultRecord*>**)ptr;
             }
         );
 
         // Create new map to store data with template T key
-        std::multimap<T, VaultRecord*>* TtoVaultRecordMap = new std::multimap<T, VaultRecord*>;
+        Map<T, VaultRecord*>* TtoVaultRecordMap = new Map<T, VaultRecord*>(true);
         VaultMapStructure.SetData(key, TtoVaultRecordMap, [](const void* ptr)
             {
-                delete* (std::multimap<T, VaultRecord*>**)ptr;
+                delete* (Map<T, VaultRecord*>**)ptr;
             }
         );
 
@@ -391,16 +389,16 @@ namespace mvlt
                 T value = defaultKeyValue;
                 // Try to get key value from new record. If it is not value inside then defaultKeyValue will be used
                 newRecord->GetData(key, value);
-                TtoVaultRecordHashMap->emplace(value, newRecord);
-                TtoVaultRecordMap->emplace(value, newRecord);
+                TtoVaultRecordHashMap->Emplace(value, newRecord);
+                TtoVaultRecordMap->Emplace(value, newRecord);
             }
         );
 
         // Add function to TtoVaultRecordHashMap cleareing
         VaultRecordClearers.emplace(key, [=]()
             {
-                TtoVaultRecordHashMap->clear();
-                TtoVaultRecordMap->clear();
+                TtoVaultRecordHashMap->Clear();
+                TtoVaultRecordMap->Clear();
             }
         );
 
@@ -412,26 +410,26 @@ namespace mvlt
                 newRecord->GetData(key, recordTData);
 
                 // Find all elements on multi_map with recordTData value
-                auto FirstAndLastIteratorsWithKeyOnHashMap = TtoVaultRecordHashMap->equal_range(recordTData);
+                auto FirstAndLastIteratorsWithKeyOnHashMap = TtoVaultRecordHashMap->EqualRange(recordTData);
 
                 // Find newRecord and erase it from TtoVaultRecordHashMap
                 for (auto pairIt = FirstAndLastIteratorsWithKeyOnHashMap.first; pairIt != FirstAndLastIteratorsWithKeyOnHashMap.second; ++pairIt)
                 {
-                    if (pairIt->second == newRecord)
+                    if ((*pairIt).second == newRecord)
                     {
-                        TtoVaultRecordHashMap->erase(pairIt);
+                        TtoVaultRecordHashMap->Erase(pairIt);
                         break;
                     }
                 }
 
                 // Find all elements on map with recordTData value
-                auto FirstAndLastIteratorsWithKeyOnMap = TtoVaultRecordMap->equal_range(recordTData);
+                auto FirstAndLastIteratorsWithKeyOnMap = TtoVaultRecordMap->EqualRange(recordTData);
                 // Find newRecord and erase it from TtoVaultRecordHashMap
                 for (auto pairIt = FirstAndLastIteratorsWithKeyOnMap.first; pairIt != FirstAndLastIteratorsWithKeyOnMap.second; ++pairIt)
                 {
-                    if (pairIt->second == newRecord)
+                    if ((*pairIt).second == newRecord)
                     {
-                        TtoVaultRecordMap->erase(pairIt);
+                        TtoVaultRecordMap->Erase((*pairIt).first);
                         break;
                     }
                 }
@@ -448,8 +446,8 @@ namespace mvlt
             }
             else
             {
-                for (auto TtoVaultRecordMapIt = TtoVaultRecordMap->rbegin(); TtoVaultRecordMapIt != TtoVaultRecordMap->rend(); ++TtoVaultRecordMapIt)
-                    if(!functionToSortedData(VaultRecordRef(TtoVaultRecordMapIt->second, this)))
+                for (auto TtoVaultRecordMapIt = TtoVaultRecordMap->Rbegin(); TtoVaultRecordMapIt != TtoVaultRecordMap->Rend(); ++TtoVaultRecordMapIt)
+                    if(!functionToSortedData(VaultRecordRef((*TtoVaultRecordMapIt).second, this)))
                         break;
             }
         });
@@ -466,8 +464,8 @@ namespace mvlt
             for (const auto& recordsSetIt : RecordsSet)
             {
                 recordsSetIt->SetData(key, defaultKeyValue);
-                TtoVaultRecordHashMap->emplace(defaultKeyValue, recordsSetIt);
-                TtoVaultRecordMap->emplace(defaultKeyValue, recordsSetIt);
+                TtoVaultRecordHashMap->Emplace(defaultKeyValue, recordsSetIt);
+                TtoVaultRecordMap->Emplace(defaultKeyValue, recordsSetIt);
             }
 
             for (VaultRecordSet* set : RecordSetsSet)
@@ -481,8 +479,8 @@ namespace mvlt
             // Add new data to record set
             for (const auto& recordsSetIt : RecordsSet)
             {
-                TtoVaultRecordHashMap->emplace(defaultKeyValue, recordsSetIt);
-                TtoVaultRecordMap->emplace(defaultKeyValue, recordsSetIt);
+                TtoVaultRecordHashMap->Emplace(defaultKeyValue, recordsSetIt);
+                TtoVaultRecordMap->Emplace(defaultKeyValue, recordsSetIt);
             }
         }
 
@@ -590,16 +588,16 @@ namespace mvlt
         }
 
         // Pointer to store map inside VaultStructureHashMap
-        std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
+        UnorderedMap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
 
         // Checking whether such a key exists
         VaultHashMapStructure.GetData(key, TtoVaultRecordHashMap);
         
         // Iterator to element with T type and keyValue value
-        auto TtoVaultRecordIt = TtoVaultRecordHashMap->find(keyValue);
-        if (TtoVaultRecordIt != TtoVaultRecordHashMap->end())
+        auto TtoVaultRecordIt = TtoVaultRecordHashMap->Find(keyValue);
+        if (TtoVaultRecordIt != TtoVaultRecordHashMap->End())
         {
-            vaultRecordRef.SetRecord(TtoVaultRecordIt->second, const_cast<Vault*>(this));
+            vaultRecordRef.SetRecord((*TtoVaultRecordIt).second, const_cast<Vault*>(this));
             res.IsOperationSuccess = true;
             res.ResultCode = VaultOperationResultCode::Success;
         }
@@ -647,20 +645,20 @@ namespace mvlt
         }
 
         // Pointer to store map inside VaultStructureHashMap
-        std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
+        UnorderedMap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
 
         // Checking whether such a key exists
         VaultHashMapStructure.GetData(key, TtoVaultRecordHashMap);
         
         // Pair with begin and end iterator with T type and keyValue value
-        auto equalRange = TtoVaultRecordHashMap->equal_range(keyValue);
+        auto equalRange = TtoVaultRecordHashMap->EqualRange(keyValue);
         if (equalRange.first != TtoVaultRecordHashMap->end())
         {
             std::size_t counter = 0;
             for (auto equalRangeIt = equalRange.first; equalRangeIt != equalRange.second; ++equalRangeIt)
             {
                 ++counter;
-                recordsRefs.emplace_back(VaultRecordRef(equalRangeIt->second, const_cast<Vault*>(this)));
+                recordsRefs.emplace_back(VaultRecordRef((*equalRangeIt).second, const_cast<Vault*>(this)));
                 if (counter >= amountOfRecords) break;
             }
         }
@@ -798,16 +796,16 @@ namespace mvlt
         }
 
         // Pointer to store map inside VaultStructureHashMap
-        std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
+        UnorderedMap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
 
         // Checking whether such a key exists
         VaultHashMapStructure.GetData(key, TtoVaultRecordHashMap);
         
         // Iterator to element with T type and keyValue value
-        auto TtoVaultRecordIt = TtoVaultRecordHashMap->find(keyValue);
+        auto TtoVaultRecordIt = TtoVaultRecordHashMap->Find(keyValue);
         if (TtoVaultRecordIt != TtoVaultRecordHashMap->end())
         {
-            VaultRecord* tmpRec = TtoVaultRecordIt->second;
+            VaultRecord* tmpRec = (*TtoVaultRecordIt).second;
 
             for (auto& eraser : VaultRecordErasers)
                 eraser.second(tmpRec);
@@ -862,13 +860,13 @@ namespace mvlt
         }
 
         // Pointer to store map inside VaultStructureHashMap
-        std::unordered_multimap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
+        UnorderedMap<T, VaultRecord*>* TtoVaultRecordHashMap = nullptr;
 
         // Checking whether such a key exists
         VaultHashMapStructure.GetData(key, TtoVaultRecordHashMap);
         
         // Pair with begin and end iterator with T type and keyValue value
-        auto equalRange = TtoVaultRecordHashMap->equal_range(keyValue);
+        auto equalRange = TtoVaultRecordHashMap->EqualRange(keyValue);
         if (equalRange.first != TtoVaultRecordHashMap->end())
         {
             res.IsOperationSuccess = true;
@@ -883,7 +881,7 @@ namespace mvlt
 
                 ++counter;
 
-                VaultRecord* tmpRec = equalRangeIt->second;
+                VaultRecord* tmpRec = (*equalRangeIt).second;
                 for (auto& eraser : VaultRecordErasers)
                     eraser.second(tmpRec);
 
