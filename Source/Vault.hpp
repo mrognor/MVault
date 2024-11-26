@@ -343,7 +343,8 @@ namespace mvlt
     }
 
     template <class T>
-    bool Vault::AddKey(const std::string& key, const T& defaultKeyValue) noexcept
+    bool Vault::AddKey(const std::string& key, const T& defaultKeyValue, const bool& isUniqueKey,
+        std::function<T(std::size_t)> uniqueKeyFunction) noexcept
     {
         static_assert(!std::is_array<T>::value, "It is not possible to use a c array as a key value. \n\
             If you want to use a string as a key, you must specialize the function with a string. Like this: \n\
@@ -366,8 +367,11 @@ namespace mvlt
         // Add data to template
         RecordTemplate.SetData(key, defaultKeyValue);
 
+        // Add unique key
+        if (isUniqueKey) UniqueKeys.emplace(key);
+
         // Create new hash map to store data with template T key
-        UnorderedMap<T, VaultRecord*>* TtoVaultRecordHashMap = new UnorderedMap<T, VaultRecord*>(true);
+        UnorderedMap<T, VaultRecord*>* TtoVaultRecordHashMap = new UnorderedMap<T, VaultRecord*>(!isUniqueKey);
         VaultHashMapStructure.SetData(key, TtoVaultRecordHashMap, [](const void* ptr)
             {
                 delete* (UnorderedMap<T, VaultRecord*>**)ptr;
@@ -375,7 +379,7 @@ namespace mvlt
         );
 
         // Create new map to store data with template T key
-        Map<T, VaultRecord*>* TtoVaultRecordMap = new Map<T, VaultRecord*>(true);
+        Map<T, VaultRecord*>* TtoVaultRecordMap = new Map<T, VaultRecord*>(!isUniqueKey);
         VaultMapStructure.SetData(key, TtoVaultRecordMap, [](const void* ptr)
             {
                 delete* (Map<T, VaultRecord*>**)ptr;
@@ -389,8 +393,16 @@ namespace mvlt
                 T value = defaultKeyValue;
                 // Try to get key value from new record. If it is not value inside then defaultKeyValue will be used
                 newRecord->GetData(key, value);
-                TtoVaultRecordHashMap->Emplace(value, newRecord);
+
+                // Try to emplace data into hash table. If it is multi container then it is always emplaced
+                // If it is not multi container then data emplaced only if it was not same data alredy in hash table
+                auto emplaceRes = TtoVaultRecordHashMap->Emplace(value, newRecord);
+
+                // Return false if data alredy in hash table
+                if (!emplaceRes.second) return false;
+
                 TtoVaultRecordMap->Emplace(value, newRecord);
+                return true;
             }
         );
 
@@ -461,30 +473,83 @@ namespace mvlt
         if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
         {
             // Add new data to record set
-            for (const auto& recordsSetIt : RecordsSet)
+            if (isUniqueKey)
             {
-                recordsSetIt->SetData(key, defaultKeyValue);
-                TtoVaultRecordHashMap->Emplace(defaultKeyValue, recordsSetIt);
-                TtoVaultRecordMap->Emplace(defaultKeyValue, recordsSetIt);
-            }
+                std::size_t counter = 0;
+                for (const auto& recordsSetIt : RecordsSet)
+                {
+                    T value = uniqueKeyFunction(counter);
+                    ++counter;
 
-            for (VaultRecordSet* set : RecordSetsSet)
+                    recordsSetIt->SetData(key, value);
+                    TtoVaultRecordHashMap->Emplace(value, recordsSetIt);
+                    TtoVaultRecordMap->Emplace(value, recordsSetIt);
+                }
+
+                counter = 0;
+                for (VaultRecordSet* set : RecordSetsSet)
+                {
+                    T value = uniqueKeyFunction(counter);
+                    ++counter;
+
+                    set->AddKey(key, value);
+                    set->KeysOrder.emplace_back(key);
+                }
+            }
+            else
             {
-                set->AddKey(key, defaultKeyValue);
-                set->KeysOrder.emplace_back(key);
+                for (const auto& recordsSetIt : RecordsSet)
+                {
+                    recordsSetIt->SetData(key, defaultKeyValue);
+                    TtoVaultRecordHashMap->Emplace(defaultKeyValue, recordsSetIt);
+                    TtoVaultRecordMap->Emplace(defaultKeyValue, recordsSetIt);
+                }
+
+                for (VaultRecordSet* set : RecordSetsSet)
+                {
+                    set->AddKey(key, defaultKeyValue);
+                    set->KeysOrder.emplace_back(key);
+                }
             }
         }
         else
         {
             // Add new data to record set
-            for (const auto& recordsSetIt : RecordsSet)
+            if (isUniqueKey)
             {
-                TtoVaultRecordHashMap->Emplace(defaultKeyValue, recordsSetIt);
-                TtoVaultRecordMap->Emplace(defaultKeyValue, recordsSetIt);
+                std::size_t counter = 0;
+                for (const auto& recordsSetIt : RecordsSet)
+                {    
+                    T value = uniqueKeyFunction(counter);
+                    ++counter;
+
+                    TtoVaultRecordHashMap->Emplace(value, recordsSetIt);
+                    TtoVaultRecordMap->Emplace(value, recordsSetIt);
+                }
+            }
+            else 
+            {
+                for (const auto& recordsSetIt : RecordsSet)
+                {
+                    TtoVaultRecordHashMap->Emplace(defaultKeyValue, recordsSetIt);
+                    TtoVaultRecordMap->Emplace(defaultKeyValue, recordsSetIt);
+                }
             }
         }
 
         return true;
+    }
+
+    template <class T>
+    bool Vault::AddKey(const std::string& key, const T& defaultKeyValue) noexcept
+    {
+        return AddKey(key, defaultKeyValue, false, {[&](std::size_t counter) -> T{ return defaultKeyValue; }});
+    }
+
+    template <class T>
+    bool Vault::AddUniqueKey(const std::string& key, std::function<T(std::size_t)> uniqueKeyFunction) noexcept
+    {
+        return AddKey(key, T(), true, uniqueKeyFunction);
     }
 
     template <class T>

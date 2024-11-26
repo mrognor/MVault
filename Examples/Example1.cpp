@@ -80,4 +80,38 @@ int main()
     vlt.UpdateKey("id", 0);
     vlt.CreateRecord();
     vlt.PrintAsTable(true);
+
+    vlt.DropVault();
+    vlt.AddKey("A", -1);
+    vlt.AddKey<std::string>("B", "");
+    vlt.AddKey("C", false);
+
+    vlt.CreateRecord();
+    vlt.CreateRecord();
+    vlt.CreateRecord();
+    vlt.CreateRecord();
+    vlt.CreateRecord();
+    vlt.CreateRecord();
+    
+    vlt.PrintAsTable();
+    
+    vlt.AddUniqueKey<std::string>("D", {[](const std::size_t& count) -> std::string 
+    { 
+        switch (count % 3)
+        {
+        case 0:
+            return "Zero";
+            break;
+        case 1:
+            return "One";
+            break;
+        case 2:
+            return "Two";
+            break;
+        }
+
+        return "None";
+    }});
+    vlt.PrintAsTable();
+    vlt.CreateRecord();
 }

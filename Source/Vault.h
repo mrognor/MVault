@@ -63,7 +63,7 @@ namespace mvlt
         std::unordered_map<std::string, std::type_index> KeysTypes;
 
         // Unordered_map of functions that add a new element to the VaultStructureHashMap
-        std::unordered_map<std::string, std::function<void(VaultRecord*)>> VaultRecordAdders;
+        std::unordered_map<std::string, std::function<bool(VaultRecord*)>> VaultRecordAdders;
 
         // Unordered_map of functions which clean up the Vault structure, but do not delete records
         std::unordered_map<std::string, std::function<void()>> VaultRecordClearers;
@@ -84,6 +84,9 @@ namespace mvlt
 
         // List to store keys order
         std::list<std::string> KeysOrder;
+
+        // Set with all unique keys
+        std::set<std::string> UniqueKeys;
 
         // Recursive mutex for thread safety
         mutable RecursiveReadWriteMutex RecursiveReadWriteMtx;
@@ -177,6 +180,21 @@ namespace mvlt
             const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue, 
             const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept;
 
+        /**
+            \brief Template method to add new key with default value to Vault
+
+            \tparam <T> Any type of data except for c arrays
+
+            \param [in] key new key name
+            \param [in] defaultKeyValue default key value
+            \param [in] isUniqueKey is this is key with only unique values
+
+            \return Returns false if such a key already exists, otherwise it returns true
+        */
+        template <class T>
+        bool AddKey(const std::string& key, const T& defaultKeyValue, const bool& isUniqueKey, 
+            std::function<T(std::size_t)> uniqueKeyFunction) noexcept;
+
     public:
 
         /// Making the VaultRecordRef class friendly so that it has access to the internal members of the Vault class
@@ -213,6 +231,29 @@ namespace mvlt
         */
         template <class T>
         bool AddKey(const std::string& key, const T& defaultKeyValue) noexcept;
+
+        /**
+            \brief Template method to add new unique key to Vault
+
+            \tparam <T> Any type of data except for c arrays
+
+            \param [in] key new key name
+            \param [in] uniqueKeyFunction A function to determine the value of the key that will be set
+             for an entry that has already been in vault. The function takes std::size_t as the index of the record. 
+             The same index value between runs is not guaranteed. The function should return an object of type T, which will be set to a record.
+            
+            \warning If the user function contains an error and the vault has the same unique key value for different records, then the vault behavior is undefined
+
+            The basic syntax of the method is as follows:
+            \code{.cpp}
+                vlt.AddUniqueKey<int>("A", {[](std::size_t count) -> int { return static_cast<int>(count); }});
+            \endcode
+            Note that the lambda function is enclosed in {} and the return value is specified via ->
+
+            \return Returns false if such a key already exists, otherwise it returns true
+        */
+        template <class T>
+        bool AddUniqueKey(const std::string& key, std::function<T(std::size_t)> uniqueKeyFunction) noexcept;
 
         /**
             \brief Template method to update default key value
@@ -290,7 +331,9 @@ namespace mvlt
             The method accepts a vector of pairs, the first element of the pair is a string with a key, 
             and the second element of the pair are key values of any type.
             The order of the pairs is not important, assignment takes place by key. The number of pairs can be any, 
-            for all keys for which no value has been specified, the default value will remain
+            for all keys for which no value has been specified, the default value will remain.
+            If there are unique keys in the vault, then when you try to add a record with a 
+            unique key value that is already in the vault, the new record will not be added.
 
             The Vault in the example has 2 keys. One is the id of the int type, and the second is the name of the std::string type
             Usage example:
@@ -342,6 +385,9 @@ namespace mvlt
         /**
             \overload
             \brief Method to create new VaultRecord.
+
+            If there are unique keys in the vault, then when you try to add a record with a unique key value that is already in the vault, 
+            the new record will not be added, and the record created earlier will be placed in vaultRecordRef.
 
             \param [in] vaultRecordRef The reference to the VaultRecordRef to which the new record will be assigned
             \param [in] params a vector of pairs with data to be put in the Vault

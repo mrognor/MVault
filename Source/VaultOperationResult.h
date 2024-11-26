@@ -16,15 +16,16 @@ namespace mvlt
     /// \brief Enum with all error handling codes
     enum class VaultOperationResultCode
     {
-        RecordAlredyInSet = -6,   ///< This code is returned when trying to add an record to the set when it is already in it
-        ParentVaultNotMatch = -5, ///< This code is returned during operations on VaultRecordSet when objects depend on different Vaults
-        ParentVaultNotValid = -4, ///< This code is returned when calling VaultRecordSet operations when the parent Vault is not valid
-        DataRecordNotValid = -3,  ///< This code is returned when data is requested from the VaultRecordRef and the record it refers to is not valid
-        WrongKey = -2,            ///< This code is returned when the requested key has not been found.
-        WrongType = -1,           ///< This code is returned when the requested type does not match the saved type.
-        Idle = 0,                 ///< The default state.
-        WrongValue = 1,           ///< This value is returned when the key was found, the requested type and the saved type are equal, but the requested value was not found
-        Success = 2,              ///< This value is returned when the request was completely successful
+        RecordAlredyInSet = -6,        ///< This code is returned when trying to add an record to the set when it is already in it
+        ParentVaultNotMatch = -5,      ///< This code is returned during operations on VaultRecordSet when objects depend on different Vaults
+        ParentVaultNotValid = -4,      ///< This code is returned when calling VaultRecordSet operations when the parent Vault is not valid
+        DataRecordNotValid = -3,       ///< This code is returned when data is requested from the VaultRecordRef and the record it refers to is not valid
+        WrongKey = -2,                 ///< This code is returned when the requested key has not been found.
+        WrongType = -1,                ///< This code is returned when the requested type does not match the saved type.
+        Idle = 0,                      ///< The default state.
+        WrongValue = 1,                ///< This value is returned when the key was found, the requested type and the saved type are equal, but the requested value was not found
+        UniqueKeyValueAlredyInSet = 2, ///< This value is returned when the key was found, the requested type and the saved type are equal, but the new value alredy in vault
+        Success = 3,                   ///< This value is returned when the request was completely successful
     };
     
     /**@} */

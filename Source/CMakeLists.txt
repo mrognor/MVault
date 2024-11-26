@@ -19,7 +19,8 @@ set(CMAKE_CXX_STANDARD 11)
 set(MVaultHeaders
     MVault.h
 
-    Vault.h 
+    Map.h
+    Vault.h
     VaultRecord.h
     VaultRequest.h
     VaultRecordRef.h
@@ -27,8 +28,8 @@ set(MVaultHeaders
     VaultParamInput.h
     VaultOperationResult.h
 
-    DataContainer.h 
-    DataSaver.h 
+    DataContainer.h
+    DataSaver.h
     ReadWriteMutex.h
 
     Functions/ToString.h

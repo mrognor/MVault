@@ -19,6 +19,9 @@ namespace mvlt
         case VaultOperationResultCode::Idle:
             return "Idle state. The operation was not performed.";
 
+        case VaultOperationResultCode::UniqueKeyValueAlredyInSet:
+            return "Unique key value alredy in set";
+
         case VaultOperationResultCode::Success:
             return "The operation was completed successfully.";
 

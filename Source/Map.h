@@ -271,20 +271,21 @@ namespace mvlt
             \param [in] key rvalue to key
             \param [in] value rvlaue to value
 
-            \return Iterator with new created data
+            \return A pair consisting of an iterator to the inserted element 
+            (or to the element that prevented the insertion) and a bool value set to true if and only if the insertion took place.
         */
         template <class EmplaceKeyType, class EmplaceValueType>
-        Iterator Emplace(EmplaceKeyType&& key, EmplaceValueType&& value)
+        std::pair<Iterator, bool> Emplace(EmplaceKeyType&& key, EmplaceValueType&& value)
         {
             if (IsMultiMap)
             {
                 auto dataMultiMapIt = DataMultiMap.emplace(std::forward<EmplaceKeyType>(key), std::forward<EmplaceValueType>(value));
-                return Iterator(dataMultiMapIt, DataMap.end(), true);
+                return std::pair<Iterator, bool>(Iterator(dataMultiMapIt, DataMap.end(), true), true);
             }
             else
             {
                 auto dataMapIt = DataMap.emplace(std::forward<EmplaceKeyType>(key), std::forward<EmplaceValueType>(value));
-                return Iterator(DataMultiMap.end(), dataMapIt.first, false);
+                return std::pair<Iterator, bool>(Iterator(DataMultiMap.end(), dataMapIt.first, false), dataMapIt.second);
             }
         }
 

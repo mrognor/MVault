@@ -83,6 +83,9 @@ namespace mvlt
         if (foundedKeyInHashMapIt == KeysTypes.end())
             return false;
 
+        // Try to erase unique key
+        UniqueKeys.erase(key);
+
         // Remove key from hash map with keys types
         KeysTypes.erase(foundedKeyInHashMapIt);
 
@@ -127,20 +130,8 @@ namespace mvlt
 
     VaultRecordRef Vault::CreateRecord() noexcept
     {
-        // Lock Vault to write
-        WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
-
-        // Create new record
-        VaultRecord* newData = new VaultRecord(RecordTemplate);
-        // Add new record to set
-        RecordsSet.emplace(newData);
-
-        // Add new record to every maps inside VaultStructureHashMap
-        for (const auto& vaultRecordAddersIt : VaultRecordAdders)
-            vaultRecordAddersIt.second(newData);
-
-        VaultRecordRef res(newData, this);
-
+        VaultRecordRef res;
+        CreateRecord(res, std::vector<std::pair<std::string, VaultParamInput>>());
         return res;
     }
 
@@ -208,14 +199,48 @@ namespace mvlt
         // If param vec correct than add new record
         if (isCorrectParams)
         {
-            // Add new record to set
-            RecordsSet.emplace(newData);
+            std::vector<std::string> addedUniqueKeys;
+            std::string incorrectUniqueKey;
 
-            // Add new record to every maps inside VaultStructureHashMap
-            for (const auto& vaultRecordAddersIt : VaultRecordAdders)
-                vaultRecordAddersIt.second(newData);
+            // Adding unique keys
+            for (auto uniqueKeyIt = UniqueKeys.begin(); uniqueKeyIt != UniqueKeys.end(); ++uniqueKeyIt)
+            {
+                // Find key adder and try to emplace data and if add failed, then break cycle
+                if (!VaultRecordAdders.find(*uniqueKeyIt)->second(newData))
+                {
+                    incorrectUniqueKey = *uniqueKeyIt;
+                    break;
+                }
 
-            vaultRecordRef.SetRecord(newData, this);
+                addedUniqueKeys.emplace_back(*uniqueKeyIt);
+            }
+
+            // If at least one unique key adding fail
+            if (addedUniqueKeys.size() != UniqueKeys.size())
+            {
+                // Removed added unique keys
+                for (const std::string& uniqueKey : addedUniqueKeys)
+                    VaultRecordErasers.find(uniqueKey)->second(newData);
+
+                res.IsOperationSuccess = false;
+                res.Key = incorrectUniqueKey;
+                res.SavedType = KeysTypes.find(incorrectUniqueKey)->second;
+                res.RequestedType = res.SavedType;
+                res.ResultCode = VaultOperationResultCode::UniqueKeyValueAlredyInSet;
+                isCorrectParams = true;
+                delete newData;
+            }
+            else
+            {
+                // Add new record to set
+                RecordsSet.emplace(newData);
+
+                // Add new record to every maps inside VaultStructureHashMap
+                for (const auto& vaultRecordAddersIt : VaultRecordAdders)
+                    vaultRecordAddersIt.second(newData);
+
+                vaultRecordRef.SetRecord(newData, this);
+            }
         }
         else delete newData;
 
