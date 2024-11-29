@@ -193,7 +193,7 @@ namespace mvlt
         */
         template <class T>
         bool AddKey(const std::string& key, const T& defaultKeyValue, const bool& isUniqueKey, 
-            std::function<T(std::size_t)> uniqueKeyFunction) noexcept;
+            std::function<T(std::size_t, const VaultRecordRef&)> uniqueKeyFunction) noexcept;
 
     public:
 
@@ -253,7 +253,7 @@ namespace mvlt
             \return Returns false if such a key already exists, otherwise it returns true
         */
         template <class T>
-        bool AddUniqueKey(const std::string& key, std::function<T(std::size_t)> uniqueKeyFunction) noexcept;
+        bool AddUniqueKey(const std::string& key, std::function<T(std::size_t, const VaultRecordRef&)> uniqueKeyFunction) noexcept;
 
         /**
             \brief Template method to update default key value

@@ -344,7 +344,7 @@ namespace mvlt
 
     template <class T>
     bool Vault::AddKey(const std::string& key, const T& defaultKeyValue, const bool& isUniqueKey,
-        std::function<T(std::size_t)> uniqueKeyFunction) noexcept
+        std::function<T(std::size_t, const VaultRecordRef&)> uniqueKeyFunction) noexcept
     {
         static_assert(!std::is_array<T>::value, "It is not possible to use a c array as a key value. \n\
             If you want to use a string as a key, you must specialize the function with a string. Like this: \n\
@@ -470,70 +470,44 @@ namespace mvlt
         });  
 
 
-        if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
+        // Add new data to record set
+        if (isUniqueKey)
         {
-            // Add new data to record set
-            if (isUniqueKey)
+            std::size_t counter = 0;
+            for (const auto& recordsSetIt : RecordsSet)
             {
-                std::size_t counter = 0;
-                for (const auto& recordsSetIt : RecordsSet)
-                {
-                    T value = uniqueKeyFunction(counter);
-                    ++counter;
+                T value = uniqueKeyFunction(counter, VaultRecordRef(recordsSetIt, this));
+                ++counter;
 
+                if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
                     recordsSetIt->SetData(key, value);
-                    TtoVaultRecordHashMap->Emplace(value, recordsSetIt);
-                    TtoVaultRecordMap->Emplace(value, recordsSetIt);
-                }
 
-                counter = 0;
-                for (VaultRecordSet* set : RecordSetsSet)
-                {
-                    T value = uniqueKeyFunction(counter);
-                    ++counter;
-
-                    set->AddKey(key, value);
-                    set->KeysOrder.emplace_back(key);
-                }
+                TtoVaultRecordHashMap->Emplace(value, recordsSetIt);
+                TtoVaultRecordMap->Emplace(std::move(value), recordsSetIt);
             }
-            else
-            {
-                for (const auto& recordsSetIt : RecordsSet)
-                {
-                    recordsSetIt->SetData(key, defaultKeyValue);
-                    TtoVaultRecordHashMap->Emplace(defaultKeyValue, recordsSetIt);
-                    TtoVaultRecordMap->Emplace(defaultKeyValue, recordsSetIt);
-                }
 
+            if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
+            {
                 for (VaultRecordSet* set : RecordSetsSet)
                 {
-                    set->AddKey(key, defaultKeyValue);
+                    set->AddUniqueKey(key, uniqueKeyFunction);
                     set->KeysOrder.emplace_back(key);
                 }
             }
         }
         else
         {
-            // Add new data to record set
-            if (isUniqueKey)
+            for (const auto& recordsSetIt : RecordsSet)
             {
-                std::size_t counter = 0;
-                for (const auto& recordsSetIt : RecordsSet)
-                {    
-                    T value = uniqueKeyFunction(counter);
-                    ++counter;
-
-                    TtoVaultRecordHashMap->Emplace(value, recordsSetIt);
-                    TtoVaultRecordMap->Emplace(value, recordsSetIt);
-                }
+                recordsSetIt->SetData(key, defaultKeyValue);
+                TtoVaultRecordHashMap->Emplace(defaultKeyValue, recordsSetIt);
+                TtoVaultRecordMap->Emplace(defaultKeyValue, recordsSetIt);
             }
-            else 
+
+            for (VaultRecordSet* set : RecordSetsSet)
             {
-                for (const auto& recordsSetIt : RecordsSet)
-                {
-                    TtoVaultRecordHashMap->Emplace(defaultKeyValue, recordsSetIt);
-                    TtoVaultRecordMap->Emplace(defaultKeyValue, recordsSetIt);
-                }
+                set->AddKey(key, defaultKeyValue);
+                set->KeysOrder.emplace_back(key);
             }
         }
 
@@ -543,11 +517,11 @@ namespace mvlt
     template <class T>
     bool Vault::AddKey(const std::string& key, const T& defaultKeyValue) noexcept
     {
-        return AddKey(key, defaultKeyValue, false, {[&](std::size_t counter) -> T{ return defaultKeyValue; }});
+        return AddKey(key, defaultKeyValue, false, {[&](std::size_t counter, const VaultRecordRef&) -> T{ return defaultKeyValue; }});
     }
 
     template <class T>
-    bool Vault::AddUniqueKey(const std::string& key, std::function<T(std::size_t)> uniqueKeyFunction) noexcept
+    bool Vault::AddUniqueKey(const std::string& key, std::function<T(std::size_t, const VaultRecordRef&)> uniqueKeyFunction) noexcept
     {
         return AddKey(key, T(), true, uniqueKeyFunction);
     }

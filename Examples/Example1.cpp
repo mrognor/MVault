@@ -86,32 +86,20 @@ int main()
     vlt.AddKey<std::string>("B", "");
     vlt.AddKey("C", false);
 
-    vlt.CreateRecord();
-    vlt.CreateRecord();
-    vlt.CreateRecord();
-    vlt.CreateRecord();
-    vlt.CreateRecord();
-    vlt.CreateRecord();
+    for (int i = 0; i < 10; ++i)
+    {
+        vlt.CreateRecord({{"A", i * i}});
+    }
     
     vlt.PrintAsTable();
     
-    vlt.AddUniqueKey<std::string>("D", {[](const std::size_t& count) -> std::string 
-    { 
-        switch (count % 3)
-        {
-        case 0:
-            return "Zero";
-            break;
-        case 1:
-            return "One";
-            break;
-        case 2:
-            return "Two";
-            break;
-        }
-
-        return "None";
+    vlt.AddUniqueKey<std::string>("D", {[](const std::size_t& counter, const mvlt::VaultRecordRef& vrf) -> std::string 
+    {
+        int i;
+        vrf.GetData("A", i);
+        return "Number: " + std::to_string(i * 2) + " index: " + std::to_string(counter);
     }});
+
     vlt.PrintAsTable();
     vlt.CreateRecord();
 }

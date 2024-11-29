@@ -182,9 +182,9 @@ void Vault_CreateRecord_Test()
     TEST_ASSERT(vrr1.GetRecordUniqueId() == vrr2.GetRecordUniqueId(), "Failed to create record");
 
     vlt.DropVault();
-    vlt.AddUniqueKey<int>("A", {[](std::size_t count) -> int { return static_cast<int>(count); }});
+    vlt.AddUniqueKey<int>("A", {[](std::size_t counter, const VaultRecordRef& vrf) -> int { return static_cast<int>(counter); }});
     vlt.AddKey("B", -1);
-    vlt.AddUniqueKey<int>("C", {[](std::size_t count) -> int { return static_cast<int>(count); }});
+    vlt.AddUniqueKey<int>("C", {[](std::size_t counter, const VaultRecordRef& vrf) -> int { return static_cast<int>(counter); }});
 
     vlt.CreateRecord(vrr1, {{"A", 1}, {"B", 1}, {"C", 1}});
     vlt.CreateRecord(vrr1, {{"A", 2}, {"B", 1}, {"C", 2}});
