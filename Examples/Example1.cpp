@@ -93,7 +93,7 @@ int main()
     
     vlt.PrintAsTable();
     
-    vlt.AddUniqueKey<std::string>("D", {[](const std::size_t& counter, const mvlt::VaultRecordRef& vrf) -> std::string 
+    vlt.AddUniqueKey<std::string>("D", {[&](const std::size_t& counter, const mvlt::VaultRecordRef& vrf) -> std::string 
     {
         int i;
         vrf.GetData("A", i);

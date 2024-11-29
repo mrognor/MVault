@@ -16,6 +16,47 @@ void Vault_AddKey_Test()
     TEST_ASSERT(vlt.AddKey("A", -1) == false, "Error when try to add key with existing name");
 }
 
+void Vault_AddUniqueKey_Test()
+{
+    Vault vlt;
+
+    // Add to empty Vault
+    // Correct add new key
+    TEST_ASSERT(vlt.AddUniqueKey<int>("A", {[](std::size_t counter, const VaultRecordRef& vrf) -> int { return static_cast<int>(counter); }}) == true, "Failed to add new unique key");
+
+    // Incorrect try to add exist key
+    TEST_ASSERT(vlt.AddUniqueKey<int>("A", {[](std::size_t counter, const VaultRecordRef& vrf) -> int { return static_cast<int>(counter); }}) == false, "Error when try to add key with existing name");
+
+    // Fill vault
+    for (int i = 0; i < 10; ++i)
+    {
+        vlt.CreateRecord({{"A", i}});
+    }
+
+    // Add to filled vault
+    // Correct add new key
+    TEST_ASSERT(vlt.AddUniqueKey<int>("B", {[](std::size_t counter, const VaultRecordRef& vrf) -> int { return static_cast<int>(counter * counter); }}) == true, "Failed to add new unique key");
+
+    // Incorrect try to add exist key
+    TEST_ASSERT(vlt.AddUniqueKey<int>("C", {[](std::size_t counter, const VaultRecordRef& vrf) -> int { return 1; }}) == false, "Error when try to add key with existing name");
+
+    // Check lambda
+    TEST_ASSERT(vlt.AddUniqueKey<int>("C", {[](std::size_t counter, const VaultRecordRef& vrf) -> int 
+    { 
+        int i;
+        vrf.GetData("B", i);
+        return static_cast<int>(2 * i); 
+    }}) == true, "Failed to add new unique key");
+
+    VaultRecordRef vrf;
+    for (int i = 0; i < 10; ++i)
+    {
+        TEST_ASSERT(vlt.GetRecord("A", i, vrf).IsOperationSuccess == true, "Error in unique key lamda!");
+        TEST_ASSERT(vlt.GetRecord("B", i * i, vrf).IsOperationSuccess == true, "Error in unique key lamda!");
+        TEST_ASSERT(vlt.GetRecord("C", i * i * 2, vrf).IsOperationSuccess == true, "Error in unique key lamda!");
+    }
+}
+
 void Vault_UpdateKey_Test()
 {
     Vault vlt;
@@ -635,6 +676,7 @@ void Vault_Destructor_Test()
 int main()
 {
     Vault_AddKey_Test();
+    Vault_AddUniqueKey_Test();
     Vault_UpdateKey_Test();
     Vault_IsKeyExist_Test();
     Vault_GetKeyValue_Test();

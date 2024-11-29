@@ -353,22 +353,9 @@ namespace mvlt
         // Lock Vault to write
         WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
 
-        // If the key was added earlier, then it must be deleted
+        // If the key was added earlier
         if (KeysTypes.find(key) != KeysTypes.end())
             return false;
-
-        // Add key to list with key order
-        if(VaultDerivedClass == VaultDerivedClasses::VaultBase)
-            KeysOrder.emplace_back(key);
-
-        // Add key type to hash map with keys types
-        KeysTypes.emplace(key, typeid(T)); 
-
-        // Add data to template
-        RecordTemplate.SetData(key, defaultKeyValue);
-
-        // Add unique key
-        if (isUniqueKey) UniqueKeys.emplace(key);
 
         // Create new hash map to store data with template T key
         UnorderedMap<T, VaultRecord*>* TtoVaultRecordHashMap = new UnorderedMap<T, VaultRecord*>(!isUniqueKey);
@@ -385,6 +372,73 @@ namespace mvlt
                 delete* (Map<T, VaultRecord*>**)ptr;
             }
         );
+
+        // Add new data to record set
+        if (isUniqueKey)
+        {
+            std::size_t counter = 0;
+            std::vector<T> cachedData;
+            bool isCorrectKey = true;
+
+            // Cycle for check uniqueKeyFunction validity
+            for (VaultRecord* recordsSetIt : RecordsSet)
+            {
+                T value = uniqueKeyFunction(counter, VaultRecordRef(recordsSetIt, this));
+                ++counter;
+
+                auto emplacePair = TtoVaultRecordHashMap->Emplace(value, recordsSetIt);
+                // If failed to emplace unique key then it is duplicate and error in uniqueKeyFunction
+                if (!emplacePair.second)
+                {
+                    isCorrectKey = false;
+                    break;
+                }
+
+                cachedData.emplace_back(std::move(value));
+            }
+
+            // If key correct then add data to all places
+            if (isCorrectKey)
+            {
+                counter = 0;
+                for (VaultRecord* recordsSetIt : RecordsSet)
+                {
+                    TtoVaultRecordMap->Emplace(cachedData[counter], recordsSetIt);
+                    if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
+                        recordsSetIt->SetData(key, cachedData[counter]);
+
+                    ++counter;
+                }
+            }
+            else
+            {
+                VaultHashMapStructure.EraseData(key);
+                VaultMapStructure.EraseData(key);
+                return false;
+            }
+        }
+        else
+        {
+            for (VaultRecord* recordsSetIt : RecordsSet)
+            {
+                recordsSetIt->SetData(key, defaultKeyValue);
+                TtoVaultRecordHashMap->Emplace(defaultKeyValue, recordsSetIt);
+                TtoVaultRecordMap->Emplace(defaultKeyValue, recordsSetIt);
+            }
+        }
+
+        // Add key to list with key order
+        if(VaultDerivedClass == VaultDerivedClasses::VaultBase)
+            KeysOrder.emplace_back(key);
+
+        // Add key type to hash map with keys types
+        KeysTypes.emplace(key, typeid(T)); 
+
+        // Add data to template
+        RecordTemplate.SetData(key, defaultKeyValue);
+
+        // Add unique key
+        if (isUniqueKey) UniqueKeys.emplace(key);
 
         // Add function to VaultRecord creation
         VaultRecordAdders.emplace(key, [=](VaultRecord* newRecord)
@@ -467,46 +521,13 @@ namespace mvlt
         VaultKeyCopiers.emplace(key, [=](VaultRecordSet& vaultRecordSet)
         {
             vaultRecordSet.AddKey(key, defaultKeyValue);
-        });  
+        });
 
-
-        // Add new data to record set
-        if (isUniqueKey)
+        if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
         {
-            std::size_t counter = 0;
-            for (const auto& recordsSetIt : RecordsSet)
-            {
-                T value = uniqueKeyFunction(counter, VaultRecordRef(recordsSetIt, this));
-                ++counter;
-
-                if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
-                    recordsSetIt->SetData(key, value);
-
-                TtoVaultRecordHashMap->Emplace(value, recordsSetIt);
-                TtoVaultRecordMap->Emplace(std::move(value), recordsSetIt);
-            }
-
-            if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
-            {
-                for (VaultRecordSet* set : RecordSetsSet)
-                {
-                    set->AddUniqueKey(key, uniqueKeyFunction);
-                    set->KeysOrder.emplace_back(key);
-                }
-            }
-        }
-        else
-        {
-            for (const auto& recordsSetIt : RecordsSet)
-            {
-                recordsSetIt->SetData(key, defaultKeyValue);
-                TtoVaultRecordHashMap->Emplace(defaultKeyValue, recordsSetIt);
-                TtoVaultRecordMap->Emplace(defaultKeyValue, recordsSetIt);
-            }
-
             for (VaultRecordSet* set : RecordSetsSet)
             {
-                set->AddKey(key, defaultKeyValue);
+                set->AddUniqueKey(key, uniqueKeyFunction);
                 set->KeysOrder.emplace_back(key);
             }
         }

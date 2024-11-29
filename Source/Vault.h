@@ -241,12 +241,10 @@ namespace mvlt
             \param [in] uniqueKeyFunction A function to determine the value of the key that will be set
              for an entry that has already been in vault. The function takes std::size_t as the index of the record. 
              The same index value between runs is not guaranteed. The function should return an object of type T, which will be set to a record.
-            
-            \warning If the user function contains an error and the vault has the same unique key value for different records, then the vault behavior is undefined
 
             The basic syntax of the method is as follows:
             \code{.cpp}
-                vlt.AddUniqueKey<int>("A", {[](std::size_t count) -> int { return static_cast<int>(count); }});
+                vlt.AddUniqueKey<int>("A", {[](std::size_t counter, const VaultRecordRef& vrf) -> int { return static_cast<int>(counter); }});
             \endcode
             Note that the lambda function is enclosed in {} and the return value is specified via ->
 
