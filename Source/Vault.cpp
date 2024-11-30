@@ -163,11 +163,6 @@ namespace mvlt
                 if (ds.GetDataType() == paramsIt.second.GetDataType())
                 {
                     paramsIt.second.SetDataToRecord(paramsIt.first, newData);
-
-                    // If key in record template and key tipy match type in param
-                    res.IsOperationSuccess = true;
-                    res.SavedType = paramsIt.second.GetDataType();
-                    res.ResultCode = VaultOperationResultCode::Success;
                 }
                 else
                 {   // If the type in param not match type in record template
@@ -233,6 +228,9 @@ namespace mvlt
                     vaultRecordAddersIt.second(newData);
 
                 vaultRecordRef.SetRecord(newData, this);
+
+                res.IsOperationSuccess = true;
+                res.ResultCode = VaultOperationResultCode::Success;
             }
         }
         else delete newData;

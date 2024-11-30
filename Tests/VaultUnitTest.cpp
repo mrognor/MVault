@@ -216,7 +216,7 @@ void Vault_CreateRecord_Test()
     TEST_ASSERT(vlt.CreateRecord({ {"A", 1}, {"D", 1} }).ResultCode == VaultOperationResultCode::WrongKey, "Failed to create record");
     TEST_ASSERT(vlt.CreateRecord({ {"A", 1}, {"A", 'a'} }).ResultCode == VaultOperationResultCode::WrongType, "Failed to create record");
 
-    // Third method overload
+    // Second method overload
     VaultRecordRef vrr1, vrr2;
     vlt.CreateRecord(vrr1, {{"A", 100}});
     vlt.GetRecord("A", 100, vrr2);
@@ -227,7 +227,8 @@ void Vault_CreateRecord_Test()
     vlt.AddKey("B", -1);
     vlt.AddUniqueKey<int>("C", {[](std::size_t counter, const VaultRecordRef& vrf) -> int { return static_cast<int>(counter); }});
 
-    vlt.CreateRecord(vrr1, {{"A", 1}, {"B", 1}, {"C", 1}});
+    TEST_ASSERT(vlt.CreateRecord(vrr1, {{"A", 1}, {"B", 1}, {"C", 1}}).ResultCode == VaultOperationResultCode::Success, "Unique key adding failed!");
+
     vlt.CreateRecord(vrr1, {{"A", 2}, {"B", 1}, {"C", 2}});
     vlt.CreateRecord(vrr1, {{"A", 3}, {"B", 1}, {"C", 3}});
 
