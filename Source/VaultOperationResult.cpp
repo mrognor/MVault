@@ -7,6 +7,9 @@ namespace mvlt
         switch (ResultCode)
         {
         default:
+        case VaultOperationResultCode::TryToUpdateUniqueKey:
+            return "The key is unique and you can not update it default value.";
+
         case VaultOperationResultCode::DataRecordNotValid:
             return "The record referenced by VaultRecordRef is not valid.";
 

@@ -328,6 +328,9 @@ namespace mvlt
         // Set proper key order
         vaultRecordSet.KeysOrder = KeysOrder;
 
+        // Set unique keys
+        vaultRecordSet.UniqueKeys = UniqueKeys;
+
         res = RequestRecordsSet(requestType, key, beginKeyValue, endKeyValue, vaultRecordSet.RecordsSet, isIncludeBeginKeyValue, isIncludeEndKeyValue, amountOfRecords, requestPredicat);
 
         for (VaultRecord* record : vaultRecordSet.RecordsSet)
@@ -527,7 +530,10 @@ namespace mvlt
         {
             for (VaultRecordSet* set : RecordSetsSet)
             {
-                set->AddUniqueKey(key, uniqueKeyFunction);
+                if (isUniqueKey)
+                    set->AddUniqueKey(key, uniqueKeyFunction);
+                else
+                    set->AddKey(key, defaultKeyValue);
                 set->KeysOrder.emplace_back(key);
             }
         }
@@ -569,9 +575,18 @@ namespace mvlt
         // Check it is trying to set coorect type 
         if (res.RequestedType != keyTypeIt->second)
         {
-            res.RequestedType = keyTypeIt->second;
+            res.SavedType = keyTypeIt->second;
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongType;
+            return res;
+        }
+
+        // Check if it is unique key
+        if (UniqueKeys.find(key) != UniqueKeys.end())
+        {
+            res.SavedType = keyTypeIt->second;
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::TryToUpdateUniqueKey;
             return res;
         }
 
@@ -604,6 +619,19 @@ namespace mvlt
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongType;
+            return res;
+        }
+
+        for (auto& it : UniqueKeys)
+        {
+            std::cout << it << std::endl;
+        }
+
+        // Check if it is unique key
+        if (UniqueKeys.find(key) != UniqueKeys.end())
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::TryToUpdateUniqueKey;
             return res;
         }
 
@@ -799,6 +827,9 @@ namespace mvlt
         
         // Set key proper key order
         vaultRecordSet.KeysOrder = KeysOrder;
+
+        // Set unique keys
+        vaultRecordSet.UniqueKeys = UniqueKeys;
 
         // Copy keys from this to vaultRecordSet
         for (auto& keyCopierIt : VaultKeyCopiers)

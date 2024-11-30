@@ -160,7 +160,8 @@ void VaultRecordSet_GetKeyValue_Test()
     // Dynamic key add
     vlt.AddKey("B", -1);
 
-    TEST_ASSERT(vrs.GetKeyValue("B", keyValue).ResultCode == VaultOperationResultCode::Success, "Failed to get not existed key value");
+    VaultOperationResult vrss = vrs.GetKeyValue("B", keyValue);
+    TEST_ASSERT(vrss.ResultCode == VaultOperationResultCode::Success, "Failed to get not existed key value");
 }
 
 void VaultRecordSet_GetKeyType_Test()

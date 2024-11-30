@@ -63,15 +63,20 @@ void Vault_UpdateKey_Test()
 
     vlt.AddKey("A", -1);
     vlt.AddKey<std::string>("B", "none");
+    vlt.AddUniqueKey<std::size_t>("C", {[](std::size_t counter, const VaultRecordRef& vrf) -> bool { return counter; }});
 
     // Correct key update
     TEST_ASSERT(vlt.UpdateKey("A", 0).IsOperationSuccess == true, "Failed to update key");
 
     // Wrong key update
-    TEST_ASSERT(vlt.UpdateKey("C", -1).ResultCode == VaultOperationResultCode::WrongKey, "Cannot update not existing key");
+    TEST_ASSERT(vlt.UpdateKey("D", -1).ResultCode == VaultOperationResultCode::WrongKey, "Cannot update not existing key");
 
     // Wrong key type
     TEST_ASSERT(vlt.UpdateKey("B", -1).ResultCode == VaultOperationResultCode::WrongType, "Cannot set incorrect type to new key value");
+
+    // Try to update unique key
+    VaultOperationResult vrs = vlt.UpdateKey<std::size_t>("C", 250);
+    TEST_ASSERT(vrs.ResultCode == VaultOperationResultCode::TryToUpdateUniqueKey, "Cannot update unique key");
 }
 
 void Vault_IsKeyExist_Test()
