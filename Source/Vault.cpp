@@ -128,13 +128,6 @@ namespace mvlt
         return true;
     }
 
-    VaultRecordRef Vault::CreateRecord() noexcept
-    {
-        VaultRecordRef res;
-        CreateRecord(res, std::vector<std::pair<std::string, VaultParamInput>>());
-        return res;
-    }
-
     VaultOperationResult Vault::CreateRecord(const std::vector<std::pair<std::string, VaultParamInput>>& params) noexcept
     {
         VaultRecordRef tmp;

@@ -253,7 +253,8 @@ void VaultRecordSet_AddRecord_Test()
         VaultRecordSet vrs;
         vlt.RequestLess("A", i, vrs);
 
-        VaultRecordRef vrr = vlt.CreateRecord();
+        VaultRecordRef vrr;
+        vlt.CreateRecord(vrr, {});
 
         Starter starter;
 

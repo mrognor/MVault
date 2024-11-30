@@ -156,7 +156,7 @@ void Vault_RemoveKey_Test()
     vlt.AddKey("B", -1);
     vlt.AddKey("C", -1);
 
-    vlt.CreateRecord();
+    vlt.CreateRecord({});
 
     // Check keys
     keys = vlt.GetKeys();
@@ -178,7 +178,7 @@ void Vault_CreateRecord_Test()
     vlt.AddKey("C", true);
 
     // Empty create record overload
-    for (int i = 0; i < 10; ++i) vlt.CreateRecord();
+    for (int i = 0; i < 10; ++i) vlt.CreateRecord({});
     
     // Check vault size
     TEST_ASSERT(vlt.Size() == 10, "Failed to create records");
@@ -260,7 +260,7 @@ void Vault_GetRecord_Test()
     // Wrong key type
     TEST_ASSERT(vlt.GetRecord("A", std::string(), vrr).ResultCode == VaultOperationResultCode::WrongType, "Error on get result");
 
-    vlt.CreateRecord();
+    vlt.CreateRecord({});
     
     // Correct get record
     TEST_ASSERT(vlt.GetRecord("A", -1, vrr).ResultCode == VaultOperationResultCode::Success, "Error on record creation");
@@ -607,8 +607,8 @@ void Vault_EraseRecord_Test()
     for (int i = 1; i < 10; ++i)
         TEST_ASSERT(vlt.EraseRecord("A", i).ResultCode == VaultOperationResultCode::Success, "Error on erase");
 
-    vlt.CreateRecord();
-    vlt.CreateRecord();
+    vlt.CreateRecord({});
+    vlt.CreateRecord({});
 
     vlt.EraseRecord("A", -1);
     TEST_ASSERT(vlt.Size() == 1, "Failed to erase record");
@@ -629,7 +629,7 @@ void Vault_EraseRecords_Test()
     TEST_ASSERT(vlt.EraseRecords("A", 0).ResultCode == VaultOperationResultCode::WrongValue, "Error on erase");
 
     // Fill vault
-    for (int i = 0; i < 10; ++i) vlt.CreateRecord();
+    for (int i = 0; i < 10; ++i) vlt.CreateRecord({});
     vlt.CreateRecord({ {"A", 1} });
 
     // Erase 2 records
@@ -666,7 +666,7 @@ void Vault_Destructor_Test()
     Vault* vlt = new Vault;
 
     vlt->AddKey("A", -1);
-    vlt->CreateRecord();
+    vlt->CreateRecord({});
 
     delete vlt;
     vlt = new Vault;

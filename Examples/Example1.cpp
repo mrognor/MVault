@@ -44,17 +44,17 @@ int main()
     vlt.CreateRecord({ {"id", 3}, {"name", std::string("D")}, {"gender", false}, {"slaves", std::vector<int>{1, 2, 3}} });
     vlt.PrintAsTable();
 
-    mvlt::VaultRecordRef vltrr;
-    vlt.GetRecord("id", 2, vltrr);
-    if (vltrr.IsValid()) vltrr.PrintRecord();
+    mvlt::VaultRecordRef vrf;
+    vlt.GetRecord("id", 2, vrf);
+    if (vrf.IsValid()) vrf.PrintRecord();
 
-    vlt.GetRecord<std::string>("name", "D", vltrr);
-    if (vltrr.IsValid()) vltrr.PrintRecord();
+    vlt.GetRecord<std::string>("name", "D", vrf);
+    if (vrf.IsValid()) vrf.PrintRecord();
         
-    std::cout << vltrr.IsValid() << std::endl; 
-    vlt.EraseRecord(vltrr);
-    std::cout << vltrr.IsValid() << std::endl;
-    std::cout << vltrr.GetRecordUniqueId() << std::endl;
+    std::cout << vrf.IsValid() << std::endl; 
+    vlt.EraseRecord(vrf);
+    std::cout << vrf.IsValid() << std::endl;
+    std::cout << vrf.GetRecordUniqueId() << std::endl;
 
     std::type_index ti = typeid(void);
     vlt.GetKeyType("slaves", ti);
@@ -65,20 +65,20 @@ int main()
     vlt.PrintAsTable();
     vlt.PrintAsTable();
 
-    vltrr = vlt.CreateRecord();
+    vlt.CreateRecord(vrf, {});
 
-    vltrr.SetData({ {"id", 112}, {"name", std::string("sg")}, {"slaves", std::vector<int>{300, 30, 3}} });
-    vltrr.PrintRecord();
+    vrf.SetData({ {"id", 112}, {"name", std::string("sg")}, {"slaves", std::vector<int>{300, 30, 3}} });
+    vrf.PrintRecord();
 
     vlt.EraseRecords("slaves", std::vector<int>());
 
     vlt.DropVault();
 
     vlt.AddKey("id", -1);
-    vlt.CreateRecord();
+    vlt.CreateRecord({});
     vlt.PrintAsTable(true);
     vlt.UpdateKey("id", 0);
-    vlt.CreateRecord();
+    vlt.CreateRecord({});
     vlt.PrintAsTable(true);
 
     vlt.DropVault();
@@ -101,5 +101,5 @@ int main()
     }});
 
     vlt.PrintAsTable();
-    vlt.CreateRecord();
+    vlt.CreateRecord({});
 }

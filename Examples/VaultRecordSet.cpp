@@ -7,7 +7,7 @@ int main()
     vlt.AddKey("A", 0);
     vlt.AddKey("B", 0);
 
-    vlt.CreateRecord();
+    vlt.CreateRecord({});
     vlt.CreateRecord({ {"A", 1} });
     vlt.CreateRecord({ {"B", 1} });
 
@@ -89,9 +89,9 @@ int main()
 
     std::cout << "Erase records" << std::endl;
 
-    vlt.CreateRecord();
-    vlt.CreateRecord();
-    vlt.CreateRecord();
+    vlt.CreateRecord({});
+    vlt.CreateRecord({});
+    vlt.CreateRecord({});
     
     vlt.RequestEqual("A", 0, vrs);
 

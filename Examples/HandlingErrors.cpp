@@ -252,7 +252,7 @@ int main()
     mvlt::Vault* vltp = new mvlt::Vault;
     vltp->AddKey("A", 1);
 
-    vltp->CreateRecord();
+    vltp->CreateRecord({});
 
     opr = vltp->GetRecord("A", 1, vrr);
 

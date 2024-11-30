@@ -317,13 +317,6 @@ namespace mvlt
         bool RemoveKey(const std::string& key) noexcept;
 
         /**
-            \brief Method to create new VaultRecord. A record will be created by copying RecordTemplate.
-            
-            \return ref to new record 
-        */
-        VaultRecordRef CreateRecord() noexcept;
-
-        /**
             \brief Method to create new VaultRecord.
 
             The method accepts a vector of pairs, the first element of the pair is a string with a key, 
@@ -366,7 +359,7 @@ namespace mvlt
             what is equivalent to such a code without passing values to a function
 
             \code{.cpp}
-                VaultRecordRef vltrr = vlt.CreateRecord();
+                VaultRecordRef vltrr = vlt.CreateRecord({});
 
                 vltrr.SetData("id", 0);
                 vltrr.SetData<std::string>("name", "mrognor");

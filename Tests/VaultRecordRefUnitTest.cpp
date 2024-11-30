@@ -16,7 +16,7 @@ void VaultRecordRef_CopyConstructor_Test()
     TEST_ASSERT(!vrr2.IsValid(), "Failed to copy vault record ref");
 
     vlt.AddKey("A", -1);
-    vrr1 = vlt.CreateRecord();
+    vlt.CreateRecord(vrr1, {});
 
     VaultRecordRef vrr3(vrr1);
 
@@ -38,7 +38,7 @@ void VaultRecordRef_OperatorAssignment_Test()
     TEST_ASSERT(!vrr2.IsValid(), "Failed to assign vault record ref");
 
     vlt.AddKey("A", -1);
-    vrr1 = vlt.CreateRecord();
+    vlt.CreateRecord(vrr1, {});
 
     VaultRecordRef vrr3 = vrr1;
 
@@ -59,14 +59,14 @@ void VaultRecordRef_OperatorComparison_Test()
     TEST_ASSERT(vrr1 == vrr2, "Failed to compare vault record ref");
 
     vlt.AddKey("A", -1);
-    vlt.CreateRecord();
+    vlt.CreateRecord({});
 
     vlt.GetRecord("A", -1, vrr1);
     vlt.GetRecord("A", -1, vrr2);
 
     TEST_ASSERT(vrr1 == vrr2, "Failed to compare vault record ref");
 
-    vrr1 = vlt.CreateRecord();
+    vlt.CreateRecord(vrr1, {});
 
     TEST_ASSERT(!(vrr1 == vrr2), "Failed to compare vault record ref");
 
@@ -88,7 +88,7 @@ void VaultRecordRef_GetRecordUniqueId_Test()
     TEST_ASSERT(vrr2.GetRecordUniqueId() == "null", "Failed to get unique id vault record ref");
 
     vlt.AddKey("A", -1);
-    vlt.CreateRecord();
+    vlt.CreateRecord(vrr1, {});
 
     vlt.GetRecord("A", -1, vrr1);
     vlt.GetRecord("A", -1, vrr2);
@@ -106,7 +106,7 @@ void VaultRecordRef_SetData_Test()
     vlt.AddKey("A", -1);
     vlt.AddKey<std::string>("B", "");
 
-    vrr1 = vlt.CreateRecord();
+    vlt.CreateRecord(vrr1, {});
     vrr2 = vrr1;
 
     vrr1.SetData("A", 0);
@@ -122,7 +122,7 @@ void VaultRecordRef_SetData_Test()
     // Second function version
     for (int i = 1; i < 11; ++i)
     {
-        vrr1 = vlt.CreateRecord();
+        vlt.CreateRecord(vrr1, {});
         res = vrr1.SetData({{"A", i}, {"B", std::to_string(i)}});
 
         vrr1.GetData("A", a);
@@ -159,7 +159,7 @@ void VaultRecordRef_GetData_Test()
     vlt.AddKey("A", 0);
     vlt.AddKey<std::string>("B","null");
 
-    vrr = vlt.CreateRecord();
+    vlt.CreateRecord(vrr, {});
 
     // Valid get
     int i; std::string s;
@@ -186,7 +186,7 @@ void VaultRecordRef_GetDataAsString_Test()
     vlt.AddKey("A", 0);
     vlt.AddKey<std::string>("B","null");
 
-    vrr = vlt.CreateRecord();
+    vlt.CreateRecord(vrr, {});
 
     // Valid get
     vrr.GetDataAsString("A", s);
@@ -209,7 +209,7 @@ void VaultRecordRef_IsValid_Test()
     vlt.AddKey("A", 0);
     vlt.AddKey<std::string>("B","null");
 
-    vrr = vlt.CreateRecord();
+    vlt.CreateRecord(vrr, {});
 
     // Valid ref
     TEST_ASSERT(vrr.IsValid() == true, "Failed to get is valid from vault record ref");
@@ -226,7 +226,7 @@ void VaultRecordRef_GetKeys_Test()
     vlt.AddKey("A", 0);
     vlt.AddKey<std::string>("B","null");
 
-    vrr = vlt.CreateRecord();
+    vlt.CreateRecord(vrr, {});
 
     // Valid ref
     std::vector<std::string> v = {"A", "B"};
@@ -244,7 +244,7 @@ void VaultRecordRef_Reset_Test()
     vlt.AddKey("A", 0);
     vlt.AddKey<std::string>("B","null");
 
-    vrr = vlt.CreateRecord();
+    vlt.CreateRecord(vrr, {});
 
     // Valid ref
     TEST_ASSERT(vrr.IsValid() == true, "Failed to reset vault record ref");

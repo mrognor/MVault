@@ -20,7 +20,7 @@ void KeyAddictionTests()
     TEST_ASSERT(vrs.GetKeys() == vector<string>(), "VaultRecordSet is not created with empty keys");
 
     // Create new record
-    vrr = vlt.CreateRecord();
+    vlt.CreateRecord(vrr, {});
 
     // Add key
     vlt.AddKey<int>("A", -1);
@@ -57,7 +57,7 @@ void KeyUpdationTests()
     vlt.AddKey<int>("A", -1);
 
     // Create record
-    vrr = vlt.CreateRecord();
+    vlt.CreateRecord(vrr, {});
 
     // Check VaultRecordRef getting
     int A;
@@ -66,7 +66,7 @@ void KeyUpdationTests()
 
     // Update default value
     vlt.UpdateKey("A", 0);
-    vrr = vlt.CreateRecord();
+    vlt.CreateRecord(vrr, {});
     vlt.GetRecord("A", 0, vrr);
 
     // Check key value updating
@@ -94,7 +94,7 @@ void KeyCheckTests()
     vlt.AddKey<int>("A", -1);
 
     // Create new record
-    vrr = vlt.CreateRecord();
+    vlt.CreateRecord(vrr, {});
 
     // Request record
     vlt.RequestEqual("A", -1, vrs);
@@ -148,7 +148,7 @@ void RecordCreationTests()
     vlt.AddKey<int>("D", -1);
 
     // Create new records
-    vlt.CreateRecord();
+    vlt.CreateRecord({});
     
     // Check vault size
     TEST_ASSERT(vlt.Size() == 1, "Record was not created!");
@@ -210,7 +210,7 @@ void RecordUpdationTests()
     vlt.AddKey<int>("B", 1);
 
     // Create new record
-    vrr1 = vlt.CreateRecord();
+    vlt.CreateRecord(vrr1, {});
     std::string recordId = vrr1.GetRecordUniqueId();
 
     // Fill sets
@@ -260,7 +260,7 @@ void RecordDeletionTests()
     vlt.AddKey<int>("B", 1);
 
     // Create record
-    vrr1 = vlt.CreateRecord();
+    vlt.CreateRecord(vrr1, {});
 
     // Copy ref
     vrr2 = vrr1;
@@ -298,7 +298,7 @@ void DropsTests()
     vlt.AddKey<int>("B", 1);
 
     // Create record
-    vrr1 = vlt.CreateRecord();
+    vlt.CreateRecord(vrr1, {});
 
     // Copy ref
     vrr2 = vrr1;
@@ -321,7 +321,7 @@ void DropsTests()
     TEST_ASSERT(vrs2.Size() == 0, "Drop data failed");
 
     // Create record
-    vrr1 = vlt.CreateRecord();
+    vlt.CreateRecord(vrr1, {});
 
     // Copy ref
     vrr2 = vrr1;

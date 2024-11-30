@@ -69,7 +69,7 @@ void VaultRecordSet_GetIsParentVaultValid_Test()
     TEST_ASSERT(vrs.GetIsParentVaultValid() == false, "Failed to create set");
 
     vlt->AddKey("A", -1);
-    vlt->CreateRecord();
+    vlt->CreateRecord({});
     vlt->Request(Equal("A", -1), vrs);
 
     TEST_ASSERT(vrs.GetIsParentVaultValid() == true, "Failed to request");
@@ -79,7 +79,7 @@ void VaultRecordSet_GetIsParentVaultValid_Test()
     vlt = new Vault;
 
     vlt->AddKey("A", -1);
-    vlt->CreateRecord();
+    vlt->CreateRecord({});
     vlt->Request(Equal("A", -1), vrs);
 
     TEST_ASSERT(vrs.GetIsParentVaultValid() == true, "Failed to request");
@@ -117,7 +117,7 @@ void VaultRecordSet_IsKeyExist_Test()
     TEST_ASSERT(vrs.IsKeyExist("A") == false, "Exist key check failed");
 
     vlt.AddKey("A", -1);
-    vlt.CreateRecord();
+    vlt.CreateRecord({});
 
     vlt.Request(Equal("A", -1), vrs);
 
@@ -144,7 +144,7 @@ void VaultRecordSet_GetKeyValue_Test()
     TEST_ASSERT(vrs.GetKeyValue("A", keyValue).ResultCode == VaultOperationResultCode::ParentVaultNotValid, "Failed to get proper key value");
 
     vlt.AddKey("A", -1);
-    vlt.CreateRecord();
+    vlt.CreateRecord({});
 
     vlt.Request(Equal("A", -1), vrs);
 
@@ -173,7 +173,7 @@ void VaultRecordSet_GetKeyType_Test()
 
     vlt.AddKey("A", -1);
 
-    vlt.CreateRecord();
+    vlt.CreateRecord({});
 
     vlt.Request(Equal("A", -1), vrs);
 
@@ -199,7 +199,7 @@ void VaultRecordSet_AddRecord_Test()
     TEST_ASSERT(vrs.AddRecord(vrf).ResultCode == VaultOperationResultCode::ParentVaultNotValid, "Failed to add record");
 
     vlt.AddKey("A", -1);
-    vrf = vlt.CreateRecord();
+    vlt.CreateRecord(vrf, {});
 
     TEST_ASSERT(vrs.AddRecord(vrf).ResultCode == VaultOperationResultCode::ParentVaultNotValid, "Failed to add record");
 
@@ -212,7 +212,7 @@ void VaultRecordSet_AddRecord_Test()
 
     Vault vlt2;
 
-    vrf = vlt2.CreateRecord();
+    vlt2.CreateRecord(vrf, {});
 
     TEST_ASSERT(vrs.AddRecord(vrf).ResultCode == VaultOperationResultCode::ParentVaultNotMatch, "Failed to add record");
 }
@@ -230,7 +230,7 @@ void VaultRecordSet_GetRecord_Test()
     vlt.AddKey("C", true);
 
     // Get set and make it empty
-    vrr = vlt.CreateRecord();
+    vlt.CreateRecord(vrr, {});
     vlt.Request(Equal("A", -1), vrs);
     vlt.EraseRecord(vrr);
 
@@ -244,7 +244,9 @@ void VaultRecordSet_GetRecord_Test()
     TEST_ASSERT(vrs.GetRecord("A", std::string(), vrr).ResultCode == VaultOperationResultCode::WrongType, "Error on get result");
 
     // Add record to set
-    vrs.AddRecord(vlt.CreateRecord());
+    VaultRecordRef vrf;
+    vlt.CreateRecord(vrf, {});
+    vrs.AddRecord(vrf);
 
     // Correct get record
     TEST_ASSERT(vrs.GetRecord("A", -1, vrr).ResultCode == VaultOperationResultCode::Success, "Error on record creation");
@@ -285,7 +287,7 @@ void VaultRecordSet_GetRecords_Test()
     vlt.AddKey("C", true);
 
     // Get set and make it empty
-    vrr = vlt.CreateRecord();
+    vlt.CreateRecord(vrr, {});
     vlt.Request(Equal("A", -1), vrs);
     vlt.EraseRecord(vrr);
 
@@ -621,15 +623,17 @@ void VaultRecordSet_RemoveRecord_Test()
 
     vlt.DropData();
 
-    vrs.AddRecord(vlt.CreateRecord());
-    vrs.AddRecord(vlt.CreateRecord());
+    vlt.CreateRecord(vrr, {});
+    vrs.AddRecord(vrr);
+    vlt.CreateRecord(vrr, {});
+    vrs.AddRecord(vrr);
 
     vlt.EraseRecord("A", -1);
     TEST_ASSERT(vrs.Size() == 1, "Failed to erase record");
     vrs.RemoveRecord("A", -1);
     TEST_ASSERT(vrs.Size() == 0, "Failed to erase record");
 
-    vrr = vlt.CreateRecord();
+    vlt.CreateRecord(vrr, {});
     vrs.AddRecord(vrr);
     vlt.EraseRecord("A", -1);
     vlt.EraseRecord(vrr);
@@ -655,7 +659,7 @@ void VaultRecordSet_RemoveRecords_Test()
     TEST_ASSERT(vrs.RemoveRecords("A", 0).ResultCode == VaultOperationResultCode::WrongValue, "Error on erase");
 
     // Fill vault
-    for (int i = 0; i < 10; ++i) vlt.CreateRecord();
+    for (int i = 0; i < 10; ++i) vlt.CreateRecord({});
     vlt.CreateRecord({ {"A", 1} });
 
     vlt.Request(Equal("A", -1) || Equal("A", 1), vrs);
@@ -679,7 +683,7 @@ void VaultRecordSet_Size_Test()
 
     for (std::size_t i = 1; i < 11; ++i)
     {
-        vlt.CreateRecord();
+        vlt.CreateRecord({});
         vlt.Request(Equal("A", -1), vrs);
         TEST_ASSERT(vrs.Size() == i, "Failed to create record");
     }
@@ -696,7 +700,7 @@ void VaultRecordSet_Destructor_Test()
     Vault vlt;
 
     vlt.AddKey("A", -1);
-    vlt.CreateRecord();
+    vlt.CreateRecord({});
 
     VaultRecordSet* vrs = new VaultRecordSet;
 
