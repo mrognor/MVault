@@ -14,9 +14,21 @@ int main()
     vlt.CreateRecord({ {"id", 3}, {"name", std::string("D")}, {"gender", false} });
     vlt.PrintAsTable();
 
-    vlt.SaveToFile("CsvResult.csv", ";", false);
+    vlt.SaveToFile("CsvResult.csv", ";");
     vlt.DropVault();
 
+    vlt.AddKey("id", -1);    
+    vlt.AddKey<std::string>("name", "");
+    vlt.AddKey<std::string>("gender", "");
+
+    vlt.ReadFile("CsvResult.csv", ';', true, [](std::vector<std::string>& keys, std::vector<std::string>& values) 
+    {
+        if (values[2] == "true") values[2] = "Man";
+        else if (values[2] == "false") values[2] = "Woman";
+    });
+
+    vlt.PrintAsTable();
+    vlt.DropVault();
 
     vlt.AddKey("cpuName", std::string());    
     vlt.AddKey<float>("price", 0.0);

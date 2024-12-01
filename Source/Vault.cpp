@@ -35,6 +35,66 @@ namespace mvlt
         return dataIt;
     }
 
+    bool Vault::ReadFile(const std::string& fileName, const bool& isPreprocessRecord, std::function<void (std::vector<std::string>&, std::vector<std::string>&)> recordHandler, 
+            const char& separator, const bool& isLoadKeys) noexcept
+    {
+        // Open and parse file
+        CsvParser parser;
+        if (!parser.OpenFile(fileName)) return false;
+
+        // Write lock because new records will be added
+        WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
+
+        std::vector<std::string> keys;
+
+        // Vector with record keys
+        std::vector<std::string> record;
+
+        if (isLoadKeys) parser.GetNextVector(keys, separator);
+        
+        // Read new record from parser
+        while(parser.GetNextVector(record, separator))
+        {
+            // Record to set to it data from file and store in Vault
+            VaultRecord* newRecord = new VaultRecord(RecordTemplate);
+        
+            if (isLoadKeys)
+            {
+                if (isPreprocessRecord)
+                    recordHandler(keys, record);
+
+                for (std::size_t i = 0; i < keys.size(); ++i)
+                    if (i < record.size())
+                        newRecord->SetDataFromString(keys[i], record[i]);
+            }
+            else
+            {
+                // Iteraror to load keys
+                auto keyOrderIt = KeysOrder.begin();
+
+                // Store all keys values to record
+                for (const auto& recordPole : record)
+                {
+                    // Set last record pole
+                    newRecord->SetDataFromString(*keyOrderIt, recordPole);
+
+                    ++keyOrderIt;
+                }
+            }
+
+            // Add new record to set
+            RecordsSet.emplace(newRecord);
+
+            // Add new record to every maps inside VaultStructureHashMap
+            for (const auto& vaultRecordAddersIt : VaultRecordAdders)
+                vaultRecordAddersIt.second(newRecord);
+
+            record.clear();
+        }
+
+        return true;
+    }
+
     Vault::Vault() noexcept 
     {
         VaultDerivedClass = VaultDerivedClasses::VaultBase;
@@ -576,58 +636,12 @@ namespace mvlt
 
     bool Vault::ReadFile(const std::string& fileName, const char& separator, const bool& isLoadKeys) noexcept
     {
-        // Open and parse file
-        CsvParser parser;
-        if (!parser.OpenFile(fileName)) return false;
+        return ReadFile(fileName, false, [](std::vector<std::string>&, std::vector<std::string>&) {}, separator, isLoadKeys);
+    }
 
-        // Write lock because new records will be added
-        WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
-
-        std::vector<std::string> keys;
-
-        // Vector with record keys
-        std::vector<std::string> record;
-
-        if (isLoadKeys) parser.GetNextVector(keys, separator);
-        
-        // Read new record from parser
-        while(parser.GetNextVector(record, separator))
-        {
-            // Record to set to it data from file and store in Vault
-            VaultRecord* newRecord = new VaultRecord(RecordTemplate);
-        
-            if (isLoadKeys)
-            {
-                for (std::size_t i = 0; i < keys.size(); ++i)
-                    if (i < record.size())
-                        newRecord->SetDataFromString(keys[i], record[i]);
-            }
-            else
-            {
-                // Iteraror to load keys
-                auto keyOrderIt = KeysOrder.begin();
-
-                // Store all keys values to record
-                for (const auto& recordPole : record)
-                {
-                    // Set last record pole
-                    newRecord->SetDataFromString(*keyOrderIt, recordPole);
-
-                    ++keyOrderIt;
-                }
-            }
-
-            // Add new record to set
-            RecordsSet.emplace(newRecord);
-
-            // Add new record to every maps inside VaultStructureHashMap
-            for (const auto& vaultRecordAddersIt : VaultRecordAdders)
-                vaultRecordAddersIt.second(newRecord);
-
-            record.clear();
-        }
-
-        return true;
+    bool Vault::ReadFile(const std::string& fileName, const char& separator, const bool& isLoadKeys, std::function<void (std::vector<std::string>&, std::vector<std::string>&)> recordHandler) noexcept
+    {
+        return ReadFile(fileName, true, recordHandler, separator, isLoadKeys);
     }
 
     Vault::~Vault() noexcept

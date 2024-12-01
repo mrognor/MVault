@@ -195,6 +195,22 @@ namespace mvlt
         bool AddKey(const std::string& key, const T& defaultKeyValue, const bool& isUniqueKey, 
             std::function<T(std::size_t, const VaultRecordRef&)> uniqueKeyFunction) noexcept;
 
+        /**
+            \brief A method for reading a csv file and loading data from it into memory
+
+            \param [in] fileName the name of the file to read the data from
+            \param [in] isPreprocessRecord a flag indicating the need to pre-process the record
+            \param [in] recordHandler a function for preprocessing the recording. Accepts two vectors with strings. 
+            The first vector contains the keys in the order in which they are specified in the file. 
+            If the file does not contain keys, then this vector will be empty. The second vector is a vector of values.
+            \param [in] separator The symbol to be used as a data separator in the file
+            \param [in] isLoadKeys Are there any keys in the file
+
+            \return returns true if it was possible to read the file, otherwise it returns false
+        */
+        bool ReadFile(const std::string& fileName, const bool& isPreprocessRecord, std::function<void (std::vector<std::string>&, std::vector<std::string>&)> recordHandler, 
+            const char& separator, const bool& isLoadKeys) noexcept;
+
     public:
 
         /// Making the VaultRecordRef class friendly so that it has access to the internal members of the Vault class
@@ -666,6 +682,20 @@ namespace mvlt
             \return returns true if it was possible to read the file, otherwise it returns false
         */
         bool ReadFile(const std::string& fileName, const char& separator = ',', const bool& isLoadKeys = true) noexcept;
+
+        /**
+            \brief A method for reading a csv file and loading data from it into memory
+
+            \param [in] fileName the name of the file to read the data from
+            \param [in] separator The symbol to be used as a data separator in the file
+            \param [in] isLoadKeys Are there any keys in the file
+            \param [in] recordHandler a function for preprocessing the recording. Accepts two vectors with strings. 
+            The first vector contains the keys in the order in which they are specified in the file. 
+            If the file does not contain keys, then this vector will be empty. The second vector is a vector of values.
+
+            \return returns true if it was possible to read the file, otherwise it returns false
+        */
+        bool ReadFile(const std::string& fileName, const char& separator, const bool& isLoadKeys, std::function<void (std::vector<std::string>&, std::vector<std::string>&)> recordHandler) noexcept;
 
         /// \brief Default destructor
         ~Vault() noexcept;
