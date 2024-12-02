@@ -35,8 +35,11 @@ jobs:
         uses: actions/configure-pages@v5
 
       - name: Install packages
-        run: sudo apt-get update && sudo apt-get upgrade && sudo DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install doxygen graphviz lcov cmake
+        run: sudo apt-get update && sudo apt-get upgrade && sudo DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install doxygen graphviz lcov cmake pipx clang clang-tidy cppcheck
 
+      - name: Install CodeChecker
+        run: sudo pipx install CodeChecker --force
+ 
       - name: Create documentation
         run: ./Docs/Gendoc.sh
 
@@ -49,12 +52,21 @@ jobs:
       - name: Move coverage artifact
         run: mv ./Coverage ./Docs/Generated/html
 
+      - name: Run sast
+        run: ./Scripts/RunSast.sh
+
+      - name: Move sast artifacts
+        run: |
+          mv ./Sast/html_clang_tidy ./Docs/Generated/html
+          mv ./Sast/html_clangsa ./Docs/Generated/html
+          mv ./Sast/html_cppcheck ./Docs/Generated/html 
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload documentation
           path: './Docs/Generated/html/'
-          
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
