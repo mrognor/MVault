@@ -56,7 +56,7 @@ namespace mvlt
         \* std::string  
     */
 
-    /**       
+    /**
         \brief A template method for providing an interface converting any type to a string
 
         This function allows you to use the same interface inside the Vault for any class, 
@@ -74,7 +74,55 @@ namespace mvlt
     template <class T>
     std::string ToString(const T& data) noexcept { return ""; }
 
-    /**       
+    /**
+        \brief Specialization of the ToString method for the long long int type
+
+        \tparam <long long int> integer variable
+
+        \param [in] data the variable to be converted to a string
+
+        \return result of std::to_string function
+    */
+    template <>
+    inline std::string ToString(const long long int& data) noexcept { return std::to_string(data); }
+
+    /**
+        \brief Specialization of the ToString method for the unsigned long long int type
+
+        \tparam <unsigned long long int> integer variable
+
+        \param [in] data the variable to be converted to a string
+
+        \return result of std::to_string function
+    */
+    template <>
+    inline std::string ToString(const unsigned long long int& data) noexcept { return std::to_string(data); }
+
+    /**
+        \brief Specialization of the ToString method for the int type
+
+        \tparam <long int> integer variable
+
+        \param [in] data the variable to be converted to a string
+
+        \return result of std::to_string function
+    */
+    template <>
+    inline std::string ToString(const long int& data) noexcept { return std::to_string(data); }
+
+    /**
+        \brief Specialization of the ToString method for the int type
+
+        \tparam <unsigned long int> integer variable
+
+        \param [in] data the variable to be converted to a string
+
+        \return result of std::to_string function
+    */
+    template <>
+    inline std::string ToString(const unsigned long int& data) noexcept { return std::to_string(data); }
+
+    /**
         \brief Specialization of the ToString method for the int type
 
         \tparam <int> integer variable
@@ -86,7 +134,43 @@ namespace mvlt
     template <>
     inline std::string ToString(const int& data) noexcept { return std::to_string(data); }
 
-    /**       
+    /**
+        \brief Specialization of the ToString method for the unsigned int type
+
+        \tparam <unsigned int> integer variable
+
+        \param [in] data the variable to be converted to a string
+
+        \return result of std::to_string function
+    */
+    template <>
+    inline std::string ToString(const unsigned int& data) noexcept { return std::to_string(data); }
+
+    /**
+        \brief Specialization of the ToString method for the short int type
+
+        \tparam <short int> integer variable
+
+        \param [in] data the variable to be converted to a string
+
+        \return result of std::to_string function
+    */
+    template <>
+    inline std::string ToString(const short int& data) noexcept { return std::to_string(data); }
+
+    /**
+        \brief Specialization of the ToString method for the unsigned short int type
+
+        \tparam <unsigned short int> integer variable
+
+        \param [in] data the variable to be converted to a string
+
+        \return result of std::to_string function
+    */
+    template <>
+    inline std::string ToString(const unsigned short int& data) noexcept { return std::to_string(data); }
+
+    /**
         \brief Specialization of the ToString method for the bool type
 
         \tparam <bool> boolean variable
@@ -98,7 +182,7 @@ namespace mvlt
     template <>
     inline std::string ToString(const bool& data) noexcept { if(data) return "true"; else return "false"; }
 
-    /**       
+    /**
         \brief Specialization of the ToString method for the std::string type
 
         \tparam <std::string> string variable
@@ -110,7 +194,7 @@ namespace mvlt
     template <>
     inline std::string ToString(const std::string& data) noexcept { return data; }
 
-    /**       
+    /**
         \brief Specialization of the ToString method for the float type
 
         \tparam <float> float variable
@@ -122,7 +206,19 @@ namespace mvlt
     template <>
     inline std::string ToString(const float& data) noexcept { return std::to_string(data); }
 
-    /**       
+    /**
+        \brief Specialization of the ToString method for the double type
+
+        \tparam <double> float variable
+
+        \param [in] data the variable to be converted to a string
+
+        \return result of std::to_string function
+    */
+    template <>
+    inline std::string ToString(const double& data) noexcept { return std::to_string(data); }
+
+    /**
         \brief Specialization of the ToString method for the float type
 
         \tparam <char> char variable

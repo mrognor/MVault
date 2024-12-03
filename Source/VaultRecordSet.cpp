@@ -295,14 +295,14 @@ namespace mvlt
         }
     }
 
-    bool VaultRecordSet::SaveToFile(const std::string& fileName, const std::string& separator, const bool& isSaveKey) const noexcept
+    bool VaultRecordSet::SaveToFile(const std::string& fileName, const std::vector<std::string> keys, const std::string& separator, const bool& isSaveKey) const noexcept
     {
         bool res = false;
 
         if (GetIsParentVaultValid())
         {
             ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
-            res = Vault::SaveToFile(fileName);
+            res = Vault::SaveToFile(fileName, keys, separator, isSaveKey);
         }
 
         return res;

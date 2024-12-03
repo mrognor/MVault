@@ -667,6 +667,51 @@ void Vault_Size_Test()
     }
 }
 
+void Vault_SaveToFile_Test()
+{
+    Vault vlt;
+    std::ifstream ifile;
+    std::string line;
+
+    vlt.AddKey<std::size_t>("A", -1);
+    vlt.AddKey<bool>("B", false);
+    vlt.AddKey<std::string>("C", "none");
+    vlt.AddKey<double>("D", 0.0);
+
+    vlt.CreateRecord({{"A", std::size_t(0)}, {"B", true}, {"C", std::string("record1")}, {"D", 0.151}});
+
+    vlt.SaveToFile("Vault_UnitTest_SaveToFile.csv");
+    ifile.open("Vault_UnitTest_SaveToFile.csv");
+
+    getline(ifile, line);
+    TEST_ASSERT(line == "A,B,C,D", "Failed to save data in file");
+    getline(ifile, line);
+    TEST_ASSERT(line == "0,true,record1,0.151000", "Failed to save data in file")
+    ifile.close();
+
+    vlt.SaveToFile("Vault_UnitTest_SaveToFile.csv", {"A", "C", "B"}, ";");
+    ifile.open("Vault_UnitTest_SaveToFile.csv");
+
+    getline(ifile, line);
+    TEST_ASSERT(line == "A;C;B", "Failed to save data in file");
+    getline(ifile, line);
+    TEST_ASSERT(line == "0;record1;true", "Failed to save data in file")
+    ifile.close();
+
+    vlt.SaveToFile("Vault_UnitTest_SaveToFile.csv", {}, "|", false);
+    ifile.open("Vault_UnitTest_SaveToFile.csv");
+
+    getline(ifile, line);
+    TEST_ASSERT(line == "0|true|record1|0.151000", "Failed to save data in file");
+    ifile.close();
+
+    vlt.SaveToFile("Vault_UnitTest_SaveToFile.csv", {"A", "non_existed_key", "B"}, "|", false);
+    ifile.open("Vault_UnitTest_SaveToFile.csv");
+
+    getline(ifile, line);
+    TEST_ASSERT(line == "0||true", "Failed to save data in file");
+}
+
 void Vault_Destructor_Test()
 {
     Vault* vlt = new Vault;
@@ -698,5 +743,6 @@ int main()
     Vault_EraseRecord_Test();
     Vault_EraseRecords_Test();
     Vault_Size_Test();
+    Vault_SaveToFile_Test();
     Vault_Destructor_Test();
 }

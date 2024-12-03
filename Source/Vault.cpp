@@ -584,7 +584,7 @@ namespace mvlt
         std::cout << " (" << RecordsSet.size() << " records)" << std::endl;
     }
 
-    bool Vault::SaveToFile(const std::string& fileName, const std::string& separator, const bool& isSaveKey) const noexcept
+    bool Vault::SaveToFile(const std::string& fileName, const std::vector<std::string> keys, const std::string& separator, const bool& isSaveKey) const noexcept
     {
         // Lock Vault to read
         ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
@@ -604,29 +604,65 @@ namespace mvlt
         // Save keys to file
         if (isSaveKey)
         {
-            auto keysOrderIt = KeysOrder.cbegin();
-            csvFile << *keysOrderIt;
-            ++keysOrderIt;
-            for (;keysOrderIt != KeysOrder.cend(); ++keysOrderIt) csvFile << separator << *keysOrderIt;
-            csvFile.write(endOfLine, 2);
+            if (keys.empty())
+            {
+                auto keysOrderIt = KeysOrder.cbegin();
+                csvFile << *keysOrderIt;
+                ++keysOrderIt;
+                for (;keysOrderIt != KeysOrder.cend(); ++keysOrderIt) csvFile << separator << *keysOrderIt;
+                csvFile.write(endOfLine, 2);
+            }
+            else 
+            {
+                auto keysOrderIt = keys.cbegin();
+                csvFile << *keysOrderIt;
+                ++keysOrderIt;
+                for (;keysOrderIt != keys.cend(); ++keysOrderIt) csvFile << separator << *keysOrderIt;
+                csvFile.write(endOfLine, 2);
+            }
         }
 
-        for (const auto& record : RecordsSet)
+        if (keys.empty())
         {
-            // Getting the number of items in a record 
-            std::size_t counter = record->Size();
-            for (const auto& recordKeyValue : *record)
+            for (const auto& record : RecordsSet)
             {
-                // Calling the string formatting function for the csv format
-                csvFile << FormatStringToCsv(recordKeyValue.second.Str());
+                // Getting the number of items in a record 
+                std::size_t counter = record->Size();
+                for (const std::string& key : KeysOrder)
+                {
+                    std::string data;
+                    record->GetDataAsString(key, data);
+                    csvFile << FormatStringToCsv(data);
 
-                // Checking not to write a comma to the end of the line
-                if (counter == 1) break;
+                    // Checking not to write a comma to the end of the line
+                    if (counter == 1) break;
 
-                csvFile << separator;
-                --counter;
+                    csvFile << separator;
+                    --counter;
+                }
+                csvFile.write(endOfLine, 2);
             }
-            csvFile.write(endOfLine, 2);
+        }
+        else 
+        {
+            for (const auto& record : RecordsSet)
+            {
+                std::size_t counter = keys.size();
+                for (const std::string& key : keys)
+                {
+                    std::string data;
+                    record->GetDataAsString(key, data);
+                    csvFile << FormatStringToCsv(data);
+
+                    // Checking not to write a comma to the end of the line
+                    if (counter == 1) break;
+
+                    csvFile << separator;
+                    --counter;
+                }
+
+                csvFile.write(endOfLine, 2);
+            }
         }
 
         csvFile.close();

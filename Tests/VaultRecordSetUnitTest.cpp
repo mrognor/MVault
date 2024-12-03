@@ -696,6 +696,55 @@ void VaultRecordSet_Size_Test()
     }
 }
 
+void VaultRecordSet_SaveToFile_Test()
+{
+    Vault vlt;
+    VaultRecordSet vrs;
+    std::ifstream ifile;
+    std::string line;
+
+    vlt.AddKey<std::size_t>("A", -1);
+    vlt.AddKey<bool>("B", false);
+    vlt.AddKey<std::string>("C", "none");
+    vlt.AddKey<double>("D", 0.0);
+
+    vlt.CreateRecord({{"A", std::size_t(0)}, {"B", true}, {"C", std::string("record1")}, {"D", 0.151}});
+    vlt.CreateRecord({{"A", std::size_t(1)}, {"B", false}, {"C", std::string("record2")}, {"D", 0.7534}});
+
+    vlt.Request(Equal("A", std::size_t(1)), vrs);
+
+    vrs.SaveToFile("VaultRecordSet_UnitTest_SaveToFile.csv");
+    ifile.open("VaultRecordSet_UnitTest_SaveToFile.csv");
+
+    getline(ifile, line);
+    TEST_ASSERT(line == "A,B,C,D", "Failed to save data in file");
+    getline(ifile, line);
+    TEST_ASSERT(line == "1,false,record2,0.753400", "Failed to save data in file")
+    ifile.close();
+
+    vrs.SaveToFile("VaultRecordSet_UnitTest_SaveToFile.csv", {"A", "C", "B"}, ";");
+    ifile.open("VaultRecordSet_UnitTest_SaveToFile.csv");
+
+    getline(ifile, line);
+    TEST_ASSERT(line == "A;C;B", "Failed to save data in file");
+    getline(ifile, line);
+    TEST_ASSERT(line == "1;record2;false", "Failed to save data in file")
+    ifile.close();
+
+    vrs.SaveToFile("VaultRecordSet_UnitTest_SaveToFile.csv", {}, "|", false);
+    ifile.open("VaultRecordSet_UnitTest_SaveToFile.csv");
+
+    getline(ifile, line);
+    TEST_ASSERT(line == "1|false|record2|0.753400", "Failed to save data in file");
+    ifile.close();
+
+    vrs.SaveToFile("VaultRecordSet_UnitTest_SaveToFile.csv", {"A", "non_existed_key", "B"}, "|", false);
+    ifile.open("VaultRecordSet_UnitTest_SaveToFile.csv");
+
+    getline(ifile, line);
+    TEST_ASSERT(line == "1||false", "Failed to save data in file");
+}
+
 void VaultRecordSet_Destructor_Test()
 {
     Vault vlt;
@@ -729,5 +778,6 @@ int main()
     VaultRecordSet_Reset_Tests();
     VaultRecordSet_RemoveRecord_Test();
     VaultRecordSet_RemoveRecords_Test();
+    VaultRecordSet_SaveToFile_Test();
     VaultRecordSet_Destructor_Test();
 }
