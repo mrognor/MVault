@@ -346,19 +346,27 @@ namespace mvlt
     }
 
     template <class T>
-    bool Vault::AddKey(const std::string& key, const T& defaultKeyValue, const bool& isUniqueKey,
+    VaultOperationResult Vault::AddKey(const std::string& key, const T& defaultKeyValue, const bool& isUniqueKey,
         std::function<T(std::size_t, const VaultRecordRef&)> uniqueKeyFunction) noexcept
     {
         static_assert(!std::is_array<T>::value, "It is not possible to use a c array as a key value. \n\
             If you want to use a string as a key, you must specialize the function with a string. Like this: \n\
             AddKey<std::string>(\"Key\", \"Value\") or AddKey(\"Key\", std::string(\"Value\"))");
 
+        VaultOperationResult res;
+        res.Key = key;
+        res.RequestedType = typeid(T);
+
         // Lock Vault to write
         WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
 
         // If the key was added earlier
         if (KeysTypes.find(key) != KeysTypes.end())
-            return false;
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::DuplicateKey;
+            return res;
+        }
 
         // Create new hash map to store data with template T key
         UnorderedMap<T, VaultRecord*>* TtoVaultRecordHashMap = new UnorderedMap<T, VaultRecord*>(!isUniqueKey);
@@ -417,7 +425,10 @@ namespace mvlt
             {
                 VaultHashMapStructure.EraseData(key);
                 VaultMapStructure.EraseData(key);
-                return false;
+
+                res.IsOperationSuccess = false;
+                res.ResultCode = VaultOperationResultCode::UniqueKeyValueAlredyInSet;
+                return res;
             }
         }
         else
@@ -538,17 +549,19 @@ namespace mvlt
             }
         }
 
-        return true;
+        res.IsOperationSuccess = true;
+        res.ResultCode = VaultOperationResultCode::Success;
+        return res;
     }
 
     template <class T>
     bool Vault::AddKey(const std::string& key, const T& defaultKeyValue) noexcept
     {
-        return AddKey(key, defaultKeyValue, false, {[&](std::size_t counter, const VaultRecordRef&) -> T{ return defaultKeyValue; }});
+        return AddKey(key, defaultKeyValue, false, {[&](std::size_t counter, const VaultRecordRef&) -> T{ return defaultKeyValue; }}).IsOperationSuccess;
     }
 
     template <class T>
-    bool Vault::AddUniqueKey(const std::string& key, std::function<T(std::size_t, const VaultRecordRef&)> uniqueKeyFunction) noexcept
+    VaultOperationResult Vault::AddUniqueKey(const std::string& key, std::function<T(std::size_t, const VaultRecordRef&)> uniqueKeyFunction) noexcept
     {
         return AddKey(key, T(), true, uniqueKeyFunction);
     }

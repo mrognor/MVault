@@ -192,7 +192,7 @@ namespace mvlt
             \return Returns false if such a key already exists, otherwise it returns true
         */
         template <class T>
-        bool AddKey(const std::string& key, const T& defaultKeyValue, const bool& isUniqueKey, 
+        VaultOperationResult AddKey(const std::string& key, const T& defaultKeyValue, const bool& isUniqueKey, 
             std::function<T(std::size_t, const VaultRecordRef&)> uniqueKeyFunction) noexcept;
 
         /**
@@ -267,7 +267,7 @@ namespace mvlt
             \return Returns false if such a key already exists, otherwise it returns true
         */
         template <class T>
-        bool AddUniqueKey(const std::string& key, std::function<T(std::size_t, const VaultRecordRef&)> uniqueKeyFunction) noexcept;
+        VaultOperationResult AddUniqueKey(const std::string& key, std::function<T(std::size_t, const VaultRecordRef&)> uniqueKeyFunction) noexcept;
 
         /**
             \brief Template method to update default key value
@@ -665,11 +665,9 @@ namespace mvlt
             \brief A method for saving data to a table file. The file format is csv
 
             \param [in] fileName The file name to save the data, the extension must be specified manually
-            \param [in] keys a vector with the keys to save. The keys will be stored in the same order as in the vector
             \param [in] separator The symbol that will be used to separate the record elements in the file
             \param [in] isSaveKey A variable that determines whether to save keys to a file
 
-            The validity of the keys is provided by the user. In case of a non-existent key, an empty column will be written to the file.
             \return It will return true if it was possible to open the file and write the data, otherwise it will return false
         */
         bool SaveToFile(const std::string& fileName, const std::vector<std::string> keys = {}, const std::string& separator = ",", const bool& isSaveKey = true) const noexcept;

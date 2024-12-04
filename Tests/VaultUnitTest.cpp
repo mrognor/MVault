@@ -22,10 +22,10 @@ void Vault_AddUniqueKey_Test()
 
     // Add to empty Vault
     // Correct add new key
-    TEST_ASSERT(vlt.AddUniqueKey<int>("A", {[](std::size_t counter, const VaultRecordRef& vrf) -> int { return static_cast<int>(counter); }}) == true, "Failed to add new unique key");
+    TEST_ASSERT(vlt.AddUniqueKey<int>("A", {[](std::size_t counter, const VaultRecordRef& vrf) -> int { return static_cast<int>(counter); }}).IsOperationSuccess == true, "Failed to add new unique key");
 
     // Incorrect try to add exist key
-    TEST_ASSERT(vlt.AddUniqueKey<int>("A", {[](std::size_t counter, const VaultRecordRef& vrf) -> int { return static_cast<int>(counter); }}) == false, "Error when try to add key with existing name");
+    TEST_ASSERT(vlt.AddUniqueKey<int>("A", {[](std::size_t counter, const VaultRecordRef& vrf) -> int { return static_cast<int>(counter); }}).IsOperationSuccess == false, "Error when try to add key with existing name");
 
     // Fill vault
     for (int i = 0; i < 10; ++i)
@@ -35,10 +35,10 @@ void Vault_AddUniqueKey_Test()
 
     // Add to filled vault
     // Correct add new key
-    TEST_ASSERT(vlt.AddUniqueKey<int>("B", {[](std::size_t counter, const VaultRecordRef& vrf) -> int { return static_cast<int>(counter * counter); }}) == true, "Failed to add new unique key");
+    TEST_ASSERT(vlt.AddUniqueKey<int>("B", {[](std::size_t counter, const VaultRecordRef& vrf) -> int { return static_cast<int>(counter * counter); }}).IsOperationSuccess == true, "Failed to add new unique key");
 
     // Incorrect try to add exist key
-    TEST_ASSERT(vlt.AddUniqueKey<int>("C", {[](std::size_t counter, const VaultRecordRef& vrf) -> int { return 1; }}) == false, "Error when try to add key with existing name");
+    TEST_ASSERT(vlt.AddUniqueKey<int>("C", {[](std::size_t counter, const VaultRecordRef& vrf) -> int { return 1; }}).IsOperationSuccess == false, "Error when try to add key with existing name");
 
     // Check lambda
     TEST_ASSERT(vlt.AddUniqueKey<int>("C", {[](std::size_t counter, const VaultRecordRef& vrf) -> int 
@@ -46,7 +46,7 @@ void Vault_AddUniqueKey_Test()
         int i;
         vrf.GetData("B", i);
         return static_cast<int>(2 * i); 
-    }}) == true, "Failed to add new unique key");
+    }}).IsOperationSuccess == true, "Failed to add new unique key");
 
     VaultRecordRef vrf;
     for (int i = 0; i < 10; ++i)

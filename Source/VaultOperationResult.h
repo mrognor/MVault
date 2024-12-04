@@ -16,6 +16,7 @@ namespace mvlt
     /// \brief Enum with all error handling codes
     enum class VaultOperationResultCode
     {
+        DuplicateKey = -8,             ///< This code is returned when trying to add key which alredy in vault
         TryToUpdateUniqueKey = -7,     ///< This code is returned when trying to update default value in an unique key
         RecordAlredyInSet = -6,        ///< This code is returned when trying to add an record to the set when it is already in it
         ParentVaultNotMatch = -5,      ///< This code is returned during operations on VaultRecordSet when objects depend on different Vaults
