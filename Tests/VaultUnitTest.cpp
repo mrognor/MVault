@@ -683,32 +683,32 @@ void Vault_SaveToFile_Test()
     vlt.SaveToFile("Vault_UnitTest_SaveToFile.csv");
     ifile.open("Vault_UnitTest_SaveToFile.csv");
 
-    getline(ifile, line);
+    line = GetLine(ifile);
     TEST_ASSERT(line == "A,B,C,D", "Failed to save data in file");
-    getline(ifile, line);
+    line = GetLine(ifile);
     TEST_ASSERT(line == "0,true,record1,0.151000", "Failed to save data in file")
     ifile.close();
 
     vlt.SaveToFile("Vault_UnitTest_SaveToFile.csv", {"A", "C", "B"}, ";");
     ifile.open("Vault_UnitTest_SaveToFile.csv");
 
-    getline(ifile, line);
+    line = GetLine(ifile);
     TEST_ASSERT(line == "A;C;B", "Failed to save data in file");
-    getline(ifile, line);
+    line = GetLine(ifile);
     TEST_ASSERT(line == "0;record1;true", "Failed to save data in file")
     ifile.close();
 
     vlt.SaveToFile("Vault_UnitTest_SaveToFile.csv", {}, "|", false);
     ifile.open("Vault_UnitTest_SaveToFile.csv");
 
-    getline(ifile, line);
+    line = GetLine(ifile);
     TEST_ASSERT(line == "0|true|record1|0.151000", "Failed to save data in file");
     ifile.close();
 
     vlt.SaveToFile("Vault_UnitTest_SaveToFile.csv", {"A", "non_existed_key", "B"}, "|", false);
     ifile.open("Vault_UnitTest_SaveToFile.csv");
 
-    getline(ifile, line);
+    line = GetLine(ifile);
     TEST_ASSERT(line == "0||true", "Failed to save data in file");
 }
 

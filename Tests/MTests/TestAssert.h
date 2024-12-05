@@ -1,5 +1,6 @@
 #pragma once
 
+#include "GetLine.h"
 #include "ColorizedPrint.h"
 
 #define TEST_ASSERT(expression, description) if (!(expression)) \
