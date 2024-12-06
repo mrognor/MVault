@@ -4,6 +4,6 @@ mkdir -p Build
 cd Build
 cmake ..
 
-# Copy csv table
+# Copy csv folder
 cd ..
-cp Resources/Csv/CPU_benchmark_v4.csv Build/
+cp -r Resources/Csv Build/

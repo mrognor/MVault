@@ -712,6 +712,89 @@ void Vault_SaveToFile_Test()
     TEST_ASSERT(line == "0||true", "Failed to save data in file");
 }
 
+void Vault_ReadFromFile_Test()
+{
+    Vault vlt;
+
+    vlt.AddKey<std::size_t>("A", 0);
+    vlt.AddKey<std::string>("B", "none");
+    vlt.AddKey<double>("C", -1.1);
+    vlt.AddKey<int>("D", -1);
+
+    vlt.ReadFile("Csv/ReadFile_Test1.csv", ',', false);
+    TEST_ASSERT(vlt.Size() == 0, "Error in reading vault!");
+
+    vlt.ReadFile("Csv/ReadFile_Test2.csv", ',', false);
+    TEST_ASSERT(vlt.Size() == 1, "Error in reading vault!");
+
+    vlt.ReadFile("Csv/ReadFile_Test3.csv", ',', false);
+    TEST_ASSERT(vlt.Size() == 9, "Error in reading vault!");
+    
+    vlt.ReadFile("Csv/ReadFile_Test4.csv", ';', true);
+    TEST_ASSERT(vlt.Size() == 12, "Error in reading vault!");
+
+    bool res = vlt.ReadFile("Csv/NoneExisted.csv", ';', true, [](const std::vector<std::string>& keys, std::vector<std::string>& values) 
+    {
+        for (std::size_t i = 0; i < keys.size(); ++i)
+        {
+            if (keys[i] == "B")
+                values[i] += "Preprocess";
+        }
+    });
+
+    TEST_ASSERT(res == false, "Error in reading vault!");
+
+    vlt.ReadFile("Csv/ReadFile_Test4.csv", ';', true, [](const std::vector<std::string>& keys, std::vector<std::string>& values) 
+    {
+        for (std::size_t i = 0; i < keys.size(); ++i)
+        {
+            if (keys[i] == "B")
+                values[i] = "Preprocess";
+        }
+    });
+
+    std::vector<VaultRecordRef> refs;
+    vlt.GetRecords<std::string>("B", "Preprocess", refs);
+    TEST_ASSERT(refs.size() == 3, "Error in reading vault!");
+
+    vlt.DropData();
+
+    vlt.ReadFile("Csv/ReadFile_Test4.csv", ';', false, {"D", "C"});
+
+    // Read unique keys
+    vlt.DropVault();
+    vlt.AddUniqueKey<std::size_t>("A", {[](std::size_t counter, const VaultRecordRef& ref) -> std::size_t
+    {
+        return counter;
+    }});
+
+    vlt.ReadFile("Csv/ReadFile_Test5.csv");
+    TEST_ASSERT(vlt.Size() == 10, "Error in reading vault!");
+
+    std::vector<std::pair<std::size_t, std::string>> errors = vlt.GetErrorsInLastReadedFile();
+    TEST_ASSERT(errors.size() == 6, "Error in reading vault!");
+    TEST_ASSERT(errors[0].first == 7, "Error in reading vault!");
+    TEST_ASSERT(errors[1].second == "A", "Error in reading vault!");
+}
+
+void Vault_GetErrorsInLastReadedFile_Test()
+{
+    Vault vlt;
+
+    vlt.AddKey<std::size_t>("A", 0);
+    vlt.AddKey<std::string>("B", "none");
+    vlt.AddKey<double>("C", -1.1);
+    vlt.AddKey<int>("D", -1);
+
+    vlt.ReadFile("Csv/ReadFile_Test1.csv", ',', false);
+    TEST_ASSERT(vlt.Size() == 0, "Error in reading vault!");
+
+    std::vector<std::pair<std::size_t, std::string>> errors = vlt.GetErrorsInLastReadedFile();
+
+    TEST_ASSERT(errors[0].first == 0, "Error in reading vault!");
+    TEST_ASSERT(errors[1].second == "C", "Error in reading vault!");
+}
+
 void Vault_Destructor_Test()
 {
     Vault* vlt = new Vault;
@@ -744,5 +827,7 @@ int main()
     Vault_EraseRecords_Test();
     Vault_Size_Test();
     Vault_SaveToFile_Test();
+    Vault_ReadFromFile_Test();
+    Vault_GetErrorsInLastReadedFile_Test();
     Vault_Destructor_Test();
 }

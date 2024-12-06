@@ -158,15 +158,19 @@ namespace mvlt
 
             \param [in] key the key to set the data on
             \param [in] str the string that will be converted to data
+
+            \return true in success, otherwise return false
         */
-        void SetDataFromString(const std::string& key, const std::string& str) noexcept
+        bool SetDataFromString(const std::string& key, const std::string& str) noexcept
         {
             // Find data iterator
             auto findResIt = Container.find(key);
 
             // Checking whether there was such a key in the container
             if (findResIt != Container.end())
-                findResIt->second.SetDataFromString(str);
+                return findResIt->second.SetDataFromString(str);
+
+            return false;
         }
 
         /**

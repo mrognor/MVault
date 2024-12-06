@@ -88,6 +88,9 @@ namespace mvlt
         // Set with all unique keys
         std::set<std::string> UniqueKeys;
 
+        // Vector with all invalid records in last readed file
+        std::vector<std::pair<std::size_t, std::string>> InvalidFileRecords;
+
         // Recursive mutex for thread safety
         mutable RecursiveReadWriteMutex RecursiveReadWriteMtx;
     protected:
@@ -203,13 +206,14 @@ namespace mvlt
             \param [in] recordHandler a function for preprocessing the recording. Accepts two vectors with strings. 
             The first vector contains the keys in the order in which they are specified in the file. 
             If the file does not contain keys, then this vector will be empty. The second vector is a vector of values.
-            \param [in] separator The symbol to be used as a data separator in the file
-            \param [in] isLoadKeys Are there any keys in the file
+            \param [in] separator the symbol to be used as a data separator in the file
+            \param [in] isLoadKeys are there any keys in the file
+            \param [in] userKeys vector with keys to read from file
 
             \return returns true if it was possible to read the file, otherwise it returns false
         */
-        bool ReadFile(const std::string& fileName, const bool& isPreprocessRecord, std::function<void (std::vector<std::string>&, std::vector<std::string>&)> recordHandler, 
-            const char& separator, const bool& isLoadKeys) noexcept;
+        bool ReadFile(const std::string& fileName, const bool& isPreprocessRecord, std::function<void (const std::vector<std::string>&, std::vector<std::string>&)> recordHandler, 
+            const char& separator, const bool& isLoadKeys, const std::vector<std::string> userKeys) noexcept;
 
     public:
 
@@ -676,12 +680,13 @@ namespace mvlt
             \brief A method for reading a csv file and loading data from it into memory
 
             \param [in] fileName the name of the file to read the data from
-            \param [in] separator The symbol to be used as a data separator in the file
-            \param [in] isLoadKeys Are there any keys in the file
+            \param [in] separator the symbol to be used as a data separator in the file
+            \param [in] isLoadKeys are there any keys in the file
+            \param [in] keys vector with keys to read from file. Useless if isLoadKeys == true
 
             \return returns true if it was possible to read the file, otherwise it returns false
         */
-        bool ReadFile(const std::string& fileName, const char& separator = ',', const bool& isLoadKeys = true) noexcept;
+        bool ReadFile(const std::string& fileName, const char& separator = ',', const bool& isLoadKeys = true, const std::vector<std::string> keys = {}) noexcept;
 
         /**
             \brief A method for reading a csv file and loading data from it into memory
@@ -695,7 +700,16 @@ namespace mvlt
 
             \return returns true if it was possible to read the file, otherwise it returns false
         */
-        bool ReadFile(const std::string& fileName, const char& separator, const bool& isLoadKeys, std::function<void (std::vector<std::string>&, std::vector<std::string>&)> recordHandler) noexcept;
+        bool ReadFile(const std::string& fileName, const char& separator, const bool& isLoadKeys, std::function<void (const std::vector<std::string>&, std::vector<std::string>&)> recordHandler) noexcept;
+
+        /**
+            \brief A method for getting errors in the last read file
+
+            In the returned vector, the first element is the error string, and the second is the key whose value could not be read.
+
+            \return vector with errors
+        */
+        std::vector<std::pair<std::size_t, std::string>> GetErrorsInLastReadedFile() const noexcept;
 
         /// \brief Default destructor
         ~Vault() noexcept;

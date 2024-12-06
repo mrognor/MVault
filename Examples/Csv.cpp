@@ -21,7 +21,7 @@ int main()
     vlt.AddKey<std::string>("name", "");
     vlt.AddKey<std::string>("gender", "");
 
-    vlt.ReadFile("CsvResult.csv", ';', true, [](std::vector<std::string>& keys, std::vector<std::string>& values) 
+    vlt.ReadFile("CsvResult.csv", ';', true, [](const std::vector<std::string>& keys, std::vector<std::string>& values) 
     {
         if (values[2] == "true") values[2] = "Man";
         else if (values[2] == "false") values[2] = "Woman";
@@ -44,6 +44,6 @@ int main()
     vlt.AddKey("category", std::string());
 
 
-    vlt.ReadFile("CPU_benchmark_v4.csv", ',', true);
+    vlt.ReadFile("Csv/CPU_benchmark_v4.csv", ',', true);
     vlt.PrintAsTable(false, 10, "cpuMark", true);
 }

@@ -171,7 +171,7 @@ int main()
     vlt.AddKey<std::string>("socket", "");
     vlt.AddKey<std::string>("category", "");
     
-    vlt.ReadFile("CPU_benchmark_v4.csv");
+    vlt.ReadFile("Csv/CPU_benchmark_v4.csv");
 
     vrs1.Clear();
     vlt.RequestGreater("cpuMark", 80000, vrs1);

@@ -4,6 +4,10 @@ cd ../
 
 # Build all
 ./Configure.sh
+
+# Copy csv folder
+cp -r Resources/Csv Build/Tests
+
 cd Build
 make -j
 

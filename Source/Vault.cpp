@@ -35,8 +35,8 @@ namespace mvlt
         return dataIt;
     }
 
-    bool Vault::ReadFile(const std::string& fileName, const bool& isPreprocessRecord, std::function<void (std::vector<std::string>&, std::vector<std::string>&)> recordHandler, 
-            const char& separator, const bool& isLoadKeys) noexcept
+    bool Vault::ReadFile(const std::string& fileName, const bool& isPreprocessRecord, std::function<void (const std::vector<std::string>&, std::vector<std::string>&)> recordHandler, 
+            const char& separator, const bool& isLoadKeys, const std::vector<std::string> userKeys) noexcept
     {
         // Open and parse file
         CsvParser parser;
@@ -47,47 +47,128 @@ namespace mvlt
 
         std::vector<std::string> keys;
 
+        InvalidFileRecords.clear();
+
+        std::size_t lineCounter = 0;
+
         // Vector with record keys
         std::vector<std::string> record;
 
         if (isLoadKeys) parser.GetNextVector(keys, separator);
-        
+
         // Read new record from parser
         while(parser.GetNextVector(record, separator))
         {
+            ++lineCounter;
+
             // Record to set to it data from file and store in Vault
             VaultRecord* newRecord = new VaultRecord(RecordTemplate);
-        
+
+            bool isCorrectRecordInFile = false;
+
             if (isLoadKeys)
             {
                 if (isPreprocessRecord)
                     recordHandler(keys, record);
 
                 for (std::size_t i = 0; i < keys.size(); ++i)
+                {
                     if (i < record.size())
-                        newRecord->SetDataFromString(keys[i], record[i]);
+                    {
+                        isCorrectRecordInFile = newRecord->SetDataFromString(keys[i], record[i]);
+
+                        if (!isCorrectRecordInFile) 
+                        {
+                            InvalidFileRecords.emplace_back(std::pair<std::size_t, std::string>(lineCounter - 1, keys[i]));
+                            break;
+                        }
+                    }
+                }
             }
             else
             {
-                // Iteraror to load keys
-                auto keyOrderIt = KeysOrder.begin();
-
-                // Store all keys values to record
-                for (const auto& recordPole : record)
+                if (userKeys.empty())
                 {
-                    // Set last record pole
-                    newRecord->SetDataFromString(*keyOrderIt, recordPole);
+                    // Iteraror to load keys
+                    auto keyOrderIt = KeysOrder.begin();
 
-                    ++keyOrderIt;
+                    // Store all keys values to record
+                    for (const auto& recordPole : record)
+                    {
+                        // Set last record pole
+                        isCorrectRecordInFile = newRecord->SetDataFromString(*keyOrderIt, recordPole);
+
+                        if (!isCorrectRecordInFile) 
+                        {
+                            InvalidFileRecords.emplace_back(std::pair<std::size_t, std::string>(lineCounter - 1, *keyOrderIt));
+                            break;
+                        }
+
+                        ++keyOrderIt;
+                    }
+                }
+                else 
+                {
+                    // Iteraror to load keys
+                    auto keyOrderIt = userKeys.begin();
+
+                    // Store all keys values to record
+                    for (const auto& recordPole : record)
+                    {
+                        // Set last record pole
+                        isCorrectRecordInFile = newRecord->SetDataFromString(*keyOrderIt, recordPole);
+
+                        if (!isCorrectRecordInFile) 
+                        {
+                            InvalidFileRecords.emplace_back(std::pair<std::size_t, std::string>(lineCounter - 1, *keyOrderIt));
+                            break;
+                        }
+
+                        ++keyOrderIt;
+                        if (keyOrderIt == userKeys.end()) break;
+                    }
                 }
             }
 
-            // Add new record to set
-            RecordsSet.emplace(newRecord);
+            if (!isCorrectRecordInFile) 
+            {
+                delete newRecord;
+                record.clear();
+                continue;
+            }
 
-            // Add new record to every maps inside VaultStructureHashMap
-            for (const auto& vaultRecordAddersIt : VaultRecordAdders)
-                vaultRecordAddersIt.second(newRecord);
+            std::vector<std::string> addedUniqueKeys;
+
+            // Adding unique keys
+            auto uniqueKeyIt = UniqueKeys.begin();
+            for (; uniqueKeyIt != UniqueKeys.end(); ++uniqueKeyIt)
+            {
+                // Find key adder and try to emplace data and if add failed, then break cycle
+                if (!VaultRecordAdders.find(*uniqueKeyIt)->second(newRecord))
+                    break;
+
+                addedUniqueKeys.emplace_back(*uniqueKeyIt);
+            }
+
+            // If at least one unique key adding fail
+            if (addedUniqueKeys.size() != UniqueKeys.size())
+            {
+                // Removed added unique keys
+                for (const std::string& uniqueKey : addedUniqueKeys)
+                    VaultRecordErasers.find(uniqueKey)->second(newRecord);
+                
+                InvalidFileRecords.emplace_back(lineCounter, *uniqueKeyIt);
+                delete newRecord;
+            }
+            else
+            {
+                // Add new record to set
+                RecordsSet.emplace(newRecord);
+
+                // Add new record to every maps inside VaultStructureHashMap
+                for (const auto& vaultRecordAddersIt : VaultRecordAdders)
+                    vaultRecordAddersIt.second(newRecord);
+            }
 
             record.clear();
         }
@@ -205,7 +286,7 @@ namespace mvlt
         bool isCorrectParams = true;
 
         // Create new record
-        VaultRecord* newData = new VaultRecord(RecordTemplate);
+        VaultRecord* newRecord = new VaultRecord(RecordTemplate);
 
         for (const auto& paramsIt : params)
         {
@@ -215,14 +296,14 @@ namespace mvlt
             res.RequestedType = paramsIt.second.GetDataType();
 
             // Check if key exist in record template
-            if (newData->GetDataSaver(paramsIt.first, ds))
+            if (newRecord->GetDataSaver(paramsIt.first, ds))
             {
                 res.RequestedType = KeysTypes.find(paramsIt.first)->second;
 
                 // Check if type in params match type in record template
                 if (ds.GetDataType() == paramsIt.second.GetDataType())
                 {
-                    paramsIt.second.SetDataToRecord(paramsIt.first, newData);
+                    paramsIt.second.SetDataToRecord(paramsIt.first, newRecord);
                 }
                 else
                 {   // If the type in param not match type in record template
@@ -254,7 +335,7 @@ namespace mvlt
             for (auto uniqueKeyIt = UniqueKeys.begin(); uniqueKeyIt != UniqueKeys.end(); ++uniqueKeyIt)
             {
                 // Find key adder and try to emplace data and if add failed, then break cycle
-                if (!VaultRecordAdders.find(*uniqueKeyIt)->second(newData))
+                if (!VaultRecordAdders.find(*uniqueKeyIt)->second(newRecord))
                 {
                     incorrectUniqueKey = *uniqueKeyIt;
                     break;
@@ -268,7 +349,7 @@ namespace mvlt
             {
                 // Removed added unique keys
                 for (const std::string& uniqueKey : addedUniqueKeys)
-                    VaultRecordErasers.find(uniqueKey)->second(newData);
+                    VaultRecordErasers.find(uniqueKey)->second(newRecord);
 
                 res.IsOperationSuccess = false;
                 res.Key = incorrectUniqueKey;
@@ -276,24 +357,24 @@ namespace mvlt
                 res.RequestedType = res.SavedType;
                 res.ResultCode = VaultOperationResultCode::UniqueKeyValueAlredyInSet;
                 isCorrectParams = true;
-                delete newData;
+                delete newRecord;
             }
             else
             {
                 // Add new record to set
-                RecordsSet.emplace(newData);
+                RecordsSet.emplace(newRecord);
 
                 // Add new record to every maps inside VaultStructureHashMap
                 for (const auto& vaultRecordAddersIt : VaultRecordAdders)
-                    vaultRecordAddersIt.second(newData);
+                    vaultRecordAddersIt.second(newRecord);
 
-                vaultRecordRef.SetRecord(newData, this);
+                vaultRecordRef.SetRecord(newRecord, this);
 
                 res.IsOperationSuccess = true;
                 res.ResultCode = VaultOperationResultCode::Success;
             }
         }
-        else delete newData;
+        else delete newRecord;
 
         return res;
     }
@@ -670,14 +751,19 @@ namespace mvlt
         return true;
     }
 
-    bool Vault::ReadFile(const std::string& fileName, const char& separator, const bool& isLoadKeys) noexcept
+    bool Vault::ReadFile(const std::string& fileName, const char& separator, const bool& isLoadKeys, const std::vector<std::string> keys) noexcept
     {
-        return ReadFile(fileName, false, [](std::vector<std::string>&, std::vector<std::string>&) {}, separator, isLoadKeys);
+        return ReadFile(fileName, false, [](const std::vector<std::string>&, std::vector<std::string>&) {}, separator, isLoadKeys, keys);
     }
 
-    bool Vault::ReadFile(const std::string& fileName, const char& separator, const bool& isLoadKeys, std::function<void (std::vector<std::string>&, std::vector<std::string>&)> recordHandler) noexcept
+    bool Vault::ReadFile(const std::string& fileName, const char& separator, const bool& isLoadKeys, std::function<void (const std::vector<std::string>&, std::vector<std::string>&)> recordHandler) noexcept
     {
-        return ReadFile(fileName, true, recordHandler, separator, isLoadKeys);
+        return ReadFile(fileName, true, recordHandler, separator, isLoadKeys, {});
+    }
+
+    std::vector<std::pair<std::size_t, std::string>> Vault::GetErrorsInLastReadedFile() const noexcept
+    {
+        return InvalidFileRecords;
     }
 
     Vault::~Vault() noexcept
