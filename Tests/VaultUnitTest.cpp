@@ -55,6 +55,19 @@ void Vault_AddUniqueKey_Test()
         TEST_ASSERT(vlt.GetRecord("B", i * i, vrf).IsOperationSuccess == true, "Error in unique key lamda!");
         TEST_ASSERT(vlt.GetRecord("C", i * i * 2, vrf).IsOperationSuccess == true, "Error in unique key lamda!");
     }
+
+    // Add unique key without lamda
+    vlt.DropVault();
+    VaultOperationResult vor = vlt.AddUniqueKey<int>("A");
+    TEST_ASSERT(vor.IsOperationSuccess == true, "Error in adding unique key without lamda!");
+
+    vor = vlt.AddUniqueKey<int>("A");
+    TEST_ASSERT(vor.IsOperationSuccess == false, "Error in adding unique key without lamda!");
+
+    vor = vlt.CreateRecord({{"A", 12}});
+
+    vor = vlt.AddUniqueKey<std::size_t>("B");
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::TryToAddUniqueKeyInNonEmptyVaultWithoutLambda , "Error in adding unique key without lamda!");
 }
 
 void Vault_UpdateKey_Test()
@@ -546,9 +559,13 @@ void Vault_DropVault_Tests()
     vlt.AddKey("A", -1);
     vlt.AddKey("B", '0');
     vlt.AddKey("C", true);
+    vlt.AddUniqueKey<int>("D");
 
     // Fill vault
-    for (int i = 0; i < 10; ++i) vlt.CreateRecord({ {"A", i} });
+    for (int i = 0; i < 10; ++i) vlt.CreateRecord({ {"A", i}, {"D", i} });
+
+    TEST_ASSERT(vlt.GetKeys().size() == 4, "Failed to create vault");
+    TEST_ASSERT(vlt.Size() == 10, "Failed to create vault");
 
     vlt.DropVault();
 

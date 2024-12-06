@@ -392,6 +392,12 @@ namespace mvlt
             (*itToDelete)->Reset();
         }
 
+        // Clear unique keys vector
+        UniqueKeys.clear();
+
+        // Clear last readed file errors
+        InvalidFileRecords.clear();
+
         // Invalidate all records
         for (const auto& recordsSetIt : RecordsSet) 
             recordsSetIt->Invalidate();

@@ -191,11 +191,13 @@ namespace mvlt
             \param [in] key new key name
             \param [in] defaultKeyValue default key value
             \param [in] isUniqueKey is this is key with only unique values
+            \param [in] isUniqueKeyWithoutLambda is try to add unique key without lambda. Vault must be empty
+            \param [in] uniqueKeyFunction the function to add unique key in non-empty vault
 
             \return Returns false if such a key already exists, otherwise it returns true
         */
         template <class T>
-        VaultOperationResult AddKey(const std::string& key, const T& defaultKeyValue, const bool& isUniqueKey, 
+        VaultOperationResult AddKey(const std::string& key, const T& defaultKeyValue, const bool& isUniqueKey, const bool& isUniqueKeyWithoutLambda,
             std::function<T(std::size_t, const VaultRecordRef&)> uniqueKeyFunction) noexcept;
 
         /**
@@ -257,6 +259,20 @@ namespace mvlt
 
             \tparam <T> Any type of data except for c arrays
 
+            Use it only on empty vault. If vault is not empty, then this method return error.
+
+            \param [in] key new key name
+
+            \return Returns VaultOperationResult with information about key adding
+        */
+        template <class T>
+        VaultOperationResult AddUniqueKey(const std::string& key) noexcept;
+
+        /**
+            \brief Template method to add new unique key to Vault
+
+            \tparam <T> Any type of data except for c arrays
+
             \param [in] key new key name
             \param [in] uniqueKeyFunction A function to determine the value of the key that will be set
              for an entry that has already been in vault. The function takes std::size_t as the index of the record. 
@@ -268,7 +284,7 @@ namespace mvlt
             \endcode
             Note that the lambda function is enclosed in {} and the return value is specified via ->
 
-            \return Returns false if such a key already exists, otherwise it returns true
+            \return Returns VaultOperationResult with information about key adding
         */
         template <class T>
         VaultOperationResult AddUniqueKey(const std::string& key, std::function<T(std::size_t, const VaultRecordRef&)> uniqueKeyFunction) noexcept;

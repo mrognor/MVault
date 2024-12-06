@@ -7,6 +7,12 @@ namespace mvlt
         switch (ResultCode)
         {
         default:
+        case VaultOperationResultCode::TryToAddUniqueKeyInNonEmptyVaultWithoutLambda:
+            return "You can not add unique key without lambda in non-empty vault";
+             
+        case VaultOperationResultCode::DuplicateKey:
+            return "This key is alredy in vault";
+
         case VaultOperationResultCode::TryToUpdateUniqueKey:
             return "The key is unique and you can not update it default value.";
 

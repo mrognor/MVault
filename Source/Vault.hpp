@@ -346,7 +346,7 @@ namespace mvlt
     }
 
     template <class T>
-    VaultOperationResult Vault::AddKey(const std::string& key, const T& defaultKeyValue, const bool& isUniqueKey,
+    VaultOperationResult Vault::AddKey(const std::string& key, const T& defaultKeyValue, const bool& isUniqueKey, const bool& isUniqueKeyWithoutLambda,
         std::function<T(std::size_t, const VaultRecordRef&)> uniqueKeyFunction) noexcept
     {
         static_assert(!std::is_array<T>::value, "It is not possible to use a c array as a key value. \n\
@@ -387,6 +387,14 @@ namespace mvlt
         // Add new data to record set
         if (isUniqueKey)
         {
+            // If no lamda provided and vault not empty
+            if (isUniqueKeyWithoutLambda && !RecordsSet.empty())
+            {
+                res.IsOperationSuccess = false;
+                res.ResultCode = VaultOperationResultCode::TryToAddUniqueKeyInNonEmptyVaultWithoutLambda;
+                return res;
+            }
+
             std::size_t counter = 0;
             std::vector<T> cachedData;
             bool isCorrectKey = true;
@@ -557,13 +565,19 @@ namespace mvlt
     template <class T>
     bool Vault::AddKey(const std::string& key, const T& defaultKeyValue) noexcept
     {
-        return AddKey(key, defaultKeyValue, false, {[&](std::size_t counter, const VaultRecordRef&) -> T{ return defaultKeyValue; }}).IsOperationSuccess;
+        return AddKey(key, defaultKeyValue, false, false, {[&](std::size_t counter, const VaultRecordRef&) -> T{ return defaultKeyValue; }}).IsOperationSuccess;
+    }
+
+    template <class T>
+    VaultOperationResult Vault::AddUniqueKey(const std::string& key) noexcept
+    {
+        return AddKey(key, T(), true, true, {[&](std::size_t counter, const VaultRecordRef&) -> T{ return T(); }});
     }
 
     template <class T>
     VaultOperationResult Vault::AddUniqueKey(const std::string& key, std::function<T(std::size_t, const VaultRecordRef&)> uniqueKeyFunction) noexcept
     {
-        return AddKey(key, T(), true, uniqueKeyFunction);
+        return AddKey(key, T(), true, false, uniqueKeyFunction);
     }
 
     template <class T>
