@@ -148,6 +148,13 @@ namespace mvlt
         return res;
     }
 
+    bool VaultRecordSet::CheckRecord(const VaultRecordRef& ref) const noexcept
+    {
+        ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
+        if (Vault::RecordsSet.find(ref.VaultRecordPtr) != Vault::RecordsSet.end()) return true;
+        else return false;
+    }
+
     void VaultRecordSet::Reset() noexcept
     {
         if (GetIsParentVaultValid())

@@ -535,6 +535,31 @@ void VaultRecordSet_Request_Tests()
     TEST_ASSERT(n == 5, "Failed to make request");
 }
 
+void VaultRecordSet_CheckRecord_Test()
+{
+    Vault vlt;
+
+    vlt.AddKey("A", 1);
+    vlt.AddKey<std::string>("B", "none");
+    vlt.AddUniqueKey<int>("C");
+
+    for (int i = 0; i < 10; ++i)  
+        vlt.CreateRecord({{"A", i}, {"C", 100 + i}});
+    
+    VaultRecordSet vrs;
+    vlt.Request(Greater("C", 102) && Less("A", 8), vrs);
+
+    VaultRecordRef vrf;
+    vlt.GetRecord("A", 57, vrf);
+    TEST_ASSERT(vrs.CheckRecord(vrf) == false, "Failed to check record!");
+
+    vlt.GetRecord("A", 5, vrf);
+    TEST_ASSERT(vrs.CheckRecord(vrf) == true, "Failed to check record!");
+
+    vlt.GetRecord("A", 1, vrf);
+    TEST_ASSERT(vrs.CheckRecord(vrf) == false, "Failed to check record!");
+}
+
 void VaultRecordSet_Reset_Tests()
 {
     Vault vlt;
@@ -775,6 +800,7 @@ int main()
     VaultRecordSet_GetRecord_Test();
     VaultRecordSet_GetRecords_Test();
     VaultRecordSet_Request_Tests();
+    VaultRecordSet_CheckRecord_Test();
     VaultRecordSet_Reset_Tests();
     VaultRecordSet_RemoveRecord_Test();
     VaultRecordSet_RemoveRecords_Test();

@@ -295,6 +295,15 @@ namespace mvlt
         template <VaultRequestType Type>
         VaultOperationResult Request(const VaultRequest<Type>&& request, VaultRecordSet& vaultRecordSet) const;
 
+        /**
+            \brief A method for checking for an entry in set
+
+            \param [in] ref ref to the record to check for availability in the set
+
+            \return returns true if the record is in set, otherwise false
+        */
+        bool CheckRecord(const VaultRecordRef& ref) const noexcept;
+
         /// \brief Resets the object to its initial state
         void Reset() noexcept;
 
