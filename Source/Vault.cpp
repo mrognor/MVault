@@ -181,6 +181,69 @@ namespace mvlt
         VaultDerivedClass = VaultDerivedClasses::VaultBase;
     }
 
+    Vault::Vault(const Vault& other) noexcept
+    {
+        VaultDerivedClass = VaultDerivedClasses::VaultBase;
+
+        // Copy keys
+        for (auto& keyCopierIt : other.VaultKeyCopiers)
+            keyCopierIt.second(this);
+
+        // Set proper key order
+        KeysOrder = other.KeysOrder;
+
+        // Set unique keys
+        UniqueKeys = other.UniqueKeys;
+
+        for (VaultRecord* recordPtr : other.RecordsSet)
+        {
+            // Allocate space to new record and copy data to it
+            VaultRecord* newRecord = new VaultRecord(*recordPtr);
+            
+            // Add new record to set
+            RecordsSet.emplace(newRecord);
+
+            // Add new record to every maps inside VaultStructureHashMap
+            for (const auto& vaultRecordAddersIt : VaultRecordAdders)
+                vaultRecordAddersIt.second(newRecord);
+        }
+    }
+
+    Vault& Vault::operator= (const Vault& other) noexcept
+    {
+        if (&other != this)
+        {
+            DropVault();
+
+            VaultDerivedClass = VaultDerivedClasses::VaultBase;
+
+            // Copy keys
+            for (auto& keyCopierIt : other.VaultKeyCopiers)
+                keyCopierIt.second(this);
+
+            // Set proper key order
+            KeysOrder = other.KeysOrder;
+
+            // Set unique keys
+            UniqueKeys = other.UniqueKeys;
+
+            for (VaultRecord* recordPtr : other.RecordsSet)
+            {
+                // Allocate space to new record and copy data to it
+                VaultRecord* newRecord = new VaultRecord(*recordPtr);
+                
+                // Add new record to set
+                RecordsSet.emplace(newRecord);
+
+                // Add new record to every maps inside VaultStructureHashMap
+                for (const auto& vaultRecordAddersIt : VaultRecordAdders)
+                    vaultRecordAddersIt.second(newRecord);
+            }
+        }
+
+        return *this;
+    }
+
     bool Vault::IsKeyExist(const std::string& key) const noexcept
     {
         bool res;

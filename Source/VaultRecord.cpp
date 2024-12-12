@@ -16,6 +16,23 @@ namespace mvlt
         other.VaultRecordMutex.unlock();
     }
 
+    VaultRecord& VaultRecord::operator= (const VaultRecord& other) noexcept
+    {
+        if (&other != this)
+        {
+            IsValid = true;
+            RefCounter = 0;
+
+            other.VaultRecordMutex.lock();
+            Container.clear();
+            for (const auto& containerIt : other.Container)
+                Container.emplace(containerIt);
+            other.VaultRecordMutex.unlock();
+        }
+
+        return *this;
+    }
+
     void VaultRecord::AddRef() noexcept
     {
         VaultRecordMutex.lock();

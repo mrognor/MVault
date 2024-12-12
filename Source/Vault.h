@@ -80,7 +80,7 @@ namespace mvlt
         std::unordered_map<std::string, std::function<void( std::function<bool(const VaultRecordRef&)> functionToSortedData, bool isReverse )>> VaultRecordSorters;
 
         // Unordered_map of functions that copy keys from this to VaultRecordSet
-        std::unordered_map<std::string, std::function<void(VaultRecordSet& vaultRecordSet)>> VaultKeyCopiers;
+        std::unordered_map<std::string, std::function<void(Vault* vaultRecordSet)>> VaultKeyCopiers;
 
         // List to store keys order
         std::list<std::string> KeysOrder;
@@ -235,11 +235,21 @@ namespace mvlt
         /// \brief Default constructor
         Vault() noexcept;
 
-        /// \brief Deleted copy constructor
-        Vault(const Vault& other) = delete;
+        /**
+            \brief Copy constructor
 
-        /// \brief Deleted assign operator
-        Vault& operator= (const Vault& other) = delete;
+            \param [in] other object to copy data from
+        */
+        Vault(const Vault& other) noexcept;
+
+        /**
+            \brief Assignment operator
+
+            \param [in] other object to copy data from
+
+            \return reference to copied object
+        */
+        Vault& operator= (const Vault& other) noexcept;
 
         /**
             \brief Template method to add new key with default value to Vault

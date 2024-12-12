@@ -323,8 +323,8 @@ namespace mvlt
 
         // Copy keys from this to vaultRecordSet
         for (auto& keyCopierIt : VaultKeyCopiers)
-            keyCopierIt.second(vaultRecordSet);
-        
+            keyCopierIt.second(&vaultRecordSet);
+
         // Set proper key order
         vaultRecordSet.KeysOrder = KeysOrder;
 
@@ -540,9 +540,9 @@ namespace mvlt
             }
         });
         
-        VaultKeyCopiers.emplace(key, [=](VaultRecordSet& vaultRecordSet)
+        VaultKeyCopiers.emplace(key, [=](Vault* vaultRecordSet)
         {
-            vaultRecordSet.AddKey(key, defaultKeyValue);
+            vaultRecordSet->AddKey(key, defaultKeyValue);
         });
 
         if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
@@ -860,7 +860,7 @@ namespace mvlt
 
         // Copy keys from this to vaultRecordSet
         for (auto& keyCopierIt : VaultKeyCopiers)
-            keyCopierIt.second(vaultRecordSet);
+            keyCopierIt.second(&vaultRecordSet);
         
         // Try to make complex request 
         try

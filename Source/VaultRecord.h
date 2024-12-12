@@ -43,8 +43,21 @@ namespace mvlt
         /// \brief Default constructor
         VaultRecord() noexcept;
 
-        /// \brief Copy constructor
+        /**
+            \brief Copy constructor
+
+            \param [in] other object to copy data from
+        */
         VaultRecord(const VaultRecord& other) noexcept;
+
+        /**
+            \brief Assignment operator
+
+            \param [in] other object to copy data from
+
+            \return reference to copied object
+        */
+        VaultRecord& operator= (const VaultRecord& other) noexcept;
 
         /// \brief A method for increasing the number of references to an object
         void AddRef() noexcept;

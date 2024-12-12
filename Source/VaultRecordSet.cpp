@@ -17,7 +17,7 @@ namespace mvlt
         KeysOrder = other.KeysOrder;
 
         for (auto& keyCopierIt : other.VaultKeyCopiers)
-            keyCopierIt.second(*this);
+            keyCopierIt.second(this);
 
         other.ParentVault->RecordSetsSet.emplace(this);
 

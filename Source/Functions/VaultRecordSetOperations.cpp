@@ -17,7 +17,7 @@ namespace mvlt
             res.ParentVault = a.ParentVault;
             
             for (auto& keyCopierIt : a.VaultKeyCopiers)
-                keyCopierIt.second(res);
+                keyCopierIt.second(&res);
 
             a.ParentVault->RecordSetsSet.emplace(&res);
 

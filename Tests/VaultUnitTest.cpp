@@ -5,6 +5,86 @@
 using namespace mvlt;
 using namespace std;
 
+void Vault_CopyConstructor_Test()
+{
+    Vault vlt1;
+    
+    vlt1.AddKey<int>("A", -1);
+    vlt1.AddKey<std::string>("B", "none");
+    vlt1.AddUniqueKey<std::size_t>("C");
+
+    for (std::size_t i = 0; i < 10; ++i)
+        vlt1.CreateRecord({{"A", static_cast<int>(i * i * i)}, {"B", "test" + std::to_string(i)}, {"C", i}});    
+
+    Vault vlt2(vlt1);
+
+    std::vector<VaultRecordRef> refs1, refs2;
+
+    refs1 = vlt1.GetSortedRecords("C");
+    refs2 = vlt2.GetSortedRecords("C");
+    
+    for (int i = 0; i < 10; ++i)
+    {
+        int A1, A2;
+        std::string B1, B2;
+        std::size_t C1, C2;
+
+        refs1[i].GetData("A", A1);
+        refs1[i].GetData("B", B1);
+        refs1[i].GetData("C", C1);
+
+        refs2[i].GetData("A", A2);
+        refs2[i].GetData("B", B2);
+        refs2[i].GetData("C", C2);
+
+        TEST_ASSERT(A1 == A2, "Failed to copy vault");
+        TEST_ASSERT(B1 == B2, "Failed to copy vault");
+        TEST_ASSERT(C1 == C2, "Failed to copy vault");
+
+        TEST_ASSERT(refs1[i].GetRecordUniqueId() != refs2[i].GetRecordUniqueId(), "Failed to copy vault");
+    }
+}
+
+void Vault_OperatorAssignment_Test()
+{
+    Vault vlt1;
+    
+    vlt1.AddKey<int>("A", -1);
+    vlt1.AddKey<std::string>("B", "none");
+    vlt1.AddUniqueKey<std::size_t>("C");
+
+    for (std::size_t i = 0; i < 10; ++i)
+        vlt1.CreateRecord({{"A", static_cast<int>(i * i * i)}, {"B", "test" + std::to_string(i)}, {"C", i}});    
+
+    Vault vlt2 = vlt1;
+
+    std::vector<VaultRecordRef> refs1, refs2;
+
+    refs1 = vlt1.GetSortedRecords("C");
+    refs2 = vlt2.GetSortedRecords("C");
+    
+    for (int i = 0; i < 10; ++i)
+    {
+        int A1, A2;
+        std::string B1, B2;
+        std::size_t C1, C2;
+
+        refs1[i].GetData("A", A1);
+        refs1[i].GetData("B", B1);
+        refs1[i].GetData("C", C1);
+
+        refs2[i].GetData("A", A2);
+        refs2[i].GetData("B", B2);
+        refs2[i].GetData("C", C2);
+
+        TEST_ASSERT(A1 == A2, "Failed to copy vault");
+        TEST_ASSERT(B1 == B2, "Failed to copy vault");
+        TEST_ASSERT(C1 == C2, "Failed to copy vault");
+
+        TEST_ASSERT(refs1[i].GetRecordUniqueId() != refs2[i].GetRecordUniqueId(), "Failed to copy vault");
+    }
+}
+
 void Vault_AddKey_Test()
 {
     Vault vlt;
@@ -826,6 +906,8 @@ void Vault_Destructor_Test()
 
 int main()
 {
+    Vault_CopyConstructor_Test();
+    Vault_OperatorAssignment_Test();
     Vault_AddKey_Test();
     Vault_AddUniqueKey_Test();
     Vault_UpdateKey_Test();
