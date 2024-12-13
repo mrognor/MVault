@@ -34,6 +34,42 @@ namespace mvlt
         RecursiveReadWriteMtx.Disable();
     }
 
+    void VaultRecordSet::MoveSet(VaultRecordSet& other) noexcept
+    {
+        WriteLock<RecursiveReadWriteMutex> writeLock(other.ParentVault->RecursiveReadWriteMtx);
+
+        VaultDerivedClass = VaultDerivedClasses::VaultRecordSetDerived;
+
+        ParentVault = other.ParentVault;
+        other.ParentVault = nullptr;
+
+        RecordTemplate = std::move(other.RecordTemplate);
+        VaultHashMapStructure = std::move(other.VaultHashMapStructure);
+        VaultMapStructure = std::move(other.VaultMapStructure);
+        KeysTypes = std::move(other.KeysTypes);
+        VaultRecordAdders = std::move(other.VaultRecordAdders);
+        VaultRecordClearers = std::move(other.VaultRecordClearers);
+        VaultRecordErasers = std::move(other.VaultRecordErasers);
+        VaultRecordSorters = std::move(other.VaultRecordSorters);
+        VaultKeyCopiers = std::move(other.VaultKeyCopiers);
+        KeysOrder = std::move(other.KeysOrder);
+        UniqueKeys = std::move(other.UniqueKeys);
+        InvalidFileRecords = std::move(other.InvalidFileRecords);
+        RecordsSet = std::move(other.RecordsSet);
+        RecordSetsSet = std::move(other.RecordSetsSet);
+
+        ParentVault->RecordSetsSet.erase(&other);
+        ParentVault->RecordSetsSet.emplace(this);
+
+        for (VaultRecord* record : other.RecordsSet)
+        {
+            record->EraseDependentSet(&other);
+            record->AddToDependentSets(this);
+        }
+
+        RecursiveReadWriteMtx.Disable();
+    }
+
     VaultRecordSet::VaultRecordSet() noexcept 
     {
         VaultDerivedClass = VaultDerivedClasses::VaultRecordSetDerived;
@@ -42,7 +78,7 @@ namespace mvlt
 
     VaultRecordSet::VaultRecordSet(const VaultRecordSet& other) noexcept
     {
-        if (&other != this && other.GetIsParentVaultValid())
+        if (other.GetIsParentVaultValid())
             CopySet(other);
     }
 
@@ -53,6 +89,25 @@ namespace mvlt
             Reset();
             if (other.GetIsParentVaultValid())
                 CopySet(other);
+        }
+
+        return *this;
+    }
+
+    VaultRecordSet::VaultRecordSet(VaultRecordSet&& other) noexcept
+    {
+        if (other.GetIsParentVaultValid())
+            MoveSet(other);
+    }
+
+    VaultRecordSet& VaultRecordSet::operator=(VaultRecordSet&& other) noexcept
+    {
+        if (&other != this)
+        {
+            if (other.GetIsParentVaultValid())
+                MoveSet(other);
+            else
+                Reset();
         }
 
         return *this;

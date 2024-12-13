@@ -249,7 +249,7 @@ namespace mvlt
 
             \return reference to copied object
         */
-        Vault& operator= (const Vault& other) noexcept;
+        Vault& operator=(const Vault& other) noexcept;
 
         /**
             \brief Move constructor
@@ -265,7 +265,7 @@ namespace mvlt
 
             \return reference to moved object
         */
-        Vault& operator= (Vault&& other) noexcept;
+        Vault& operator=(Vault&& other) noexcept;
 
         /**
             \brief Template method to add new key with default value to Vault

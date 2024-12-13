@@ -59,6 +59,13 @@ namespace mvlt
         */
         void CopySet(const VaultRecordSet& other) noexcept;
 
+        /**
+            \brief An internal method for moving objects
+
+            \param [in] other object to move
+        */
+        void MoveSet(VaultRecordSet& other) noexcept;
+
     public:
 
         /// Make Vault class friend
@@ -81,9 +88,27 @@ namespace mvlt
             \brief Operator assignment
 
             \param [in] other object to copy
+
+            \return reference to copied object
         */
         VaultRecordSet& operator=(const VaultRecordSet& other) noexcept;
-        
+
+        /**
+            \brief Move constructor
+
+            \param [in] other object to move
+        */
+        VaultRecordSet(VaultRecordSet&& other) noexcept;
+
+        /**
+            \brief Move assignment perator
+
+            \param [in] other object to move
+
+            \return reference to moveed object
+        */
+        VaultRecordSet& operator=(VaultRecordSet&& other) noexcept;
+
         /// Making operator comparison function friendly
         friend bool operator==(const VaultRecordSet& a, const VaultRecordSet& b);
 

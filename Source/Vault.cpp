@@ -211,7 +211,7 @@ namespace mvlt
         }
     }
 
-    Vault& Vault::operator= (const Vault& other) noexcept
+    Vault& Vault::operator=(const Vault& other) noexcept
     {
         if (&other != this)
         {
@@ -271,10 +271,12 @@ namespace mvlt
         RecordSetsSet = std::move(other.RecordSetsSet);
     }
 
-    Vault& Vault::operator= (Vault&& other) noexcept
+    Vault& Vault::operator=(Vault&& other) noexcept
     {
         if (this != &other)
         {
+            DropVault();
+
             ReadLock<RecursiveReadWriteMutex> otherReadLock(other.RecursiveReadWriteMtx);
 
             VaultDerivedClass = VaultDerivedClasses::VaultBase;

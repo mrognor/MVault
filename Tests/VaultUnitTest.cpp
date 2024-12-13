@@ -252,6 +252,12 @@ void Vault_MoveAssignment_Test()
     TEST_ASSERT(vecB1 == vecB2, "Failed to move Vault");
     TEST_ASSERT(vecC1 == vecC2, "Failed to move Vault");
     TEST_ASSERT(pointers1 == pointers2, "Failed to move Vault");
+
+    // Check clearing old data
+    vlt2 = Vault();
+
+    TEST_ASSERT(vlt2.Size() == 0,"Failed to move Vault");
+    TEST_ASSERT(vlt2.GetKeys().empty(),"Failed to move Vault");
 }
 
 void Vault_AddKey_Test()
