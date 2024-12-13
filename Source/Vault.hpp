@@ -349,10 +349,6 @@ namespace mvlt
     VaultOperationResult Vault::AddKey(const std::string& key, const T& defaultKeyValue, const bool& isUniqueKey, const bool& isUniqueKeyWithoutLambda,
         std::function<T(std::size_t, const VaultRecordRef&)> uniqueKeyFunction) noexcept
     {
-        static_assert(!std::is_array<T>::value, "It is not possible to use a c array as a key value. \n\
-            If you want to use a string as a key, you must specialize the function with a string. Like this: \n\
-            AddKey<std::string>(\"Key\", \"Value\") or AddKey(\"Key\", std::string(\"Value\"))");
-
         VaultOperationResult res;
         res.Key = key;
         res.RequestedType = typeid(T);
@@ -524,18 +520,18 @@ namespace mvlt
             }
         );
 
-        VaultRecordSorters.emplace(key, [=](std::function<bool(const VaultRecordRef&)> functionToSortedData, bool isReverse)
+        VaultRecordSorters.emplace(key, [=](std::function<bool(const VaultRecordRef&)> functionToSortedData, Vault* vltPtr, bool isReverse)
         {
             if (!isReverse)
             {
                 for (const auto& TtoVaultRecordMapIt : *TtoVaultRecordMap)
-                    if(!functionToSortedData(VaultRecordRef(TtoVaultRecordMapIt.second, this)))
+                    if(!functionToSortedData(VaultRecordRef(TtoVaultRecordMapIt.second, vltPtr)))
                         break;
             }
             else
             {
                 for (auto TtoVaultRecordMapIt = TtoVaultRecordMap->Rbegin(); TtoVaultRecordMapIt != TtoVaultRecordMap->Rend(); ++TtoVaultRecordMapIt)
-                    if(!functionToSortedData(VaultRecordRef((*TtoVaultRecordMapIt).second, this)))
+                    if(!functionToSortedData(VaultRecordRef((*TtoVaultRecordMapIt).second, vltPtr)))
                         break;
             }
         });
@@ -565,6 +561,10 @@ namespace mvlt
     template <class T>
     bool Vault::AddKey(const std::string& key, const T& defaultKeyValue) noexcept
     {
+        static_assert(!std::is_array<T>::value, "It is not possible to use a c array as a key value. \n\
+            If you want to use a string as a key, you must specialize the function with a string. Like this: \n\
+            AddKey<std::string>(\"Key\", \"Value\") or AddKey(\"Key\", std::string(\"Value\"))");
+
         return AddKey(key, defaultKeyValue, false, false, {[&](std::size_t counter, const VaultRecordRef&) -> T{ return defaultKeyValue; }}).IsOperationSuccess;
     }
 
@@ -1046,7 +1046,7 @@ namespace mvlt
 
                     ++counter;
                     return true;
-                }, isReverse);
+                }, const_cast<Vault*>(this), isReverse);
         }
     }
 }

@@ -7,16 +7,13 @@ namespace mvlt
     
     VaultRecord::VaultRecord(const VaultRecord& other) noexcept
     {
-        IsValid = true;
-        RefCounter = 0;
-
         other.VaultRecordMutex.lock();
         for (const auto& containerIt : other.Container)
             Container.emplace(containerIt);
         other.VaultRecordMutex.unlock();
     }
 
-    VaultRecord& VaultRecord::operator= (const VaultRecord& other) noexcept
+    VaultRecord& VaultRecord::operator=(const VaultRecord& other) noexcept
     {
         if (&other != this)
         {
@@ -27,6 +24,28 @@ namespace mvlt
             Container.clear();
             for (const auto& containerIt : other.Container)
                 Container.emplace(containerIt);
+            other.VaultRecordMutex.unlock();
+        }
+
+        return *this;
+    }
+
+    VaultRecord::VaultRecord(VaultRecord&& other) noexcept
+    {
+        other.VaultRecordMutex.lock();
+        Container = std::move(other.Container);
+        other.VaultRecordMutex.unlock();
+    }
+
+    VaultRecord& VaultRecord::operator=(VaultRecord&& other) noexcept
+    {
+        if (&other != this)
+        {
+            IsValid = true;
+            RefCounter = 0;
+
+            other.VaultRecordMutex.lock();
+            Container = std::move(other.Container);
             other.VaultRecordMutex.unlock();
         }
 

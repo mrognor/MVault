@@ -183,6 +183,8 @@ namespace mvlt
 
     Vault::Vault(const Vault& other) noexcept
     {
+        ReadLock<RecursiveReadWriteMutex> readLock(other.RecursiveReadWriteMtx);
+
         VaultDerivedClass = VaultDerivedClasses::VaultBase;
 
         // Copy keys
@@ -215,6 +217,9 @@ namespace mvlt
         {
             DropVault();
 
+            ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
+            ReadLock<RecursiveReadWriteMutex> otherReadLock(other.RecursiveReadWriteMtx);
+
             VaultDerivedClass = VaultDerivedClasses::VaultBase;
 
             // Copy keys
@@ -239,6 +244,55 @@ namespace mvlt
                 for (const auto& vaultRecordAddersIt : VaultRecordAdders)
                     vaultRecordAddersIt.second(newRecord);
             }
+        }
+
+        return *this;
+    }
+
+    Vault::Vault(Vault&& other) noexcept
+    {
+        ReadLock<RecursiveReadWriteMutex> otherReadLock(other.RecursiveReadWriteMtx);
+
+        VaultDerivedClass = VaultDerivedClasses::VaultBase;
+
+        RecordTemplate = std::move(other.RecordTemplate);
+        VaultHashMapStructure = std::move(other.VaultHashMapStructure);
+        VaultMapStructure = std::move(other.VaultMapStructure);
+        KeysTypes = std::move(other.KeysTypes);
+        VaultRecordAdders = std::move(other.VaultRecordAdders);
+        VaultRecordClearers = std::move(other.VaultRecordClearers);
+        VaultRecordErasers = std::move(other.VaultRecordErasers);
+        VaultRecordSorters = std::move(other.VaultRecordSorters);
+        VaultKeyCopiers = std::move(other.VaultKeyCopiers);
+        KeysOrder = std::move(other.KeysOrder);
+        UniqueKeys = std::move(other.UniqueKeys);
+        InvalidFileRecords = std::move(other.InvalidFileRecords);
+        RecordsSet = std::move(other.RecordsSet);
+        RecordSetsSet = std::move(other.RecordSetsSet);
+    }
+
+    Vault& Vault::operator= (Vault&& other) noexcept
+    {
+        if (this != &other)
+        {
+            ReadLock<RecursiveReadWriteMutex> otherReadLock(other.RecursiveReadWriteMtx);
+
+            VaultDerivedClass = VaultDerivedClasses::VaultBase;
+
+            RecordTemplate = std::move(other.RecordTemplate);
+            VaultHashMapStructure = std::move(other.VaultHashMapStructure);
+            VaultMapStructure = std::move(other.VaultMapStructure);
+            KeysTypes = std::move(other.KeysTypes);
+            VaultRecordAdders = std::move(other.VaultRecordAdders);
+            VaultRecordClearers = std::move(other.VaultRecordClearers);
+            VaultRecordErasers = std::move(other.VaultRecordErasers);
+            VaultRecordSorters = std::move(other.VaultRecordSorters);
+            VaultKeyCopiers = std::move(other.VaultKeyCopiers);
+            KeysOrder = std::move(other.KeysOrder);
+            UniqueKeys = std::move(other.UniqueKeys);
+            InvalidFileRecords = std::move(other.InvalidFileRecords);
+            RecordsSet = std::move(other.RecordsSet);
+            RecordSetsSet = std::move(other.RecordSetsSet);
         }
 
         return *this;
@@ -562,7 +616,7 @@ namespace mvlt
                     res.emplace_back(vaultRecordRef);
                     ++counter;
                     return true;
-                }, isReverse);
+                }, const_cast<Vault*>(this), isReverse);
         }
 
         return res;

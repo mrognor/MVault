@@ -74,10 +74,10 @@ namespace mvlt
         // Unordered_map of functions for getting sorted data.
         // The key is a string with the name of the key from the Vault.
         // The std::function is used as the value, in which the lambda function is written at the time of adding the key.
-        // Lambda accepts a function that is called for each record inside. VaultRecordRef is passed to her. 
+        // Lambda accepts a function that is called for each record inside. VaultRecordRef and Vault pointer is passed to it. 
         // By default, iteration by records occurs in ascending order. 
         // isReverse parameter is used for the reverse order.
-        std::unordered_map<std::string, std::function<void( std::function<bool(const VaultRecordRef&)> functionToSortedData, bool isReverse )>> VaultRecordSorters;
+        std::unordered_map<std::string, std::function<void( std::function<bool(const VaultRecordRef&)> functionToSortedData, Vault* vltPtr, bool isReverse )>> VaultRecordSorters;
 
         // Unordered_map of functions that copy keys from this to VaultRecordSet
         std::unordered_map<std::string, std::function<void(Vault* vaultRecordSet)>> VaultKeyCopiers;
@@ -250,6 +250,22 @@ namespace mvlt
             \return reference to copied object
         */
         Vault& operator= (const Vault& other) noexcept;
+
+        /**
+            \brief Move constructor
+
+            \param [in] other object to move data from
+        */
+        Vault(Vault&& other) noexcept;
+
+        /**
+            \brief Move assignment operator
+
+            \param [in] other object to move data from
+
+            \return reference to moved object
+        */
+        Vault& operator= (Vault&& other) noexcept;
 
         /**
             \brief Template method to add new key with default value to Vault

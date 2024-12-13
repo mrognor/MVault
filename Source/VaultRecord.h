@@ -57,7 +57,23 @@ namespace mvlt
 
             \return reference to copied object
         */
-        VaultRecord& operator= (const VaultRecord& other) noexcept;
+        VaultRecord& operator=(const VaultRecord& other) noexcept;
+
+        /**
+            \brief Move constructor
+
+            \param [in] other object to move data from
+        */
+        VaultRecord(VaultRecord&& other) noexcept;
+
+        /**
+            \brief Move assignment operator
+
+            \param [in] other object to move data from
+
+            \return reference to moved object
+        */
+        VaultRecord& operator=(VaultRecord&& other) noexcept;
 
         /// \brief A method for increasing the number of references to an object
         void AddRef() noexcept;

@@ -85,6 +85,175 @@ void Vault_OperatorAssignment_Test()
     }
 }
 
+void Vault_MoveConstructor_Test()
+{
+    Vault* vlt1 = new Vault;
+    
+    vlt1->AddKey<int>("A", -1);
+    vlt1->AddKey<std::string>("B", "none");
+    vlt1->AddUniqueKey<std::size_t>("C");
+
+    for (std::size_t i = 0; i < 10; ++i)
+        vlt1->CreateRecord({{"A", static_cast<int>(i * i * i)}, {"B", "test" + std::to_string(i)}, {"C", i}});
+
+    std::vector<int> vecA1;
+    std::vector<std::string> vecB1;
+    std::vector<std::size_t> vecC1;
+    std::vector<std::string> pointers1;
+
+    vlt1->SortBy("A", [&](const VaultRecordRef& ref)
+    {
+        int A;
+        std::string B;
+        std::size_t C;
+
+        ref.GetData("A", A);
+        ref.GetData("B", B);
+        ref.GetData("C", C);
+
+        vecA1.emplace_back(std::move(A));
+        vecB1.emplace_back(std::move(B));
+        vecC1.emplace_back(std::move(C));
+        pointers1.emplace_back(ref.GetRecordUniqueId());
+
+        return true;
+    });
+
+    std::vector<std::string> keys = vlt1->GetKeys();
+
+    Vault vlt2(std::move(*vlt1));
+
+    TEST_ASSERT(vlt1->Size() == 0,"Failed to move Vault");
+    TEST_ASSERT(vlt1->GetKeys().empty(),"Failed to move Vault");
+
+    TEST_ASSERT(vlt2.Size() == 10,"Failed to move Vault");
+    TEST_ASSERT(keys == vlt2.GetKeys(),"Failed to move Vault");
+
+    std::type_index keyType = typeid(void);
+    vlt2.GetKeyType("A", keyType);
+    TEST_ASSERT(keyType == typeid(int),"Failed to move Vault");
+    vlt2.GetKeyType("B", keyType);
+    TEST_ASSERT(keyType == typeid(std::string),"Failed to move Vault");
+    vlt2.GetKeyType("C", keyType);
+    TEST_ASSERT(keyType == typeid(std::size_t),"Failed to move Vault");
+
+    // Delete old vault to destroy all possibly invalid links
+    delete vlt1;
+
+    std::vector<int> vecA2;
+    std::vector<std::string> vecB2;
+    std::vector<std::size_t> vecC2;
+    std::vector<std::string> pointers2;
+
+    vlt2.SortBy("A", [&](const VaultRecordRef& ref)
+    {
+        int A;
+        std::string B;
+        std::size_t C;
+
+        ref.GetData("A", A);
+        ref.GetData("B", B);
+        ref.GetData("C", C);
+
+        vecA2.emplace_back(std::move(A));
+        vecB2.emplace_back(std::move(B));
+        vecC2.emplace_back(std::move(C));
+        pointers2.emplace_back(ref.GetRecordUniqueId());
+
+        return true;
+    });
+
+    TEST_ASSERT(vecA1 == vecA2, "Failed to move Vault");
+    TEST_ASSERT(vecB1 == vecB2, "Failed to move Vault");
+    TEST_ASSERT(vecC1 == vecC2, "Failed to move Vault");
+    TEST_ASSERT(pointers1 == pointers2, "Failed to move Vault");
+}
+
+void Vault_MoveAssignment_Test()
+{
+    Vault* vlt1 = new Vault;
+    Vault vlt2;
+
+    vlt1->AddKey<int>("A", -1);
+    vlt1->AddKey<std::string>("B", "none");
+    vlt1->AddUniqueKey<std::size_t>("C");
+
+    for (std::size_t i = 0; i < 10; ++i)
+        vlt1->CreateRecord({{"A", static_cast<int>(i * i * i)}, {"B", "test" + std::to_string(i)}, {"C", i}});
+
+    std::vector<int> vecA1;
+    std::vector<std::string> vecB1;
+    std::vector<std::size_t> vecC1;
+    std::vector<std::string> pointers1;
+
+    vlt1->SortBy("A", [&](const VaultRecordRef& ref)
+    {
+        int A;
+        std::string B;
+        std::size_t C;
+
+        ref.GetData("A", A);
+        ref.GetData("B", B);
+        ref.GetData("C", C);
+
+        vecA1.emplace_back(std::move(A));
+        vecB1.emplace_back(std::move(B));
+        vecC1.emplace_back(std::move(C));
+        pointers1.emplace_back(ref.GetRecordUniqueId());
+
+        return true;
+    });
+
+    std::vector<std::string> keys = vlt1->GetKeys();
+
+    vlt2 = std::move(*vlt1);
+
+    TEST_ASSERT(vlt1->Size() == 0,"Failed to move Vault");
+    TEST_ASSERT(vlt1->GetKeys().empty(),"Failed to move Vault");
+
+    TEST_ASSERT(vlt2.Size() == 10,"Failed to move Vault");
+    TEST_ASSERT(keys == vlt2.GetKeys(),"Failed to move Vault");
+
+    std::type_index keyType = typeid(void);
+    vlt2.GetKeyType("A", keyType);
+    TEST_ASSERT(keyType == typeid(int),"Failed to move Vault");
+    vlt2.GetKeyType("B", keyType);
+    TEST_ASSERT(keyType == typeid(std::string),"Failed to move Vault");
+    vlt2.GetKeyType("C", keyType);
+    TEST_ASSERT(keyType == typeid(std::size_t),"Failed to move Vault");
+
+    // Delete old vault to destroy all possibly invalid links
+    delete vlt1;
+
+    std::vector<int> vecA2;
+    std::vector<std::string> vecB2;
+    std::vector<std::size_t> vecC2;
+    std::vector<std::string> pointers2;
+
+    vlt2.SortBy("A", [&](const VaultRecordRef& ref)
+    {
+        int A;
+        std::string B;
+        std::size_t C;
+
+        ref.GetData("A", A);
+        ref.GetData("B", B);
+        ref.GetData("C", C);
+
+        vecA2.emplace_back(std::move(A));
+        vecB2.emplace_back(std::move(B));
+        vecC2.emplace_back(std::move(C));
+        pointers2.emplace_back(ref.GetRecordUniqueId());
+
+        return true;
+    });
+
+    TEST_ASSERT(vecA1 == vecA2, "Failed to move Vault");
+    TEST_ASSERT(vecB1 == vecB2, "Failed to move Vault");
+    TEST_ASSERT(vecC1 == vecC2, "Failed to move Vault");
+    TEST_ASSERT(pointers1 == pointers2, "Failed to move Vault");
+}
+
 void Vault_AddKey_Test()
 {
     Vault vlt;
@@ -908,6 +1077,8 @@ int main()
 {
     Vault_CopyConstructor_Test();
     Vault_OperatorAssignment_Test();
+    Vault_MoveConstructor_Test();
+    Vault_MoveAssignment_Test();
     Vault_AddKey_Test();
     Vault_AddUniqueKey_Test();
     Vault_UpdateKey_Test();
