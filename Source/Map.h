@@ -263,8 +263,6 @@ namespace mvlt
         /**
             \brief The method for inserting data into the Map
 
-            \todo проверить необходимость дополнительных шаблонов тут
-
             \tparam <EmplaceKeyType> - Key type
             \tparam <EmplaceValueType> - Value type
 

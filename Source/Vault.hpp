@@ -571,6 +571,10 @@ namespace mvlt
     template <class T>
     VaultOperationResult Vault::AddUniqueKey(const std::string& key) noexcept
     {
+        static_assert(!std::is_array<T>::value, "It is not possible to use a c array as a key value. \n\
+            If you want to use a string as a key, you must specialize the function with a string. Like this: \n\
+            AddUniqueKey<std::string>(\"Key\")");
+
         return AddKey(key, T(), true, true, {[&](std::size_t counter, const VaultRecordRef&) -> T{ return T(); }});
     }
 
@@ -583,6 +587,10 @@ namespace mvlt
     template <class T>
     VaultOperationResult Vault::UpdateKey(const std::string& key, const T& defaultKeyValue) noexcept
     {
+        static_assert(!std::is_array<T>::value, "It is not possible to use a c array as a key value. \n\
+            If you want to use a string as a key, you must specialize the function with a string. Like this: \n\
+            UpdateKey<std::string>(\"Key\", \"Value\") or UpdateKey(\"Key\", std::string(\"Value\"))");
+
         VaultOperationResult res;
         res.Key = key;
         res.RequestedType = typeid(defaultKeyValue);
@@ -626,6 +634,8 @@ namespace mvlt
     template <class T>
     VaultOperationResult Vault::GetKeyValue(const std::string& key, T& defaultKeyValue) const noexcept
     {
+        static_assert(!std::is_array<T>::value, "It is not possible to use a c array as a key value.");
+
         VaultOperationResult res;
         res.Key = key;
         res.RequestedType = typeid(T);
@@ -676,7 +686,7 @@ namespace mvlt
     {
         static_assert(!std::is_array<T>::value, "It is not possible to use a c array as a key value. \n\
             If you want to use a string as a key, you must specialize the function with a string. Like this: \n\
-            AddKey<std::string>(\"Key\", \"Value\") or AddKey(\"Key\", std::string(\"Value\"))");
+            GetRecord<std::string>(\"Key\", \"Value\") or GetRecord(\"Key\", std::string(\"Value\"))");
 
         // Fill res info known at start
         VaultOperationResult res;
@@ -731,7 +741,7 @@ namespace mvlt
     {
         static_assert(!std::is_array<T>::value, "It is not possible to use a c array as a key value. \n\
             If you want to use a string as a key, you must specialize the function with a string. Like this: \n\
-            AddKey<std::string>(\"Key\", \"Value\") or AddKey(\"Key\", std::string(\"Value\"))");
+            GetRecords<std::string>(\"Key\", \"Value\") or GetRecords(\"Key\", std::string(\"Value\"))");
 
         // Fill res info known at start
         VaultOperationResult res;
@@ -790,6 +800,10 @@ namespace mvlt
     VaultOperationResult Vault::RequestEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
         const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept
     {
+        static_assert(!std::is_array<T>::value, "It is not possible to use a c array as a key value. \n\
+            If you want to use a string as a key, you must specialize the function with a string. Like this: \n\
+            RequestEqual<std::string>(\"Key\", \"Value\") or RequestEqual(\"Key\", std::string(\"Value\"))");
+
         return RequestRecords(VaultRequestType::Equal, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords, requestPredicat);
     }
 
@@ -797,6 +811,10 @@ namespace mvlt
     VaultOperationResult Vault::RequestGreater(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
         const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept
     {
+        static_assert(!std::is_array<T>::value, "It is not possible to use a c array as a key value. \n\
+            If you want to use a string as a key, you must specialize the function with a string. Like this: \n\
+            RequestGreater<std::string>(\"Key\", \"Value\") or RequestGreater(\"Key\", std::string(\"Value\"))");
+
         return RequestRecords(VaultRequestType::Greater, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords, requestPredicat);
     }
 
@@ -804,6 +822,10 @@ namespace mvlt
     VaultOperationResult Vault::RequestGreaterOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
         const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept
     {
+        static_assert(!std::is_array<T>::value, "It is not possible to use a c array as a key value. \n\
+            If you want to use a string as a key, you must specialize the function with a string. Like this: \n\
+            RequestGreaterOrEqual<std::string>(\"Key\", \"Value\") or RequestGreaterOrEqual(\"Key\", std::string(\"Value\"))");
+
         return RequestRecords(VaultRequestType::GreaterOrEqual, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords, requestPredicat);
     }
 
@@ -811,6 +833,10 @@ namespace mvlt
     VaultOperationResult Vault::RequestLess(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
         const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept
     {
+        static_assert(!std::is_array<T>::value, "It is not possible to use a c array as a key value. \n\
+            If you want to use a string as a key, you must specialize the function with a string. Like this: \n\
+            RequestLess<std::string>(\"Key\", \"Value\") or RequestLess(\"Key\", std::string(\"Value\"))");
+
         return RequestRecords(VaultRequestType::Less, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords, requestPredicat);
     }
 
@@ -818,6 +844,10 @@ namespace mvlt
     VaultOperationResult Vault::RequestLessOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
         const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept
     {
+        static_assert(!std::is_array<T>::value, "It is not possible to use a c array as a key value. \n\
+            If you want to use a string as a key, you must specialize the function with a string. Like this: \n\
+            RequestLessOrEqual<std::string>(\"Key\", \"Value\") or RequestLessOrEqual(\"Key\", std::string(\"Value\"))");
+
         return RequestRecords(VaultRequestType::LessOrEqual, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords, requestPredicat);
     }
 
@@ -826,6 +856,10 @@ namespace mvlt
         const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue, 
         const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept
     {
+        static_assert(!std::is_array<T>::value, "It is not possible to use a c array as a key value. \n\
+            If you want to use a string as a key, you must specialize the function with a string. Like this: \n\
+            RequestInterval<std::string>(\"Key\", \"Value\") or RequestInterval(\"Key\", std::string(\"Value\"))");
+
         return RequestRecords(VaultRequestType::Interval, key, beginKeyValue, 
             endKeyValue, vaultRecordSet, isIncludeBeginKeyValue, isIncludeEndKeyValue, 
             amountOfRecords, requestPredicat);
@@ -889,6 +923,10 @@ namespace mvlt
     template <class T>
     VaultOperationResult Vault::EraseRecord(const std::string& key, const T& keyValue) noexcept
     {
+        static_assert(!std::is_array<T>::value, "It is not possible to use a c array as a key value. \n\
+            If you want to use a string as a key, you must specialize the function with a string. Like this: \n\
+            EraseRecord<std::string>(\"Key\", \"Value\") or EraseRecord(\"Key\", std::string(\"Value\"))");
+
         // Fill res info known at start
         VaultOperationResult res;
         res.Key = key;
@@ -953,6 +991,10 @@ namespace mvlt
     template <class T>
     VaultOperationResult Vault::EraseRecords(const std::string& key, const T& keyValue, const std::size_t& amountOfRecords) noexcept
     {
+        static_assert(!std::is_array<T>::value, "It is not possible to use a c array as a key value. \n\
+            If you want to use a string as a key, you must specialize the function with a string. Like this: \n\
+            EraseRecords<std::string>(\"Key\", \"Value\") or EraseRecords(\"Key\", std::string(\"Value\"))");
+
         // Fill res info known at start
         VaultOperationResult res;
         res.Key = key;

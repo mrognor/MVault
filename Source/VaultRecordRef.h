@@ -45,7 +45,7 @@ namespace mvlt
         /// Making the std::hash<VaultRecordRef> struct friendly so that it has access to the internal members of the VaultRecordRef class
         friend std::hash<VaultRecordRef>;
 
-        /// \todo Конструктор по умолчанию
+        /// \brief Default constructor
         VaultRecordRef() noexcept;
         
         /**

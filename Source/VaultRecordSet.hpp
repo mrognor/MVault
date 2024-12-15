@@ -179,6 +179,10 @@ namespace mvlt
     template <class T>
     VaultOperationResult VaultRecordSet::RemoveRecord(const std::string& key, const T& keyValue) noexcept
     {
+        static_assert(!std::is_array<T>::value, "It is not possible to use a c array as a key value. \n\
+            If you want to use a string as a key, you must specialize the function with a string. Like this: \n\
+            RemoveRecord<std::string>(\"Key\", \"Value\") or RemoveRecord(\"Key\", std::string(\"Value\"))");
+
         VaultOperationResult res;
 
         if (GetIsParentVaultValid())
@@ -200,6 +204,10 @@ namespace mvlt
     template <class T>
     VaultOperationResult VaultRecordSet::RemoveRecords(const std::string& key, const T& keyValue, const std::size_t& amountOfRecords) noexcept
     {
+        static_assert(!std::is_array<T>::value, "It is not possible to use a c array as a key value. \n\
+            If you want to use a string as a key, you must specialize the function with a string. Like this: \n\
+            RemoveRecords<std::string>(\"Key\", \"Value\") or RemoveRecords(\"Key\", std::string(\"Value\"))");
+
         VaultOperationResult res;
 
         if (GetIsParentVaultValid())
