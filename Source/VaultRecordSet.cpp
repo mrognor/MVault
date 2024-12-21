@@ -281,6 +281,18 @@ namespace mvlt
         return res;
     }
 
+    std::string VaultRecordSet::ToJson(const bool& isFormat, const std::size_t& tabSize, const bool& isUseRecordTemplate,
+        const std::string& recordTemplate) const noexcept
+    {
+        if (GetIsParentVaultValid())
+        {
+            ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
+            return Vault::ToJson(isFormat, tabSize, isUseRecordTemplate, recordTemplate);
+        }
+        else
+            return "{}";
+    }
+
     void VaultRecordSet::PrintSet(const std::size_t& amountOfRecords) const noexcept
     {
         if (GetIsParentVaultValid())

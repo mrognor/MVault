@@ -437,6 +437,19 @@ namespace mvlt
         void SortBy(const std::string& key, const F&& func, const bool& isReverse = false, const std::size_t& amountOfRecords = -1) const noexcept;
 
         /**
+            \brief Method for saving the contents of the VaultRecordSet in json
+
+            \param [in] isFormat is line formatting required, i.e. adding line breaks and tabs
+            \param [in] tabSize the number of spaces when tabbing
+            \param [in] isUseRecordTemplate will recordTemplate be used for the title of the record or will an internal unique identifier be used
+            \param [in] recordTemplate a template for the record name to which the record number will be added
+
+            \return json string
+        */
+        std::string ToJson(const bool& isFormat = false, const std::size_t& tabSize = 2, const bool& isUseRecordTemplate = true,
+            const std::string& recordTemplate = "Record") const noexcept;
+
+        /**
             \brief A method for displaying the contents of a Vault on the screen
             
             \param [in] amountOfRecords The number of records to be printed. The default value is -1, which means that all entries will be output

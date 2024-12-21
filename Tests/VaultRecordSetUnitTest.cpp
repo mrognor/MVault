@@ -894,15 +894,52 @@ void VaultRecordSet_Size_Test()
     for (std::size_t i = 1; i < 11; ++i)
     {
         vlt.CreateRecord({});
-        vlt.Request(Equal("A", -1), vrs);
+        vlt.Request(Equal("A", std::size_t(-1)), vrs);
         TEST_ASSERT(vrs.Size() == i, "Failed to create record");
     }
 
     for (std::size_t i = 10; i > 0; --i)
     {
-        vrs.RemoveRecord("A", i);
+        vrs.RemoveRecord("A", std::size_t(-1));
         TEST_ASSERT(vrs.Size() == i - 1, "Failed to create record");
     }
+}
+
+void VaultRecordSet_ToJson_Test()
+{
+        Vault vlt;
+
+    vlt.AddUniqueKey<std::size_t>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    for (std::size_t i = 0; i < 10; ++i)
+    {
+        vlt.CreateRecord({ {"A", std::size_t(i)}, {"B", std::string("txt") + std::to_string(i)} });
+    }
+
+    VaultRecordSet vrs;
+    vlt.Request(Greater("A", std::size_t(0)) && Less("A", std::size_t(4)), vrs);
+
+    std::string res;
+    res = vrs.ToJson();
+
+    TEST_ASSERT(res == "{\"Record0\":{\"A\":\"3\",\"B\":\"txt3\"},\"Record1\":{\"A\":\"2\",\"B\":\"txt2\"},\"Record2\":{\"A\":\"1\",\"B\":\"txt1\"}}", "Failed to convert vault to json");
+    
+    res = vrs.ToJson(true);
+    TEST_ASSERT(res == "{\n  \"Record0\":{\n    \"A\":\"3\",\n    \"B\":\"txt3\"\n  },\n  \"Record1\":{\n    \"A\":\"2\",\n    \"B\":\"txt2\"\n  },\n  \"Record2\":{\n    \"A\":\"1\",\n    \"B\":\"txt1\"\n  }\n}",
+        "Failed to convert vault to json");
+
+    res = vrs.ToJson(true, 1);
+    TEST_ASSERT(res == "{\n \"Record0\":{\n  \"A\":\"3\",\n  \"B\":\"txt3\"\n },\n \"Record1\":{\n  \"A\":\"2\",\n  \"B\":\"txt2\"\n },\n \"Record2\":{\n  \"A\":\"1\",\n  \"B\":\"txt1\"\n }\n}",
+        "Failed to convert vault to json");
+
+    res = vrs.ToJson(true, 1, true, "Rec");
+    TEST_ASSERT(res == "{\n \"Rec0\":{\n  \"A\":\"3\",\n  \"B\":\"txt3\"\n },\n \"Rec1\":{\n  \"A\":\"2\",\n  \"B\":\"txt2\"\n },\n \"Rec2\":{\n  \"A\":\"1\",\n  \"B\":\"txt1\"\n }\n}",
+        "Failed to convert vault to json");
+
+    vrs.Reset();
+    res = vrs.ToJson();
+    TEST_ASSERT(res == "{}", "Failed to convert vault to json");
 }
 
 void VaultRecordSet_SaveToFile_Test()
@@ -990,6 +1027,8 @@ int main()
     VaultRecordSet_Reset_Tests();
     VaultRecordSet_RemoveRecord_Test();
     VaultRecordSet_RemoveRecords_Test();
+    VaultRecordSet_Size_Test();
+    VaultRecordSet_ToJson_Test();
     VaultRecordSet_SaveToFile_Test();
     VaultRecordSet_Destructor_Test();
 }

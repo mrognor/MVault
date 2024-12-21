@@ -939,6 +939,34 @@ void Vault_Size_Test()
     }
 }
 
+void Vault_ToJson_Test()
+{
+    Vault vlt;
+
+    vlt.AddUniqueKey<std::size_t>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    vlt.CreateRecord({ {"A", std::size_t(1)}, {"B", std::string("txt1")} });
+    vlt.CreateRecord({ {"A", std::size_t(2)}, {"B", std::string("txt2")} });
+    vlt.CreateRecord({ {"A", std::size_t(3)}, {"B", std::string("txt3")} });
+
+    std::string res;
+    res = vlt.ToJson();
+    TEST_ASSERT(res == "{\"Record0\":{\"A\":\"3\",\"B\":\"txt3\"},\"Record1\":{\"A\":\"2\",\"B\":\"txt2\"},\"Record2\":{\"A\":\"1\",\"B\":\"txt1\"}}", "Failed to convert vault to json");
+    
+    res = vlt.ToJson(true);
+    TEST_ASSERT(res == "{\n  \"Record0\":{\n    \"A\":\"3\",\n    \"B\":\"txt3\"\n  },\n  \"Record1\":{\n    \"A\":\"2\",\n    \"B\":\"txt2\"\n  },\n  \"Record2\":{\n    \"A\":\"1\",\n    \"B\":\"txt1\"\n  }\n}",
+        "Failed to convert vault to json");
+
+    res = vlt.ToJson(true, 1);
+    TEST_ASSERT(res == "{\n \"Record0\":{\n  \"A\":\"3\",\n  \"B\":\"txt3\"\n },\n \"Record1\":{\n  \"A\":\"2\",\n  \"B\":\"txt2\"\n },\n \"Record2\":{\n  \"A\":\"1\",\n  \"B\":\"txt1\"\n }\n}",
+        "Failed to convert vault to json");
+
+    res = vlt.ToJson(true, 1, true, "Rec");
+    TEST_ASSERT(res == "{\n \"Rec0\":{\n  \"A\":\"3\",\n  \"B\":\"txt3\"\n },\n \"Rec1\":{\n  \"A\":\"2\",\n  \"B\":\"txt2\"\n },\n \"Rec2\":{\n  \"A\":\"1\",\n  \"B\":\"txt1\"\n }\n}",
+        "Failed to convert vault to json");
+}
+
 void Vault_SaveToFile_Test()
 {
     Vault vlt;
@@ -1102,6 +1130,7 @@ int main()
     Vault_EraseRecord_Test();
     Vault_EraseRecords_Test();
     Vault_Size_Test();
+    Vault_ToJson_Test();
     Vault_SaveToFile_Test();
     Vault_ReadFromFile_Test();
     Vault_GetErrorsInLastReadedFile_Test();

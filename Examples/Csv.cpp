@@ -43,7 +43,6 @@ int main()
     vlt.AddKey("socket", std::string());
     vlt.AddKey("category", std::string());
 
-
     vlt.ReadFile("Csv/CPU_benchmark_v4.csv", ',', true);
     vlt.PrintAsTable(false, 10, "cpuMark", true);
 }
