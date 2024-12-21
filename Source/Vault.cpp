@@ -624,19 +624,65 @@ namespace mvlt
         return res;
     }
 
+    std::string Vault::ToJson(const bool& isFormat, const std::size_t& tabSize, const bool& isUseRecordTemplate,
+            const std::string& recordTemplate) const noexcept
+    {
+        std::stringstream res;
+
+        // Lock Vault to read
+        ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
+
+        std::size_t counter = 0, keysAmount = KeysOrder.size(), recordsAmount = RecordsSet.size();
+        const std::string tab(tabSize, ' ');
+
+        res << "{";
+
+        for (const auto& record : RecordsSet)
+        {
+            if (isFormat) res << "\n" << tab;
+            if (isUseRecordTemplate)
+                res << "\"" << recordTemplate << counter << "\":{";
+            else
+                res << "\"" << record << "\":{";
+
+            std::size_t keyCounter = 0;
+            for(const std::string& key : KeysOrder)
+            {
+                if (isFormat) res << "\n" << tab << tab;
+
+                DataSaver dataSaver;
+                record->GetDataSaver(key, dataSaver);
+
+                res << "\"" << key << "\":\"" << dataSaver.Str() << "\"";
+
+                ++keyCounter;
+                if (keyCounter != keysAmount) res << ",";
+            }
+
+            if (isFormat) res << "\n" << tab;
+            res << "}";
+
+            ++counter;
+            if (counter != recordsAmount) res << ",";
+        }
+
+        if (isFormat) res << "\n";
+        res << "}";
+        return res.str();
+    }
+
     void Vault::PrintVault(const std::size_t& amountOfRecords) const noexcept
     {
         // Lock Vault to read
         ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
 
-        std::vector<std::string> keys = GetKeys();
         std::size_t counter = 0;
 
         for (const auto& record : RecordsSet)
         {
             std::cout << "Vault record " << record << ":" << std::endl;
 
-            for (const std::string& key : keys)
+            for (const std::string& key : KeysOrder)
             {
                 DataSaver dataSaver;
                 record->GetDataSaver(key, dataSaver);

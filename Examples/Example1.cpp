@@ -102,4 +102,20 @@ int main()
 
     vlt.PrintAsTable();
     vlt.CreateRecord({});
+
+    vlt.DropVault();
+
+    std::vector<std::string> names = {"Alice", "Bob", "Charlie", "Diana", "Evan", "Frank", "Grace", "Henry", "Ivy", "Jack"};
+    std::vector<std::string> surnames = {"Smith", "Johnson", "Williams", "Brown", "Jones", "Davis", "Miller", "Wilson", "Moore", "Taylor"};
+    std::vector<std::string> cities = {"London", "Paris", "Tokyo", "Sydney", "Cape Town", "Rio de Janeiro", "Berlin", "Dubai", "Moscow", "Bangkok"};
+    
+    vlt.AddUniqueKey<std::size_t>("Id");
+    vlt.AddKey<std::string>("Name", "none");
+    vlt.AddKey<std::string>("Surname", "none");
+    vlt.AddKey<std::string>("City", "none");
+
+    for (std::size_t i = 0; i < 10; ++i) vlt.CreateRecord({ {"Id", i}, {"Name", names[i]}, {"Surname", surnames[i]}, {"City", cities[i]} });
+
+    vlt.PrintAsTable();
+    std::cout << vlt.ToJson(true, 2, true, "Rec") << std::endl;
 }
