@@ -316,9 +316,37 @@ namespace mvlt
             std::cout << "The parent Vault is not valid!" << std::endl;
     }
 
-    void VaultRecordSet::Join(const VaultRecordSet& a) noexcept
+    VaultOperationResult VaultRecordSet::Join(const VaultRecordSet& a) noexcept
     {
-        if (GetIsParentVaultValid() && a.GetIsParentVaultValid())
+        VaultOperationResult res;
+        res.IsOperationSuccess = true;
+
+        // Handle errors
+        if (!GetIsParentVaultValid())
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::ParentVaultNotValid;
+        }
+
+        if (res.IsOperationSuccess && !a.GetIsParentVaultValid())
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::OtherParentVaultNotValid;
+        }
+
+        if (res.IsOperationSuccess && a.ParentVault != ParentVault)
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::ParentVaultNotMatch;
+        }
+
+        if (this == &a)
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::SameVaultRecordSetInRequest;
+        }
+
+        if (res.IsOperationSuccess)
         {
             ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
 
@@ -333,6 +361,8 @@ namespace mvlt
                 }
             }
         }
+
+        return res;
     }
 
     void VaultRecordSet::Exclude(const VaultRecordSet& a) noexcept

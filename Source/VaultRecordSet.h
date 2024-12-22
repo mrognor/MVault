@@ -472,8 +472,10 @@ namespace mvlt
             \brief A method for adding all records from a to this
             
             \param [in] a the set from which the recordings will be added
+
+            \return join result
         */
-        void Join(const VaultRecordSet& a) noexcept;
+        VaultOperationResult Join(const VaultRecordSet& a) noexcept;
 
         /**
             \brief A method for deleting all records from this that are also in a

@@ -701,9 +701,9 @@ void VaultRecordSet_Request_Tests()
     TEST_ASSERT(vrs1.RequestEqual("B", -1, vrs2, 2).ResultCode == VaultOperationResultCode::Success, "Error on record request");
     TEST_ASSERT(vrs2.Size() == 2, "Error on record request");
 
-    VaultOperationResult res;
+    VaultOperationResult vor;
     // Predicat test. B == -1 and A = stoi(C)
-    res = vrs1.RequestEqual("B", -1, vrs2, -1, [](const VaultRecordRef& ref)
+    vor = vrs1.RequestEqual("B", -1, vrs2, -1, [](const VaultRecordRef& ref)
         {
             int a; std::string c;
             ref.GetData("A", a);
@@ -711,7 +711,7 @@ void VaultRecordSet_Request_Tests()
             if (a == stoi(c)) return true;
             else return false;
         });
-    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::Success, "Error on record request");
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::Success, "Error on record request");
     TEST_ASSERT(vrs2.Size() == 1, "Error on record request");
     vrs2.GetRecord("B", -1, vrr);
     int n;
@@ -749,6 +749,12 @@ void VaultRecordSet_Request_Tests()
     vrs2.Request(Greater("A", 2), vrs3);
     TEST_ASSERT(vrs3.ToJson() == "{\"Record0\":{\"A\":\"4\"},\"Record1\":{\"A\":\"3\"}}",
         "Failed to request recors");
+
+    vor = vrs3.Request(Equal("A", 3), vrs3);
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSetInRequest, "Failed to request set");
+
+    vor = vrs3.RequestEqual("A", 3, vrs3);
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSetInRequest, "Failed to request set");
 }
 
 void VaultRecordSet_CheckRecord_Test()
@@ -974,6 +980,49 @@ void VaultRecordSet_ToJson_Test()
     TEST_ASSERT(res == "{}", "Failed to convert vault to json");
 }
 
+void VaultRecordSet_Join_Test()
+{
+    Vault vlt1, vlt2;
+    VaultRecordSet vrs1, vrs2, vrs3;
+    VaultOperationResult vor;
+
+    vlt1.AddUniqueKey<int>("A");
+    vlt1.AddKey<std::string>("B", "none");
+
+    for (int i = 0; i < 10; ++i) vlt1.CreateRecord({ {"A", i}, {"B", std::string("none") + std::to_string(i)} });
+
+
+    vlt2.AddUniqueKey<std::size_t>("C");
+
+    for (std::size_t i = 0; i < 10; ++i) vlt2.CreateRecord({ {"C", i} });
+
+
+    vlt1.RequestLess("A", 4, vrs1);
+    vlt1.RequestGreater("A", 6, vrs2);
+
+
+    vor = vrs3.Join(vrs2);    
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::ParentVaultNotValid, "Failed to join");
+
+    vor = vrs1.Join(vrs3);
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::OtherParentVaultNotValid, "Failed to join");
+
+
+    vlt2.RequestLess("A", std::size_t(4), vrs3);
+
+    vor = vrs1.Join(vrs3);
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::ParentVaultNotMatch, "Failed to join");
+    
+    vrs3 = vrs1;
+    vrs1.Join(vrs2);
+
+    TEST_ASSERT(vrs1.ToJson() == "{\"Record0\":{\"A\":\"7\",\"B\":\"none7\"},\"Record1\":{\"A\":\"8\",\"B\":\"none8\"},\"Record2\":{\"A\":\"9\",\"B\":\"none9\"},\"Record3\":{\"A\":\"3\",\"B\":\"none3\"},\"Record4\":{\"A\":\"2\",\"B\":\"none2\"},\"Record5\":{\"A\":\"1\",\"B\":\"none1\"},\"Record6\":{\"A\":\"0\",\"B\":\"none0\"}}",
+        "Failed to join sets");
+
+    vor = vrs3.Join(vrs3);
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSetInRequest, "Failed to join");
+}
+
 void VaultRecordSet_SaveToFile_Test()
 {
     Vault vlt;
@@ -1061,6 +1110,7 @@ int main()
     VaultRecordSet_RemoveRecords_Test();
     VaultRecordSet_Size_Test();
     VaultRecordSet_ToJson_Test();
+    VaultRecordSet_Join_Test();
     VaultRecordSet_SaveToFile_Test();
     VaultRecordSet_Destructor_Test();
 }

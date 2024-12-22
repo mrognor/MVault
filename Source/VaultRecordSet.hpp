@@ -13,17 +13,25 @@ namespace mvlt
 
         if (GetIsParentVaultValid())
         {
-            ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
+            if (&vaultRecordSet == this)
+            {
+                res.IsOperationSuccess = false;
+                res.ResultCode = VaultOperationResultCode::SameVaultRecordSetInRequest;
+            }
+            else 
+            {
+                ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
 
-            // Remove old data from vaultRecordSet
-            if (vaultRecordSet.ParentVault != ParentVault) vaultRecordSet.Reset();
-            else vaultRecordSet.Clear();
+                // Remove old data from vaultRecordSet
+                if (vaultRecordSet.ParentVault != ParentVault) vaultRecordSet.Reset();
+                else vaultRecordSet.Clear();
 
-            // Save vaultRecordSet
-            ParentVault->RecordSetsSet.emplace(&vaultRecordSet);
+                // Save vaultRecordSet
+                ParentVault->RecordSetsSet.emplace(&vaultRecordSet);
 
-            res = Vault::RequestRecords(requestType, key, beginKeyValue, endKeyValue, vaultRecordSet, isIncludeBeginKeyValue, isIncludeEndKeyValue, amountOfRecords, requestPredicat);
-            vaultRecordSet.ParentVault = ParentVault;
+                res = Vault::RequestRecords(requestType, key, beginKeyValue, endKeyValue, vaultRecordSet, isIncludeBeginKeyValue, isIncludeEndKeyValue, amountOfRecords, requestPredicat);
+                vaultRecordSet.ParentVault = ParentVault;
+            }
         }
         else 
         {
@@ -157,17 +165,25 @@ namespace mvlt
 
         if (GetIsParentVaultValid())
         {
-            ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
+            if (&vaultRecordSet == this)
+            {
+                res.IsOperationSuccess = false;
+                res.ResultCode = VaultOperationResultCode::SameVaultRecordSetInRequest;
+            }
+            else 
+            {
+                ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
 
-            // Remove old data from vaultRecordSet
-            if (vaultRecordSet.ParentVault != ParentVault) vaultRecordSet.Reset();
-            else vaultRecordSet.Clear();
+                // Remove old data from vaultRecordSet
+                if (vaultRecordSet.ParentVault != ParentVault) vaultRecordSet.Reset();
+                else vaultRecordSet.Clear();
 
-            // Save vaultRecordSet
-            ParentVault->RecordSetsSet.emplace(&vaultRecordSet);
+                // Save vaultRecordSet
+                ParentVault->RecordSetsSet.emplace(&vaultRecordSet);
 
-            res = Vault::Request(std::move(request), vaultRecordSet);
-            vaultRecordSet.ParentVault = ParentVault;
+                res = Vault::Request(std::move(request), vaultRecordSet);
+                vaultRecordSet.ParentVault = ParentVault;
+            }
         }
         else 
         {
