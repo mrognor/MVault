@@ -15,8 +15,9 @@ namespace mvlt
         {
             ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
 
-            // \todo Replace to reset to clear keys 
-            vaultRecordSet.Clear();
+            // Remove old data from vaultRecordSet
+            if (vaultRecordSet.ParentVault != ParentVault) vaultRecordSet.Reset();
+            else vaultRecordSet.Clear();
 
             // Save vaultRecordSet
             ParentVault->RecordSetsSet.emplace(&vaultRecordSet);
@@ -158,8 +159,9 @@ namespace mvlt
         {
             ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
 
-            // \todo Replace to reset to clear keys 
-            vaultRecordSet.Clear();
+            // Remove old data from vaultRecordSet
+            if (vaultRecordSet.ParentVault != ParentVault) vaultRecordSet.Reset();
+            else vaultRecordSet.Clear();
 
             // Save vaultRecordSet
             ParentVault->RecordSetsSet.emplace(&vaultRecordSet);

@@ -717,6 +717,38 @@ void VaultRecordSet_Request_Tests()
     int n;
     vrr.GetData("A", n);
     TEST_ASSERT(n == 5, "Failed to make request");
+
+    Vault vlt1, vlt2;
+    VaultRecordSet vrs3;
+
+    vlt1.AddUniqueKey<std::size_t>("A");
+    vlt1.AddKey("B", -1);
+    vlt1.AddKey<std::string>("C", "none");
+    
+    vlt1.CreateRecord({ {"A", std::size_t(0)}, {"B", 5}, {"C", std::string("txt10")} });
+    vlt1.CreateRecord({ {"A", std::size_t(1)}, {"B", 4}, {"C", std::string("txt11")} });
+    vlt1.CreateRecord({ {"A", std::size_t(2)}, {"B", 3}, {"C", std::string("txt12")} });
+    vlt1.CreateRecord({ {"A", std::size_t(3)}, {"B", 2}, {"C", std::string("txt13")} });
+
+    vlt1.Request(GreaterOrEqual("A", std::size_t(0)), vrs1);
+
+    vlt2.AddKey("A", -1);
+
+    vlt2.CreateRecord({ {"A", 0} });
+    vlt2.CreateRecord({ {"A", 1} });
+    vlt2.CreateRecord({ {"A", 2} });
+    vlt2.CreateRecord({ {"A", 3} });
+    vlt2.CreateRecord({ {"A", 4} });
+
+    vlt2.Request(GreaterOrEqual("A", 0), vrs2);
+
+    vrs1.Request(Greater("A", std::size_t(0)), vrs3);
+    TEST_ASSERT(vrs3.ToJson() == "{\"Record0\":{\"A\":\"3\",\"B\":\"2\",\"C\":\"txt13\"},\"Record1\":{\"A\":\"2\",\"B\":\"3\",\"C\":\"txt12\"},\"Record2\":{\"A\":\"1\",\"B\":\"4\",\"C\":\"txt11\"}}",
+        "Failed to request recors");
+
+    vrs2.Request(Greater("A", 2), vrs3);
+    TEST_ASSERT(vrs3.ToJson() == "{\"Record0\":{\"A\":\"4\"},\"Record1\":{\"A\":\"3\"}}",
+        "Failed to request recors");
 }
 
 void VaultRecordSet_CheckRecord_Test()

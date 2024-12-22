@@ -789,9 +789,9 @@ void Vault_Request_Tests()
     TEST_ASSERT(vlt.RequestEqual("B", -1, vrs, 2).ResultCode == VaultOperationResultCode::Success, "Error on record request");
     TEST_ASSERT(vrs.Size() == 2, "Error on record request");
 
-    VaultOperationResult res;
+    VaultOperationResult vor;
     // Predicat test. B == -1 and A = stoi(C)
-    res = vlt.RequestEqual("B", -1, vrs, -1, [](const VaultRecordRef& ref)
+    vor = vlt.RequestEqual("B", -1, vrs, -1, [](const VaultRecordRef& ref)
         {
             int a; std::string c;
             ref.GetData("A", a);
@@ -799,12 +799,38 @@ void Vault_Request_Tests()
             if (a == stoi(c)) return true;
             else return false;
         });
-    TEST_ASSERT(res.ResultCode == VaultOperationResultCode::Success, "Error on record request");
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::Success, "Error on record request");
     TEST_ASSERT(vrs.Size() == 1, "Error on record request");
     vrs.GetRecord("B", -1, vrr);
     int n;
     vrr.GetData("A", n);
     TEST_ASSERT(n == 5, "Failed to make request");
+
+    Vault vlt1, vlt2;
+
+    vlt1.AddUniqueKey<std::size_t>("A");
+    vlt1.AddKey("B", -1);
+    vlt1.AddKey<std::string>("C", "none");
+    
+    vlt1.CreateRecord({ {"A", std::size_t(0)}, {"B", 5}, {"C", std::string("txt10")} });
+    vlt1.CreateRecord({ {"A", std::size_t(1)}, {"B", 4}, {"C", std::string("txt11")} });
+    vlt1.CreateRecord({ {"A", std::size_t(2)}, {"B", 3}, {"C", std::string("txt12")} });
+    vlt1.CreateRecord({ {"A", std::size_t(3)}, {"B", 2}, {"C", std::string("txt13")} });
+
+    vlt1.Request(Greater("A", std::size_t(0)), vrs);
+    TEST_ASSERT(vrs.ToJson() == "{\"Record0\":{\"A\":\"3\",\"B\":\"2\",\"C\":\"txt13\"},\"Record1\":{\"A\":\"2\",\"B\":\"3\",\"C\":\"txt12\"},\"Record2\":{\"A\":\"1\",\"B\":\"4\",\"C\":\"txt11\"}}",
+        "Failed to request recors");
+
+    vlt2.AddKey("A", -1);
+    vlt2.CreateRecord({ {"A", 0} });
+    vlt2.CreateRecord({ {"A", 1} });
+    vlt2.CreateRecord({ {"A", 2} });
+    vlt2.CreateRecord({ {"A", 3} });
+    vlt2.CreateRecord({ {"A", 4} });
+
+    vlt2.Request(Greater("A", 2), vrs);
+    TEST_ASSERT(vrs.ToJson() == "{\"Record0\":{\"A\":\"4\"},\"Record1\":{\"A\":\"3\"}}", 
+        "Failed to request recors");
 }
 
 void Vault_DropVault_Tests()
