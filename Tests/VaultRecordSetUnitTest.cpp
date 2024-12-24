@@ -1023,6 +1023,90 @@ void VaultRecordSet_Join_Test()
     TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSetInRequest, "Failed to join");
 }
 
+void VaultRecordSet_Exclude_Test()
+{
+    Vault vlt1, vlt2;
+    VaultRecordSet vrs1, vrs2, vrs3;
+    VaultOperationResult vor;
+
+    vlt1.AddUniqueKey<int>("A");
+    vlt1.AddKey<std::string>("B", "none");
+
+    for (int i = 0; i < 10; ++i) vlt1.CreateRecord({ {"A", i}, {"B", std::string("none") + std::to_string(i)} });
+
+
+    vlt2.AddUniqueKey<std::size_t>("C");
+
+    for (std::size_t i = 0; i < 10; ++i) vlt2.CreateRecord({ {"C", i} });
+
+
+    vlt1.RequestLess("A", 9, vrs1);
+    vlt1.RequestGreater("A", 6, vrs2);
+
+    vor = vrs3.Exclude(vrs2);    
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::ParentVaultNotValid, "Failed to exclude");
+
+    vor = vrs1.Exclude(vrs3);
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::OtherParentVaultNotValid, "Failed to exclude");
+
+
+    vlt2.RequestLess("A", std::size_t(4), vrs3);
+
+    vor = vrs1.Exclude(vrs3);
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::ParentVaultNotMatch, "Failed to exclude");
+
+    vrs3 = vrs1;
+    vrs1.Exclude(vrs2);
+
+    TEST_ASSERT(vrs1.ToJson() == "{\"Record0\":{\"A\":\"6\",\"B\":\"none6\"},\"Record1\":{\"A\":\"5\",\"B\":\"none5\"},\"Record2\":{\"A\":\"4\",\"B\":\"none4\"},\"Record3\":{\"A\":\"3\",\"B\":\"none3\"},\"Record4\":{\"A\":\"2\",\"B\":\"none2\"},\"Record5\":{\"A\":\"1\",\"B\":\"none1\"},\"Record6\":{\"A\":\"0\",\"B\":\"none0\"}}",
+        "Failed to exclude sets");
+
+    vor = vrs3.Exclude(vrs3);
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSetInRequest, "Failed to exclude");
+}
+
+void VaultRecordSet_Intersect_Test()
+{
+    Vault vlt1, vlt2;
+    VaultRecordSet vrs1, vrs2, vrs3;
+    VaultOperationResult vor;
+
+    vlt1.AddUniqueKey<int>("A");
+    vlt1.AddKey<std::string>("B", "none");
+
+    for (int i = 0; i < 10; ++i) vlt1.CreateRecord({ {"A", i}, {"B", std::string("none") + std::to_string(i)} });
+
+
+    vlt2.AddUniqueKey<std::size_t>("C");
+
+    for (std::size_t i = 0; i < 10; ++i) vlt2.CreateRecord({ {"C", i} });
+
+
+    vlt1.RequestLess("A", 9, vrs1);
+    vlt1.RequestGreater("A", 6, vrs2);
+
+    vor = vrs3.Intersect(vrs2);    
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::ParentVaultNotValid, "Failed to intersect");
+
+    vor = vrs1.Intersect(vrs3);
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::OtherParentVaultNotValid, "Failed to intersect");
+
+
+    vlt2.RequestLess("A", std::size_t(4), vrs3);
+
+    vor = vrs1.Intersect(vrs3);
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::ParentVaultNotMatch, "Failed to intersect");
+
+    vrs3 = vrs1;
+    vrs1.Intersect(vrs2);
+
+    TEST_ASSERT(vrs1.ToJson() == "{\"Record0\":{\"A\":\"8\",\"B\":\"none8\"},\"Record1\":{\"A\":\"7\",\"B\":\"none7\"}}",
+        "Failed to intersect sets");
+
+    vor = vrs3.Intersect(vrs3);
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSetInRequest, "Failed to intersect");
+}
+
 void VaultRecordSet_SaveToFile_Test()
 {
     Vault vlt;
@@ -1088,6 +1172,120 @@ void VaultRecordSet_Destructor_Test()
     delete vrs;
 }
 
+void Union_Test()
+{
+    Vault vlt1, vlt2;
+    VaultRecordSet vrs1, vrs2, vrs3;
+    VaultOperationResult vor;
+
+    vlt1.AddUniqueKey<int>("A");
+    vlt1.AddKey<std::string>("B", "none");
+
+    for (int i = 0; i < 10; ++i) vlt1.CreateRecord({ {"A", i}, {"B", std::string("none") + std::to_string(i)} });
+
+
+    vlt2.AddUniqueKey<std::size_t>("C");
+
+    for (std::size_t i = 0; i < 10; ++i) vlt2.CreateRecord({ {"C", i} });
+
+    // Not valid first set 
+    vor = Union(vrs1, vrs2, vrs3);
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::ParentVaultNotValid, "Failed to union");
+
+    vlt1.RequestLess("A", 3, vrs1);
+
+    // Not valid second set
+    vor = Union(vrs1, vrs2, vrs3);
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::OtherParentVaultNotValid, "Failed to union");
+
+    vlt1.RequestGreater("A", 7, vrs2);
+    vlt2.RequestGreater("C", std::size_t(2), vrs3);
+
+    // Correct request
+    vor = Union(vrs1, vrs2, vrs3);
+    TEST_ASSERT(vor.IsOperationSuccess == true, "Failed to union");
+    TEST_ASSERT(vrs3.ToJson() == "{\"Record0\":{\"A\":\"8\",\"B\":\"none8\"},\"Record1\":{\"A\":\"9\",\"B\":\"none9\"},\"Record2\":{\"A\":\"0\",\"B\":\"none0\"},\"Record3\":{\"A\":\"1\",\"B\":\"none1\"},\"Record4\":{\"A\":\"2\",\"B\":\"none2\"}}",
+        "Failed to union sets");
+
+    // Same sets in request
+    vor = Union(vrs1, vrs1, vrs3);
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSetInRequest, "Failed to union");
+
+    vor = Union(vrs1, vrs2, vrs1);
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSetInRequest, "Failed to union");
+
+    vor = Union(vrs1, vrs2, vrs2);
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSetInRequest, "Failed to union");
+
+    vor = Union(vrs3, vrs3, vrs3);
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSetInRequest, "Failed to union");
+
+    // Different parent vaults
+    vlt2.RequestLess("A", 3, vrs2);
+
+    vor = Union(vrs1, vrs2, vrs3);
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::ParentVaultNotMatch, "Failed to union");
+}
+
+void Intersection_Test()
+{
+    Vault vlt1, vlt2;
+    VaultRecordSet vrs1, vrs2, vrs3;
+    VaultOperationResult vor;
+
+    vlt1.AddUniqueKey<int>("A");
+    vlt1.AddKey<std::string>("B", "none");
+
+    for (int i = 0; i < 10; ++i) vlt1.CreateRecord({ {"A", i}, {"B", std::string("none") + std::to_string(i)} });
+
+
+    vlt2.AddUniqueKey<std::size_t>("C");
+
+    for (std::size_t i = 0; i < 10; ++i) vlt2.CreateRecord({ {"C", i} });
+
+    // Not valid first set 
+    vor = Intersection(vrs1, vrs2, vrs3);
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::ParentVaultNotValid, "Failed to intersection");
+
+    vlt1.RequestLess("A", 7, vrs1);
+
+    // Not valid second set
+    vor = Intersection(vrs1, vrs2, vrs3);
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::OtherParentVaultNotValid, "Failed to intersection");
+
+    vlt1.RequestGreater("A", 3, vrs2);
+    vlt2.RequestGreater("C", std::size_t(2), vrs3);
+
+    vrs1.PrintAsTable();
+    vrs2.PrintAsTable();
+
+    // Correct request
+    vor = Intersection(vrs1, vrs2, vrs3);
+
+    TEST_ASSERT(vor.IsOperationSuccess == true, "Failed to intersection");
+    TEST_ASSERT(vrs3.ToJson() == "{\"Record0\":{\"A\":\"4\",\"B\":\"none4\"},\"Record1\":{\"A\":\"5\",\"B\":\"none5\"},\"Record2\":{\"A\":\"6\",\"B\":\"none6\"}}",
+        "Failed to intersection sets");
+
+    // Same sets in request
+    vor = Intersection(vrs1, vrs1, vrs3);
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSetInRequest, "Failed to intersection");
+
+    vor = Intersection(vrs1, vrs2, vrs1);
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSetInRequest, "Failed to intersection");
+
+    vor = Intersection(vrs1, vrs2, vrs2);
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSetInRequest, "Failed to intersection");
+
+    vor = Intersection(vrs3, vrs3, vrs3);
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSetInRequest, "Failed to intersection");
+
+    // Different parent vaults
+    vlt2.RequestLess("A", 3, vrs2);
+
+    vor = Intersection(vrs1, vrs2, vrs3);
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::ParentVaultNotMatch, "Failed to intersection");
+}
+
 int main()
 {
     VaultRecordSet_CopyConstructor_Test();
@@ -1111,6 +1309,10 @@ int main()
     VaultRecordSet_Size_Test();
     VaultRecordSet_ToJson_Test();
     VaultRecordSet_Join_Test();
+    VaultRecordSet_Exclude_Test();
+    VaultRecordSet_Intersect_Test();
     VaultRecordSet_SaveToFile_Test();
     VaultRecordSet_Destructor_Test();
+    Union_Test();
+    Intersection_Test();
 }

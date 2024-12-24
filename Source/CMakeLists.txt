@@ -2,15 +2,15 @@ cmake_minimum_required(VERSION 3.6)
 
 if(WIN32)
     if (CMAKE_BUILD_TYPE STREQUAL "Release")
-        set(CMAKE_CXX_FLAGS "-Wall -O3")
+        set(CMAKE_CXX_FLAGS "-Wextra -O3")
     else()
-        set(CMAKE_CXX_FLAGS "-Wall -g")
+        set(CMAKE_CXX_FLAGS "-Wextra -g")
     endif()
 else()
     if (CMAKE_BUILD_TYPE STREQUAL "Release")
-        set(CMAKE_CXX_FLAGS "-Wall -O3")
+        set(CMAKE_CXX_FLAGS "-Wextra -O3")
     else()
-        set(CMAKE_CXX_FLAGS "-Wall -fsanitize=address -fsanitize=leak -lgcov --coverage -g")
+        set(CMAKE_CXX_FLAGS "-Wextra -fsanitize=address -fsanitize=leak -lgcov --coverage -g")
     endif()
 endif()
 
@@ -36,7 +36,6 @@ set(MVaultHeaders
     Functions/CsvParser.h
     Functions/FromString.h
     Functions/PrintAsTable.h
-    Functions/VaultRecordSetOperations.h
 )
 
 set(MVaultTemplates
@@ -61,7 +60,6 @@ set(MVaultSource
     VaultRecordSet.cpp
     
     Functions/CsvParser.cpp
-    Functions/VaultRecordSetOperations.cpp
 )
 
 project(MVault)

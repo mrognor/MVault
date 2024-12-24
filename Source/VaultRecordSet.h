@@ -481,15 +481,19 @@ namespace mvlt
             \brief A method for deleting all records from this that are also in a
             
             \param [in] a the record set that contains the records to remove
+
+            \return exclude result
         */
-        void Exclude(const VaultRecordSet& a) noexcept;
+        VaultOperationResult Exclude(const VaultRecordSet& a) noexcept;
         
         /**
             \brief A method to delete all records from this that are not in a
             
             \param [in] a a set that contains records that do not need to be removed
+
+            \return intersect result
         */
-        void Intersect(const VaultRecordSet& a) noexcept;
+        VaultOperationResult Intersect(const VaultRecordSet& a) noexcept;
 
         /**
             \brief A method for saving data to a table file. The file format is csv
@@ -509,10 +513,10 @@ namespace mvlt
         ~VaultRecordSet() noexcept;
 
         /// Making Union function friendly
-        friend void Union(const VaultRecordSet& a, const VaultRecordSet& b, VaultRecordSet& res) noexcept;
+        friend VaultOperationResult Union(const VaultRecordSet& a, const VaultRecordSet& b, VaultRecordSet& res) noexcept;
 
         /// Making Intersection function friendly
-        friend void Intersection(const VaultRecordSet& a, const VaultRecordSet& b, VaultRecordSet& res) noexcept;
+        friend VaultOperationResult Intersection(const VaultRecordSet& a, const VaultRecordSet& b, VaultRecordSet& res) noexcept;
     };
 
     /**
@@ -524,4 +528,26 @@ namespace mvlt
         \return true if a equal b, false otherwise
     */
     bool operator==(const VaultRecordSet& a, const VaultRecordSet& b);
+
+    /**
+        \brief A function for combining sets
+
+        \param [in] a a set to combine
+        \param [in] b a set to combine
+        \param [out] res a set to save the result
+
+        \return union result
+    */
+    VaultOperationResult Union(const VaultRecordSet& a, const VaultRecordSet& b, VaultRecordSet& res) noexcept;
+
+    /**
+        \brief A function for finding the intersection of two sets
+
+        \param [in] a a set to intersection
+        \param [in] b a set to intersection
+        \param [out] res a set to save the result
+
+        \return intersection result
+    */
+    VaultOperationResult Intersection(const VaultRecordSet& a, const VaultRecordSet& b, VaultRecordSet& res) noexcept;
 }

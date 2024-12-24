@@ -770,6 +770,6 @@ namespace mvlt
         ~Vault() noexcept;
 
         /// Making Intersection function friendly
-        friend void Intersection(const VaultRecordSet& a, const VaultRecordSet& b, VaultRecordSet& res) noexcept;
+        friend VaultOperationResult Intersection(const VaultRecordSet& a, const VaultRecordSet& b, VaultRecordSet& res) noexcept;
     };
 }

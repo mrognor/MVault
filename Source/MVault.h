@@ -13,7 +13,6 @@
 #include "Functions/ToString.h"
 #include "Functions/CsvParser.h"
 #include "Functions/PrintAsTable.h"
-#include "Functions/VaultRecordSetOperations.h"
 
 #include "Vault.hpp"
 #include "VaultRequest.hpp"

@@ -76,7 +76,7 @@ namespace mvlt
         RecursiveReadWriteMtx.Disable();
     }
 
-    VaultRecordSet::VaultRecordSet(const VaultRecordSet& other) noexcept
+    VaultRecordSet::VaultRecordSet(const VaultRecordSet& other) noexcept : Vault()
     {
         if (other.GetIsParentVaultValid())
             CopySet(other);
@@ -340,7 +340,7 @@ namespace mvlt
             res.ResultCode = VaultOperationResultCode::ParentVaultNotMatch;
         }
 
-        if (this == &a)
+        if (res.IsOperationSuccess && this == &a)
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::SameVaultRecordSetInRequest;
@@ -365,9 +365,37 @@ namespace mvlt
         return res;
     }
 
-    void VaultRecordSet::Exclude(const VaultRecordSet& a) noexcept
+    VaultOperationResult VaultRecordSet::Exclude(const VaultRecordSet& a) noexcept
     {
-        if (GetIsParentVaultValid() && a.GetIsParentVaultValid())
+        VaultOperationResult res;
+        res.IsOperationSuccess = true;
+
+        // Handle errors
+        if (!GetIsParentVaultValid())
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::ParentVaultNotValid;
+        }
+
+        if (res.IsOperationSuccess && !a.GetIsParentVaultValid())
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::OtherParentVaultNotValid;
+        }
+
+        if (res.IsOperationSuccess && a.ParentVault != ParentVault)
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::ParentVaultNotMatch;
+        }
+
+        if (res.IsOperationSuccess && this == &a)
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::SameVaultRecordSetInRequest;
+        }
+        
+        if (res.IsOperationSuccess)
         {
             ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
 
@@ -380,11 +408,41 @@ namespace mvlt
                     ++recordsSetIt;
             }
         }
+
+        return res;
     }
 
-    void VaultRecordSet::Intersect(const VaultRecordSet& a) noexcept
+    VaultOperationResult VaultRecordSet::Intersect(const VaultRecordSet& a) noexcept
     {
-        if (GetIsParentVaultValid() && a.GetIsParentVaultValid())
+        VaultOperationResult res;
+        res.IsOperationSuccess = true;
+
+        // Handle errors
+        if (!GetIsParentVaultValid())
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::ParentVaultNotValid;
+        }
+
+        if (res.IsOperationSuccess && !a.GetIsParentVaultValid())
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::OtherParentVaultNotValid;
+        }
+
+        if (res.IsOperationSuccess && a.ParentVault != ParentVault)
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::ParentVaultNotMatch;
+        }
+
+        if (res.IsOperationSuccess && this == &a)
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::SameVaultRecordSetInRequest;
+        }
+        
+        if (res.IsOperationSuccess)
         {
             ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
 
@@ -397,6 +455,8 @@ namespace mvlt
                     ++recordsSetIt;
             }
         }
+
+        return res;
     }
 
     bool VaultRecordSet::SaveToFile(const std::string& fileName, const std::vector<std::string> keys, const std::string& separator, const bool& isSaveKey) const noexcept
@@ -426,5 +486,110 @@ namespace mvlt
             res = true;
 
         return res;
+    }
+
+    VaultOperationResult Union(const VaultRecordSet& a, const VaultRecordSet& b, VaultRecordSet& res) noexcept
+    {
+        VaultOperationResult vor;
+
+        if (&a == &b || &a == &res || &b == &res)
+        {
+            vor.IsOperationSuccess = false;
+            vor.ResultCode = VaultOperationResultCode::SameVaultRecordSetInRequest;
+        }
+        else 
+        {
+            res = a;
+            vor = res.Join(b);
+        }
+
+        return vor;
+    }
+
+    VaultOperationResult Intersection(const VaultRecordSet& a, const VaultRecordSet& b, VaultRecordSet& res) noexcept
+    {
+        VaultOperationResult vor;
+        vor.IsOperationSuccess = true;
+
+        // Handle errors
+        if (&a == &b || &a == &res || &b == &res)
+        {
+            vor.IsOperationSuccess = false;
+            vor.ResultCode = VaultOperationResultCode::SameVaultRecordSetInRequest;
+        }
+
+        if (vor.IsOperationSuccess && !a.GetIsParentVaultValid())
+        {
+            vor.IsOperationSuccess = false;
+            vor.ResultCode = VaultOperationResultCode::ParentVaultNotValid;
+        }
+
+        if (vor.IsOperationSuccess && !b.GetIsParentVaultValid())
+        {
+            vor.IsOperationSuccess = false;
+            vor.ResultCode = VaultOperationResultCode::OtherParentVaultNotValid;
+        }
+
+        if (vor.IsOperationSuccess && a.ParentVault != b.ParentVault)
+        {
+            vor.IsOperationSuccess = false;
+            vor.ResultCode = VaultOperationResultCode::ParentVaultNotMatch;
+        }
+
+        if (vor.IsOperationSuccess)
+        {
+            if (res.GetIsParentVaultValid()) res.Reset();
+
+            a.ParentVault->RecursiveReadWriteMtx.ReadLock();
+
+            res.ParentVault = a.ParentVault;
+            
+            for (auto& keyCopierIt : a.VaultKeyCopiers)
+                keyCopierIt.second(&res);
+
+            // Set proper key order
+            res.KeysOrder = a.KeysOrder;
+
+            // Set unique keys
+            res.UniqueKeys = a.UniqueKeys;
+
+            a.ParentVault->RecordSetsSet.emplace(&res);
+
+            // Pick less set to iterate 
+            if (a.RecordsSet.size() < b.RecordsSet.size())
+            {
+                // Iterate over all records in a
+                for (VaultRecord* record : a.RecordsSet)
+                {
+                    // if record in b then add it to the res
+                    if (b.RecordsSet.find(record) != b.RecordsSet.end())
+                    {
+                        res.RecordsSet.emplace(record);
+                    
+                        for (auto& adder : res.VaultRecordAdders)
+                            adder.second(record);
+                    }
+                }
+            }
+            else 
+            {
+                // Iterate over all records in b
+                for (VaultRecord* record : b.RecordsSet)
+                {
+                    // if record in b then add it to the res
+                    if (a.RecordsSet.find(record) != a.RecordsSet.end())
+                    {
+                        res.RecordsSet.emplace(record);
+                    
+                        for (auto& adder : res.VaultRecordAdders)
+                            adder.second(record);
+                    }
+                }
+            }
+
+            a.ParentVault->RecursiveReadWriteMtx.ReadUnlock();
+        }
+
+        return vor;
     }
 }
