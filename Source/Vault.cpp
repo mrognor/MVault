@@ -133,7 +133,6 @@ namespace mvlt
             if (!isCorrectRecordInFile) 
             {
                 delete newRecord;
-                record.clear();
                 continue;
             }
 
@@ -169,8 +168,6 @@ namespace mvlt
                 for (const auto& vaultRecordAddersIt : VaultRecordAdders)
                     vaultRecordAddersIt.second(newRecord);
             }
-
-            record.clear();
         }
 
         return true;

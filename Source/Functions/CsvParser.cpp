@@ -58,6 +58,9 @@ namespace mvlt
 
     bool CsvParser::GetNextVector(std::vector<std::string>& vectorWithNext, const char& separator) noexcept
     {
+        // Clear old data
+        vectorWithNext.clear();
+
         // Is escaping flag
         bool isEscaping = false;
 
