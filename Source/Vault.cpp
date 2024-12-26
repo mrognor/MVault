@@ -324,10 +324,12 @@ namespace mvlt
 
     std::vector<std::string> Vault::GetKeys() const noexcept
     {
-        std::vector<std::string> res;
-
         ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
-        for (const auto& vaultMapStructureIt : VaultMapStructure) res.emplace_back(vaultMapStructureIt.first);
+
+        std::vector<std::string> res(KeysOrder.size());
+
+        std::size_t counter = 0;
+        for (const std::string& key : KeysOrder) res[counter++] = key;
 
         return res;
     }
