@@ -413,11 +413,40 @@ void Vault_GetKeys_Test()
     vlt.AddKey("D", -1);
     vlt.AddKey("E", -1);
     vlt.AddKey("F", -1);
-    vlt.AddKey("G", -1);
+    vlt.AddUniqueKey<int>("G");
 
     // Many keys
     keys = vlt.GetKeys();
     TEST_ASSERT(keys == vector<string>({"A", "B", "C", "D", "E", "F", "G"}), "Failed to get vault keys");
+}
+
+void Vault_GetUniqueKeys_Test()
+{
+    Vault vlt;
+    std::vector<std::string> keys;
+
+    // Empty vault
+    keys = vlt.GetUniqueKeys();
+    TEST_ASSERT(keys.empty(), "Failed to get empty vault keys");
+
+    vlt.AddKey("A", -1);
+    TEST_ASSERT(keys.empty(), "Failed to get empty vault keys");
+
+    vlt.AddUniqueKey<int>("B");
+
+    // One key
+    keys = vlt.GetUniqueKeys();
+    TEST_ASSERT(keys == vector<string>({"B"}), "Failed to get vault key");
+
+    vlt.AddKey("C", -1);
+    vlt.AddKey("D", -1);
+    vlt.AddUniqueKey<int>("E");
+    vlt.AddUniqueKey<int>("F");
+    vlt.AddUniqueKey<int>("G");
+
+    // Many keys
+    keys = vlt.GetUniqueKeys();
+    TEST_ASSERT(keys == vector<string>({"B", "E", "F", "G"}), "Failed to get vault keys");
 }
 
 void Vault_RemoveKey_Test()
@@ -1146,6 +1175,7 @@ int main()
     Vault_GetKeyValue_Test();
     Vault_GetKeyType_Test();
     Vault_GetKeys_Test();
+    Vault_GetUniqueKeys_Test();
     Vault_RemoveKey_Test();
     Vault_CreateRecord_Test();
     Vault_GetRecord_Test();

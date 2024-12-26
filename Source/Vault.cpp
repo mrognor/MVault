@@ -331,6 +331,18 @@ namespace mvlt
         return res;
     }
 
+    std::vector<std::string> Vault::GetUniqueKeys() const noexcept
+    {
+        ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
+
+        std::vector<std::string> res(UniqueKeys.size());
+
+        std::size_t counter = 0;
+        for (const std::string& key : UniqueKeys) res[counter++] = key;
+
+        return res;
+    }
+
     bool Vault::RemoveKey(const std::string& key) noexcept
     {
         WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
