@@ -23,7 +23,23 @@ namespace mvlt
                 ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
 
                 // Remove old data from vaultRecordSet
-                if (vaultRecordSet.ParentVault != ParentVault) vaultRecordSet.Reset();
+                if (vaultRecordSet.ParentVault != ParentVault)
+                {
+                    vaultRecordSet.Reset();
+
+                    // Set new parent vault to vaultRecordSet
+                    vaultRecordSet.ParentVault = ParentVault;
+
+                    // Copy keys from this to vaultRecordSet
+                    for (auto& keyCopierIt : VaultKeyCopiers)
+                        keyCopierIt.second(&vaultRecordSet);
+
+                    // Set proper key order
+                    vaultRecordSet.KeysOrder = KeysOrder;
+
+                    // Set unique keys
+                    vaultRecordSet.UniqueKeys = UniqueKeys;
+                }
                 else vaultRecordSet.Clear();
 
                 // Save vaultRecordSet
@@ -175,7 +191,23 @@ namespace mvlt
                 ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
 
                 // Remove old data from vaultRecordSet
-                if (vaultRecordSet.ParentVault != ParentVault) vaultRecordSet.Reset();
+                if (vaultRecordSet.ParentVault != ParentVault)
+                {
+                    vaultRecordSet.Reset();
+
+                    // Set new parent vault to vaultRecordSet
+                    vaultRecordSet.ParentVault = ParentVault;
+
+                    // Copy keys from this to vaultRecordSet
+                    for (auto& keyCopierIt : VaultKeyCopiers)
+                        keyCopierIt.second(&vaultRecordSet);
+
+                    // Set proper key order
+                    vaultRecordSet.KeysOrder = KeysOrder;
+
+                    // Set unique keys
+                    vaultRecordSet.UniqueKeys = UniqueKeys;
+                }
                 else vaultRecordSet.Clear();
 
                 // Save vaultRecordSet

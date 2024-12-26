@@ -346,6 +346,37 @@ void DropsTests()
     TEST_ASSERT(vrs2.GetIsParentVaultValid() == false, "Drop vault failed");
 }
 
+void RecordSetRequests()
+{
+    // No need TEST_ASSERT because sanitizers will throw error
+    mvlt::Vault vlt;
+    
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+
+    vlt.CreateRecord({});
+    vlt.CreateRecord({ {"A", 1} });
+    vlt.CreateRecord({ {"B", 1} });
+
+    mvlt::VaultRecordSet vrs, vrs2, vrs3;
+    mvlt::VaultRecordRef vrf;
+
+    vlt.RequestEqual("A", 0, vrs);
+
+    vrs2 = vrs;
+    vrs3 = vrs;
+
+    vlt.GetRecord("B", 1, vrf);
+
+    vrs.RequestEqual("A", 2, vrs2);
+    vrs.RequestEqual("A", 2, vrs3);
+
+    vrs2.AddRecord(vrf);
+    vrs3.AddRecord(vrf);
+
+    vlt.DropData();
+}
+
 int main()
 {
     KeyAddictionTests();
@@ -355,4 +386,5 @@ int main()
     RecordUpdationTests();
     RecordDeletionTests();
     DropsTests();
+    RecordSetRequests();
 }

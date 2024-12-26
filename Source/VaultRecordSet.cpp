@@ -14,10 +14,12 @@ namespace mvlt
 
         VaultDerivedClass = VaultDerivedClasses::VaultRecordSetDerived;
         ParentVault = other.ParentVault;
-        KeysOrder = other.KeysOrder;
 
         for (auto& keyCopierIt : other.VaultKeyCopiers)
             keyCopierIt.second(this);
+
+        KeysOrder = other.KeysOrder;
+        UniqueKeys = other.UniqueKeys;
 
         other.ParentVault->RecordSetsSet.emplace(this);
 
@@ -225,16 +227,19 @@ namespace mvlt
 
     void VaultRecordSet::Clear() noexcept
     {
-        // Remove this from records
-        for (VaultRecord* record : RecordsSet)
-            record->EraseDependentSet(this);
+        if (GetIsParentVaultValid())
+        {
+            // Remove this from records
+            for (VaultRecord* record : RecordsSet)
+                record->EraseDependentSet(this);
 
-        // Clear structure
-        for (const auto& vaultRecordClearersIt : VaultRecordClearers)
-            vaultRecordClearersIt.second();
+            // Clear structure
+            for (const auto& vaultRecordClearersIt : VaultRecordClearers)
+                vaultRecordClearersIt.second();
 
-        // No need to delete each record because it is RecordSet and records will be delete in original vault
-        RecordsSet.clear();
+            // No need to delete each record because it is RecordSet and records will be delete in original vault
+            RecordsSet.clear();
+        }
     }
 
     bool VaultRecordSet::RemoveRecord(const VaultRecordRef& recordRefToErase) noexcept

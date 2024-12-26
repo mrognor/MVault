@@ -1256,9 +1256,6 @@ void Intersection_Test()
     vlt1.RequestGreater("A", 3, vrs2);
     vlt2.RequestGreater("C", std::size_t(2), vrs3);
 
-    vrs1.PrintAsTable();
-    vrs2.PrintAsTable();
-
     // Correct request
     vor = Intersection(vrs1, vrs2, vrs3);
 

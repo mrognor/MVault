@@ -310,26 +310,32 @@ namespace mvlt
         // Lock Vault to read
         ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
 
-        // Save vaultRecordSet
+        // If it is Vault object
         if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
+        {
+            // Save vaultRecordSet
             RecordSetsSet.emplace(&vaultRecordSet);
 
-        // Remove old data from vaultRecordSet
-        if (vaultRecordSet.ParentVault != this) vaultRecordSet.Reset();
-        else vaultRecordSet.Clear();
+            // Remove old data from vaultRecordSet
+            if (vaultRecordSet.ParentVault != this)
+            {
+                vaultRecordSet.Reset();
 
-        // Set new parent vault to vaultRecordSet
-        vaultRecordSet.ParentVault = const_cast<Vault*>(this);
+                // Set new parent vault to vaultRecordSet
+                vaultRecordSet.ParentVault = const_cast<Vault*>(this);
 
-        // Copy keys from this to vaultRecordSet
-        for (auto& keyCopierIt : VaultKeyCopiers)
-            keyCopierIt.second(&vaultRecordSet);
+                // Copy keys from this to vaultRecordSet
+                for (auto& keyCopierIt : VaultKeyCopiers)
+                    keyCopierIt.second(&vaultRecordSet);
 
-        // Set proper key order
-        vaultRecordSet.KeysOrder = KeysOrder;
+                // Set proper key order
+                vaultRecordSet.KeysOrder = KeysOrder;
 
-        // Set unique keys
-        vaultRecordSet.UniqueKeys = UniqueKeys;
+                // Set unique keys
+                vaultRecordSet.UniqueKeys = UniqueKeys;
+            }
+            else vaultRecordSet.Clear();
+        }
 
         res = RequestRecordsSet(requestType, key, beginKeyValue, endKeyValue, vaultRecordSet.RecordsSet, isIncludeBeginKeyValue, isIncludeEndKeyValue, amountOfRecords, requestPredicat);
 
@@ -875,27 +881,33 @@ namespace mvlt
         // Lock Vault to read
         ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
 
-        // Save vaultRecordSet
+        // If it is Vault object
         if (VaultDerivedClass == VaultDerivedClasses::VaultBase)
+        {
+            // Save vaultRecordSet
             RecordSetsSet.emplace(&vaultRecordSet);
 
-        // Remove old data from vaultRecordSet
-        if (vaultRecordSet.ParentVault != this) vaultRecordSet.Reset();
-        else vaultRecordSet.Clear();
+            // Remove old data from vaultRecordSet
+            if (vaultRecordSet.ParentVault != this)
+            {
+                vaultRecordSet.Reset();
 
-        // Set new parent vault to vaultRecordSet
-        vaultRecordSet.ParentVault = const_cast<Vault*>(this);
-        
-        // Set key proper key order
-        vaultRecordSet.KeysOrder = KeysOrder;
+                // Set new parent vault to vaultRecordSet
+                vaultRecordSet.ParentVault = const_cast<Vault*>(this);
 
-        // Set unique keys
-        vaultRecordSet.UniqueKeys = UniqueKeys;
+                // Copy keys from this to vaultRecordSet
+                for (auto& keyCopierIt : VaultKeyCopiers)
+                    keyCopierIt.second(&vaultRecordSet);
 
-        // Copy keys from this to vaultRecordSet
-        for (auto& keyCopierIt : VaultKeyCopiers)
-            keyCopierIt.second(&vaultRecordSet);
-        
+                // Set proper key order
+                vaultRecordSet.KeysOrder = KeysOrder;
+
+                // Set unique keys
+                vaultRecordSet.UniqueKeys = UniqueKeys;
+            }
+            else vaultRecordSet.Clear();
+        }
+
         // Try to make complex request 
         try
         {
