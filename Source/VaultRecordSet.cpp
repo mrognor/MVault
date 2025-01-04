@@ -78,6 +78,7 @@ namespace mvlt
         RecursiveReadWriteMtx.Disable();
     }
 
+    // codechecker_intentional [all] its not call parent class copy constructor because it is other copying style
     VaultRecordSet::VaultRecordSet(const VaultRecordSet& other) noexcept : Vault()
     {
         if (other.GetIsParentVaultValid())

@@ -46,7 +46,7 @@ namespace mvlt
 
         // Read file
         FileData = new char[FileLen];
-        csvFile.read(FileData, FileLen);
+        csvFile.read(FileData, static_cast<std::streamsize>(FileLen));
 
         // Close file
         csvFile.close();

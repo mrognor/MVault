@@ -139,7 +139,7 @@ namespace mvlt
                     // Convert src pointer to T pointer and get data from T pointer.
                     // Use T copy constructor to create T object.
                     // Allocate new memory to T type and convert it to void pointer.
-                    dst = static_cast<void*>(new T(*static_cast<T*>(const_cast<void*>(src))));
+                    dst = static_cast<void*>(new T(*reinterpret_cast<T*>(src)));
                 };
 
             // Set new DeleteFunc

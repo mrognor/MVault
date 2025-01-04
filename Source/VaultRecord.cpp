@@ -4,7 +4,8 @@
 namespace mvlt
 {
     VaultRecord::VaultRecord() noexcept {}
-    
+
+    // codechecker_intentional [all] its not call parent class copy constructor because it is mutexes inside this class
     VaultRecord::VaultRecord(const VaultRecord& other) noexcept
     {
         other.VaultRecordMutex.lock();

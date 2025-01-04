@@ -923,7 +923,7 @@ namespace mvlt
                 record->AddToDependentSets(&vaultRecordSet);
             }
         }
-        catch(VaultOperationResult result) // Catch complex request errors
+        catch(VaultOperationResult& result) // Catch complex request errors
         {
             vaultRecordSet.Clear();
             res = result;

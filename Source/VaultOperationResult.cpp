@@ -41,8 +41,8 @@ namespace mvlt
 
     bool operator== (const VaultOperationResult& resA, const VaultOperationResult& resB) noexcept
     {
-        return (resA.IsOperationSuccess == resB.IsOperationSuccess) & (resA.ResultCode == resB.ResultCode) &
-            (resA.Key == resB.Key) & (resA.RequestedType == resB.RequestedType) & 
+        return (resA.IsOperationSuccess == resB.IsOperationSuccess) && (resA.ResultCode == resB.ResultCode) &&
+            (resA.Key == resB.Key) && (resA.RequestedType == resB.RequestedType) &&
             (resA.SavedType == resB.SavedType);
     }
 }

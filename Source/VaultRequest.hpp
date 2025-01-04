@@ -29,7 +29,7 @@ namespace mvlt
                 res = vlt->RequestRecordsSet(VaultRequestType::Interval, key, *static_cast<T*>(beginValue), *static_cast<T*>(endValue), vaultRecordSet, isIncludeBeginKeyValue, isIncludeEndKeyValue, -1, requestPredicat);
 
             // Throw error
-            if (!res.IsOperationSuccess) throw res;
+            if (!res.IsOperationSuccess) throw VaultOperationResult(res);
         };
 
         DeleteFunc = [](void* ptrToDelete)
