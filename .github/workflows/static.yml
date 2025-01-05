@@ -35,7 +35,7 @@ jobs:
         uses: actions/configure-pages@v5
 
       - name: Install packages
-        run: sudo apt-get update && sudo apt-get upgrade && sudo DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install doxygen graphviz lcov cmake pipx clang clang-tidy cppcheck
+        run: sudo apt-get update && sudo apt-get upgrade && sudo DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install doxygen graphviz lcov cmake pipx clang clang-tidy cppcheck python3
 
       - name: Install CodeChecker
         run: sudo pipx install CodeChecker --force
@@ -60,6 +60,9 @@ jobs:
           mv ./Sast/html_clang_tidy ./Docs/Generated/html
           mv ./Sast/html_clangsa ./Docs/Generated/html
           mv ./Sast/html_cppcheck ./Docs/Generated/html 
+
+      - name: Send report to telegram
+        run: ./.github/TelegramReport/SendCiReportToTelegram.sh ${{ secrets.BotId }} ${{ secrets.ChatId }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
