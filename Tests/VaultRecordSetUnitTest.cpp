@@ -1,5 +1,6 @@
 #include "../Source/MVault.h"
 
+#include "MTests/TestLog.h"
 #include "MTests/TestAssert.h"
 
 using namespace mvlt;
@@ -7,6 +8,8 @@ using namespace std;
 
 void VaultRecordSet_CopyConstructor_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordSet vrs1, vrs2;
 
@@ -29,6 +32,8 @@ void VaultRecordSet_CopyConstructor_Test()
 
 void VaultRecordSet_OperatorAssignment_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordSet vrs1;
 
@@ -47,6 +52,8 @@ void VaultRecordSet_OperatorAssignment_Test()
 
 void VaultRecordSet_MoveConstructor_Test()
 {
+    TEST_LOG();
+
     Vault* vlt = new Vault;
     
     vlt->AddKey<int>("A", -1);
@@ -136,6 +143,8 @@ void VaultRecordSet_MoveConstructor_Test()
 
 void VaultRecordSet_MoveAssignment_Test()
 {
+    TEST_LOG();
+
     Vault* vlt = new Vault;
     
     vlt->AddKey<int>("A", -1);
@@ -231,6 +240,8 @@ void VaultRecordSet_MoveAssignment_Test()
 
 void VaultRecordSet_OperatorComparison_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordSet vrs1, vrs2;
 
@@ -248,6 +259,8 @@ void VaultRecordSet_OperatorComparison_Test()
 
 void VaultRecordSet_GetIsParentVaultValid_Test()
 {
+    TEST_LOG();
+
     Vault* vlt = new Vault;
     VaultRecordSet vrs;
     TEST_ASSERT(vrs.GetIsParentVaultValid() == false, "Failed to create set");
@@ -277,6 +290,8 @@ void VaultRecordSet_GetIsParentVaultValid_Test()
 
 void VaultRecordSet_GetParentVaultUniqueId_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordSet vrs;
 
@@ -294,6 +309,8 @@ void VaultRecordSet_GetParentVaultUniqueId_Test()
 
 void VaultRecordSet_IsKeyExist_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     VaultRecordSet vrs;
@@ -319,6 +336,8 @@ void VaultRecordSet_IsKeyExist_Test()
 
 void VaultRecordSet_GetKeyValue_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     int keyValue;
     std::string wrongKeyValue;
@@ -350,6 +369,8 @@ void VaultRecordSet_GetKeyValue_Test()
 
 void VaultRecordSet_GetKeyType_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     std::type_index type = typeid(void);
     VaultRecordSet vrs;
@@ -377,6 +398,8 @@ void VaultRecordSet_GetKeyType_Test()
 
 void VaultRecordSet_AddRecord_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordSet vrs;
     VaultRecordRef vrf;
@@ -404,6 +427,8 @@ void VaultRecordSet_AddRecord_Test()
 
 void VaultRecordSet_GetRecord_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordSet vrs;
     VaultRecordRef vrr;
@@ -460,6 +485,8 @@ void VaultRecordSet_GetRecord_Test()
 
 void VaultRecordSet_GetRecords_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordRef vrr;
     VaultRecordSet vrs;
@@ -505,6 +532,8 @@ void VaultRecordSet_GetRecords_Test()
 
 void VaultRecordSet_Request_Tests()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordRef vrr;
     VaultRecordSet vrs1, vrs2;
@@ -759,6 +788,8 @@ void VaultRecordSet_Request_Tests()
 
 void VaultRecordSet_CheckRecord_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddKey("A", 1);
@@ -784,6 +815,8 @@ void VaultRecordSet_CheckRecord_Test()
 
 void VaultRecordSet_Reset_Tests()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordSet vrs;
 
@@ -804,6 +837,8 @@ void VaultRecordSet_Reset_Tests()
 
 void VaultRecordSet_Clear_Tests()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordSet vrs;
 
@@ -824,6 +859,8 @@ void VaultRecordSet_Clear_Tests()
 
 void VaultRecordSet_RemoveRecord_Test()
 {
+    TEST_LOG();
+
     // VaultRecordRef overload
     Vault vlt;
     VaultRecordSet vrs;
@@ -889,6 +926,8 @@ void VaultRecordSet_RemoveRecord_Test()
 
 void VaultRecordSet_RemoveRecords_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordSet vrs;
     VaultRecordRef vrr;
@@ -923,6 +962,8 @@ void VaultRecordSet_RemoveRecords_Test()
 
 void VaultRecordSet_Size_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordSet vrs;
     VaultRecordRef vrr;
@@ -945,7 +986,9 @@ void VaultRecordSet_Size_Test()
 
 void VaultRecordSet_ToJson_Test()
 {
-        Vault vlt;
+    TEST_LOG();
+
+    Vault vlt;
 
     vlt.AddUniqueKey<std::size_t>("A");
     vlt.AddKey<std::string>("B", "none");
@@ -982,6 +1025,8 @@ void VaultRecordSet_ToJson_Test()
 
 void VaultRecordSet_Join_Test()
 {
+    TEST_LOG();
+
     Vault vlt1, vlt2;
     VaultRecordSet vrs1, vrs2, vrs3;
     VaultOperationResult vor;
@@ -1025,6 +1070,8 @@ void VaultRecordSet_Join_Test()
 
 void VaultRecordSet_Exclude_Test()
 {
+    TEST_LOG();
+
     Vault vlt1, vlt2;
     VaultRecordSet vrs1, vrs2, vrs3;
     VaultOperationResult vor;
@@ -1067,6 +1114,8 @@ void VaultRecordSet_Exclude_Test()
 
 void VaultRecordSet_Intersect_Test()
 {
+    TEST_LOG();
+
     Vault vlt1, vlt2;
     VaultRecordSet vrs1, vrs2, vrs3;
     VaultOperationResult vor;
@@ -1109,6 +1158,8 @@ void VaultRecordSet_Intersect_Test()
 
 void VaultRecordSet_SaveToFile_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordSet vrs;
     std::ifstream ifile;
@@ -1158,6 +1209,8 @@ void VaultRecordSet_SaveToFile_Test()
 
 void VaultRecordSet_Destructor_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddKey("A", -1);
@@ -1174,6 +1227,8 @@ void VaultRecordSet_Destructor_Test()
 
 void Union_Test()
 {
+    TEST_LOG();
+
     Vault vlt1, vlt2;
     VaultRecordSet vrs1, vrs2, vrs3;
     VaultOperationResult vor;
@@ -1229,6 +1284,8 @@ void Union_Test()
 
 void Intersection_Test()
 {
+    TEST_LOG();
+
     Vault vlt1, vlt2;
     VaultRecordSet vrs1, vrs2, vrs3;
     VaultOperationResult vor;
@@ -1285,6 +1342,8 @@ void Intersection_Test()
 
 int main()
 {
+    TEST_LOG();
+
     VaultRecordSet_CopyConstructor_Test();
     VaultRecordSet_OperatorAssignment_Test();
     VaultRecordSet_MoveConstructor_Test();

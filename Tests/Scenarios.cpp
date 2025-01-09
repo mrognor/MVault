@@ -1,5 +1,6 @@
 #include "../Source/MVault.h"
 
+#include "MTests/TestLog.h"
 #include "MTests/TestAssert.h"
 
 using namespace mvlt;
@@ -7,6 +8,8 @@ using namespace std;
 
 void KeyAddictionTests()
 {
+    TEST_LOG();
+
     // Create Vault
     Vault vlt;
     TEST_ASSERT(vlt.GetKeys() == vector<string>(), "Vault is not created with empty keys");
@@ -47,6 +50,8 @@ void KeyAddictionTests()
 
 void KeyUpdationTests()
 {
+    TEST_LOG();
+
     // Create Vault
     Vault vlt;
     
@@ -76,6 +81,8 @@ void KeyUpdationTests()
 
 void KeyCheckTests()
 {
+    TEST_LOG();
+
     // Create Vault
     Vault vlt;
 
@@ -128,6 +135,8 @@ void KeyCheckTests()
 
 void RecordCreationTests()
 {
+    TEST_LOG();
+
     // Create Vault
     Vault vlt;
 
@@ -196,6 +205,8 @@ void RecordCreationTests()
 
 void RecordUpdationTests()
 {
+    TEST_LOG();
+
     // Create Vault
     Vault vlt;
 
@@ -246,6 +257,8 @@ void RecordUpdationTests()
 
 void RecordDeletionTests()
 {
+    TEST_LOG();
+
     // Create Vault
     Vault vlt;
 
@@ -284,6 +297,8 @@ void RecordDeletionTests()
 
 void DropsTests()
 {
+    TEST_LOG();
+
     // Create Vault
     Vault vlt;
 
@@ -348,6 +363,8 @@ void DropsTests()
 
 void RecordSetRequests()
 {
+    TEST_LOG();
+
     // No need TEST_ASSERT because sanitizers will throw error
     mvlt::Vault vlt;
     
@@ -379,6 +396,8 @@ void RecordSetRequests()
 
 int main()
 {
+    TEST_LOG();
+
     KeyAddictionTests();
     KeyUpdationTests();
     KeyCheckTests();

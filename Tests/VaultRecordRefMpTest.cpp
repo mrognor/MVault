@@ -2,14 +2,17 @@
 
 #include "../Source/MVault.h"
 
-#include "MTests/TestAssert.h"
 #include "MTests/Starter.h"
+#include "MTests/TestLog.h"
+#include "MTests/TestAssert.h"
 
 using namespace mvlt;
 using namespace std;
 
 void VaultRecordRef_Copy_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddKey("A", -1);
@@ -55,6 +58,8 @@ void VaultRecordRef_Copy_Test()
 
 void VaultRecordRef_OperatorComparison_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddKey("A", -1);
@@ -94,6 +99,8 @@ void VaultRecordRef_OperatorComparison_Test()
 
 void VaultRecordRef_GetRecordUniqueId_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddKey("A", -1);
@@ -125,6 +132,8 @@ void VaultRecordRef_GetRecordUniqueId_Test()
 
 void VaultRecordRef_SetData_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddKey("A", -1);
@@ -182,6 +191,8 @@ void VaultRecordRef_SetData_Test()
 
 void VaultRecordRef_GetData_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddKey("A", -1);
@@ -216,6 +227,8 @@ void VaultRecordRef_GetData_Test()
 
 void VaultRecordRef_GetDataAsString_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddKey("A", -1);
@@ -250,6 +263,8 @@ void VaultRecordRef_GetDataAsString_Test()
 
 void VaultRecordRef_IsValid_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddKey("A", -1);
@@ -284,6 +299,8 @@ void VaultRecordRef_IsValid_Test()
 
 void VaultRecordRef_IsKeyExist_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddKey("A", -1);
@@ -318,6 +335,8 @@ void VaultRecordRef_IsKeyExist_Test()
 
 void VaultRecordRef_GetKeys_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddKey("A", -1);
@@ -352,6 +371,8 @@ void VaultRecordRef_GetKeys_Test()
 
 void VaultRecordRef_Reset_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddKey("A", -1);
@@ -386,6 +407,8 @@ void VaultRecordRef_Reset_Test()
 
 void VaultRecordRef_Destructor_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddKey("A", -1);
@@ -421,6 +444,8 @@ void VaultRecordRef_Destructor_Test()
 
 int main()
 {
+    TEST_LOG();
+
     VaultRecordRef_Copy_Test();
     VaultRecordRef_OperatorComparison_Test();
     VaultRecordRef_GetRecordUniqueId_Test();

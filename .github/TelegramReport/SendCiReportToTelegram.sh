@@ -8,4 +8,4 @@ source $path/env/bin/activate
 pip install pyTelegramBotAPI
 
 # Call python scripts
-python SendCiReportToTelegram.py $1 $2
+python SendCiReportToTelegram.py $1 $2 $3

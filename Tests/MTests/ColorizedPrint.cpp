@@ -1,7 +1,7 @@
 #include "ColorizedPrint.h"
 #include <string>
 
-void ColorizedPrint(const std::string text, const ConsoleTextColor& color)
+void ColorizedPrint(const std::string text, const ConsoleTextColor& color, const std::string& end)
 {
     if (color != ConsoleTextColor::Default)
     {
@@ -19,11 +19,11 @@ void ColorizedPrint(const std::string text, const ConsoleTextColor& color)
             std::cout << text << std::endl;
             SetConsoleTextAttribute(ConsoleHandle, static_cast<std::uint8_t>(info.wAttributes));
         }
-        else std::cout << text << std::endl;
+        else std::cout << text << end;
         #else
-        std::cout << "\x1B[" + std::to_string(static_cast<std::uint8_t>(color)) + "m" + text + "\033[0m" << std::endl;
+        std::cout << "\x1B[" + std::to_string(static_cast<std::uint8_t>(color)) + "m" + text + "\033[0m" << end;
         #endif
     }
     else
-        std::cout << text << std::endl;
+        std::cout << text << end;
 }

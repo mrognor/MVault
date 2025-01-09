@@ -1,5 +1,6 @@
 #include "../Source/MVault.h"
 
+#include "MTests/TestLog.h"
 #include "MTests/TestAssert.h"
 
 using namespace mvlt;
@@ -7,6 +8,8 @@ using namespace std;
 
 void VaultRecordRef_CopyConstructor_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordRef vrr1;
     VaultRecordRef vrr2(vrr1);
@@ -29,6 +32,8 @@ void VaultRecordRef_CopyConstructor_Test()
 
 void VaultRecordRef_OperatorAssignment_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordRef vrr1;
     VaultRecordRef vrr2 = vrr1;
@@ -52,6 +57,8 @@ void VaultRecordRef_OperatorAssignment_Test()
 
 void VaultRecordRef_OperatorComparison_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordRef vrr1, vrr2;
 
@@ -80,6 +87,8 @@ void VaultRecordRef_OperatorComparison_Test()
 
 void VaultRecordRef_GetRecordUniqueId_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordRef vrr1, vrr2;
 
@@ -99,6 +108,8 @@ void VaultRecordRef_GetRecordUniqueId_Test()
 
 void VaultRecordRef_SetData_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordRef vrr1, vrr2;
     VaultOperationResult res;
@@ -149,6 +160,8 @@ void VaultRecordRef_SetData_Test()
 
 void VaultRecordRef_GetData_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordRef vrr;
     VaultOperationResult res;
@@ -175,6 +188,8 @@ void VaultRecordRef_GetData_Test()
 
 void VaultRecordRef_GetDataAsString_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordRef vrr;
 
@@ -200,6 +215,8 @@ void VaultRecordRef_GetDataAsString_Test()
 
 void VaultRecordRef_IsValid_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordRef vrr;
 
@@ -217,6 +234,8 @@ void VaultRecordRef_IsValid_Test()
 
 void VaultRecordRef_GetKeys_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordRef vrr;
 
@@ -235,6 +254,8 @@ void VaultRecordRef_GetKeys_Test()
 
 void VaultRecordRef_Reset_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordRef vrr;
 
@@ -255,6 +276,8 @@ void VaultRecordRef_Reset_Test()
 
 int main()
 {
+    TEST_LOG();
+
     VaultRecordRef_CopyConstructor_Test();
     VaultRecordRef_OperatorAssignment_Test();
     VaultRecordRef_OperatorComparison_Test();   

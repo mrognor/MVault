@@ -62,7 +62,7 @@ jobs:
           mv ./Sast/html_cppcheck ./Docs/Generated/html 
 
       - name: Send report to telegram
-        run: ./.github/TelegramReport/SendCiReportToTelegram.sh ${{ secrets.BotId }} ${{ secrets.ChatId }}
+        run: ./.github/TelegramReport/SendCiReportToTelegram.sh ${{ secrets.BOT_ID }} ${{ secrets.CHAT_ID }} ${{ secrets.TOPIC_ID }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

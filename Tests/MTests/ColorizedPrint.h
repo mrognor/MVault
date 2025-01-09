@@ -47,4 +47,4 @@ enum class ConsoleTextColor : std::uint8_t
 
 #endif
 
-void ColorizedPrint(const std::string text, const ConsoleTextColor& color = ConsoleTextColor::Default);
+void ColorizedPrint(const std::string text, const ConsoleTextColor& color = ConsoleTextColor::Default, const std::string& end = "\n");

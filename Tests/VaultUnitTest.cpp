@@ -1,5 +1,6 @@
 #include "../Source/MVault.h"
 
+#include "MTests/TestLog.h"
 #include "MTests/TestAssert.h"
 
 using namespace mvlt;
@@ -7,6 +8,8 @@ using namespace std;
 
 void Vault_CopyConstructor_Test()
 {
+    TEST_LOG();
+
     Vault vlt1;
     
     vlt1.AddKey<int>("A", -1);
@@ -47,6 +50,8 @@ void Vault_CopyConstructor_Test()
 
 void Vault_OperatorAssignment_Test()
 {
+    TEST_LOG();
+
     Vault vlt1;
     
     vlt1.AddKey<int>("A", -1);
@@ -87,6 +92,8 @@ void Vault_OperatorAssignment_Test()
 
 void Vault_MoveConstructor_Test()
 {
+    TEST_LOG();
+
     Vault* vlt1 = new Vault;
     
     vlt1->AddKey<int>("A", -1);
@@ -171,6 +178,8 @@ void Vault_MoveConstructor_Test()
 
 void Vault_MoveAssignment_Test()
 {
+    TEST_LOG();
+
     Vault* vlt1 = new Vault;
     Vault vlt2;
 
@@ -262,6 +271,8 @@ void Vault_MoveAssignment_Test()
 
 void Vault_AddKey_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     // Correct add new key
@@ -273,6 +284,8 @@ void Vault_AddKey_Test()
 
 void Vault_AddUniqueKey_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     // Add to empty Vault
@@ -327,6 +340,8 @@ void Vault_AddUniqueKey_Test()
 
 void Vault_UpdateKey_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddKey("A", -1);
@@ -349,6 +364,8 @@ void Vault_UpdateKey_Test()
 
 void Vault_IsKeyExist_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddKey("A", -1);
@@ -362,6 +379,8 @@ void Vault_IsKeyExist_Test()
 
 void Vault_GetKeyValue_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     int keyValue;
     std::string wrongKeyValue;
@@ -380,6 +399,8 @@ void Vault_GetKeyValue_Test()
 
 void Vault_GetKeyType_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     std::type_index type = typeid(void);
 
@@ -395,6 +416,8 @@ void Vault_GetKeyType_Test()
 
 void Vault_GetKeys_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     std::vector<std::string> keys;
 
@@ -422,6 +445,8 @@ void Vault_GetKeys_Test()
 
 void Vault_GetUniqueKeys_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     std::vector<std::string> keys;
 
@@ -451,6 +476,8 @@ void Vault_GetUniqueKeys_Test()
 
 void Vault_RemoveKey_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     std::vector<std::string> keys;
 
@@ -473,6 +500,8 @@ void Vault_RemoveKey_Test()
 
 void Vault_CreateRecord_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddKey("A", -1);
@@ -547,6 +576,8 @@ void Vault_CreateRecord_Test()
 
 void Vault_GetRecord_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordRef vrr;
 
@@ -591,6 +622,8 @@ void Vault_GetRecord_Test()
 
 void Vault_GetRecords_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordRef vrr;
     std::vector<VaultRecordRef> vec;
@@ -627,6 +660,8 @@ void Vault_GetRecords_Test()
 
 void Vault_Request_Tests()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordRef vrr;
     VaultRecordSet vrs;
@@ -864,6 +899,8 @@ void Vault_Request_Tests()
 
 void Vault_DropVault_Tests()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddKey("A", -1);
@@ -885,6 +922,8 @@ void Vault_DropVault_Tests()
 
 void Vault_DropData_Tests()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddKey("A", -1);
@@ -902,6 +941,8 @@ void Vault_DropData_Tests()
 
 void Vault_EraseRecord_Test()
 {
+    TEST_LOG();
+
     // VaultRecordRef overload
     Vault vlt;
     VaultRecordRef vrr;
@@ -949,6 +990,8 @@ void Vault_EraseRecord_Test()
 
 void Vault_EraseRecords_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordRef vrr;
 
@@ -976,6 +1019,8 @@ void Vault_EraseRecords_Test()
 
 void Vault_Size_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordRef vrr;
 
@@ -996,6 +1041,8 @@ void Vault_Size_Test()
 
 void Vault_ToJson_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddUniqueKey<std::size_t>("A");
@@ -1024,6 +1071,8 @@ void Vault_ToJson_Test()
 
 void Vault_SaveToFile_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     std::ifstream ifile;
     std::string line;
@@ -1069,6 +1118,8 @@ void Vault_SaveToFile_Test()
 
 void Vault_ReadFromFile_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddKey<std::size_t>("A", 0);
@@ -1134,6 +1185,8 @@ void Vault_ReadFromFile_Test()
 
 void Vault_GetErrorsInLastReadedFile_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddKey<std::size_t>("A", 0);
@@ -1152,6 +1205,8 @@ void Vault_GetErrorsInLastReadedFile_Test()
 
 void Vault_Destructor_Test()
 {
+    TEST_LOG();
+
     Vault* vlt = new Vault;
 
     vlt->AddKey("A", -1);
@@ -1164,6 +1219,8 @@ void Vault_Destructor_Test()
 
 int main()
 {
+    TEST_LOG();
+
     Vault_CopyConstructor_Test();
     Vault_OperatorAssignment_Test();
     Vault_MoveConstructor_Test();

@@ -2,14 +2,16 @@
 
 #include "../Source/MVault.h"
 
-#include "MTests/TestAssert.h"
 #include "MTests/Starter.h"
+#include "MTests/TestLog.h"
 
 using namespace mvlt;
 using namespace std;
 
 void VaultRecordSet_Copy_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddKey("A", -1);
@@ -58,6 +60,8 @@ void VaultRecordSet_Copy_Test()
 
 void VaultRecordSet_OperatorComparison_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddKey("A", -1);
@@ -101,6 +105,8 @@ void VaultRecordSet_OperatorComparison_Test()
 
 void VaultRecordSet_GetIsParentVaultValid_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddKey("A", -1);
@@ -134,6 +140,8 @@ void VaultRecordSet_GetIsParentVaultValid_Test()
 
 void VaultRecordSet_IsKeyExist_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddKey("A", -1);
@@ -168,6 +176,8 @@ void VaultRecordSet_IsKeyExist_Test()
 
 void VaultRecordSet_GetKeyValue_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddKey("A", -1);
@@ -204,6 +214,8 @@ void VaultRecordSet_GetKeyValue_Test()
 
 void VaultRecordSet_GetKeyType_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddKey("A", -1);
@@ -240,6 +252,8 @@ void VaultRecordSet_GetKeyType_Test()
 
 void VaultRecordSet_AddRecord_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddKey("A", -1);
@@ -277,6 +291,8 @@ void VaultRecordSet_AddRecord_Test()
 
 void VaultRecordSet_GetRecord_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordRef vrr;
 
@@ -311,6 +327,8 @@ void VaultRecordSet_GetRecord_Test()
 
 void VaultRecordSet_GetRecords_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordRef vrr;
 
@@ -346,6 +364,8 @@ void VaultRecordSet_GetRecords_Test()
 
 void VaultRecordSet_Request_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordRef vrr;
 
@@ -380,6 +400,8 @@ void VaultRecordSet_Request_Test()
 
 void VaultRecordSet_Reset_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordRef vrr;
 
@@ -414,6 +436,8 @@ void VaultRecordSet_Reset_Test()
 
 void VaultRecordSet_Clear_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
     VaultRecordRef vrr;
 
@@ -448,6 +472,8 @@ void VaultRecordSet_Clear_Test()
 
 void VaultRecordSet_RemoveRecord_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddKey("A", -1);
@@ -492,6 +518,8 @@ void VaultRecordSet_RemoveRecord_Test()
 
 void VaultRecordSet_RemoveRecords_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddKey("A", -1);
@@ -526,6 +554,8 @@ void VaultRecordSet_RemoveRecords_Test()
 
 void VaultRecordSet_Size_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddKey("A", -1);
@@ -560,6 +590,8 @@ void VaultRecordSet_Size_Test()
 
 void VaultRecordSet_GetKeys_Test()
 {
+    TEST_LOG();
+
     Vault vlt;
 
     vlt.AddKey("A", -1);
@@ -594,6 +626,8 @@ void VaultRecordSet_GetKeys_Test()
 
 int main()
 {
+    TEST_LOG();
+
     VaultRecordSet_Copy_Test();
     VaultRecordSet_OperatorComparison_Test();
     VaultRecordSet_GetIsParentVaultValid_Test();

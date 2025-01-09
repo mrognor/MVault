@@ -5,3 +5,5 @@ Build
 Release
 Coverage
 Sast
+Resources/Telegram/BotToken
+Resources/Telegram/env

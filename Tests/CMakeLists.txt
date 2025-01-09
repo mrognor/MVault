@@ -8,9 +8,9 @@ endif()
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(TestsHeaders MTests/ColorizedPrint.h MTests/TestAssert.h MTests/Starter.h MTests/GetLine.h)
+set(TestsHeaders MTests/ColorizedPrint.h MTests/TestAssert.h MTests/Starter.h MTests/GetLine.h MTests/TestLog.h)
 
-set(TestsSource MTests/ColorizedPrint.cpp MTests/Starter.cpp MTests/GetLine.cpp)
+set(TestsSource MTests/ColorizedPrint.cpp MTests/Starter.cpp MTests/GetLine.cpp MTests/TestLog.cpp)
 
 include_directories(../Source)
 
