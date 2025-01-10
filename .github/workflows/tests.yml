@@ -1,0 +1,79 @@
+# Simple workflow for run tests on GitHub Actions
+name: Run tests
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["master"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  # Run project tests
+  tests:
+    name: Build and run tests
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install packages
+        run: sudo apt-get update && sudo apt-get upgrade && sudo apt-get -y install cmake lcov
+
+      - name: Build and run tests
+        run: ./Scripts/RunTests.sh
+
+      # Upload artifacts to reuse it in next jobs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TestArtifacts
+          path: ./Build
+  
+  # Send report with tests result to telegram
+  telegram:
+    name: Send report to telegram
+    needs: tests
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: TestArtifacts
+          path: ./Build
+
+      - name: Send report to telegram
+        run: ./.github/TelegramReport/SendCiReportToTelegram.sh ${{ secrets.BOT_ID }} ${{ secrets.CHAT_ID }} ${{ secrets.TOPIC_ID }}
+
+  # Run tests coverage
+  coverage:
+    name: Run tests coverage
+    needs: tests
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install packages
+        run: sudo apt-get update && sudo apt-get upgrade && sudo apt-get -y install lcov
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: TestArtifacts
+          path: ./Build
+
+      - name: Run test coverage
+        run: ./Scripts/TestCoverage.sh
+
+      # Upload coverage artifacts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CoverageArtifacts
+          path: ./Coverage

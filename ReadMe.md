@@ -1,9 +1,4 @@
 Full documentation available [here](https://mrognor.github.io/MVault/index.html)  
-Test coverage available [here](https://mrognor.github.io/MVault/Coverage/CodeCoverage.html)  
-Sast clang_tidy available [here](https://mrognor.github.io/MVault/html_clang_tidy/index.html#sort=file-path&asc=1)  
-Sast clangsa available [here](https://mrognor.github.io/MVault/html_clangsa/index.html#sort=file-path&asc=1)  
-Sast cppcheck available [here](https://mrognor.github.io/MVault/html_cppcheck/index.html#sort=file-path&asc=1)
-
 
 # Configure project
 Cmake is used to configure the project. It is called via the **Configure** script. 
