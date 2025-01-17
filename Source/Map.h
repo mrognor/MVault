@@ -404,7 +404,7 @@ namespace mvlt
 
             \param [in] isMultiMap is this UnorderedMap store data in std::multimap
         */
-        Map(bool isMultiMap)
+        explicit Map(bool isMultiMap)
         {
             ParentMap<std::multimap<KeyType, ValueType>, std::map<KeyType, ValueType>, MapIterator<KeyType, ValueType>, KeyType, ValueType>::IsMultiMap = isMultiMap;
         }
@@ -477,7 +477,7 @@ namespace mvlt
 
             \param [in] isMultiMap is this UnorderedMap store data in std::unordered_multimap
         */
-        UnorderedMap(bool isMultiMap)
+        explicit UnorderedMap(bool isMultiMap)
         {
             ParentMap<std::unordered_multimap<KeyType, ValueType>, std::unordered_map<KeyType, ValueType>, UnorderedMapIterator<KeyType, ValueType>, KeyType, ValueType>::IsMultiMap = isMultiMap;
         }

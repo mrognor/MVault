@@ -59,7 +59,8 @@ namespace mvlt
             
             \param [in] data data to be stored inside VaultParamInput
         */
-        template <class T>
+        template <class T> 
+        // codechecker_intentional [all] its not explicit to simplify code
         VaultParamInput(const T& data) noexcept;
 
         /**

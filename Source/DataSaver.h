@@ -60,7 +60,7 @@ namespace mvlt
             \param [in] data data to be stored inside DataSaver
         */
         template<class T>
-        DataSaver(const T& data) noexcept : DataType(typeid(void))
+        explicit DataSaver(const T& data) noexcept : DataType(typeid(void))
         {
             SetData(data);
         }
@@ -180,7 +180,7 @@ namespace mvlt
             // Check data type stored in DataSaver
             if (DataType != typeid(data))
             {
-                std::cerr << "Wrong type! Was: " + std::string(DataType.name()) + " Requested: " + typeid(data).name() << std::endl;
+                std::cerr << "Wrong type! Was: " + std::string(DataType.name()) + " Requested: " + typeid(data).name() << "\n";
                 return false;
             }
 

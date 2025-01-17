@@ -272,6 +272,7 @@ namespace mvlt
             case VaultRequestType::Equal:
             case VaultRequestType::Or:
             case VaultRequestType::And:
+            default:
                 break;
             }
 
@@ -667,7 +668,7 @@ namespace mvlt
 
         for (auto& it : UniqueKeys)
         {
-            std::cout << it << std::endl;
+            std::cout << it << "\n";
         }
 
         // Check if it is unique key

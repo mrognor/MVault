@@ -3,6 +3,7 @@
 #include <string>
 #include <typeinfo>
 #include <typeindex>
+#include <cstdint>
 
 namespace mvlt
 {
@@ -14,7 +15,7 @@ namespace mvlt
     */
     
     /// \brief Enum with all error handling codes
-    enum class VaultOperationResultCode
+    enum class VaultOperationResultCode : std::int8_t
     {
         OtherParentVaultNotValid,
         SameVaultRecordSetInRequest = -10,

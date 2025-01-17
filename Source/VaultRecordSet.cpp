@@ -307,7 +307,7 @@ namespace mvlt
             Vault::PrintVault(amountOfRecords);
         }
         else
-            std::cout << "The parent Vault is not valid!" << std::endl;
+            std::cout << "The parent Vault is not valid!" << "\n";
     }
 
     void VaultRecordSet::PrintAsTable(bool isPrintId, const std::size_t& amountOfRecords, std::string primaryKey, const bool& isReverse,
@@ -319,7 +319,7 @@ namespace mvlt
             Vault::PrintAsTable(isPrintId, amountOfRecords, primaryKey, isReverse, keys);
         }
         else
-            std::cout << "The parent Vault is not valid!" << std::endl;
+            std::cout << "The parent Vault is not valid!" << "\n";
     }
 
     VaultOperationResult VaultRecordSet::Join(const VaultRecordSet& a) noexcept

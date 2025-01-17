@@ -28,8 +28,8 @@ namespace mvlt
     {
         if (container.empty()) 
         {
-            std::cout << "The keys could not be retrieved because the container is empty" << std::endl;
-            std::cout << " (0 records)" << std::endl;
+            std::cout << "The keys could not be retrieved because the container is empty" << "\n";
+            std::cout << " (0 records)" << "\n";
             return;
         }
 
@@ -64,7 +64,7 @@ namespace mvlt
             for (std::size_t j = 0; j < maxLengths[i]; ++j) std::cout << "-";
             std::cout << "-+";
         }
-        std::cout << std::endl;
+        std::cout << "\n";
 
         // Print header
         std::cout << "|";
@@ -74,7 +74,7 @@ namespace mvlt
             for (std::size_t j = (*realKeys)[i].length(); j < maxLengths[i]; ++j) std::cout << " ";
             std::cout << " |";
         }
-        std::cout << std::endl;
+        std::cout << "\n";
 
         // Print splitter
         std::cout << "+";
@@ -84,7 +84,7 @@ namespace mvlt
             for (std::size_t j = 0; j < maxLengths[i]; ++j) std::cout << "-";
             std::cout << "-+";
         }
-        std::cout << std::endl;
+        std::cout << "\n";
 
         // Print records
         std::size_t counter = 0;
@@ -99,9 +99,9 @@ namespace mvlt
                     std::cout << " |";
             }
             if (isPrintId)
-                std::cout << " " << record.GetRecordUniqueId() << std::endl;
+                std::cout << " " << record.GetRecordUniqueId() << "\n";
             else 
-                std::cout << std::endl;
+                std::cout << "\n";
 
             ++counter;
             if (counter == amountOfRecords) break;
@@ -117,7 +117,7 @@ namespace mvlt
                 for (std::size_t j = 0; j < maxLengths[i]; ++j) std::cout << "-";
                 std::cout << "-+";
             }
-            std::cout << std::endl;
+            std::cout << "\n";
         }
         else
         {
@@ -128,10 +128,10 @@ namespace mvlt
                 for (std::size_t j = 0; j < maxLengths[i]; ++j) std::cout << "~";
                 std::cout << "~$";
             }
-            std::cout << std::endl;
+            std::cout << "\n";
         }
 
-        std::cout << " (" << container.size() << " records)" << std::endl;
+        std::cout << " (" << container.size() << " records)" << "\n";
 
         if (keys.empty())
             delete realKeys;

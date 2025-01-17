@@ -691,14 +691,14 @@ namespace mvlt
 
         for (const auto& record : RecordsSet)
         {
-            std::cout << "Vault record " << record << ":" << std::endl;
+            std::cout << "Vault record " << record << ":" << "\n";
 
             for (const std::string& key : KeysOrder)
             {
                 DataSaver dataSaver;
                 record->GetDataSaver(key, dataSaver);
 
-                std::cout << "\t" << key << " = " << dataSaver.Str() << std::endl;
+                std::cout << "\t" << key << " = " << dataSaver.Str() << "\n";
             }
 
             ++counter;
@@ -717,15 +717,18 @@ namespace mvlt
             switch (VaultDerivedClass)
             {
             case VaultDerivedClasses::VaultBase:
-                std::cout << "Vault does not contain keys!" << std::endl;
+                std::cout << "Vault does not contain keys!" << "\n";
                 break;
 
             case VaultDerivedClasses::VaultRecordSetDerived:
-                std::cout << "VaultRecordSet does not contain keys!" << std::endl;
+                std::cout << "VaultRecordSet does not contain keys!" << "\n";
+                break;
+            
+            default:
                 break;
             }
 
-            std::cout << " (" << RecordsSet.size() << " records)" << std::endl;
+            std::cout << " (" << RecordsSet.size() << " records)" << "\n";
             return;
         }
 
@@ -772,7 +775,7 @@ namespace mvlt
             std::cout << "-+";
             ++counter;
         }
-        std::cout << std::endl;
+        std::cout << "\n";
 
         // Print header
         counter = 0;
@@ -784,7 +787,7 @@ namespace mvlt
             std::cout << " |";
             ++counter;
         }
-        std::cout << std::endl;
+        std::cout << "\n";
         
         // Print splitter
         counter = 0;
@@ -796,7 +799,7 @@ namespace mvlt
             std::cout << "-+";
             ++counter;
         }
-        std::cout << std::endl;
+        std::cout << "\n";
 
         // Print records
         counter = 0;
@@ -814,9 +817,9 @@ namespace mvlt
                     ++counter;
                 }
                 if (isPrintId)
-                    std::cout << " " << record.GetRecordUniqueId() << std::endl;
+                    std::cout << " " << record.GetRecordUniqueId() << "\n";
                 else 
-                    std::cout << std::endl;
+                    std::cout << "\n";
                 return true;
             }, isReverse, amountOfRecords);
 
@@ -830,7 +833,7 @@ namespace mvlt
                 for (std::size_t j = 0; j < maxLengths[i]; ++j) std::cout << "-";
                 std::cout << "-+";
             }
-            std::cout << std::endl;
+            std::cout << "\n";
         }
         else
         {
@@ -841,10 +844,10 @@ namespace mvlt
                 for (std::size_t j = 0; j < maxLengths[i]; ++j) std::cout << "~";
                 std::cout << "~$";
             }
-            std::cout << std::endl;
+            std::cout << "\n";
         }
 
-        std::cout << " (" << RecordsSet.size() << " records)" << std::endl;
+        std::cout << " (" << RecordsSet.size() << " records)" << "\n";
     }
 
     bool Vault::SaveToFile(const std::string& fileName, const std::vector<std::string> keys, const std::string& separator, const bool& isSaveKey) const noexcept

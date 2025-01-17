@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <cstdint>
 
 namespace mvlt
 {
@@ -169,10 +170,9 @@ namespace mvlt
         \brief FromStringSignedInt template for working with all signed integers
         
         \tparam <T> signed integer as a type
-        \tparam <short> short int as a type
-        \tparam <int> signed int as a type
-        \tparam <long> long int as a type
-        \tparam <long long> long long int as a type
+        \tparam <std::int16_t> std::int16_t int as a type
+        \tparam <std::int32_t> std::int32_t int as a type
+        \tparam <std::int64_t> std::int64_t int as a type
 
         \param [in] stringToCopyDataFrom the string to be converted to type int
         \param [out] data the variable where the converted string will be written
@@ -209,9 +209,9 @@ namespace mvlt
     }
 
     /**
-        \brief FromString specialization for working with short int
+        \brief FromString specialization for working with std::int16_t int
         
-        \tparam <short> int as a type
+        \tparam <std::int16_t> int as a type
 
         \param [in] stringToCopyDataFrom the string to be converted to type int
         \param [out] data the variable where the converted string will be written
@@ -219,15 +219,15 @@ namespace mvlt
         \return Returns true if the conversion was successful, otherwise it returns false
     */
     template <>
-    inline bool FromString(const std::string& stringToCopyDataFrom, short& data) noexcept
+    inline bool FromString(const std::string& stringToCopyDataFrom, std::int16_t& data) noexcept
     {
         return FromStringSignedInt(stringToCopyDataFrom, data);
     }
 
     /**
-        \brief FromString specialization for working with int
+        \brief FromString specialization for working with std::int32_t
         
-        \tparam <int> int as a type
+        \tparam <std::int32_t> int as a type
 
         \param [in] stringToCopyDataFrom the string to be converted to type int
         \param [out] data the variable where the converted string will be written
@@ -235,39 +235,23 @@ namespace mvlt
         \return Returns true if the conversion was successful, otherwise it returns false
     */
     template <>
-    inline bool FromString(const std::string& stringToCopyDataFrom, int& data) noexcept
+    inline bool FromString(const std::string& stringToCopyDataFrom, std::int32_t& data) noexcept
     {
         return FromStringSignedInt(stringToCopyDataFrom, data);
     }
 
     /**
-        \brief FromString specialization for working with long
+        \brief FromString specialization for working with std::int64_t
         
-        \tparam <long> int as a type
+        \tparam <std::int64_t> int as a type
 
-        \param [in] stringToCopyDataFrom the string to be converted to type long
+        \param [in] stringToCopyDataFrom the string to be converted to type std::int64_t
         \param [out] data the variable where the converted string will be written
 
         \return Returns true if the conversion was successful, otherwise it returns false
     */
     template <>
-    inline bool FromString(const std::string& stringToCopyDataFrom, long& data) noexcept
-    {
-        return FromStringSignedInt(stringToCopyDataFrom, data);
-    }
-
-    /**
-        \brief FromString specialization for working with long long
-        
-        \tparam <long long> int as a type
-
-        \param [in] stringToCopyDataFrom the string to be converted to type long long
-        \param [out] data the variable where the converted string will be written
-
-        \return Returns true if the conversion was successful, otherwise it returns false
-    */
-    template <>
-    inline bool FromString(const std::string& stringToCopyDataFrom, long long& data) noexcept
+    inline bool FromString(const std::string& stringToCopyDataFrom, std::int64_t& data) noexcept
     {
         return FromStringSignedInt(stringToCopyDataFrom, data);
     }
@@ -305,25 +289,9 @@ namespace mvlt
     }
 
     /**
-        \brief FromString specialization for working with unsigned short
+        \brief FromString specialization for working with std::uint16_t
         
-        \tparam <unsigned short> int as a type
-
-        \param [in] stringToCopyDataFrom the string to be converted to type long long
-        \param [out] data the variable where the converted string will be written
-
-        \return Returns true if the conversion was successful, otherwise it returns false
-    */
-    template <>
-    inline bool FromString(const std::string& stringToCopyDataFrom, unsigned short& data) noexcept
-    {
-        return FromStringSignedInt(stringToCopyDataFrom, data);
-    }
-
-    /**
-        \brief FromString specialization for working with unsigned int
-        
-        \tparam <unsigned int> int as a type
+        \tparam <std::uint16_t> int as a type
 
         \param [in] stringToCopyDataFrom the string to be converted to type unsigned int
         \param [out] data the variable where the converted string will be written
@@ -331,15 +299,31 @@ namespace mvlt
         \return Returns true if the conversion was successful, otherwise it returns false
     */
     template <>
-    inline bool FromString(const std::string& stringToCopyDataFrom, unsigned int& data) noexcept
+    inline bool FromString(const std::string& stringToCopyDataFrom, std::uint16_t& data) noexcept
     {
         return FromStringSignedInt(stringToCopyDataFrom, data);
     }
 
     /**
-        \brief FromString specialization for working with unsigned unsigned long int
+        \brief FromString specialization for working with std::uint32_t
         
-        \tparam <unsigned long int> int as a type
+        \tparam <std::uint32_t> int as a type
+
+        \param [in] stringToCopyDataFrom the string to be converted to type unsigned int
+        \param [out] data the variable where the converted string will be written
+
+        \return Returns true if the conversion was successful, otherwise it returns false
+    */
+    template <>
+    inline bool FromString(const std::string& stringToCopyDataFrom, std::uint32_t& data) noexcept
+    {
+        return FromStringSignedInt(stringToCopyDataFrom, data);
+    }
+
+    /**
+        \brief FromString specialization for working with unsigned unsigned std::uint64_t
+        
+        \tparam <std::uint64_t> int as a type
 
         \param [in] stringToCopyDataFrom the string to be converted to type unsigned long int
         \param [out] data the variable where the converted string will be written
@@ -347,23 +331,7 @@ namespace mvlt
         \return Returns true if the conversion was successful, otherwise it returns false
     */
     template <>
-    inline bool FromString(const std::string& stringToCopyDataFrom, unsigned long& data) noexcept
-    {
-        return FromStringSignedInt(stringToCopyDataFrom, data);
-    }
-
-    /**
-        \brief FromString specialization for working with unsigned unsigned long long int
-        
-        \tparam <unsigned long long int> int as a type
-
-        \param [in] stringToCopyDataFrom the string to be converted to type unsigned long long int
-        \param [out] data the variable where the converted string will be written
-
-        \return Returns true if the conversion was successful, otherwise it returns false
-    */
-    template <>
-    inline bool FromString(const std::string& stringToCopyDataFrom, unsigned long long& data) noexcept
+    inline bool FromString(const std::string& stringToCopyDataFrom, std::uint64_t& data) noexcept
     {
         return FromStringSignedInt(stringToCopyDataFrom, data);
     }

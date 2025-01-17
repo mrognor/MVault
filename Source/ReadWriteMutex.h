@@ -122,7 +122,7 @@ namespace mvlt
     class ReadLock
     {
     private:
-        Mutex& Mtx;
+        Mutex* Mtx = nullptr;
     public:
         /**
             \brief Constructor
@@ -131,9 +131,9 @@ namespace mvlt
 
             \param [in] mtx mutex to capture and lock
         */
-        ReadLock(Mutex& mtx) : Mtx(mtx) 
+        explicit ReadLock(Mutex& mtx) : Mtx(&mtx) 
         {
-            Mtx.ReadLock();
+            Mtx->ReadLock();
         }
 
         /**
@@ -143,7 +143,7 @@ namespace mvlt
         */
         ~ReadLock()
         {
-            Mtx.ReadUnlock();
+            Mtx->ReadUnlock();
         } 
     };
 
@@ -160,7 +160,7 @@ namespace mvlt
     class WriteLock
     {
     private:
-        Mutex& Mtx;
+        Mutex* Mtx = nullptr;
     public:
         /**
             \brief Constructor
@@ -169,9 +169,9 @@ namespace mvlt
 
             \param [in] mtx mutex to capture and lock
         */
-        WriteLock(Mutex& mtx) : Mtx(mtx) 
+        explicit WriteLock(Mutex& mtx) : Mtx(&mtx) 
         {
-            Mtx.WriteLock();
+            Mtx->WriteLock();
         }
 
         /**
@@ -181,7 +181,7 @@ namespace mvlt
         */
         ~WriteLock()
         {
-            Mtx.WriteUnlock();
+            Mtx->WriteUnlock();
         } 
     };
 }
