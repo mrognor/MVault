@@ -1,9 +1,12 @@
 #pragma once
 
 #include <string>
-#include <typeinfo>
-#include <typeindex>
 #include <cstdint>
+#include <typeinfo>
+#include <iostream>
+#include <typeindex>
+
+#include "Functions/BackTrace.h"
 
 namespace mvlt
 {
@@ -53,6 +56,13 @@ namespace mvlt
         
         /// \brief Saved key type
         std::type_index SavedType = typeid(void);
+
+        /**
+            \brief A method for setting the result of an operation
+
+            \param [in] resultCode operation code
+        */
+        void SetOpResult(VaultOperationResultCode resultCode) noexcept;
 
         /**
             \brief Function for getting a text description of the operation result

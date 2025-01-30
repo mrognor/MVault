@@ -33,6 +33,7 @@ set(MVaultHeaders
     ReadWriteMutex.h
 
     Functions/ToString.h
+    Functions/BackTrace.h
     Functions/CsvParser.h
     Functions/FromString.h
     Functions/PrintAsTable.h
@@ -60,6 +61,7 @@ set(MVaultSource
     VaultRecordSet.cpp
     
     Functions/CsvParser.cpp
+    Functions/BackTrace.cpp
 )
 
 project(MVault)

@@ -40,3 +40,6 @@ target_link_libraries(VaultRequests MVault)
 
 add_executable(Csv Csv.cpp)
 target_link_libraries(Csv MVault)
+
+add_executable(DebugPrint DebugPrint.cpp)
+target_link_libraries(DebugPrint MVault)

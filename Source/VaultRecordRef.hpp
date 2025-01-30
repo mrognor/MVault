@@ -42,6 +42,8 @@ namespace mvlt
     template <class T>
     VaultOperationResult VaultRecordRef::GetData(const std::string& key, T& data) const noexcept
     {
+        DBG_LOG_ENTER();
+
         static_assert(!std::is_array<T>::value, "It is not possible to use a c array as a key value. \n\
             If you want to use a string as a key, you must specialize the function with a string. Like this: \n\
             GetData<std::string>(\"Key\", \"Value\") or GetData(\"Key\", std::string(\"Value\"))");
@@ -82,7 +84,7 @@ namespace mvlt
         if (res.SavedType != res.RequestedType)
         {
             res.IsOperationSuccess = false;
-            res.ResultCode = VaultOperationResultCode::WrongType;
+            res.SetOpResult(VaultOperationResultCode::WrongType);
             return res;
         }
 
