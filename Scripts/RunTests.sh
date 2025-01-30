@@ -12,7 +12,7 @@ cd Build
 
 BUILD_START=$SECONDS
 make -j
-echo -e "Times:  \n  Build time: <b>" $(($SECONDS - $BUILD_START)) "</b>  \n\n<pre>" > report.md
+echo -e "Times:  \n  Build time: <b>" $(($SECONDS - $BUILD_START)) "</b>  \n\n<blockquote expandable>" > report.md
 
 mv report.md Tests
 
@@ -38,5 +38,5 @@ echo "Start VaultRecordRef unit tests"
 # echo "Start VaultRecordSet multi-threading tests"
 ./VaultRecordSetMpTest
 
-echo "</pre>" >> report.md
+echo "</blockquote>" >> report.md
 sed -i '2i\  Tests time: <b> '"$(($SECONDS - $BUILD_START))"' </b>  \' report.md

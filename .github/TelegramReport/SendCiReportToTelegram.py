@@ -1,7 +1,7 @@
 import sys
 import glob
 import telebot
-
+from git import Repo
 
 def CalculateLinesOfCode(directory, file_types):
     lines = 0
@@ -33,15 +33,19 @@ with open("../../Build/Tests/report.md") as reportFile:
         if words[i] == "Failed:":
             failedTests += int(words[i + 1][3:-5])
 
-    
+
     report = "  Passed tests: <b>" + str(passedTests) + "</b>\n\n" + report
     report = "  Failed tests: <b>" + str(failedTests) + "</b>\n" + report
     report = "Total tests: <b>" + str(totalTests) + "</b>\n" + report
 
+    repo = Repo('./../..')
+    commit = list(repo.iter_commits('master'))[0]
+
+    report = "Message: " + commit.summary + "\n\n" + report
     if (failedTests != 0):
-        report = "Status: <b>failed</b>\n\n" + report
+        report = commit.hexsha[0:11] + ": <b>failed</b>\n\n" + report
     else:
-        report = "Status: <b>success</b>\n\n" + report
+        report = commit.hexsha[0:11] + ": <b>success</b>\n\n" + report
 
     # Code lines
     file_types = [".h", ".c", ".hpp", ".cpp"]
