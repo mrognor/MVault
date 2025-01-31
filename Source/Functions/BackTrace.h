@@ -10,6 +10,7 @@
 #endif
 
 #include <vector>
+#include <cstdint>
 #include <sstream>
 #include <iostream>
 #include <typeindex>
@@ -25,15 +26,53 @@
 
 namespace mvlt
 {
-    void PrintStackTrace();
+    /**
+        \defgroup BackTraceFunctions BackTrace functions
+        \brief All functions for debug BackTrace printing
 
+        @{
+    */
+
+
+    /// \brief Debug backtrace format
+    enum class BackTraceFormat : std::uint8_t
+    {
+        Full,    ///< Full backtrace
+        Compact, ///< Only function with error
+        None     ///< None debug backtrace
+    };
+
+    /// Variable to store backtrace format
+    extern BackTraceFormat TraceFormat;
+
+    /**
+        \brief A function for setting the format of a debug message
+
+        \param [in] traceFormat debug message format
+    */
+    void SetBackTraceFormat(const BackTraceFormat& traceFormat);
+
+    /// \brief Backtrace printing function
+    void PrintBackTrace();
+
+    /// \brief A class for logging inputs and outputs from functions
     class TraceLogger
     {
     private:
+        /// Function name
         std::string FuncName;
     public:
+        /**
+            \brief Constructor to store function name
+
+            \param [in] funcName the name of the function in which the class object was created
+        */
         TraceLogger(const std::string& funcName);
 
+        /// \brief Default destructor
         ~TraceLogger();
     };
+
+
+    /**@} */
 }

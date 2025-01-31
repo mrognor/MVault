@@ -8,8 +8,6 @@ endif()
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_compile_options(-D NDEBUG)
-
 set(MTestsHeaders MTests/ColorizedPrint.h MTests/TestAssert.h MTests/Starter.h MTests/GetLine.h MTests/TestLog.h)
 
 set(MTestsSource MTests/ColorizedPrint.cpp MTests/Starter.cpp MTests/GetLine.cpp MTests/TestLog.cpp)

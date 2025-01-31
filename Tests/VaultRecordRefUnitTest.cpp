@@ -277,6 +277,7 @@ void VaultRecordRef_Reset_Test()
 int main()
 {
     TEST_LOG();
+    SetBackTraceFormat(BackTraceFormat::None);
 
     VaultRecordRef_CopyConstructor_Test();
     VaultRecordRef_OperatorAssignment_Test();
