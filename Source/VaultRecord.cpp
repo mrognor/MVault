@@ -3,11 +3,16 @@
 
 namespace mvlt
 {
-    VaultRecord::VaultRecord() noexcept {}
+    VaultRecord::VaultRecord() noexcept 
+    {
+        DBG_LOG_ENTER();
+    }
 
     // codechecker_intentional [all] its not call parent class copy constructor because it is mutexes inside this class
     VaultRecord::VaultRecord(const VaultRecord& other) noexcept
     {
+        DBG_LOG_ENTER();
+
         other.VaultRecordMutex.lock();
         for (const auto& containerIt : other.Container)
             Container.emplace(containerIt);
@@ -16,6 +21,8 @@ namespace mvlt
 
     VaultRecord& VaultRecord::operator=(const VaultRecord& other) noexcept
     {
+        DBG_LOG_ENTER();
+
         if (&other != this)
         {
             IsValid = true;
@@ -33,6 +40,8 @@ namespace mvlt
 
     VaultRecord::VaultRecord(VaultRecord&& other) noexcept
     {
+        DBG_LOG_ENTER();
+
         other.VaultRecordMutex.lock();
         Container = std::move(other.Container);
         other.VaultRecordMutex.unlock();
@@ -40,6 +49,8 @@ namespace mvlt
 
     VaultRecord& VaultRecord::operator=(VaultRecord&& other) noexcept
     {
+        DBG_LOG_ENTER();
+
         if (&other != this)
         {
             IsValid = true;
@@ -55,6 +66,8 @@ namespace mvlt
 
     void VaultRecord::AddRef() noexcept
     {
+        DBG_LOG_ENTER();
+
         VaultRecordMutex.lock();
         ++RefCounter;
         VaultRecordMutex.unlock();
@@ -62,6 +75,8 @@ namespace mvlt
 
     void VaultRecord::RemoveRef() noexcept
     {
+        DBG_LOG_ENTER();
+
         bool isEnd = false;
         VaultRecordMutex.lock();
         --RefCounter;
@@ -73,6 +88,8 @@ namespace mvlt
 
     void VaultRecord::Invalidate() noexcept
     {
+        DBG_LOG_ENTER();
+
         bool isEnd = false;
         VaultRecordMutex.lock();
         IsValid = false;
@@ -84,6 +101,8 @@ namespace mvlt
 
     bool VaultRecord::GetIsValid() const noexcept
     {
+        DBG_LOG_ENTER();
+
         bool res;
         VaultRecordMutex.lock();
         res = IsValid;
@@ -93,6 +112,8 @@ namespace mvlt
 
     void VaultRecord::RemoveFromDependentSets() noexcept
     {
+        DBG_LOG_ENTER();
+
         VaultRecordMutex.lock();
         for (VaultRecordSet* set : dependentVaultRecordSets)
             set->RemoveRecord(this, nullptr);
@@ -102,6 +123,8 @@ namespace mvlt
 
     void VaultRecord::AddToDependentSets(VaultRecordSet* vaultRecordSet) noexcept
     {
+        DBG_LOG_ENTER();
+
         VaultRecordMutex.lock();
         dependentVaultRecordSets.emplace(vaultRecordSet);
         VaultRecordMutex.unlock();
@@ -109,6 +132,8 @@ namespace mvlt
 
     void VaultRecord::EraseDependentSet(VaultRecordSet* vaultRecordSet) noexcept
     {
+        DBG_LOG_ENTER();
+
         VaultRecordMutex.lock();
         dependentVaultRecordSets.erase(vaultRecordSet);
         VaultRecordMutex.unlock();

@@ -20,13 +20,12 @@ namespace mvlt
         {
             void* array[TRACE_MAX];
             size_t traceSize;
-            std::size_t i = 3;
+            std::size_t i = Trace.size() + 2;
 
             traceSize = backtrace(array, TRACE_MAX);
 
             if (TraceFormat == BackTraceFormat::Compact)
             {
-                i = Trace.size() + 2;
                 traceSize = i + 1;
                 Trace.push_back(Trace.front());
             }

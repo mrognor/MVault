@@ -1343,6 +1343,7 @@ void Intersection_Test()
 int main()
 {
     TEST_LOG();
+    SetBackTraceFormat(BackTraceFormat::None);
 
     VaultRecordSet_CopyConstructor_Test();
     VaultRecordSet_OperatorAssignment_Test();

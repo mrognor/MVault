@@ -397,6 +397,7 @@ void RecordSetRequests()
 int main()
 {
     TEST_LOG();
+    SetBackTraceFormat(BackTraceFormat::None);
 
     KeyAddictionTests();
     KeyUpdationTests();

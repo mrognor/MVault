@@ -1220,6 +1220,7 @@ void Vault_Destructor_Test()
 int main()
 {
     TEST_LOG();
+    SetBackTraceFormat(BackTraceFormat::None);
 
     Vault_CopyConstructor_Test();
     Vault_OperatorAssignment_Test();

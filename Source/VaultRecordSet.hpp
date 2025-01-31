@@ -9,6 +9,8 @@ namespace mvlt
             const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue, 
             const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept
     {
+        DBG_LOG_ENTER();
+
         VaultOperationResult res;
 
         if (GetIsParentVaultValid())
@@ -63,6 +65,8 @@ namespace mvlt
     template <class T>
     VaultOperationResult VaultRecordSet::GetKeyValue(const std::string& key, T& defaultKeyValue) const noexcept
     {
+        DBG_LOG_ENTER();
+
         VaultOperationResult res;
 
         if (GetIsParentVaultValid())
@@ -84,6 +88,8 @@ namespace mvlt
     template <class T>
     VaultOperationResult VaultRecordSet::GetRecord(const std::string& key, const T& keyValue, VaultRecordRef& vaultRecordRef) const noexcept
     {
+        DBG_LOG_ENTER();
+
         VaultOperationResult res;
 
         if (GetIsParentVaultValid())
@@ -107,6 +113,8 @@ namespace mvlt
     template <class T>
     VaultOperationResult VaultRecordSet::GetRecords(const std::string& key, const T& keyValue, std::vector<VaultRecordRef>& recordsRefs, const std::size_t& amountOfRecords) const noexcept
     {
+        DBG_LOG_ENTER();
+
         VaultOperationResult res;
 
         if (GetIsParentVaultValid())
@@ -132,6 +140,8 @@ namespace mvlt
     VaultOperationResult VaultRecordSet::RequestEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, 
         const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const
     {
+        DBG_LOG_ENTER();
+
         return RequestRecords(VaultRequestType::Equal, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords, requestPredicat);
     }
 
@@ -139,6 +149,8 @@ namespace mvlt
     VaultOperationResult VaultRecordSet::RequestGreater(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
         const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const
     {
+        DBG_LOG_ENTER();
+
         return RequestRecords(VaultRequestType::Greater, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords, requestPredicat);
     }
 
@@ -146,6 +158,8 @@ namespace mvlt
     VaultOperationResult VaultRecordSet::RequestGreaterOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, 
         const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const
     {
+        DBG_LOG_ENTER();
+
         return RequestRecords(VaultRequestType::GreaterOrEqual, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords, requestPredicat);
     }
 
@@ -153,6 +167,8 @@ namespace mvlt
     VaultOperationResult VaultRecordSet::RequestLess(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
         const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const
     {
+        DBG_LOG_ENTER();
+
         return RequestRecords(VaultRequestType::Less, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords, requestPredicat);
     }
 
@@ -160,6 +176,8 @@ namespace mvlt
     VaultOperationResult VaultRecordSet::RequestLessOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
         const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const
     {
+        DBG_LOG_ENTER();
+
         return RequestRecords(VaultRequestType::LessOrEqual, key, keyValue, keyValue, vaultRecordSet, false, false, amountOfRecords, requestPredicat);
     }
 
@@ -169,6 +187,8 @@ namespace mvlt
         const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords,
         const std::function<bool(const VaultRecordRef&)>& requestPredicat) const
     {
+        DBG_LOG_ENTER();
+
         return RequestRecords(VaultRequestType::Interval, key, beginKeyValue, 
             endKeyValue, vaultRecordSet, isIncludeBeginKeyValue, isIncludeEndKeyValue, 
             amountOfRecords, requestPredicat);
@@ -177,6 +197,8 @@ namespace mvlt
     template <VaultRequestType Type>
     VaultOperationResult VaultRecordSet::Request(const VaultRequest<Type>&& request, VaultRecordSet& vaultRecordSet) const
     {
+        DBG_LOG_ENTER();
+
         VaultOperationResult res;
 
         if (GetIsParentVaultValid())
@@ -229,6 +251,8 @@ namespace mvlt
     template <class T>
     VaultOperationResult VaultRecordSet::RemoveRecord(const std::string& key, const T& keyValue) noexcept
     {
+        DBG_LOG_ENTER();
+
         static_assert(!std::is_array<T>::value, "It is not possible to use a c array as a key value. \n\
             If you want to use a string as a key, you must specialize the function with a string. Like this: \n\
             RemoveRecord<std::string>(\"Key\", \"Value\") or RemoveRecord(\"Key\", std::string(\"Value\"))");
@@ -254,6 +278,8 @@ namespace mvlt
     template <class T>
     VaultOperationResult VaultRecordSet::RemoveRecords(const std::string& key, const T& keyValue, const std::size_t& amountOfRecords) noexcept
     {
+        DBG_LOG_ENTER();
+
         static_assert(!std::is_array<T>::value, "It is not possible to use a c array as a key value. \n\
             If you want to use a string as a key, you must specialize the function with a string. Like this: \n\
             RemoveRecords<std::string>(\"Key\", \"Value\") or RemoveRecords(\"Key\", std::string(\"Value\"))");
@@ -279,6 +305,8 @@ namespace mvlt
     template<class F>
     void VaultRecordSet::SortBy(const std::string& key, const F&& func, const bool& isReverse, const std::size_t& amountOfRecords) const noexcept
     {
+        DBG_LOG_ENTER();
+
         if (GetIsParentVaultValid())
         {
             ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);

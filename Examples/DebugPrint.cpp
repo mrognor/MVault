@@ -6,14 +6,14 @@ void five()
     mvlt::Vault vlt;
 
     // int type
-    vlt.AddKey("A", 0);
-    vlt.CreateRecord({{"A", 1}});
+    vlt.AddKey("Int key", 0);
+    vlt.CreateRecord({{"Int key", 1}});
 
     mvlt::VaultRecordRef vrf;
-    vlt.GetRecord("A", 1, vrf);
+    vlt.GetRecord("Int key", 1, vrf);
 
     std::size_t a = 2;
-    vrf.GetData("A", a);
+    vrf.GetData("Int key", a);
 
     // 2
     std::cout << a << std::endl;
@@ -21,6 +21,17 @@ void five()
 
 void four()
 {
+    mvlt::Vault vlt;
+
+    // size_t type
+    vlt.AddKey<std::size_t>("Size_t key", 0);
+
+    // int type
+    vlt.CreateRecord({{"Size_t key", 1}});
+
+    // 2
+    std::cout << vlt.Size() << std::endl;
+
     five();
 }
 

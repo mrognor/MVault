@@ -20,6 +20,8 @@ namespace mvlt
 
     std::string VaultOperationResult::ResultCodeString() const noexcept
     {
+        DBG_LOG_ENTER();
+
         switch (ResultCode)
         {
         default:
@@ -57,6 +59,8 @@ namespace mvlt
 
     bool operator== (const VaultOperationResult& resA, const VaultOperationResult& resB) noexcept
     {
+        DBG_LOG_ENTER();
+
         return (resA.IsOperationSuccess == resB.IsOperationSuccess) && (resA.ResultCode == resB.ResultCode) &&
             (resA.Key == resB.Key) && (resA.RequestedType == resB.RequestedType) &&
             (resA.SavedType == resB.SavedType);

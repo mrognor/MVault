@@ -445,6 +445,7 @@ void VaultRecordRef_Destructor_Test()
 int main()
 {
     TEST_LOG();
+    SetBackTraceFormat(BackTraceFormat::None);
 
     VaultRecordRef_Copy_Test();
     VaultRecordRef_OperatorComparison_Test();

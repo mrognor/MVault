@@ -5,11 +5,15 @@ namespace mvlt
 {
     std::unordered_set<VaultRecord *>::iterator VaultRecordSet::RemoveRecord(VaultRecord* recordToErase, bool* wasDeleted) noexcept
     {
+        DBG_LOG_ENTER();
+
         return Vault::RemoveRecord(recordToErase, wasDeleted);
     }
 
     void VaultRecordSet::CopySet(const VaultRecordSet& other) noexcept
     {
+        DBG_LOG_ENTER();
+
         WriteLock<RecursiveReadWriteMutex> writeLock(other.ParentVault->RecursiveReadWriteMtx);
 
         VaultDerivedClass = VaultDerivedClasses::VaultRecordSetDerived;
@@ -38,6 +42,8 @@ namespace mvlt
 
     void VaultRecordSet::MoveSet(VaultRecordSet& other) noexcept
     {
+        DBG_LOG_ENTER();
+
         WriteLock<RecursiveReadWriteMutex> writeLock(other.ParentVault->RecursiveReadWriteMtx);
 
         VaultDerivedClass = VaultDerivedClasses::VaultRecordSetDerived;
@@ -74,6 +80,8 @@ namespace mvlt
 
     VaultRecordSet::VaultRecordSet() noexcept 
     {
+        DBG_LOG_ENTER();
+
         VaultDerivedClass = VaultDerivedClasses::VaultRecordSetDerived;
         RecursiveReadWriteMtx.Disable();
     }
@@ -81,12 +89,16 @@ namespace mvlt
     // codechecker_intentional [all] its not call parent class copy constructor because it is other copying style
     VaultRecordSet::VaultRecordSet(const VaultRecordSet& other) noexcept : Vault()
     {
+        DBG_LOG_ENTER();
+
         if (other.GetIsParentVaultValid())
             CopySet(other);
     }
 
     VaultRecordSet& VaultRecordSet::operator=(const VaultRecordSet& other) noexcept
     {
+        DBG_LOG_ENTER();
+
         if (&other != this)
         {
             Reset();
@@ -99,12 +111,16 @@ namespace mvlt
 
     VaultRecordSet::VaultRecordSet(VaultRecordSet&& other) noexcept
     {
+        DBG_LOG_ENTER();
+
         if (other.GetIsParentVaultValid())
             MoveSet(other);
     }
 
     VaultRecordSet& VaultRecordSet::operator=(VaultRecordSet&& other) noexcept
     {
+        DBG_LOG_ENTER();
+
         if (&other != this)
         {
             if (other.GetIsParentVaultValid())
@@ -118,11 +134,15 @@ namespace mvlt
 
     bool VaultRecordSet::GetIsParentVaultValid() const noexcept
     {
+        DBG_LOG_ENTER();
+
         return ParentVault != nullptr;
     }
 
     std::string VaultRecordSet::GetParentVaultUniqueId() const noexcept
     {
+        DBG_LOG_ENTER();
+
         std::stringstream ss;
 
         if (GetIsParentVaultValid())
@@ -135,6 +155,8 @@ namespace mvlt
 
     bool VaultRecordSet::IsKeyExist(const std::string& key) const noexcept
     {
+        DBG_LOG_ENTER();
+
         bool res = false;
 
         if (GetIsParentVaultValid())
@@ -145,6 +167,8 @@ namespace mvlt
 
     bool VaultRecordSet::GetKeyType(const std::string& key, std::type_index& keyType) const noexcept
     {
+        DBG_LOG_ENTER();
+
         bool res = false;
 
         if (GetIsParentVaultValid())
@@ -158,6 +182,8 @@ namespace mvlt
 
     VaultOperationResult VaultRecordSet::AddRecord(const VaultRecordRef& recordRef) noexcept
     {
+        DBG_LOG_ENTER();
+
         VaultOperationResult res;
 
         if (GetIsParentVaultValid())
@@ -208,6 +234,8 @@ namespace mvlt
 
     bool VaultRecordSet::CheckRecord(const VaultRecordRef& ref) const noexcept
     {
+        DBG_LOG_ENTER();
+
         ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
         if (Vault::RecordsSet.find(ref.VaultRecordPtr) != Vault::RecordsSet.end()) return true;
         else return false;
@@ -215,6 +243,8 @@ namespace mvlt
 
     void VaultRecordSet::Reset() noexcept
     {
+        DBG_LOG_ENTER();
+
         if (GetIsParentVaultValid())
         {
             WriteLock<RecursiveReadWriteMutex> writeLock(ParentVault->RecursiveReadWriteMtx);
@@ -228,6 +258,8 @@ namespace mvlt
 
     void VaultRecordSet::Clear() noexcept
     {
+        DBG_LOG_ENTER();
+
         if (GetIsParentVaultValid())
         {
             // Remove this from records
@@ -245,6 +277,8 @@ namespace mvlt
 
     bool VaultRecordSet::RemoveRecord(const VaultRecordRef& recordRefToErase) noexcept
     {
+        DBG_LOG_ENTER();
+
         if (!GetIsParentVaultValid()) return false;
         
         ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
@@ -253,6 +287,8 @@ namespace mvlt
 
     std::size_t VaultRecordSet::Size() const noexcept
     {
+        DBG_LOG_ENTER();
+
         std::size_t res = 0;
 
         if (GetIsParentVaultValid())
@@ -266,6 +302,8 @@ namespace mvlt
 
     std::vector<std::string> VaultRecordSet::GetKeys() const noexcept
     {
+        DBG_LOG_ENTER();
+
         std::vector<std::string> res;
 
         if (GetIsParentVaultValid())
@@ -276,6 +314,8 @@ namespace mvlt
 
     std::vector<VaultRecordRef> VaultRecordSet::GetSortedRecords(const std::string& key, const bool& isReverse, const std::size_t& amountOfRecords) const noexcept
     {
+        DBG_LOG_ENTER();
+
         std::vector<VaultRecordRef> res;
 
         if (GetIsParentVaultValid())
@@ -290,6 +330,8 @@ namespace mvlt
     std::string VaultRecordSet::ToJson(const bool& isFormat, const std::size_t& tabSize, const bool& isUseRecordTemplate,
         const std::string& recordTemplate) const noexcept
     {
+        DBG_LOG_ENTER();
+
         if (GetIsParentVaultValid())
         {
             ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
@@ -301,6 +343,8 @@ namespace mvlt
 
     void VaultRecordSet::PrintSet(const std::size_t& amountOfRecords) const noexcept
     {
+        DBG_LOG_ENTER();
+
         if (GetIsParentVaultValid())
         {
             ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
@@ -312,7 +356,9 @@ namespace mvlt
 
     void VaultRecordSet::PrintAsTable(bool isPrintId, const std::size_t& amountOfRecords, std::string primaryKey, const bool& isReverse,
             const std::list<std::string> keys) const noexcept
-        {
+    {
+        DBG_LOG_ENTER();
+
         if (GetIsParentVaultValid())
         {
             ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
@@ -324,6 +370,8 @@ namespace mvlt
 
     VaultOperationResult VaultRecordSet::Join(const VaultRecordSet& a) noexcept
     {
+        DBG_LOG_ENTER();
+
         VaultOperationResult res;
         res.IsOperationSuccess = true;
 
@@ -373,6 +421,8 @@ namespace mvlt
 
     VaultOperationResult VaultRecordSet::Exclude(const VaultRecordSet& a) noexcept
     {
+        DBG_LOG_ENTER();
+
         VaultOperationResult res;
         res.IsOperationSuccess = true;
 
@@ -420,6 +470,8 @@ namespace mvlt
 
     VaultOperationResult VaultRecordSet::Intersect(const VaultRecordSet& a) noexcept
     {
+        DBG_LOG_ENTER();
+
         VaultOperationResult res;
         res.IsOperationSuccess = true;
 
@@ -467,6 +519,8 @@ namespace mvlt
 
     bool VaultRecordSet::SaveToFile(const std::string& fileName, const std::vector<std::string> keys, const std::string& separator, const bool& isSaveKey) const noexcept
     {
+        DBG_LOG_ENTER();
+
         bool res = false;
 
         if (GetIsParentVaultValid())
@@ -480,12 +534,16 @@ namespace mvlt
 
     VaultRecordSet::~VaultRecordSet() noexcept
     {
+        DBG_LOG_ENTER();
+
         Reset();
     }
 
 
     bool operator==(const VaultRecordSet& a, const VaultRecordSet& b)
     {
+        DBG_LOG_ENTER();
+
         bool res = false;
 
         if (a.ParentVault == b.ParentVault && a.RecordsSet == b.RecordsSet)
@@ -496,6 +554,8 @@ namespace mvlt
 
     VaultOperationResult Union(const VaultRecordSet& a, const VaultRecordSet& b, VaultRecordSet& res) noexcept
     {
+        DBG_LOG_ENTER();
+
         VaultOperationResult vor;
 
         if (&a == &b || &a == &res || &b == &res)
@@ -514,6 +574,8 @@ namespace mvlt
 
     VaultOperationResult Intersection(const VaultRecordSet& a, const VaultRecordSet& b, VaultRecordSet& res) noexcept
     {
+        DBG_LOG_ENTER();
+
         VaultOperationResult vor;
         vor.IsOperationSuccess = true;
 

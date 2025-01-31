@@ -9,6 +9,8 @@ namespace mvlt
     template <class T>
     VaultOperationResult VaultRecordRef::SetData(const std::string& key, const T& data) noexcept
     {
+        DBG_LOG_ENTER();
+
         static_assert(!std::is_array<T>::value, "It is not possible to use a c array as a key value. \n\
             If you want to use a string as a key, you must specialize the function with a string. Like this: \n\
             SetData<std::string>(\"Key\", \"Value\") or SetData(\"Key\", std::string(\"Value\"))");

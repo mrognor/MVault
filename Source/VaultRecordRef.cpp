@@ -6,6 +6,8 @@ namespace mvlt
 {
     void VaultRecordRef::SetRecord(VaultRecord* vaultRecord, Vault* vlt) noexcept
     {
+        DBG_LOG_ENTER();
+
         vlt->RecursiveReadWriteMtx.ReadLock();
 
         if (vaultRecord != nullptr) vaultRecord->AddRef();
@@ -17,20 +19,29 @@ namespace mvlt
         vlt->RecursiveReadWriteMtx.ReadUnlock();
     }
 
-    VaultRecordRef::VaultRecordRef() noexcept {}
+    VaultRecordRef::VaultRecordRef() noexcept 
+    {
+        DBG_LOG_ENTER();
+    }
 
     VaultRecordRef::VaultRecordRef(VaultRecord* vaultRecord, Vault* vlt) noexcept
     {
+        DBG_LOG_ENTER();
+
         SetRecord(vaultRecord, vlt);
     }
 
     VaultRecordRef::VaultRecordRef(const VaultRecordRef& other) noexcept
     {
+        DBG_LOG_ENTER();
+
         *this = other;
     }
 
     VaultRecordRef& VaultRecordRef::operator=(const VaultRecordRef& other) noexcept
     {
+        DBG_LOG_ENTER();
+
         if (&other != this)
         {
             if (other.VaultRecordPtr != nullptr)
@@ -54,6 +65,8 @@ namespace mvlt
 
     bool VaultRecordRef::operator==(const VaultRecordRef& other) const noexcept
     {
+        DBG_LOG_ENTER();
+
         bool res;
 
         if (IsValid())
@@ -71,6 +84,8 @@ namespace mvlt
 
     std::string VaultRecordRef::GetRecordUniqueId() const noexcept
     {
+        DBG_LOG_ENTER();
+
         std::stringstream ss;
 
         if (IsValid())
@@ -83,6 +98,8 @@ namespace mvlt
 
     VaultOperationResult VaultRecordRef::SetData(const std::vector<std::pair<std::string, VaultParamInput>>& params) noexcept
     {
+        DBG_LOG_ENTER();
+
         VaultOperationResult res;
 
         WriteLock<RecursiveReadWriteMutex> writeLock(Vlt->RecursiveReadWriteMtx);
@@ -99,6 +116,8 @@ namespace mvlt
                 
     VaultOperationResult VaultRecordRef::GetDataAsString(const std::string& key, std::string& str) const noexcept
     {
+        DBG_LOG_ENTER();
+
         // Fill res info known at start
         VaultOperationResult res;
         res.Key = key;
@@ -139,6 +158,8 @@ namespace mvlt
 
     bool VaultRecordRef::IsValid() const noexcept
     {
+        DBG_LOG_ENTER();
+
         bool res = false;
 
         if (VaultRecordPtr != nullptr) res = VaultRecordPtr->GetIsValid();
@@ -148,6 +169,8 @@ namespace mvlt
 
     bool VaultRecordRef::IsKeyExist(const std::string& key) const noexcept
     {
+        DBG_LOG_ENTER();
+
         bool res = false;
 
         if (Vlt != nullptr) res = Vlt->IsKeyExist(key);
@@ -157,6 +180,8 @@ namespace mvlt
 
     std::vector<std::string> VaultRecordRef::GetKeys() const noexcept
     {
+        DBG_LOG_ENTER();
+
         std::vector<std::string> res;
 
         if (VaultRecordPtr != nullptr)
@@ -171,6 +196,8 @@ namespace mvlt
 
     void VaultRecordRef::PrintRecord() const noexcept
     {
+        DBG_LOG_ENTER();
+
         if (VaultRecordPtr != nullptr)
         {
             VaultRecordPtr->VaultRecordMutex.lock();
@@ -201,6 +228,8 @@ namespace mvlt
 
     void VaultRecordRef::Reset() noexcept
     {
+        DBG_LOG_ENTER();
+
         if (VaultRecordPtr != nullptr)
             VaultRecordPtr->RemoveRef();
         
@@ -210,6 +239,8 @@ namespace mvlt
 
     VaultRecordRef::~VaultRecordRef() noexcept
     {
+        DBG_LOG_ENTER();
+
         if (VaultRecordPtr != nullptr) VaultRecordPtr->RemoveRef();
     }
 }

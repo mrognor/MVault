@@ -10,6 +10,8 @@ namespace mvlt
     template <class T>
     VaultRequest<Type>::VaultRequest(const std::string& key, const T& keyValue, std::function<bool(const VaultRecordRef&)> requestPredicat) : Key(key), RequestPredicat(requestPredicat)
     {
+        DBG_LOG_ENTER();
+
         static_assert(!std::is_array<T>::value, "It is not possible to use a c array as a key value. \n\
             If you want to use a string as a key, you must specialize the function with a string. Like this: \n\
             Less<std::string>(\"Key\", \"Value\") or Greater(\"Key\", std::string(\"Value\")). \n\
@@ -42,6 +44,8 @@ namespace mvlt
     template <VaultRequestType RequestType1, VaultRequestType RequestType2>
     VaultRequest<Type>::VaultRequest(const VaultRequest<RequestType1>& request1, const VaultRequest<RequestType2>& request2) noexcept
     {
+        DBG_LOG_ENTER();
+
         // Switch by request type Or or And
         switch (Type)
         {
@@ -107,6 +111,8 @@ namespace mvlt
     template <VaultRequestType Type>
     void VaultRequest<Type>::Request(Vault* vlt, std::unordered_set<VaultRecord*>& vaultRecords) const
     {
+        DBG_LOG_ENTER();
+
         switch (Type) 
         {
         case VaultRequestType::Less:
@@ -126,6 +132,8 @@ namespace mvlt
     template <VaultRequestType Type>
     VaultRequest<Type>::~VaultRequest() noexcept
     {
+        DBG_LOG_ENTER();
+
         if (DeleteFunc != nullptr && DataPtr != nullptr)
             DeleteFunc(DataPtr);
     }
@@ -133,12 +141,16 @@ namespace mvlt
     template <VaultRequestType LType, VaultRequestType RType>
     VaultRequest<VaultRequestType::And> operator&& (const VaultRequest<LType>& lhs, const VaultRequest<RType>& rhs) noexcept
     {
+        DBG_LOG_ENTER();
+
         return VaultRequest<VaultRequestType::And>(lhs, rhs);
     }
 
     template <VaultRequestType LType, VaultRequestType RType>
     VaultRequest<VaultRequestType::Or> operator|| (const VaultRequest<LType>& lhs, const VaultRequest<RType>& rhs) noexcept
     {
+        DBG_LOG_ENTER();
+
         return VaultRequest<VaultRequestType::Or>(lhs, rhs);
     }
 }

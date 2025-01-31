@@ -8,6 +8,8 @@ namespace mvlt
 {
     std::unordered_set<VaultRecord*>::iterator Vault::RemoveRecord(VaultRecord* recordToErase, bool* wasDeleted) noexcept
     {
+        DBG_LOG_ENTER();
+
         // Lock Vault to write
         WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
 
@@ -38,6 +40,8 @@ namespace mvlt
     bool Vault::ReadFile(const std::string& fileName, const bool& isPreprocessRecord, std::function<void (const std::vector<std::string>&, std::vector<std::string>&)> recordHandler, 
             const char& separator, const bool& isLoadKeys, const std::vector<std::string> userKeys) noexcept
     {
+        DBG_LOG_ENTER();
+
         // Open and parse file
         CsvParser parser;
         if (!parser.OpenFile(fileName)) return false;
@@ -175,11 +179,15 @@ namespace mvlt
 
     Vault::Vault() noexcept 
     {
+        DBG_LOG_ENTER();
+
         VaultDerivedClass = VaultDerivedClasses::VaultBase;
     }
 
     Vault::Vault(const Vault& other) noexcept
     {
+        DBG_LOG_ENTER();
+
         ReadLock<RecursiveReadWriteMutex> readLock(other.RecursiveReadWriteMtx);
 
         VaultDerivedClass = VaultDerivedClasses::VaultBase;
@@ -210,6 +218,8 @@ namespace mvlt
 
     Vault& Vault::operator=(const Vault& other) noexcept
     {
+        DBG_LOG_ENTER();
+
         if (&other != this)
         {
             DropVault();
@@ -248,6 +258,8 @@ namespace mvlt
 
     Vault::Vault(Vault&& other) noexcept
     {
+        DBG_LOG_ENTER();
+
         ReadLock<RecursiveReadWriteMutex> otherReadLock(other.RecursiveReadWriteMtx);
 
         VaultDerivedClass = VaultDerivedClasses::VaultBase;
@@ -270,6 +282,8 @@ namespace mvlt
 
     Vault& Vault::operator=(Vault&& other) noexcept
     {
+        DBG_LOG_ENTER();
+
         if (this != &other)
         {
             DropVault();
@@ -299,6 +313,8 @@ namespace mvlt
 
     bool Vault::IsKeyExist(const std::string& key) const noexcept
     {
+        DBG_LOG_ENTER();
+
         bool res;
         ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
         res = RecordTemplate.IsData(key);
@@ -307,6 +323,8 @@ namespace mvlt
 
     bool Vault::GetKeyType(const std::string& key, std::type_index& keyType) const noexcept
     {
+        DBG_LOG_ENTER();
+
         bool res = true;
         ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
 
@@ -321,6 +339,8 @@ namespace mvlt
 
     std::vector<std::string> Vault::GetKeys() const noexcept
     {
+        DBG_LOG_ENTER();
+
         ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
 
         std::vector<std::string> res(KeysOrder.size());
@@ -333,6 +353,8 @@ namespace mvlt
 
     std::vector<std::string> Vault::GetUniqueKeys() const noexcept
     {
+        DBG_LOG_ENTER();
+
         ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
 
         std::vector<std::string> res(UniqueKeys.size());
@@ -345,6 +367,8 @@ namespace mvlt
 
     bool Vault::RemoveKey(const std::string& key) noexcept
     {
+        DBG_LOG_ENTER();
+
         WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
 
         // Find key in hash map
@@ -401,12 +425,16 @@ namespace mvlt
 
     VaultOperationResult Vault::CreateRecord(const std::vector<std::pair<std::string, VaultParamInput>>& params) noexcept
     {
+        DBG_LOG_ENTER();
+
         VaultRecordRef tmp;
         return CreateRecord(tmp, params);
     }
 
     VaultOperationResult Vault::CreateRecord(VaultRecordRef& vaultRecordRef, const std::vector<std::pair<std::string, VaultParamInput>>& params) noexcept
     {
+        DBG_LOG_ENTER();
+
         VaultOperationResult res;
 
         // Lock Vault to write
@@ -439,7 +467,7 @@ namespace mvlt
                 {   // If the type in param not match type in record template
                     res.IsOperationSuccess = false;
                     res.SavedType = paramsIt.second.GetDataType();
-                    res.ResultCode = VaultOperationResultCode::WrongType;
+                    res.SetOpResult(VaultOperationResultCode::WrongType);
                     isCorrectParams = false;
                     break;
                 }
@@ -511,6 +539,8 @@ namespace mvlt
 
     void Vault::DropVault() noexcept
     {
+        DBG_LOG_ENTER();
+
         // Lock Vault to write
         WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
 
@@ -571,6 +601,8 @@ namespace mvlt
 
     void Vault::DropData() noexcept
     {
+        DBG_LOG_ENTER();
+
         // Lock Vault to write
         WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
 
@@ -592,6 +624,8 @@ namespace mvlt
 
     bool Vault::EraseRecord(const VaultRecordRef& recordRefToErase) noexcept
     {
+        DBG_LOG_ENTER();
+
         bool res;
 
         WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
@@ -603,6 +637,8 @@ namespace mvlt
 
     std::size_t Vault::Size() const noexcept
     {
+        DBG_LOG_ENTER();
+
         std::size_t res;
         ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
 
@@ -613,6 +649,8 @@ namespace mvlt
 
     std::vector<VaultRecordRef> Vault::GetSortedRecords(const std::string& key, const bool& isReverse, const std::size_t& amountOfRecords) const noexcept
     {
+        DBG_LOG_ENTER();
+
         std::vector<VaultRecordRef> res;
         std::size_t counter = 0;
 
@@ -638,6 +676,8 @@ namespace mvlt
     std::string Vault::ToJson(const bool& isFormat, const std::size_t& tabSize, const bool& isUseRecordTemplate,
             const std::string& recordTemplate) const noexcept
     {
+        DBG_LOG_ENTER();
+
         std::stringstream res;
 
         // Lock Vault to read
@@ -684,6 +724,8 @@ namespace mvlt
 
     void Vault::PrintVault(const std::size_t& amountOfRecords) const noexcept
     {
+        DBG_LOG_ENTER();
+
         // Lock Vault to read
         ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
 
@@ -709,6 +751,8 @@ namespace mvlt
     void Vault::PrintAsTable(bool isPrintId, const std::size_t& amountOfRecords, std::string primaryKey, const bool& isReverse,
         const std::list<std::string> keys) const noexcept
     {
+        DBG_LOG_ENTER();
+
         // Lock Vault to read
         ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
 
@@ -852,6 +896,8 @@ namespace mvlt
 
     bool Vault::SaveToFile(const std::string& fileName, const std::vector<std::string> keys, const std::string& separator, const bool& isSaveKey) const noexcept
     {
+        DBG_LOG_ENTER();
+
         // Lock Vault to read
         ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
 
@@ -938,21 +984,29 @@ namespace mvlt
 
     bool Vault::ReadFile(const std::string& fileName, const char& separator, const bool& isLoadKeys, const std::vector<std::string> keys) noexcept
     {
+        DBG_LOG_ENTER();
+
         return ReadFile(fileName, false, [](const std::vector<std::string>&, std::vector<std::string>&) {}, separator, isLoadKeys, keys);
     }
 
     bool Vault::ReadFile(const std::string& fileName, const char& separator, const bool& isLoadKeys, std::function<void (const std::vector<std::string>&, std::vector<std::string>&)> recordHandler) noexcept
     {
+        DBG_LOG_ENTER();
+
         return ReadFile(fileName, true, recordHandler, separator, isLoadKeys, {});
     }
 
     std::vector<std::pair<std::size_t, std::string>> Vault::GetErrorsInLastReadedFile() const noexcept
     {
+        DBG_LOG_ENTER();
+
         return InvalidFileRecords;
     }
 
     Vault::~Vault() noexcept
     {
+        DBG_LOG_ENTER();
+
         DropVault();
     }
 }

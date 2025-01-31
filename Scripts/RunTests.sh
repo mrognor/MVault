@@ -32,10 +32,10 @@ echo "Start VaultRecordSet unit tests"
 echo "Start VaultRecordRef unit tests"
 ./VaultRecordRefUnitTest
 
-# echo "Start VaultRecordRef multi-threading tests"
+echo "Start VaultRecordRef multi-threading tests"
 ./VaultRecordRefMpTest
 
-# echo "Start VaultRecordSet multi-threading tests"
+echo "Start VaultRecordSet multi-threading tests"
 ./VaultRecordSetMpTest
 
 echo "</blockquote>" >> report.md

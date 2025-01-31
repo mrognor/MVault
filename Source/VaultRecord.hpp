@@ -8,6 +8,8 @@ namespace mvlt
     template<class T>
     void VaultRecord::UpdateDependentSets(const std::string& key, const T& data) noexcept
     {
+        DBG_LOG_ENTER();
+
         VaultRecordMutex.lock();
 
         for (VaultRecordSet* vaultRecordSet : dependentVaultRecordSets)

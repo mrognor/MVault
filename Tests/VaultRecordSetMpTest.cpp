@@ -627,6 +627,7 @@ void VaultRecordSet_GetKeys_Test()
 int main()
 {
     TEST_LOG();
+    SetBackTraceFormat(BackTraceFormat::None);
 
     VaultRecordSet_Copy_Test();
     VaultRecordSet_OperatorComparison_Test();
