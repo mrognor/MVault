@@ -17,7 +17,11 @@
 
 #define TRACE_MAX 1024
 
+#ifndef NDEBUG
 #define DBG_LOG_ENTER() TraceLogger __TraceLogger__(__FUNCTION__);
+#else
+#define DBG_LOG_ENTER()
+#endif
 
 namespace mvlt
 {
