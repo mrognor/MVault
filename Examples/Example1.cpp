@@ -1,4 +1,4 @@
-#include "../Source/MVault.h"
+#include <MVault.h>
 
 template <>
 struct std::hash<std::vector<int>>
