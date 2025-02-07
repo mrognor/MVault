@@ -96,7 +96,7 @@ namespace mvlt
     protected:
 
         /// \brief Enum for storing the object type during inheritance
-        enum class VaultDerivedClasses
+        enum class VaultDerivedClasses : std::uint8_t
         {
             VaultBase,            ///< Vault class itself
             VaultRecordSetDerived ///< VaultRecordSet class
@@ -214,8 +214,8 @@ namespace mvlt
 
             \return returns true if it was possible to read the file, otherwise it returns false
         */
-        bool ReadFile(const std::string& fileName, const bool& isPreprocessRecord, std::function<void (const std::vector<std::string>&, std::vector<std::string>&)> recordHandler, 
-            const char& separator, const bool& isLoadKeys, const std::vector<std::string> userKeys) noexcept;
+        bool ReadFile(const std::string& fileName, const bool& isPreprocessRecord, const std::function<void (const std::vector<std::string>&, std::vector<std::string>&)>& recordHandler, 
+            const char& separator, const bool& isLoadKeys, const std::vector<std::string>& userKeys) noexcept;
 
     public:
 
@@ -736,7 +736,7 @@ namespace mvlt
 
             \return It will return true if it was possible to open the file and write the data, otherwise it will return false
         */
-        bool SaveToFile(const std::string& fileName, const std::vector<std::string> keys = {}, const std::string& separator = ",", const bool& isSaveKey = true) const noexcept;
+        bool SaveToFile(const std::string& fileName, const std::vector<std::string>& keys = {}, const std::string& separator = ",", const bool& isSaveKey = true) const noexcept;
 
         /**
             \brief A method for reading a csv file and loading data from it into memory
@@ -748,7 +748,7 @@ namespace mvlt
 
             \return returns true if it was possible to read the file, otherwise it returns false
         */
-        bool ReadFile(const std::string& fileName, const char& separator = ',', const bool& isLoadKeys = true, const std::vector<std::string> keys = {}) noexcept;
+        bool ReadFile(const std::string& fileName, const char& separator = ',', const bool& isLoadKeys = true, const std::vector<std::string>& keys = {}) noexcept;
 
         /**
             \brief A method for reading a csv file and loading data from it into memory
@@ -762,7 +762,7 @@ namespace mvlt
 
             \return returns true if it was possible to read the file, otherwise it returns false
         */
-        bool ReadFile(const std::string& fileName, const char& separator, const bool& isLoadKeys, std::function<void (const std::vector<std::string>&, std::vector<std::string>&)> recordHandler) noexcept;
+        bool ReadFile(const std::string& fileName, const char& separator, const bool& isLoadKeys, const std::function<void (const std::vector<std::string>&, std::vector<std::string>&)>& recordHandler) noexcept;
 
         /**
             \brief A method for getting errors in the last read file

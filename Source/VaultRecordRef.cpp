@@ -38,6 +38,13 @@ namespace mvlt
         *this = other;
     }
 
+    VaultRecordRef::VaultRecordRef(VaultRecordRef&& other) noexcept
+    {
+        DBG_LOG_ENTER();
+
+        *this = std::move(other);
+    }
+
     VaultRecordRef& VaultRecordRef::operator=(const VaultRecordRef& other) noexcept
     {
         DBG_LOG_ENTER();
@@ -59,6 +66,15 @@ namespace mvlt
                 VaultRecordPtr = nullptr;
             }
         }
+        
+        return *this;
+    }
+
+    VaultRecordRef& VaultRecordRef::operator=(VaultRecordRef&& other) noexcept
+    {
+        DBG_LOG_ENTER();
+
+        *this = other;
         
         return *this;
     }
@@ -188,7 +204,7 @@ namespace mvlt
         {
             // Check if Vault still accessable
             if (VaultRecordPtr->GetIsValid())
-                res = std::move(Vlt->GetKeys());
+                res = Vlt->GetKeys();
         }
 
         return res;

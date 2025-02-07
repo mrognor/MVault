@@ -9,7 +9,7 @@
 namespace mvlt
 {
     /// \brief An enum with the types of all possible requests
-    enum class VaultRequestType 
+    enum class VaultRequestType : std::uint8_t
     {
         Greater,       ///< A request that will receive all records with a key value greater than the requested one
         GreaterOrEqual,///< A request that will receive all records with a key value greater than or equal to the requested one

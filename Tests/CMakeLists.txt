@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 if(WIN32)
     set(CMAKE_CXX_FLAGS "-Wextra -g")
 else()
-    set(CMAKE_CXX_FLAGS "-Wextra -fsanitize=address -fsanitize=leak -lgcov --coverage -g")
+    set(CMAKE_CXX_FLAGS "-Wextra -fsanitize=address -fsanitize=leak -lgcov --coverage -g -Wno-unused-parameter")
 endif()
 
 set(CMAKE_CXX_STANDARD 11)

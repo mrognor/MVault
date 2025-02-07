@@ -43,6 +43,37 @@ namespace mvlt
         template <VaultRequestType TType>
         friend class VaultRequest;
 
+        /// \brief Default construcor
+        VaultRequest() = default;
+
+        /**
+            \brief Copy constructor
+
+            \param [in] other object to copy
+        */
+        // VaultRequest(const VaultRequest<Type>& other) = default;
+
+        /**
+            \brief Move constructor
+
+            \param [in] other object to move
+        */
+        // VaultRequest(VaultRequest<Type>&& other) = default;
+
+        /**
+            \brief Assignment operator
+
+            \param [in] other object to copy
+        */
+        // VaultRequest& operator=(const VaultRequest<Type>& other) = delete;
+
+        /**
+            \brief Move assignment operator
+
+            \param [in] other object to move
+        */
+        // VaultRequest& operator=(VaultRequest<Type>&& other) = delete;
+
         /**
             \brief Request constructor
 
@@ -54,7 +85,7 @@ namespace mvlt
             When the function returns true, the record is added, and when false is not added.
         */
         template <class T>
-        VaultRequest(const std::string& key, const T& keyValue, std::function<bool(const VaultRecordRef&)> requestPredicat = DefaultRequestPredicat);
+        VaultRequest(const std::string& key, const T& keyValue, const std::function<bool(const VaultRecordRef&)>& requestPredicat = DefaultRequestPredicat);
 
         /**
             \brief Request constructor

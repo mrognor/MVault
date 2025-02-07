@@ -50,6 +50,39 @@ namespace mvlt
         std::size_t FileLen = 0;
     public:
 
+        /// \brief Default constructor
+        CsvParser() = default;
+
+        /**
+            \brief Deleted copy constructor
+
+            \param [in] other object to copy
+        */
+        CsvParser(const CsvParser& other) = delete;
+
+        /**
+            \brief Deleted move constructor
+
+            \param [in] other object to move
+        */
+        CsvParser(CsvParser&& other) = delete;
+
+        /**
+            \brief Deleted assignment operator
+        
+            \param [in] other object to copy
+            \return returns a new object, with data from other
+        */
+        CsvParser& operator=(const CsvParser& other) = delete;
+
+        /**
+            \brief Deleted move assignment operator
+
+            \param [in] other object to move
+            \return returns a new object, with data from other
+        */
+        CsvParser& operator=(CsvParser&& other) = delete;
+
         /**
             \brief The method for opening the file
 

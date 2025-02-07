@@ -20,7 +20,7 @@ namespace mvlt
     /// \brief Enum with all error handling codes
     enum class VaultOperationResultCode : std::int8_t
     {
-        OtherParentVaultNotValid,
+        OtherParentVaultNotValid = -11,
         SameVaultRecordSetInRequest = -10,
         TryToAddUniqueKeyInNonEmptyVaultWithoutLambda = -9, ///< This code is returned when trying to add unique key without lamda in non-empty vault
         DuplicateKey = -8,             ///< This code is returned when trying to add key which alredy in vault

@@ -11,8 +11,8 @@ namespace mvlt
         #ifndef NDEBUG
         if (TraceFormat != BackTraceFormat::None)
         {
-            std::cout << "Internal error! " << ResultCodeString() << "" << std::endl;
-            std::cout << "\tRequested key: \x1B[31m" << Key << "\033[0m. Requested type: \x1B[31m" << RequestedType.name() << "\033[0m. SavedType: \x1B[31m" << SavedType.name() << "\033[0m." << std::endl;
+            std::cout << "Internal error! " << ResultCodeString() << "\n";
+            std::cout << "\tRequested key: \x1B[31m" << Key << "\033[0m. Requested type: \x1B[31m" << RequestedType.name() << "\033[0m. SavedType: \x1B[31m" << SavedType.name() << "\033[0m.\n";
             PrintBackTrace();
         }
         #endif

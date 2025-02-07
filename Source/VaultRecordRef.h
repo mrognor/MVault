@@ -65,12 +65,27 @@ namespace mvlt
         VaultRecordRef(const VaultRecordRef& other) noexcept;
 
         /**
+            \brief Move constructor
+
+            \param [in] other other VaultRecordRef object
+        */
+        VaultRecordRef(VaultRecordRef&& other) noexcept;
+
+        /**
             \brief Assignment operator
         
             \param [in] other other VaultRecordRef object
         */
         VaultRecordRef& operator=(const VaultRecordRef& other) noexcept;
         
+        /**
+            \brief Move assignment operator
+        
+            \param [in] other other VaultRecordRef object
+            \return returns a new object, with data from other
+        */
+        VaultRecordRef& operator=(VaultRecordRef&& other) noexcept;
+
         /**
             \brief Comparison operator
         

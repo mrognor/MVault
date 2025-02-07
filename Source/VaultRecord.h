@@ -117,5 +117,8 @@ namespace mvlt
         */
         template<class T>
         void UpdateDependentSets(const std::string& key, const T& data) noexcept;
+
+        /// \brief Default destructor
+        ~VaultRecord() = default;
     };
 }

@@ -28,7 +28,31 @@ namespace mvlt
     public:
 
         /// \brief Default constructor
-        AllMapIterator() {}
+        AllMapIterator() = default;
+
+        /**
+            \brief Copy constructor
+
+            \param [in] other object to copy data from
+        */
+        AllMapIterator(const AllMapIterator& other)
+        {
+            IsMultiMap = other.IsMultiMap;
+            DataMultiMapIt = other.DataMultiMapIt;
+            DataMapIt = other.DataMapIt;
+        }
+
+        /**
+            \brief Deleted move constructor
+
+            \param [in] other object to copy data from
+        */
+        AllMapIterator(AllMapIterator&& other) noexcept
+        {
+            IsMultiMap = other.IsMultiMap;
+            DataMultiMapIt = other.DataMultiMapIt;
+            DataMapIt = other.DataMapIt;
+        }
 
         /**
             \brief Constructor
@@ -46,18 +70,6 @@ namespace mvlt
         };
 
         /**
-            \brief Copy constructor
-
-            \param [in] other object to copy data from
-        */
-        AllMapIterator(const AllMapIterator &other)
-        {
-            IsMultiMap = other.IsMultiMap;
-            DataMultiMapIt = other.DataMultiMapIt;
-            DataMapIt = other.DataMapIt;
-        }
-
-        /**
             \brief Assignment operator
 
             \param [in] other object to copy data from
@@ -65,6 +77,25 @@ namespace mvlt
             \return assigned object
         */
         AllMapIterator& operator=(const AllMapIterator& other)
+        {
+            if (&other != this)
+            {
+                IsMultiMap = other.IsMultiMap;
+                DataMultiMapIt = other.DataMultiMapIt;
+                DataMapIt = other.DataMapIt;
+            }
+
+            return *this;
+        }
+
+        /**
+            \brief Deleted move assignment operator
+
+            \param [in] other object to copy data from
+
+            \return assigned object
+        */
+        AllMapIterator& operator=(AllMapIterator&& other) noexcept
         {
             if (&other != this)
             {
@@ -166,6 +197,9 @@ namespace mvlt
         {
             return DataMultiMapIt;
         }
+
+        /// \brief Default destructor
+        ~AllMapIterator() = default;
     };
 
     /**

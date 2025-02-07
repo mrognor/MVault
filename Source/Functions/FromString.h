@@ -202,6 +202,7 @@ namespace mvlt
             res += static_cast<int>(stringToCopyDataFrom[i] - '0');
         }
 
+        // codechecker_intentional [all] its not error because negative numbers handled by if
         if (isNegative) data = res * -1;
         else data = res;
 

@@ -37,8 +37,8 @@ namespace mvlt
         return dataIt;
     }
 
-    bool Vault::ReadFile(const std::string& fileName, const bool& isPreprocessRecord, std::function<void (const std::vector<std::string>&, std::vector<std::string>&)> recordHandler, 
-            const char& separator, const bool& isLoadKeys, const std::vector<std::string> userKeys) noexcept
+    bool Vault::ReadFile(const std::string& fileName, const bool& isPreprocessRecord, const std::function<void (const std::vector<std::string>&, std::vector<std::string>&)>& recordHandler, 
+            const char& separator, const bool& isLoadKeys, const std::vector<std::string>& userKeys) noexcept
     {
         DBG_LOG_ENTER();
 
@@ -514,7 +514,6 @@ namespace mvlt
                 res.SavedType = KeysTypes.find(incorrectUniqueKey)->second;
                 res.RequestedType = res.SavedType;
                 res.ResultCode = VaultOperationResultCode::UniqueKeyValueAlredyInSet;
-                isCorrectParams = true;
                 delete newRecord;
             }
             else
@@ -894,7 +893,7 @@ namespace mvlt
         std::cout << " (" << RecordsSet.size() << " records)" << "\n";
     }
 
-    bool Vault::SaveToFile(const std::string& fileName, const std::vector<std::string> keys, const std::string& separator, const bool& isSaveKey) const noexcept
+    bool Vault::SaveToFile(const std::string& fileName, const std::vector<std::string>& keys, const std::string& separator, const bool& isSaveKey) const noexcept
     {
         DBG_LOG_ENTER();
 
@@ -982,14 +981,14 @@ namespace mvlt
         return true;
     }
 
-    bool Vault::ReadFile(const std::string& fileName, const char& separator, const bool& isLoadKeys, const std::vector<std::string> keys) noexcept
+    bool Vault::ReadFile(const std::string& fileName, const char& separator, const bool& isLoadKeys, const std::vector<std::string>& keys) noexcept
     {
         DBG_LOG_ENTER();
 
         return ReadFile(fileName, false, [](const std::vector<std::string>&, std::vector<std::string>&) {}, separator, isLoadKeys, keys);
     }
 
-    bool Vault::ReadFile(const std::string& fileName, const char& separator, const bool& isLoadKeys, std::function<void (const std::vector<std::string>&, std::vector<std::string>&)> recordHandler) noexcept
+    bool Vault::ReadFile(const std::string& fileName, const char& separator, const bool& isLoadKeys, const std::function<void (const std::vector<std::string>&, std::vector<std::string>&)>& recordHandler) noexcept
     {
         DBG_LOG_ENTER();
 

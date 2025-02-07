@@ -19,7 +19,7 @@
 #define TRACE_MAX 1024
 
 #ifndef NDEBUG
-#define DBG_LOG_ENTER() TraceLogger __TraceLogger__(__FUNCTION__);
+#define DBG_LOG_ENTER() TraceLogger LocalTraceLoggerMacro(__FUNCTION__);
 #else
 #define DBG_LOG_ENTER()
 #endif
@@ -59,16 +59,50 @@ namespace mvlt
     class TraceLogger
     {
     private:
-        /// Function name
+        // Function name
         std::string FuncName;
     public:
+        /// \brief Default constructor
+        TraceLogger() = default;
+
+        /**
+            \brief Copy constructor
+
+            \param [in] other object to copy
+        */
+        TraceLogger(const TraceLogger& other) = default;
+
+        /**
+            \brief Move constructor
+
+            \param [in] other object to move
+        */
+        TraceLogger(TraceLogger&& other) = default;
+
         /**
             \brief Constructor to store function name
 
             \param [in] funcName the name of the function in which the class object was created
         */
-        TraceLogger(const std::string& funcName);
+        explicit TraceLogger(const std::string& funcName);
 
+        /**
+            \brief Assignment operator
+
+            \param [in] other object to copy
+            \return returns a new object, with data from other
+        */
+        TraceLogger& operator=(const TraceLogger& other) = default;
+
+        /**
+            \brief Move assignment operator
+
+            \param [in] other object to move
+            \return returns a new object, with data from other
+        */
+        TraceLogger& operator=(TraceLogger&& other) = default;
+
+ 
         /// \brief Default destructor
         ~TraceLogger();
     };

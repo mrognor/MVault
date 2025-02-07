@@ -53,6 +53,13 @@ namespace mvlt
         DataSaver(const DataSaver& dataSaver) noexcept;
 
         /**
+            \brief Deleted move constructor
+
+            \param [in] dataSaver object to be moved
+        */
+        DataSaver(DataSaver&& other) = delete;
+        
+        /**
             \brief A template constructor that accepts a variable to store inside DataSaver
 
             \tparam <T> Any type of data except for c arrays
@@ -85,12 +92,20 @@ namespace mvlt
 
         /**
             \brief Assignment operator
-            
+
             \param [in] dataSaver object to be copied
             \return returns a new object, with data from dataSaver
         */
         DataSaver& operator=(const DataSaver& dataSaver) noexcept;
-        
+
+        /**
+            \brief Deleted assignment operator
+
+            \param [in] dataSaver object to be moved
+            \return returns a new object, with data from dataSaver
+        */
+        DataSaver& operator=(DataSaver&& other) = delete;
+
         /**
             \brief Template method to save data inside DataSaver
 

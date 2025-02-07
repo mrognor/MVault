@@ -535,7 +535,7 @@ namespace mvlt
             }
         );
 
-        VaultRecordSorters.emplace(key, [=](std::function<bool(const VaultRecordRef&)> functionToSortedData, Vault* vltPtr, bool isReverse)
+        VaultRecordSorters.emplace(key, [=](const std::function<bool(const VaultRecordRef&)>& functionToSortedData, Vault* vltPtr, bool isReverse)
         {
             if (!isReverse)
             {

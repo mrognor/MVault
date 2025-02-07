@@ -465,8 +465,8 @@ namespace mvlt
             \param [in] isReverse The sorting direction. If true, the data will be output from the larger to the smaller
             \param [in] keys list of keys to be printed. By default, the list is empty, which means that all keys will be output
         */
-        void PrintAsTable(bool isPrintId = false, const std::size_t& amountOfRecords = -1, std::string primaryKey = "", const bool& isReverse = false,
-            const std::list<std::string> keys = {}) const noexcept;
+        void PrintAsTable(bool isPrintId = false, const std::size_t& amountOfRecords = -1, const std::string& primaryKey = "", const bool& isReverse = false,
+            const std::list<std::string>& keys = {}) const noexcept;
 
         /**
             \brief A method for adding all records from a to this
@@ -507,7 +507,7 @@ namespace mvlt
             If parent Vault not valid return false
             \return It will return true if it was possible to open the file and write the data, otherwise it will return false
         */
-        bool SaveToFile(const std::string& fileName, const std::vector<std::string> keys = {}, const std::string& separator = ",", const bool& isSaveKey = true) const noexcept;
+        bool SaveToFile(const std::string& fileName, const std::vector<std::string>& keys = {}, const std::string& separator = ",", const bool& isSaveKey = true) const noexcept;
 
         /// \brief Destructor
         ~VaultRecordSet() noexcept;
