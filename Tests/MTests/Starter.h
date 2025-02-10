@@ -9,10 +9,10 @@ class Starter
 {
 private:
     std::condition_variable Cv;
-    std::size_t Threshold;
+    int Threshold = 0;
     std::mt19937 Random;
 public:
-    Starter(const std::size_t& threshold = 100) noexcept;
+    Starter(const int& threshold = 100) noexcept;
 
     void Wait() noexcept;
 };

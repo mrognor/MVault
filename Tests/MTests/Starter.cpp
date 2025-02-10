@@ -1,6 +1,6 @@
 #include "Starter.h"
 
-Starter::Starter(const std::size_t& threshold) noexcept : Threshold(threshold) {}
+Starter::Starter(const int& threshold) noexcept : Threshold(threshold) {}
 
 void Starter::Wait() noexcept
 {
