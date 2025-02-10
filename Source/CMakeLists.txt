@@ -34,6 +34,7 @@ set(MVaultHeaders
     Functions/CsvParser.h
     Functions/FromString.h
     Functions/PrintAsTable.h
+    Functions/StreamFileReader.h
 )
 
 set(MVaultTemplates
@@ -59,6 +60,7 @@ set(MVaultSource
     
     Functions/CsvParser.cpp
     Functions/BackTrace.cpp
+    Functions/StreamFileReader.cpp
 )
 
 project(MVault)

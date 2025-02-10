@@ -2,14 +2,14 @@
 
 #include <string>
 #include <vector>
-#include <fstream>
-#include <iostream>
+
+#include "StreamFileReader.h"
 
 namespace mvlt
 {
     /**
         \defgroup CsvParserFunctions Csv parser functions
-        \brief All functions for working with DataStorage and csv
+        \brief All functions for working with MVault and csv
 
         @{      
     */
@@ -39,15 +39,10 @@ namespace mvlt
     class CsvParser
     {
     private:
-        
-        // Pointer to array with file data
-        char* FileData = nullptr;
 
-        // Current position in file
-        std::size_t ReadingPos = 0;
+        // File reader that allow to read file by chunks
+        StreamFileReader FileReader;
 
-        // Full file length
-        std::size_t FileLen = 0;
     public:
 
         /// \brief Default constructor
@@ -103,7 +98,7 @@ namespace mvlt
         bool GetNextVector(std::vector<std::string>& vectorWithNext, const char& separator) noexcept;
 
         /// \brief Default destructor
-        ~CsvParser() noexcept;
+        ~CsvParser() noexcept = default;
     };
 
     /**@} */
