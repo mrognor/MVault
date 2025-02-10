@@ -95,7 +95,7 @@ int main()
     
     vlt.AddUniqueKey<std::string>("D", {[&](const std::size_t& counter, const mvlt::VaultRecordRef& vrf) -> std::string 
     {
-        int i;
+        int i = 0;
         vrf.GetData("A", i);
         return "Number: " + std::to_string(i * 2) + " index: " + std::to_string(counter);
     }});

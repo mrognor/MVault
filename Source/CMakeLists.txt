@@ -1,16 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
 
-if (CMAKE_BUILD_TYPE STREQUAL "Release")
-    set(CMAKE_CXX_FLAGS "-Wextra -O3")
-    add_compile_options(-D NDEBUG)
-else()
-    if(WIN32)
-        set(CMAKE_CXX_FLAGS "-Wextra -g")
-    else()
-        set(CMAKE_CXX_FLAGS "-Wextra -fsanitize=address -fsanitize=leak -lgcov --coverage -g -Wno-unused-parameter")
-    endif()
-endif()
-
 set(CMAKE_CXX_STANDARD 11)
 
 set(MVaultHeaders

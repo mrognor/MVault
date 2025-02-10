@@ -124,7 +124,7 @@ int main()
     vrs1.Clear();
     vlt.RequestEqual("A", 0, vrs1, -1, [](const VaultRecordRef& ref)
         {
-            int B;
+            int B = 0;
             ref.GetData("B", B);
             if (B > 0)
                 return true;
@@ -137,7 +137,7 @@ int main()
     vrs1.Clear();
     vlt.Request(Greater("A", 3, [](const VaultRecordRef& ref)
         {
-            int B;
+            int B = 0;
             ref.GetData("B", B);
             if (B != 6)
                 return true;
@@ -145,7 +145,7 @@ int main()
                 return false;
         }) && Less("A", 7, [](const VaultRecordRef& ref)
         {
-            int B;
+            int B = 0;
             ref.GetData("B", B);
             if (B != 4)
                 return true;

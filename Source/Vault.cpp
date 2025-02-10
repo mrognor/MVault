@@ -160,6 +160,7 @@ namespace mvlt
                 for (const std::string& uniqueKey : addedUniqueKeys)
                     VaultRecordErasers.find(uniqueKey)->second(newRecord);
                 
+                // codechecker_intentional [all] false positive warning from clangsa
                 InvalidFileRecords.emplace_back(lineCounter, *uniqueKeyIt);
                 delete newRecord;
             }

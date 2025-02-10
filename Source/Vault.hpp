@@ -57,7 +57,7 @@ namespace mvlt
         VaultHashMapStructure.GetData(key, TtoVaultRecordHashMap);
 
         // Get the current value of the key key inside the VaultRecordRef and save it for further work
-        T oldData;
+        T oldData{};
         dataRecord->GetData(key, oldData);
 
         // Remove oldData from TtoVaultRecordHashMap from VaultHashMapStructure
@@ -188,7 +188,7 @@ namespace mvlt
             VaultMapStructure.GetData(key, TtoVaultRecordMap);
             
             // Iterator to set it in switch
-            decltype(TtoVaultRecordMap->End()) startIt, endIt;
+            decltype(TtoVaultRecordMap->End()) startIt{}, endIt{};
 
             // Lambda function for finding greater value iterator
             auto findGreater = [&]()
@@ -505,7 +505,7 @@ namespace mvlt
         VaultRecordErasers.emplace(key, [=](VaultRecord* newRecord)
             {
                 // Get T type data with key key
-                T recordTData;
+                T recordTData{};
                 newRecord->GetData(key, recordTData);
 
                 // Find all elements on multi_map with recordTData value

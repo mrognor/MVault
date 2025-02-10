@@ -15,7 +15,7 @@ namespace mvlt
     /**
         \brief A template method for providing an interface converting string to a any type
 
-        This function allows you to use the same interface inside the DataStorage for any class, 
+        This function allows you to use the same interface inside the Vault for any class, 
         since this function accepts any type. Therefore, if you do not plan to use the functionality of saving to files, 
         then there will be no problems when using a custom type. At the same time, if you plan to work with files, 
         you can specialize this function for each required type.

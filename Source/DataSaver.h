@@ -120,7 +120,7 @@ namespace mvlt
         }
 
         /**
-            \brief A method for saving data from a string to a DataStorage
+            \brief A method for saving data from a string to a DataSaver
 
             \param [in] data a string with data
         */

@@ -44,35 +44,34 @@ namespace mvlt
         friend class VaultRequest;
 
         /// \brief Default construcor
-        VaultRequest() = default;
+        VaultRequest() noexcept = default;
 
         /**
             \brief Copy constructor
 
             \param [in] other object to copy
         */
-        // VaultRequest(const VaultRequest<Type>& other) = default;
+        VaultRequest(const VaultRequest<Type>& other) noexcept = default;
 
         /**
             \brief Move constructor
 
             \param [in] other object to move
         */
-        // VaultRequest(VaultRequest<Type>&& other) = default;
+        VaultRequest(VaultRequest<Type>&& other) noexcept = default;
 
         /**
             \brief Assignment operator
 
             \param [in] other object to copy
         */
-        // VaultRequest& operator=(const VaultRequest<Type>& other) = delete;
-
+        VaultRequest& operator=(const VaultRequest<Type>& other) noexcept = default;
         /**
             \brief Move assignment operator
 
             \param [in] other object to move
         */
-        // VaultRequest& operator=(VaultRequest<Type>&& other) = delete;
+        VaultRequest& operator=(VaultRequest<Type>&& other) noexcept = default;
 
         /**
             \brief Request constructor
