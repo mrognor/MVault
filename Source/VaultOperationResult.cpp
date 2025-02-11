@@ -2,7 +2,7 @@
 
 namespace mvlt
 {
-    void VaultOperationResult::SetOpResult(VaultOperationResultCode resultCode) noexcept
+    void VaultOperationResult::SetOpResult(const VaultOperationResultCode& resultCode) noexcept
     {
         DBG_LOG_ENTER();
 

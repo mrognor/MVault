@@ -61,8 +61,8 @@ namespace mvlt
             \param [in] dataMapIt iterator to container
             \param [in] isMultiMap is this Map multi 
         */
-        AllMapIterator(MultiContainerIterator dataMultiMapIt,
-            ContainerIterator dataMapIt, bool isMultiMap)
+        AllMapIterator(const MultiContainerIterator& dataMultiMapIt,
+            const ContainerIterator& dataMapIt, const bool& isMultiMap)
         {
             IsMultiMap = isMultiMap;
             DataMultiMapIt = dataMultiMapIt;
@@ -114,7 +114,7 @@ namespace mvlt
 
             \return true it other and this not equal
         */
-        bool operator!=(AllMapIterator const& other) const
+        bool operator!=(const AllMapIterator& other) const
         { 
             if (IsMultiMap)
                 return DataMultiMapIt != other.DataMultiMapIt;
@@ -129,7 +129,7 @@ namespace mvlt
 
             \return true it other and this equal
         */
-        bool operator==(AllMapIterator const& other) const
+        bool operator==(const AllMapIterator& other) const
         {
             if (IsMultiMap)
                 return DataMultiMapIt == other.DataMultiMapIt;
@@ -438,7 +438,7 @@ namespace mvlt
 
             \param [in] isMultiMap is this UnorderedMap store data in std::multimap
         */
-        explicit Map(bool isMultiMap)
+        explicit Map(const bool& isMultiMap)
         {
             ParentMap<std::multimap<KeyType, ValueType>, std::map<KeyType, ValueType>, MapIterator<KeyType, ValueType>, KeyType, ValueType>::IsMultiMap = isMultiMap;
         }
@@ -511,7 +511,7 @@ namespace mvlt
 
             \param [in] isMultiMap is this UnorderedMap store data in std::unordered_multimap
         */
-        explicit UnorderedMap(bool isMultiMap)
+        explicit UnorderedMap(const bool& isMultiMap)
         {
             ParentMap<std::unordered_multimap<KeyType, ValueType>, std::unordered_map<KeyType, ValueType>, UnorderedMapIterator<KeyType, ValueType>, KeyType, ValueType>::IsMultiMap = isMultiMap;
         }

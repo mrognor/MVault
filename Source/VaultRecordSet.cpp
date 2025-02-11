@@ -354,7 +354,7 @@ namespace mvlt
             std::cout << "The parent Vault is not valid!" << "\n";
     }
 
-    void VaultRecordSet::PrintAsTable(bool isPrintId, const std::size_t& amountOfRecords, const std::string& primaryKey, const bool& isReverse,
+    void VaultRecordSet::PrintAsTable(const bool& isPrintId, const std::size_t& amountOfRecords, const std::string& primaryKey, const bool& isReverse,
             const std::list<std::string>& keys) const noexcept
     {
         DBG_LOG_ENTER();

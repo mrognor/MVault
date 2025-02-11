@@ -62,7 +62,7 @@ namespace mvlt
 
             \param [in] resultCode operation code
         */
-        void SetOpResult(VaultOperationResultCode resultCode) noexcept;
+        void SetOpResult(const VaultOperationResultCode& resultCode) noexcept;
 
         /**
             \brief Function for getting a text description of the operation result

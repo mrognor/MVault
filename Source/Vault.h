@@ -77,7 +77,7 @@ namespace mvlt
         // Lambda accepts a function that is called for each record inside. VaultRecordRef and Vault pointer is passed to it. 
         // By default, iteration by records occurs in ascending order. 
         // isReverse parameter is used for the reverse order.
-        std::unordered_map<std::string, std::function<void( std::function<bool(const VaultRecordRef&)> functionToSortedData, Vault* vltPtr, bool isReverse )>> VaultRecordSorters;
+        std::unordered_map<std::string, std::function<void(const std::function<bool(const VaultRecordRef&)>& functionToSortedData, Vault* vltPtr, const bool& isReverse)>> VaultRecordSorters;
 
         // Unordered_map of functions that copy keys from this to VaultRecordSet
         std::unordered_map<std::string, std::function<void(Vault* vaultRecordSet)>> VaultKeyCopiers;
@@ -198,7 +198,7 @@ namespace mvlt
         */
         template <class T>
         VaultOperationResult AddKey(const std::string& key, const T& defaultKeyValue, const bool& isUniqueKey, const bool& isUniqueKeyWithoutLambda,
-            std::function<T(std::size_t, const VaultRecordRef&)> uniqueKeyFunction) noexcept;
+            const std::function<T(std::size_t, const VaultRecordRef&)>& uniqueKeyFunction) noexcept;
 
         /**
             \brief A method for reading a csv file and loading data from it into memory
@@ -313,7 +313,7 @@ namespace mvlt
             \return Returns VaultOperationResult with information about key adding
         */
         template <class T>
-        VaultOperationResult AddUniqueKey(const std::string& key, std::function<T(std::size_t, const VaultRecordRef&)> uniqueKeyFunction) noexcept;
+        VaultOperationResult AddUniqueKey(const std::string& key, const std::function<T(std::size_t, const VaultRecordRef&)>& uniqueKeyFunction) noexcept;
 
         /**
             \brief Template method to update default key value
@@ -609,7 +609,7 @@ namespace mvlt
             \param [in] vaultRecordSet Set, to save the query result
         */
         template <VaultRequestType Type>
-        VaultOperationResult Request(const VaultRequest<Type>&& request, VaultRecordSet& vaultRecordSet) const;
+        VaultOperationResult Request(VaultRequest<Type>&& request, VaultRecordSet& vaultRecordSet) const;
 
         /**
             \brief A method for deleting all data and keys
@@ -694,7 +694,7 @@ namespace mvlt
             If the key is missing in the vault, the function will be called 0 times
         */
         template<class F>
-        void SortBy(const std::string& key, const F&& func, const bool& isReverse = false, const std::size_t& amountOfRecords = -1) const noexcept;
+        void SortBy(const std::string& key, F&& func, const bool& isReverse = false, const std::size_t& amountOfRecords = -1) const noexcept;
 
         /**
             \brief Method for saving the contents of the Vault in json
@@ -724,8 +724,8 @@ namespace mvlt
             \param [in] isReverse The sorting direction. If true, the data will be output from the larger to the smaller
             \param [in] keys list of keys to be printed. By default, the list is empty, which means that all keys will be output
         */
-        void PrintAsTable(bool isPrintId = false, const std::size_t& amountOfRecords = -1, std::string primaryKey = "", const bool& isReverse = false,
-            const std::list<std::string> keys = {}) const noexcept;
+        void PrintAsTable(const bool& isPrintId = false, const std::size_t& amountOfRecords = -1, const std::string& primaryKey = "", const bool& isReverse = false,
+            const std::list<std::string>& keys = {}) const noexcept;
 
         /**
             \brief A method for saving data to a table file. The file format is csv

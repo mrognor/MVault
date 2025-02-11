@@ -20,7 +20,7 @@ namespace mvlt
         VaultRequestType RequestType = Type;
 
         /// Function for requesting data
-        void (*DataRequestFunc)(const std::string&, Vault*, std::unordered_set<VaultRecord*>&, void*, void*, bool, bool, std::function<bool(const VaultRecordRef&)>);
+        void (*DataRequestFunc)(const std::string&, Vault*, std::unordered_set<VaultRecord*>&, void*, void*, bool, bool, const std::function<bool(const VaultRecordRef&)>&);
         
         /// A variable for storing a logical request function
         std::function<void (Vault*, std::unordered_set<VaultRecord*>&)> LogicalRequestFunction;

@@ -24,7 +24,7 @@ namespace mvlt
         \param [in] keys vector of keys to be printed. By default, the vector is empty, which means that all keys will be output
     */ 
     template <template <class E, class Alloc = std::allocator<E>> class T>
-    void PrintAsTable(const T<VaultRecordRef>& container, bool isPrintId = false, const std::size_t& amountOfRecords = -1, const std::vector<std::string> keys = {}) noexcept
+    void PrintAsTable(const T<VaultRecordRef>& container, const bool& isPrintId = false, const std::size_t& amountOfRecords = -1, const std::vector<std::string>& keys = {}) noexcept
     {
         if (container.empty()) 
         {

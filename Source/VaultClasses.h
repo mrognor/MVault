@@ -17,8 +17,8 @@ namespace mvlt
         LessOrEqual,   ///< A request that will receive all records whose key value is less than or equal to the requested one
         Less,          ///< A request that will receive all records with a key value less than the requested one
         Interval,      ///< A request that will receive all records with a key value between requested
-        Or,
-        And
+        Or,            ///< A request with a logical operation or
+        And            ///< A request with a logical operation and
     };
 
     // MVault classes

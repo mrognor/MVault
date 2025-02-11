@@ -360,7 +360,7 @@ namespace mvlt
 
     template <class T>
     VaultOperationResult Vault::AddKey(const std::string& key, const T& defaultKeyValue, const bool& isUniqueKey, const bool& isUniqueKeyWithoutLambda,
-        std::function<T(std::size_t, const VaultRecordRef&)> uniqueKeyFunction) noexcept
+        const std::function<T(std::size_t, const VaultRecordRef&)>& uniqueKeyFunction) noexcept
     {
         DBG_LOG_ENTER();
 
@@ -535,7 +535,7 @@ namespace mvlt
             }
         );
 
-        VaultRecordSorters.emplace(key, [=](const std::function<bool(const VaultRecordRef&)>& functionToSortedData, Vault* vltPtr, bool isReverse)
+        VaultRecordSorters.emplace(key, [=](const std::function<bool(const VaultRecordRef&)>& functionToSortedData, Vault* vltPtr, const bool& isReverse)
         {
             if (!isReverse)
             {
@@ -598,7 +598,7 @@ namespace mvlt
     }
 
     template <class T>
-    VaultOperationResult Vault::AddUniqueKey(const std::string& key, std::function<T(std::size_t, const VaultRecordRef&)> uniqueKeyFunction) noexcept
+    VaultOperationResult Vault::AddUniqueKey(const std::string& key, const std::function<T(std::size_t, const VaultRecordRef&)>& uniqueKeyFunction) noexcept
     {
         DBG_LOG_ENTER();
 
@@ -907,7 +907,7 @@ namespace mvlt
     }
 
     template <VaultRequestType Type>
-    VaultOperationResult Vault::Request(const VaultRequest<Type>&& request, VaultRecordSet& vaultRecordSet) const
+    VaultOperationResult Vault::Request(VaultRequest<Type>&& request, VaultRecordSet& vaultRecordSet) const
     {
         DBG_LOG_ENTER();
 
@@ -1123,7 +1123,7 @@ namespace mvlt
     }
 
     template<class F>
-    void Vault::SortBy(const std::string& key, const F&& func, const bool& isReverse, const std::size_t& amountOfRecords) const noexcept
+    void Vault::SortBy(const std::string& key, F&& func, const bool& isReverse, const std::size_t& amountOfRecords) const noexcept
     {
         DBG_LOG_ENTER();
 

@@ -318,7 +318,7 @@ namespace mvlt
             \param [in] vaultRecordSet Set, to save the query result
         */
         template <VaultRequestType Type>
-        VaultOperationResult Request(const VaultRequest<Type>&& request, VaultRecordSet& vaultRecordSet) const;
+        VaultOperationResult Request(VaultRequest<Type>&& request, VaultRecordSet& vaultRecordSet) const;
 
         /**
             \brief A method for checking for an entry in set
@@ -434,7 +434,7 @@ namespace mvlt
             If the key is missing in the vault, the function will be called 0 times
         */
         template<class F>
-        void SortBy(const std::string& key, const F&& func, const bool& isReverse = false, const std::size_t& amountOfRecords = -1) const noexcept;
+        void SortBy(const std::string& key, F&& func, const bool& isReverse = false, const std::size_t& amountOfRecords = -1) const noexcept;
 
         /**
             \brief Method for saving the contents of the VaultRecordSet in json
@@ -465,7 +465,7 @@ namespace mvlt
             \param [in] isReverse The sorting direction. If true, the data will be output from the larger to the smaller
             \param [in] keys list of keys to be printed. By default, the list is empty, which means that all keys will be output
         */
-        void PrintAsTable(bool isPrintId = false, const std::size_t& amountOfRecords = -1, const std::string& primaryKey = "", const bool& isReverse = false,
+        void PrintAsTable(const bool& isPrintId = false, const std::size_t& amountOfRecords = -1, const std::string& primaryKey = "", const bool& isReverse = false,
             const std::list<std::string>& keys = {}) const noexcept;
 
         /**

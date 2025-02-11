@@ -195,7 +195,7 @@ namespace mvlt
     }
 
     template <VaultRequestType Type>
-    VaultOperationResult VaultRecordSet::Request(const VaultRequest<Type>&& request, VaultRecordSet& vaultRecordSet) const
+    VaultOperationResult VaultRecordSet::Request(VaultRequest<Type>&& request, VaultRecordSet& vaultRecordSet) const
     {
         DBG_LOG_ENTER();
 
@@ -303,7 +303,7 @@ namespace mvlt
     }
 
     template<class F>
-    void VaultRecordSet::SortBy(const std::string& key, const F&& func, const bool& isReverse, const std::size_t& amountOfRecords) const noexcept
+    void VaultRecordSet::SortBy(const std::string& key, F&& func, const bool& isReverse, const std::size_t& amountOfRecords) const noexcept
     {
         DBG_LOG_ENTER();
 

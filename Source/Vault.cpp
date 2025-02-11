@@ -748,8 +748,8 @@ namespace mvlt
         }
     }
 
-    void Vault::PrintAsTable(bool isPrintId, const std::size_t& amountOfRecords, std::string primaryKey, const bool& isReverse,
-        const std::list<std::string> keys) const noexcept
+    void Vault::PrintAsTable(const bool& isPrintId, const std::size_t& amountOfRecords, const std::string& primaryKey, const bool& isReverse,
+        const std::list<std::string>& keys) const noexcept
     {
         DBG_LOG_ENTER();
 
@@ -847,25 +847,29 @@ namespace mvlt
 
         // Print records
         counter = 0;
-        if (primaryKey.empty()) primaryKey = keysList->front();
-        SortBy(primaryKey, [&](const VaultRecordRef& record)
+        std::string key;
+
+        if (primaryKey.empty()) key = keysList->front();
+        else key = primaryKey;
+
+        SortBy(key, [&](const VaultRecordRef& record)
+        {
+            counter = 0;
+            std::cout << "|";
+            for (const std::string& key : *keysList)
             {
-                counter = 0;
-                std::cout << "|";
-                for (const std::string& key : *keysList)
-                {
-                    record.GetDataAsString(key, dataString);
-                    std::cout << " " << dataString;
-                    for (std::size_t j = dataString.length(); j < maxLengths[counter]; ++j) std::cout << " ";
-                        std::cout << " |";
-                    ++counter;
-                }
-                if (isPrintId)
-                    std::cout << " " << record.GetRecordUniqueId() << "\n";
-                else 
-                    std::cout << "\n";
-                return true;
-            }, isReverse, amountOfRecords);
+                record.GetDataAsString(key, dataString);
+                std::cout << " " << dataString;
+                for (std::size_t j = dataString.length(); j < maxLengths[counter]; ++j) std::cout << " ";
+                    std::cout << " |";
+                ++counter;
+            }
+            if (isPrintId)
+                std::cout << " " << record.GetRecordUniqueId() << "\n";
+            else 
+                std::cout << "\n";
+            return true;
+        }, isReverse, amountOfRecords);
 
         // Print splitter
         if (amountOfRecords >= RecordsSet.size())

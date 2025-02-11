@@ -21,7 +21,7 @@ namespace mvlt
 
         // Set Request func
         DataRequestFunc = [](const std::string& key, Vault* vlt, std::unordered_set<VaultRecord*>& vaultRecordSet, void* beginValue, void* endValue,
-            bool isIncludeBeginKeyValue, bool isIncludeEndKeyValue, std::function<bool(const VaultRecordRef&)> requestPredicat)
+            bool isIncludeBeginKeyValue, bool isIncludeEndKeyValue, const std::function<bool(const VaultRecordRef&)>& requestPredicat)
         {
             VaultOperationResult res;
             // Simple data request to vlt
