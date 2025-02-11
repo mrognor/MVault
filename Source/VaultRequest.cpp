@@ -5,5 +5,5 @@
 namespace mvlt 
 {
     // Set value to DefaultRequestPredicat global variable
-    std::function<bool(const VaultRecordRef&)> DefaultRequestPredicat = [](const VaultRecordRef&){return true;};
+    std::function<bool(const VaultRecordRef& ref)> DefaultRequestPredicat = [](const VaultRecordRef&){return true;};
 }

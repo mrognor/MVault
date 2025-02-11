@@ -22,10 +22,10 @@ namespace mvlt
         std::type_index DataType;
         
         // Function for setting data to VaultRecordRef
-        std::function<VaultOperationResult(const std::string&, VaultRecordRef&)> SetDataToRefFunc;
+        std::function<VaultOperationResult(const std::string& data, VaultRecordRef& ref)> SetDataToRefFunc;
         
         // Function for settind data to VaultRecord
-        std::function<void(const std::string&, VaultRecord*)> SetDataToRecordFunc;
+        std::function<void(const std::string& data, VaultRecord* record)> SetDataToRecordFunc;
         
         /**
             \brief Method for setting key data in VaultRecordRef

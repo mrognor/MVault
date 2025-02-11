@@ -63,13 +63,13 @@ namespace mvlt
         std::unordered_map<std::string, std::type_index> KeysTypes;
 
         // Unordered_map of functions that add a new element to the VaultStructureHashMap
-        std::unordered_map<std::string, std::function<bool(VaultRecord*)>> VaultRecordAdders;
+        std::unordered_map<std::string, std::function<bool(VaultRecord* newRecord)>> VaultRecordAdders;
 
         // Unordered_map of functions which clean up the Vault structure, but do not delete records
         std::unordered_map<std::string, std::function<void()>> VaultRecordClearers;
 
         // Unordered_map of functions that erase record from the unordered_map's
-        std::unordered_map<std::string, std::function<void(VaultRecord* newRecord)>> VaultRecordErasers;
+        std::unordered_map<std::string, std::function<void(VaultRecord* record)>> VaultRecordErasers;
 
         // Unordered_map of functions for getting sorted data.
         // The key is a string with the name of the key from the Vault.
@@ -77,7 +77,7 @@ namespace mvlt
         // Lambda accepts a function that is called for each record inside. VaultRecordRef and Vault pointer is passed to it. 
         // By default, iteration by records occurs in ascending order. 
         // isReverse parameter is used for the reverse order.
-        std::unordered_map<std::string, std::function<void(const std::function<bool(const VaultRecordRef&)>& functionToSortedData, Vault* vltPtr, const bool& isReverse)>> VaultRecordSorters;
+        std::unordered_map<std::string, std::function<void(const std::function<bool(const VaultRecordRef& ref)>& functionToSortedData, Vault* vltPtr, const bool& isReverse)>> VaultRecordSorters;
 
         // Unordered_map of functions that copy keys from this to VaultRecordSet
         std::unordered_map<std::string, std::function<void(Vault* vaultRecordSet)>> VaultKeyCopiers;
@@ -158,7 +158,7 @@ namespace mvlt
         template <class T>
         VaultOperationResult RequestRecordsSet(const VaultRequestType& requestType, const std::string& key, const T& beginKeyValue,
             const T& endKeyValue, std::unordered_set<VaultRecord*>& recordsSet, const bool& isIncludeBeginKeyValue, 
-            const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept;
+            const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef& ref)>& requestPredicat) const noexcept;
 
         /**
             \brief The method for getting the result of the request
@@ -181,7 +181,7 @@ namespace mvlt
         template <class T>
         VaultOperationResult RequestRecords(const VaultRequestType& requestType, const std::string& key, const T& beginKeyValue,
             const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue, 
-            const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept;
+            const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef& ref)>& requestPredicat) const noexcept;
 
         /**
             \brief Template method to add new key with default value to Vault
@@ -198,7 +198,7 @@ namespace mvlt
         */
         template <class T>
         VaultOperationResult AddKey(const std::string& key, const T& defaultKeyValue, const bool& isUniqueKey, const bool& isUniqueKeyWithoutLambda,
-            const std::function<T(std::size_t, const VaultRecordRef&)>& uniqueKeyFunction) noexcept;
+            const std::function<T(const std::size_t& counter, const VaultRecordRef& ref)>& uniqueKeyFunction) noexcept;
 
         /**
             \brief A method for reading a csv file and loading data from it into memory
@@ -214,7 +214,7 @@ namespace mvlt
 
             \return returns true if it was possible to read the file, otherwise it returns false
         */
-        bool ReadFile(const std::string& fileName, const bool& isPreprocessRecord, const std::function<void (const std::vector<std::string>&, std::vector<std::string>&)>& recordHandler, 
+        bool ReadFile(const std::string& fileName, const bool& isPreprocessRecord, const std::function<void (const std::vector<std::string>& keys, std::vector<std::string>& values)>& recordHandler, 
             const char& separator, const bool& isLoadKeys, const std::vector<std::string>& userKeys) noexcept;
 
     public:
@@ -313,7 +313,7 @@ namespace mvlt
             \return Returns VaultOperationResult with information about key adding
         */
         template <class T>
-        VaultOperationResult AddUniqueKey(const std::string& key, const std::function<T(std::size_t, const VaultRecordRef&)>& uniqueKeyFunction) noexcept;
+        VaultOperationResult AddUniqueKey(const std::string& key, const std::function<T(const std::size_t& counter, const VaultRecordRef& ref)>& uniqueKeyFunction) noexcept;
 
         /**
             \brief Template method to update default key value
@@ -505,7 +505,7 @@ namespace mvlt
         */
         template <class T>
         VaultOperationResult RequestEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
-            const std::size_t& amountOfRecords = -1, const std::function<bool(const VaultRecordRef&)>& requestPredicat = DefaultRequestPredicat) const noexcept;
+            const std::size_t& amountOfRecords = -1, const std::function<bool(const VaultRecordRef& ref)>& requestPredicat = DefaultRequestPredicat) const noexcept;
 
         /**
             \brief A method for getting all records that have a value greater than keyValue stored by the key key
@@ -523,7 +523,7 @@ namespace mvlt
         */
         template <class T>
         VaultOperationResult RequestGreater(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
-            const std::size_t& amountOfRecords = -1, const std::function<bool(const VaultRecordRef&)>& requestPredicat = DefaultRequestPredicat) const noexcept;
+            const std::size_t& amountOfRecords = -1, const std::function<bool(const VaultRecordRef& ref)>& requestPredicat = DefaultRequestPredicat) const noexcept;
 
         /**
             \brief A method for getting all records that have a value greater than or equal to keyValue stored by the key key
@@ -541,7 +541,7 @@ namespace mvlt
         */
         template <class T>
         VaultOperationResult RequestGreaterOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
-            const std::size_t& amountOfRecords = -1, const std::function<bool(const VaultRecordRef&)>& requestPredicat = DefaultRequestPredicat) const noexcept;
+            const std::size_t& amountOfRecords = -1, const std::function<bool(const VaultRecordRef& ref)>& requestPredicat = DefaultRequestPredicat) const noexcept;
 
         /**
             \brief A method for getting all records that have a value less than keyValue stored by the key key
@@ -559,7 +559,7 @@ namespace mvlt
         */
         template <class T>
         VaultOperationResult RequestLess(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
-            const std::size_t& amountOfRecords = -1, const std::function<bool(const VaultRecordRef&)>& requestPredicat = DefaultRequestPredicat) const noexcept;
+            const std::size_t& amountOfRecords = -1, const std::function<bool(const VaultRecordRef& ref)>& requestPredicat = DefaultRequestPredicat) const noexcept;
 
         /**
             \brief A method for getting all records that have a value less than or equal to keyValue stored by the key key
@@ -577,7 +577,7 @@ namespace mvlt
         */
         template <class T>
         VaultOperationResult RequestLessOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
-            const std::size_t& amountOfRecords = -1, const std::function<bool(const VaultRecordRef&)>& requestPredicat = DefaultRequestPredicat) const noexcept;
+            const std::size_t& amountOfRecords = -1, const std::function<bool(const VaultRecordRef& ref)>& requestPredicat = DefaultRequestPredicat) const noexcept;
 
         /**
             \brief The method for getting the result of the request
@@ -600,7 +600,7 @@ namespace mvlt
         VaultOperationResult RequestInterval(const std::string& key, const T& beginKeyValue,
             const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue = true, 
             const bool& isIncludeEndKeyValue = true, const std::size_t& amountOfRecords = -1,
-            const std::function<bool(const VaultRecordRef&)>& requestPredicat = DefaultRequestPredicat) const noexcept;
+            const std::function<bool(const VaultRecordRef& ref)>& requestPredicat = DefaultRequestPredicat) const noexcept;
 
         /**
             \brief A method for complex requests
@@ -762,7 +762,8 @@ namespace mvlt
 
             \return returns true if it was possible to read the file, otherwise it returns false
         */
-        bool ReadFile(const std::string& fileName, const char& separator, const bool& isLoadKeys, const std::function<void (const std::vector<std::string>&, std::vector<std::string>&)>& recordHandler) noexcept;
+        bool ReadFile(const std::string& fileName, const char& separator, const bool& isLoadKeys,
+            const std::function<void (const std::vector<std::string>& keys, std::vector<std::string>& values)>& recordHandler) noexcept;
 
         /**
             \brief A method for getting errors in the last read file

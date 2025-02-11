@@ -20,10 +20,10 @@ namespace mvlt
         VaultRequestType RequestType = Type;
 
         /// Function for requesting data
-        void (*DataRequestFunc)(const std::string&, Vault*, std::unordered_set<VaultRecord*>&, void*, void*, bool, bool, const std::function<bool(const VaultRecordRef&)>&);
+        void (*DataRequestFunc)(const std::string&, Vault*, std::unordered_set<VaultRecord*>&, void*, void*, bool, bool, const std::function<bool(const VaultRecordRef& ref)>&);
         
         /// A variable for storing a logical request function
-        std::function<void (Vault*, std::unordered_set<VaultRecord*>&)> LogicalRequestFunction;
+        std::function<void (Vault* vlt, std::unordered_set<VaultRecord*>& setWithRecords)> LogicalRequestFunction;
 
         /// A pointer to a function that delete data
         void (*DeleteFunc)(void*) = nullptr;
@@ -35,7 +35,7 @@ namespace mvlt
         void* DataPtr = nullptr;
 
         /// Variable to store predicat function
-        std::function<bool(const VaultRecordRef&)> RequestPredicat;
+        std::function<bool(const VaultRecordRef& ref)> RequestPredicat;
 
     public:
 
@@ -84,7 +84,7 @@ namespace mvlt
             When the function returns true, the record is added, and when false is not added.
         */
         template <class T>
-        VaultRequest(const std::string& key, const T& keyValue, const std::function<bool(const VaultRecordRef&)>& requestPredicat = DefaultRequestPredicat) noexcept;
+        VaultRequest(const std::string& key, const T& keyValue, const std::function<bool(const VaultRecordRef& ref)>& requestPredicat = DefaultRequestPredicat) noexcept;
 
         /**
             \brief Request constructor

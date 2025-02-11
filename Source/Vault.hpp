@@ -119,7 +119,7 @@ namespace mvlt
     template <class T>
     VaultOperationResult Vault::RequestRecordsSet(const VaultRequestType& requestType, const std::string& key, const T& beginKeyValue,
         const T& endKeyValue, std::unordered_set<VaultRecord*>& vaultRecords, const bool& isIncludeBeginKeyValue, 
-        const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept
+        const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef& ref)>& requestPredicat) const noexcept
     {
         DBG_LOG_ENTER();
 
@@ -308,7 +308,7 @@ namespace mvlt
     template <class T>
     VaultOperationResult Vault::RequestRecords(const VaultRequestType& requestType, const std::string& key, const T& beginKeyValue,
         const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue, 
-        const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept
+        const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef& ref)>& requestPredicat) const noexcept
     {
         DBG_LOG_ENTER();
 
@@ -360,7 +360,7 @@ namespace mvlt
 
     template <class T>
     VaultOperationResult Vault::AddKey(const std::string& key, const T& defaultKeyValue, const bool& isUniqueKey, const bool& isUniqueKeyWithoutLambda,
-        const std::function<T(std::size_t, const VaultRecordRef&)>& uniqueKeyFunction) noexcept
+        const std::function<T(const std::size_t& keys, const VaultRecordRef& values)>& uniqueKeyFunction) noexcept
     {
         DBG_LOG_ENTER();
 
@@ -493,7 +493,7 @@ namespace mvlt
             }
         );
 
-        // Add function to TtoVaultRecordHashMap cleareing
+        // Add function to TtoVaultRecordHashMap clearing
         VaultRecordClearers.emplace(key, [=]()
             {
                 TtoVaultRecordHashMap->Clear();
@@ -501,20 +501,20 @@ namespace mvlt
             }
         );
 
-        // Add function to erase newRecord from TtoVaultRecordHashMap
-        VaultRecordErasers.emplace(key, [=](VaultRecord* newRecord)
+        // Add function to erase record from TtoVaultRecordHashMap
+        VaultRecordErasers.emplace(key, [=](VaultRecord* record)
             {
                 // Get T type data with key key
                 T recordTData{};
-                newRecord->GetData(key, recordTData);
+                record->GetData(key, recordTData);
 
                 // Find all elements on multi_map with recordTData value
                 auto FirstAndLastIteratorsWithKeyOnHashMap = TtoVaultRecordHashMap->EqualRange(recordTData);
 
-                // Find newRecord and erase it from TtoVaultRecordHashMap
+                // Find record and erase it from TtoVaultRecordHashMap
                 for (auto pairIt = FirstAndLastIteratorsWithKeyOnHashMap.first; pairIt != FirstAndLastIteratorsWithKeyOnHashMap.second; ++pairIt)
                 {
-                    if ((*pairIt).second == newRecord)
+                    if ((*pairIt).second == record)
                     {
                         TtoVaultRecordHashMap->Erase(pairIt);
                         break;
@@ -523,10 +523,10 @@ namespace mvlt
 
                 // Find all elements on map with recordTData value
                 auto FirstAndLastIteratorsWithKeyOnMap = TtoVaultRecordMap->EqualRange(recordTData);
-                // Find newRecord and erase it from TtoVaultRecordHashMap
+                // Find record and erase it from TtoVaultRecordHashMap
                 for (auto pairIt = FirstAndLastIteratorsWithKeyOnMap.first; pairIt != FirstAndLastIteratorsWithKeyOnMap.second; ++pairIt)
                 {
-                    if ((*pairIt).second == newRecord)
+                    if ((*pairIt).second == record)
                     {
                         TtoVaultRecordMap->Erase((*pairIt).first);
                         break;
@@ -535,7 +535,7 @@ namespace mvlt
             }
         );
 
-        VaultRecordSorters.emplace(key, [=](const std::function<bool(const VaultRecordRef&)>& functionToSortedData, Vault* vltPtr, const bool& isReverse)
+        VaultRecordSorters.emplace(key, [=](const std::function<bool(const VaultRecordRef& ref)>& functionToSortedData, Vault* vltPtr, const bool& isReverse)
         {
             if (!isReverse)
             {
@@ -598,7 +598,7 @@ namespace mvlt
     }
 
     template <class T>
-    VaultOperationResult Vault::AddUniqueKey(const std::string& key, const std::function<T(std::size_t, const VaultRecordRef&)>& uniqueKeyFunction) noexcept
+    VaultOperationResult Vault::AddUniqueKey(const std::string& key, const std::function<T(const std::size_t& counter, const VaultRecordRef& ref)>& uniqueKeyFunction) noexcept
     {
         DBG_LOG_ENTER();
 
@@ -827,7 +827,7 @@ namespace mvlt
 
     template <class T>
     VaultOperationResult Vault::RequestEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
-        const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept
+        const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef& ref)>& requestPredicat) const noexcept
     {
         DBG_LOG_ENTER();
 
@@ -840,7 +840,7 @@ namespace mvlt
 
     template <class T>
     VaultOperationResult Vault::RequestGreater(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
-        const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept
+        const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef& ref)>& requestPredicat) const noexcept
     {
         DBG_LOG_ENTER();
 
@@ -853,7 +853,7 @@ namespace mvlt
 
     template <class T>
     VaultOperationResult Vault::RequestGreaterOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
-        const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept
+        const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef& ref)>& requestPredicat) const noexcept
     {
         DBG_LOG_ENTER();
 
@@ -866,7 +866,7 @@ namespace mvlt
 
     template <class T>
     VaultOperationResult Vault::RequestLess(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
-        const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept
+        const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef& ref)>& requestPredicat) const noexcept
     {
         DBG_LOG_ENTER();
 
@@ -879,7 +879,7 @@ namespace mvlt
 
     template <class T>
     VaultOperationResult Vault::RequestLessOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
-        const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept
+        const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef& ref)>& requestPredicat) const noexcept
     {
         DBG_LOG_ENTER();
 
@@ -893,7 +893,7 @@ namespace mvlt
     template <class T>
     VaultOperationResult Vault::RequestInterval(const std::string& key, const T& beginKeyValue,
         const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue, 
-        const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept
+        const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef& ref)>& requestPredicat) const noexcept
     {
         DBG_LOG_ENTER();
 

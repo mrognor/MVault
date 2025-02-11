@@ -48,5 +48,5 @@ namespace mvlt
     
         The function accepts VaultRecordRef and returns true. It is needed as a stub for the default parameter in requests. It is never called
     */
-    extern std::function<bool(const VaultRecordRef&)> DefaultRequestPredicat;
+    extern std::function<bool(const VaultRecordRef& ref)> DefaultRequestPredicat;
 }

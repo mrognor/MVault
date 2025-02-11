@@ -37,7 +37,7 @@ namespace mvlt
         return dataIt;
     }
 
-    bool Vault::ReadFile(const std::string& fileName, const bool& isPreprocessRecord, const std::function<void (const std::vector<std::string>&, std::vector<std::string>&)>& recordHandler, 
+    bool Vault::ReadFile(const std::string& fileName, const bool& isPreprocessRecord, const std::function<void (const std::vector<std::string>& keys, std::vector<std::string>& values)>& recordHandler, 
             const char& separator, const bool& isLoadKeys, const std::vector<std::string>& userKeys) noexcept
     {
         DBG_LOG_ENTER();
@@ -993,7 +993,7 @@ namespace mvlt
         return ReadFile(fileName, false, [](const std::vector<std::string>&, std::vector<std::string>&) {}, separator, isLoadKeys, keys);
     }
 
-    bool Vault::ReadFile(const std::string& fileName, const char& separator, const bool& isLoadKeys, const std::function<void (const std::vector<std::string>&, std::vector<std::string>&)>& recordHandler) noexcept
+    bool Vault::ReadFile(const std::string& fileName, const char& separator, const bool& isLoadKeys, const std::function<void (const std::vector<std::string>& keys, std::vector<std::string>& values)>& recordHandler) noexcept
     {
         DBG_LOG_ENTER();
 

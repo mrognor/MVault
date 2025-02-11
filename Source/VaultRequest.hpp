@@ -8,7 +8,7 @@ namespace mvlt
 {
     template <VaultRequestType Type>
     template <class T>
-    VaultRequest<Type>::VaultRequest(const std::string& key, const T& keyValue, const std::function<bool(const VaultRecordRef&)>& requestPredicat) noexcept : Key(key), RequestPredicat(requestPredicat)
+    VaultRequest<Type>::VaultRequest(const std::string& key, const T& keyValue, const std::function<bool(const VaultRecordRef& ref)>& requestPredicat) noexcept : Key(key), RequestPredicat(requestPredicat)
     {
         DBG_LOG_ENTER();
 
@@ -21,7 +21,7 @@ namespace mvlt
 
         // Set Request func
         DataRequestFunc = [](const std::string& key, Vault* vlt, std::unordered_set<VaultRecord*>& vaultRecordSet, void* beginValue, void* endValue,
-            bool isIncludeBeginKeyValue, bool isIncludeEndKeyValue, const std::function<bool(const VaultRecordRef&)>& requestPredicat)
+            bool isIncludeBeginKeyValue, bool isIncludeEndKeyValue, const std::function<bool(const VaultRecordRef& ref)>& requestPredicat)
         {
             VaultOperationResult res;
             // Simple data request to vlt
