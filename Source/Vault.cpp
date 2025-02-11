@@ -692,9 +692,14 @@ namespace mvlt
         {
             if (isFormat) res << "\n" << tab;
             if (isUseRecordTemplate)
-                res << "\"" << recordTemplate << counter << "\":{";
+                res << "\"" << recordTemplate << counter << "\":";
             else
-                res << "\"" << record << "\":{";
+                res << "\"" << record << "\":";
+
+            if (isFormat)
+                res << " {";
+            else
+                res << "{";
 
             std::size_t keyCounter = 0;
             for(const std::string& key : KeysOrder)
@@ -704,7 +709,30 @@ namespace mvlt
                 DataSaver dataSaver;
                 record->GetDataSaver(key, dataSaver);
 
-                res << "\"" << key << "\":\"" << dataSaver.Str() << "\"";
+                std::type_index dataType = dataSaver.GetDataType();
+                if (dataType == typeid(std::int8_t) ||
+                    dataType == typeid(std::uint8_t) ||
+                    dataType == typeid(std::int16_t) ||
+                    dataType == typeid(std::uint16_t) ||
+                    dataType == typeid(std::int32_t) ||
+                    dataType == typeid(std::uint32_t) ||
+                    dataType == typeid(std::int64_t) ||
+                    dataType == typeid(std::uint64_t) ||
+                    dataType == typeid(float) ||
+                    dataType == typeid(double))
+                {
+                    if (isFormat)
+                        res << "\"" << key << "\": " << dataSaver.Str();
+                    else
+                        res << "\"" << key << "\":" << dataSaver.Str();
+                }
+                else
+                {
+                    if (isFormat)
+                        res << "\"" << key << "\": \"" << dataSaver.Str() << "\"";
+                    else
+                        res << "\"" << key << "\":\"" << dataSaver.Str() << "\"";
+                }
 
                 ++keyCounter;
                 if (keyCounter != keysAmount) res << ",";

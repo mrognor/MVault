@@ -117,5 +117,8 @@ int main()
     for (std::size_t i = 0; i < 10; ++i) vlt.CreateRecord({ {"Id", i}, {"Name", names[i]}, {"Surname", surnames[i]}, {"City", cities[i]} });
 
     vlt.PrintAsTable();
-    std::cout << vlt.ToJson(true, 2, true, "Rec") << std::endl;
+    std::cout << vlt.ToJson(false, 2, true, "Rec") << std::endl;
+
+    vlt.GetRecord<std::string>("Name", "Evan", vrf);
+    std::cout << vrf.ToJson(false) << std::endl;
 }

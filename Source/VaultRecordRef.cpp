@@ -253,6 +253,72 @@ namespace mvlt
         Vlt = nullptr;
     }
 
+    std::string VaultRecordRef::ToJson(const bool& isFormat, const std::size_t& tabSize) const noexcept
+    {
+        DBG_LOG_ENTER();
+
+        const std::string tab(tabSize, ' ');
+        std::size_t keyCounter = 0;
+        std::string res = "{";
+
+        if (VaultRecordPtr != nullptr)
+        {
+            VaultRecordPtr->VaultRecordMutex.lock();
+
+            // Check if Vault still accessable
+            if (VaultRecordPtr->GetIsValid())
+            {
+                Vlt->RecursiveReadWriteMtx.ReadLock();
+
+                for(const std::string& key : Vlt->KeysOrder)
+                {
+                    if (isFormat) res += "\n" + tab;
+
+                    DataSaver dataSaver;
+                    VaultRecordPtr->GetDataSaver(key, dataSaver);
+
+                    std::type_index dataType = dataSaver.GetDataType();
+                    
+                    if (dataType == typeid(std::int8_t) ||
+                        dataType == typeid(std::uint8_t) ||
+                        dataType == typeid(std::int16_t) ||
+                        dataType == typeid(std::uint16_t) ||
+                        dataType == typeid(std::int32_t) ||
+                        dataType == typeid(std::uint32_t) ||
+                        dataType == typeid(std::int64_t) ||
+                        dataType == typeid(std::uint64_t) ||
+                        dataType == typeid(float) ||
+                        dataType == typeid(double))
+                    {
+                        if (isFormat)
+                            res += "\"" + key + "\": " + dataSaver.Str();
+                        else
+                            res += "\"" + key + "\":" + dataSaver.Str();
+                    }
+                    else
+                    {
+                        if (isFormat)
+                            res += "\"" + key + "\": \"" + dataSaver.Str() + "\"";
+                        else
+                            res += "\"" + key + "\":\"" + dataSaver.Str() + "\"";;
+                    }
+
+                    ++keyCounter;
+                    if (keyCounter != Vlt->KeysOrder.size()) res += ",";
+                }
+
+                Vlt->RecursiveReadWriteMtx.ReadUnlock();
+            }
+
+            VaultRecordPtr->VaultRecordMutex.unlock();
+        }
+
+        if (isFormat) res += "\n";
+        res += "}";
+
+        return res;
+    }
+
     VaultRecordRef::~VaultRecordRef() noexcept
     {
         DBG_LOG_ENTER();

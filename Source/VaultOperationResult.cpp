@@ -72,6 +72,8 @@ namespace mvlt
         default:
             break;
         }
+
+        return "";
     }
 
     bool operator== (const VaultOperationResult& resA, const VaultOperationResult& resB) noexcept

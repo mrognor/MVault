@@ -191,6 +191,16 @@ namespace mvlt
         /// \brief A method for decoupling a class object from record. Reset class object to default state
         void Reset() noexcept;
 
+        /**
+            \brief Method for conver ref to json
+
+            \param [in] isFormat is format json message
+            \param [in] tabSize size of tab
+
+            \return json string with data from ref
+        */
+        std::string ToJson(const bool& isFormat = true, const std::size_t& tabSize = 2) const noexcept;
+
         /// \brief Default destructor
         ~VaultRecordRef() noexcept;
     };

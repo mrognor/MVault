@@ -907,7 +907,7 @@ namespace mvlt
     }
 
     template <VaultRequestType Type>
-    VaultOperationResult Vault::Request(VaultRequest<Type>&& request, VaultRecordSet& vaultRecordSet) const
+    VaultOperationResult Vault::Request(const VaultRequest<Type>& request, VaultRecordSet& vaultRecordSet) const
     {
         DBG_LOG_ENTER();
 

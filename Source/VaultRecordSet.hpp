@@ -195,7 +195,7 @@ namespace mvlt
     }
 
     template <VaultRequestType Type>
-    VaultOperationResult VaultRecordSet::Request(VaultRequest<Type>&& request, VaultRecordSet& vaultRecordSet) const
+    VaultOperationResult VaultRecordSet::Request(const VaultRequest<Type>& request, VaultRecordSet& vaultRecordSet) const
     {
         DBG_LOG_ENTER();
 
@@ -310,7 +310,7 @@ namespace mvlt
         if (GetIsParentVaultValid())
         {
             ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
-            Vault::SortBy(key, std::move(func), isReverse, amountOfRecords);
+            Vault::SortBy(key, func, isReverse, amountOfRecords);
         }
     }
 }

@@ -772,11 +772,11 @@ void VaultRecordSet_Request_Tests()
     vlt2.Request(GreaterOrEqual("A", 0), vrs2);
 
     vrs1.Request(Greater("A", std::size_t(0)), vrs3);
-    TEST_ASSERT(vrs3.ToJson() == "{\"Record0\":{\"A\":\"3\",\"B\":\"2\",\"C\":\"txt13\"},\"Record1\":{\"A\":\"2\",\"B\":\"3\",\"C\":\"txt12\"},\"Record2\":{\"A\":\"1\",\"B\":\"4\",\"C\":\"txt11\"}}",
+    TEST_ASSERT(vrs3.ToJson() == "{\"Record0\":{\"A\":3,\"B\":2,\"C\":\"txt13\"},\"Record1\":{\"A\":2,\"B\":3,\"C\":\"txt12\"},\"Record2\":{\"A\":1,\"B\":4,\"C\":\"txt11\"}}",
         "Failed to request recors");
 
     vrs2.Request(Greater("A", 2), vrs3);
-    TEST_ASSERT(vrs3.ToJson() == "{\"Record0\":{\"A\":\"4\"},\"Record1\":{\"A\":\"3\"}}",
+    TEST_ASSERT(vrs3.ToJson() == "{\"Record0\":{\"A\":4},\"Record1\":{\"A\":3}}",
         "Failed to request recors");
 
     vor = vrs3.Request(Equal("A", 3), vrs3);
@@ -1004,18 +1004,18 @@ void VaultRecordSet_ToJson_Test()
     std::string res;
     res = vrs.ToJson();
 
-    TEST_ASSERT(res == "{\"Record0\":{\"A\":\"3\",\"B\":\"txt3\"},\"Record1\":{\"A\":\"2\",\"B\":\"txt2\"},\"Record2\":{\"A\":\"1\",\"B\":\"txt1\"}}", "Failed to convert vault to json");
+    TEST_ASSERT(res == "{\"Record0\":{\"A\":3,\"B\":\"txt3\"},\"Record1\":{\"A\":2,\"B\":\"txt2\"},\"Record2\":{\"A\":1,\"B\":\"txt1\"}}", "Failed to convert vault to json");
     
     res = vrs.ToJson(true);
-    TEST_ASSERT(res == "{\n  \"Record0\":{\n    \"A\":\"3\",\n    \"B\":\"txt3\"\n  },\n  \"Record1\":{\n    \"A\":\"2\",\n    \"B\":\"txt2\"\n  },\n  \"Record2\":{\n    \"A\":\"1\",\n    \"B\":\"txt1\"\n  }\n}",
+    TEST_ASSERT(res == "{\n  \"Record0\": {\n    \"A\": 3,\n    \"B\": \"txt3\"\n  },\n  \"Record1\": {\n    \"A\": 2,\n    \"B\": \"txt2\"\n  },\n  \"Record2\": {\n    \"A\": 1,\n    \"B\": \"txt1\"\n  }\n}",
         "Failed to convert vault to json");
 
     res = vrs.ToJson(true, 1);
-    TEST_ASSERT(res == "{\n \"Record0\":{\n  \"A\":\"3\",\n  \"B\":\"txt3\"\n },\n \"Record1\":{\n  \"A\":\"2\",\n  \"B\":\"txt2\"\n },\n \"Record2\":{\n  \"A\":\"1\",\n  \"B\":\"txt1\"\n }\n}",
+    TEST_ASSERT(res == "{\n \"Record0\": {\n  \"A\": 3,\n  \"B\": \"txt3\"\n },\n \"Record1\": {\n  \"A\": 2,\n  \"B\": \"txt2\"\n },\n \"Record2\": {\n  \"A\": 1,\n  \"B\": \"txt1\"\n }\n}",
         "Failed to convert vault to json");
 
     res = vrs.ToJson(true, 1, true, "Rec");
-    TEST_ASSERT(res == "{\n \"Rec0\":{\n  \"A\":\"3\",\n  \"B\":\"txt3\"\n },\n \"Rec1\":{\n  \"A\":\"2\",\n  \"B\":\"txt2\"\n },\n \"Rec2\":{\n  \"A\":\"1\",\n  \"B\":\"txt1\"\n }\n}",
+    TEST_ASSERT(res == "{\n \"Rec0\": {\n  \"A\": 3,\n  \"B\": \"txt3\"\n },\n \"Rec1\": {\n  \"A\": 2,\n  \"B\": \"txt2\"\n },\n \"Rec2\": {\n  \"A\": 1,\n  \"B\": \"txt1\"\n }\n}",
         "Failed to convert vault to json");
 
     vrs.Reset();
@@ -1061,7 +1061,7 @@ void VaultRecordSet_Join_Test()
     vrs3 = vrs1;
     vrs1.Join(vrs2);
 
-    TEST_ASSERT(vrs1.ToJson() == "{\"Record0\":{\"A\":\"7\",\"B\":\"none7\"},\"Record1\":{\"A\":\"8\",\"B\":\"none8\"},\"Record2\":{\"A\":\"9\",\"B\":\"none9\"},\"Record3\":{\"A\":\"3\",\"B\":\"none3\"},\"Record4\":{\"A\":\"2\",\"B\":\"none2\"},\"Record5\":{\"A\":\"1\",\"B\":\"none1\"},\"Record6\":{\"A\":\"0\",\"B\":\"none0\"}}",
+    TEST_ASSERT(vrs1.ToJson() == "{\"Record0\":{\"A\":7,\"B\":\"none7\"},\"Record1\":{\"A\":8,\"B\":\"none8\"},\"Record2\":{\"A\":9,\"B\":\"none9\"},\"Record3\":{\"A\":3,\"B\":\"none3\"},\"Record4\":{\"A\":2,\"B\":\"none2\"},\"Record5\":{\"A\":1,\"B\":\"none1\"},\"Record6\":{\"A\":0,\"B\":\"none0\"}}",
         "Failed to join sets");
 
     vor = vrs3.Join(vrs3);
@@ -1105,7 +1105,7 @@ void VaultRecordSet_Exclude_Test()
     vrs3 = vrs1;
     vrs1.Exclude(vrs2);
 
-    TEST_ASSERT(vrs1.ToJson() == "{\"Record0\":{\"A\":\"6\",\"B\":\"none6\"},\"Record1\":{\"A\":\"5\",\"B\":\"none5\"},\"Record2\":{\"A\":\"4\",\"B\":\"none4\"},\"Record3\":{\"A\":\"3\",\"B\":\"none3\"},\"Record4\":{\"A\":\"2\",\"B\":\"none2\"},\"Record5\":{\"A\":\"1\",\"B\":\"none1\"},\"Record6\":{\"A\":\"0\",\"B\":\"none0\"}}",
+    TEST_ASSERT(vrs1.ToJson() == "{\"Record0\":{\"A\":6,\"B\":\"none6\"},\"Record1\":{\"A\":5,\"B\":\"none5\"},\"Record2\":{\"A\":4,\"B\":\"none4\"},\"Record3\":{\"A\":3,\"B\":\"none3\"},\"Record4\":{\"A\":2,\"B\":\"none2\"},\"Record5\":{\"A\":1,\"B\":\"none1\"},\"Record6\":{\"A\":0,\"B\":\"none0\"}}",
         "Failed to exclude sets");
 
     vor = vrs3.Exclude(vrs3);
@@ -1149,7 +1149,7 @@ void VaultRecordSet_Intersect_Test()
     vrs3 = vrs1;
     vrs1.Intersect(vrs2);
 
-    TEST_ASSERT(vrs1.ToJson() == "{\"Record0\":{\"A\":\"8\",\"B\":\"none8\"},\"Record1\":{\"A\":\"7\",\"B\":\"none7\"}}",
+    TEST_ASSERT(vrs1.ToJson() == "{\"Record0\":{\"A\":8,\"B\":\"none8\"},\"Record1\":{\"A\":7,\"B\":\"none7\"}}",
         "Failed to intersect sets");
 
     vor = vrs3.Intersect(vrs3);
@@ -1259,7 +1259,7 @@ void Union_Test()
     // Correct request
     vor = Union(vrs1, vrs2, vrs3);
     TEST_ASSERT(vor.IsOperationSuccess == true, "Failed to union");
-    TEST_ASSERT(vrs3.ToJson() == "{\"Record0\":{\"A\":\"8\",\"B\":\"none8\"},\"Record1\":{\"A\":\"9\",\"B\":\"none9\"},\"Record2\":{\"A\":\"0\",\"B\":\"none0\"},\"Record3\":{\"A\":\"1\",\"B\":\"none1\"},\"Record4\":{\"A\":\"2\",\"B\":\"none2\"}}",
+    TEST_ASSERT(vrs3.ToJson() == "{\"Record0\":{\"A\":8,\"B\":\"none8\"},\"Record1\":{\"A\":9,\"B\":\"none9\"},\"Record2\":{\"A\":0,\"B\":\"none0\"},\"Record3\":{\"A\":1,\"B\":\"none1\"},\"Record4\":{\"A\":2,\"B\":\"none2\"}}",
         "Failed to union sets");
 
     // Same sets in request
@@ -1317,7 +1317,7 @@ void Intersection_Test()
     vor = Intersection(vrs1, vrs2, vrs3);
 
     TEST_ASSERT(vor.IsOperationSuccess == true, "Failed to intersection");
-    TEST_ASSERT(vrs3.ToJson() == "{\"Record0\":{\"A\":\"4\",\"B\":\"none4\"},\"Record1\":{\"A\":\"5\",\"B\":\"none5\"},\"Record2\":{\"A\":\"6\",\"B\":\"none6\"}}",
+    TEST_ASSERT(vrs3.ToJson() == "{\"Record0\":{\"A\":4,\"B\":\"none4\"},\"Record1\":{\"A\":5,\"B\":\"none5\"},\"Record2\":{\"A\":6,\"B\":\"none6\"}}",
         "Failed to intersection sets");
 
     // Same sets in request

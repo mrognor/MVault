@@ -318,7 +318,7 @@ namespace mvlt
             \param [in] vaultRecordSet Set, to save the query result
         */
         template <VaultRequestType Type>
-        VaultOperationResult Request(VaultRequest<Type>&& request, VaultRecordSet& vaultRecordSet) const;
+        VaultOperationResult Request(const VaultRequest<Type>& request, VaultRecordSet& vaultRecordSet) const;
 
         /**
             \brief A method for checking for an entry in set

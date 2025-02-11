@@ -882,7 +882,7 @@ void Vault_Request_Tests()
     vlt1.CreateRecord({ {"A", std::size_t(3)}, {"B", 2}, {"C", std::string("txt13")} });
 
     vlt1.Request(Greater("A", std::size_t(0)), vrs);
-    TEST_ASSERT(vrs.ToJson() == "{\"Record0\":{\"A\":\"3\",\"B\":\"2\",\"C\":\"txt13\"},\"Record1\":{\"A\":\"2\",\"B\":\"3\",\"C\":\"txt12\"},\"Record2\":{\"A\":\"1\",\"B\":\"4\",\"C\":\"txt11\"}}",
+    TEST_ASSERT(vrs.ToJson() == "{\"Record0\":{\"A\":3,\"B\":2,\"C\":\"txt13\"},\"Record1\":{\"A\":2,\"B\":3,\"C\":\"txt12\"},\"Record2\":{\"A\":1,\"B\":4,\"C\":\"txt11\"}}",
         "Failed to request recors");
 
     vlt2.AddKey("A", -1);
@@ -893,7 +893,7 @@ void Vault_Request_Tests()
     vlt2.CreateRecord({ {"A", 4} });
 
     vlt2.Request(Greater("A", 2), vrs);
-    TEST_ASSERT(vrs.ToJson() == "{\"Record0\":{\"A\":\"4\"},\"Record1\":{\"A\":\"3\"}}", 
+    TEST_ASSERT(vrs.ToJson() == "{\"Record0\":{\"A\":4},\"Record1\":{\"A\":3}}", 
         "Failed to request recors");
 }
 
@@ -1054,18 +1054,18 @@ void Vault_ToJson_Test()
 
     std::string res;
     res = vlt.ToJson();
-    TEST_ASSERT(res == "{\"Record0\":{\"A\":\"3\",\"B\":\"txt3\"},\"Record1\":{\"A\":\"2\",\"B\":\"txt2\"},\"Record2\":{\"A\":\"1\",\"B\":\"txt1\"}}", "Failed to convert vault to json");
+    TEST_ASSERT(res == "{\"Record0\":{\"A\":3,\"B\":\"txt3\"},\"Record1\":{\"A\":2,\"B\":\"txt2\"},\"Record2\":{\"A\":1,\"B\":\"txt1\"}}", "Failed to convert vault to json");
     
     res = vlt.ToJson(true);
-    TEST_ASSERT(res == "{\n  \"Record0\":{\n    \"A\":\"3\",\n    \"B\":\"txt3\"\n  },\n  \"Record1\":{\n    \"A\":\"2\",\n    \"B\":\"txt2\"\n  },\n  \"Record2\":{\n    \"A\":\"1\",\n    \"B\":\"txt1\"\n  }\n}",
+    TEST_ASSERT(res == "{\n  \"Record0\": {\n    \"A\": 3,\n    \"B\": \"txt3\"\n  },\n  \"Record1\": {\n    \"A\": 2,\n    \"B\": \"txt2\"\n  },\n  \"Record2\": {\n    \"A\": 1,\n    \"B\": \"txt1\"\n  }\n}",
         "Failed to convert vault to json");
 
     res = vlt.ToJson(true, 1);
-    TEST_ASSERT(res == "{\n \"Record0\":{\n  \"A\":\"3\",\n  \"B\":\"txt3\"\n },\n \"Record1\":{\n  \"A\":\"2\",\n  \"B\":\"txt2\"\n },\n \"Record2\":{\n  \"A\":\"1\",\n  \"B\":\"txt1\"\n }\n}",
+    TEST_ASSERT(res == "{\n \"Record0\": {\n  \"A\": 3,\n  \"B\": \"txt3\"\n },\n \"Record1\": {\n  \"A\": 2,\n  \"B\": \"txt2\"\n },\n \"Record2\": {\n  \"A\": 1,\n  \"B\": \"txt1\"\n }\n}",
         "Failed to convert vault to json");
 
     res = vlt.ToJson(true, 1, true, "Rec");
-    TEST_ASSERT(res == "{\n \"Rec0\":{\n  \"A\":\"3\",\n  \"B\":\"txt3\"\n },\n \"Rec1\":{\n  \"A\":\"2\",\n  \"B\":\"txt2\"\n },\n \"Rec2\":{\n  \"A\":\"1\",\n  \"B\":\"txt1\"\n }\n}",
+    TEST_ASSERT(res == "{\n \"Rec0\": {\n  \"A\": 3,\n  \"B\": \"txt3\"\n },\n \"Rec1\": {\n  \"A\": 2,\n  \"B\": \"txt2\"\n },\n \"Rec2\": {\n  \"A\": 1,\n  \"B\": \"txt1\"\n }\n}",
         "Failed to convert vault to json");
 }
 

@@ -8,6 +8,7 @@ namespace mvlt
 {
     template <VaultRequestType Type>
     template <class T>
+    // codechecker_intentional [all] false positive warning from clag_tidy
     VaultRequest<Type>::VaultRequest(const std::string& key, const T& keyValue, const std::function<bool(const VaultRecordRef& ref)>& requestPredicat) noexcept : Key(key), RequestPredicat(requestPredicat)
     {
         DBG_LOG_ENTER();
