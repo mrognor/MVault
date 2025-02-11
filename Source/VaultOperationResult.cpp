@@ -24,7 +24,12 @@ namespace mvlt
 
         switch (ResultCode)
         {
-        default:
+        case VaultOperationResultCode::OtherParentVaultNotValid:
+            return "The parent Vault of another VaultRecordSet is not valid.";
+
+        case VaultOperationResultCode::SameVaultRecordSet:
+            return "The operation is performed on the same VaultRecordSet object.";
+
         case VaultOperationResultCode::TryToAddUniqueKeyInNonEmptyVaultWithoutLambda:
             return "You can not add unique key without lambda in non-empty vault";
              
@@ -34,26 +39,38 @@ namespace mvlt
         case VaultOperationResultCode::TryToUpdateUniqueKey:
             return "The key is unique and you can not update it default value.";
 
+        case VaultOperationResultCode::RecordAlredyInSet:
+            return "The record is already in VaultRecordSet.";
+
+        case VaultOperationResultCode::ParentVaultNotMatch:
+            return "The parent Vaults don't match.";
+
+        case VaultOperationResultCode::ParentVaultNotValid:
+            return "Parent Vault is not valid.";
+
         case VaultOperationResultCode::DataRecordNotValid:
             return "The record referenced by VaultRecordRef is not valid.";
+   
+        case VaultOperationResultCode::WrongKey:
+            return "The requested key was not found.";
 
         case VaultOperationResultCode::WrongType:
             return "The mismatch between the types of the requested key and the saved one.";
-        
-        case VaultOperationResultCode::WrongKey:
-            return "The requested key was not found.";
 
         case VaultOperationResultCode::Idle:
             return "Idle state. The operation was not performed.";
 
+        case VaultOperationResultCode::WrongValue:
+            return "A record with this key value was not found.";
+
         case VaultOperationResultCode::UniqueKeyValueAlredyInSet:
-            return "Unique key value alredy in set";
+            return "Unique key value alredy in set.";
 
         case VaultOperationResultCode::Success:
             return "The operation was completed successfully.";
 
-        case VaultOperationResultCode::WrongValue:
-            return "A record with this key value was not found.";
+        default:
+            break;
         }
     }
 

@@ -397,7 +397,7 @@ namespace mvlt
         if (res.IsOperationSuccess && this == &a)
         {
             res.IsOperationSuccess = false;
-            res.ResultCode = VaultOperationResultCode::SameVaultRecordSetInRequest;
+            res.ResultCode = VaultOperationResultCode::SameVaultRecordSet;
         }
 
         if (res.IsOperationSuccess)
@@ -448,7 +448,7 @@ namespace mvlt
         if (res.IsOperationSuccess && this == &a)
         {
             res.IsOperationSuccess = false;
-            res.ResultCode = VaultOperationResultCode::SameVaultRecordSetInRequest;
+            res.ResultCode = VaultOperationResultCode::SameVaultRecordSet;
         }
         
         if (res.IsOperationSuccess)
@@ -497,7 +497,7 @@ namespace mvlt
         if (res.IsOperationSuccess && this == &a)
         {
             res.IsOperationSuccess = false;
-            res.ResultCode = VaultOperationResultCode::SameVaultRecordSetInRequest;
+            res.ResultCode = VaultOperationResultCode::SameVaultRecordSet;
         }
         
         if (res.IsOperationSuccess)
@@ -561,7 +561,7 @@ namespace mvlt
         if (&a == &b || &a == &res || &b == &res)
         {
             vor.IsOperationSuccess = false;
-            vor.ResultCode = VaultOperationResultCode::SameVaultRecordSetInRequest;
+            vor.ResultCode = VaultOperationResultCode::SameVaultRecordSet;
         }
         else 
         {
@@ -583,7 +583,7 @@ namespace mvlt
         if (&a == &b || &a == &res || &b == &res)
         {
             vor.IsOperationSuccess = false;
-            vor.ResultCode = VaultOperationResultCode::SameVaultRecordSetInRequest;
+            vor.ResultCode = VaultOperationResultCode::SameVaultRecordSet;
         }
 
         if (vor.IsOperationSuccess && !a.GetIsParentVaultValid())

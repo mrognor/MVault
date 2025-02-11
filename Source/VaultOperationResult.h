@@ -20,21 +20,21 @@ namespace mvlt
     /// \brief Enum with all error handling codes
     enum class VaultOperationResultCode : std::int8_t
     {
-        OtherParentVaultNotValid = -11,
-        SameVaultRecordSetInRequest = -10,
-        TryToAddUniqueKeyInNonEmptyVaultWithoutLambda = -9, ///< This code is returned when trying to add unique key without lamda in non-empty vault
-        DuplicateKey = -8,             ///< This code is returned when trying to add key which alredy in vault
-        TryToUpdateUniqueKey = -7,     ///< This code is returned when trying to update default value in an unique key
-        RecordAlredyInSet = -6,        ///< This code is returned when trying to add an record to the set when it is already in it
-        ParentVaultNotMatch = -5,      ///< This code is returned during operations on VaultRecordSet when objects depend on different Vaults
-        ParentVaultNotValid = -4,      ///< This code is returned when calling VaultRecordSet operations when the parent Vault is not valid
-        DataRecordNotValid = -3,       ///< This code is returned when data is requested from the VaultRecordRef and the record it refers to is not valid
-        WrongKey = -2,                 ///< This code is returned when the requested key has not been found.
-        WrongType = -1,                ///< This code is returned when the requested type does not match the saved type.
-        Idle = 0,                      ///< The default state.
-        WrongValue = 1,                ///< This value is returned when the key was found, the requested type and the saved type are equal, but the requested value was not found
-        UniqueKeyValueAlredyInSet = 2, ///< This value is returned when the key was found, the requested type and the saved type are equal, but the new value alredy in vault
-        Success = 3,                   ///< This value is returned when the request was completely successful
+        OtherParentVaultNotValid,                      ///< This code is returned when working with VaultRecordSet when another object has an invalid parent Vault
+        SameVaultRecordSet,                            ///< This code is returned when trying to call operations on the VaultRecordSet object itself
+        TryToAddUniqueKeyInNonEmptyVaultWithoutLambda, ///< This code is returned when trying to add unique key without lamda in non-empty vault
+        DuplicateKey,                                  ///< This code is returned when trying to add key which alredy in vault
+        TryToUpdateUniqueKey,                          ///< This code is returned when trying to update default value in an unique key
+        RecordAlredyInSet,                             ///< This code is returned when trying to add an record to the set when it is already in it
+        ParentVaultNotMatch,                           ///< This code is returned during operations on VaultRecordSet when objects depend on different Vaults
+        ParentVaultNotValid,                           ///< This code is returned when calling VaultRecordSet operations when the parent Vault is not valid
+        DataRecordNotValid,                            ///< This code is returned when data is requested from the VaultRecordRef and the record it refers to is not valid
+        WrongKey,                                      ///< This code is returned when the requested key has not been found
+        WrongType,                                     ///< This code is returned when the requested type does not match the saved type
+        Idle,                                          ///< The default state
+        WrongValue,                                    ///< This value is returned when the key was found, the requested type and the saved type are equal, but the requested value was not found
+        UniqueKeyValueAlredyInSet,                     ///< This value is returned when the key was found, the requested type and the saved type are equal, but the new value alredy in vault
+        Success                                        ///< This value is returned when the request was completely successful
     };
     
     /**@} */

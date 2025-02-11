@@ -780,10 +780,10 @@ void VaultRecordSet_Request_Tests()
         "Failed to request recors");
 
     vor = vrs3.Request(Equal("A", 3), vrs3);
-    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSetInRequest, "Failed to request set");
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSet, "Failed to request set");
 
     vor = vrs3.RequestEqual("A", 3, vrs3);
-    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSetInRequest, "Failed to request set");
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSet, "Failed to request set");
 }
 
 void VaultRecordSet_CheckRecord_Test()
@@ -1065,7 +1065,7 @@ void VaultRecordSet_Join_Test()
         "Failed to join sets");
 
     vor = vrs3.Join(vrs3);
-    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSetInRequest, "Failed to join");
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSet, "Failed to join");
 }
 
 void VaultRecordSet_Exclude_Test()
@@ -1109,7 +1109,7 @@ void VaultRecordSet_Exclude_Test()
         "Failed to exclude sets");
 
     vor = vrs3.Exclude(vrs3);
-    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSetInRequest, "Failed to exclude");
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSet, "Failed to exclude");
 }
 
 void VaultRecordSet_Intersect_Test()
@@ -1153,7 +1153,7 @@ void VaultRecordSet_Intersect_Test()
         "Failed to intersect sets");
 
     vor = vrs3.Intersect(vrs3);
-    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSetInRequest, "Failed to intersect");
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSet, "Failed to intersect");
 }
 
 void VaultRecordSet_SaveToFile_Test()
@@ -1264,16 +1264,16 @@ void Union_Test()
 
     // Same sets in request
     vor = Union(vrs1, vrs1, vrs3);
-    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSetInRequest, "Failed to union");
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSet, "Failed to union");
 
     vor = Union(vrs1, vrs2, vrs1);
-    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSetInRequest, "Failed to union");
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSet, "Failed to union");
 
     vor = Union(vrs1, vrs2, vrs2);
-    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSetInRequest, "Failed to union");
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSet, "Failed to union");
 
     vor = Union(vrs3, vrs3, vrs3);
-    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSetInRequest, "Failed to union");
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSet, "Failed to union");
 
     // Different parent vaults
     vlt2.RequestLess("A", 3, vrs2);
@@ -1322,16 +1322,16 @@ void Intersection_Test()
 
     // Same sets in request
     vor = Intersection(vrs1, vrs1, vrs3);
-    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSetInRequest, "Failed to intersection");
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSet, "Failed to intersection");
 
     vor = Intersection(vrs1, vrs2, vrs1);
-    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSetInRequest, "Failed to intersection");
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSet, "Failed to intersection");
 
     vor = Intersection(vrs1, vrs2, vrs2);
-    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSetInRequest, "Failed to intersection");
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSet, "Failed to intersection");
 
     vor = Intersection(vrs3, vrs3, vrs3);
-    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSetInRequest, "Failed to intersection");
+    TEST_ASSERT(vor.ResultCode == VaultOperationResultCode::SameVaultRecordSet, "Failed to intersection");
 
     // Different parent vaults
     vlt2.RequestLess("A", 3, vrs2);

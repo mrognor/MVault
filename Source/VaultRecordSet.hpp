@@ -18,7 +18,7 @@ namespace mvlt
             if (&vaultRecordSet == this)
             {
                 res.IsOperationSuccess = false;
-                res.ResultCode = VaultOperationResultCode::SameVaultRecordSetInRequest;
+                res.ResultCode = VaultOperationResultCode::SameVaultRecordSet;
             }
             else 
             {
@@ -206,7 +206,7 @@ namespace mvlt
             if (&vaultRecordSet == this)
             {
                 res.IsOperationSuccess = false;
-                res.ResultCode = VaultOperationResultCode::SameVaultRecordSetInRequest;
+                res.ResultCode = VaultOperationResultCode::SameVaultRecordSet;
             }
             else 
             {
