@@ -84,7 +84,7 @@ namespace mvlt
             When the function returns true, the record is added, and when false is not added.
         */
         template <class T>
-        VaultRequest(const std::string& key, const T& keyValue, const std::function<bool(const VaultRecordRef&)>& requestPredicat = DefaultRequestPredicat);
+        VaultRequest(const std::string& key, const T& keyValue, const std::function<bool(const VaultRecordRef&)>& requestPredicat = DefaultRequestPredicat) noexcept;
 
         /**
             \brief Request constructor

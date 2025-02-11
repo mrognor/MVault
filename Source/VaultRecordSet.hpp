@@ -138,7 +138,7 @@ namespace mvlt
     
     template <class T>
     VaultOperationResult VaultRecordSet::RequestEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, 
-        const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const
+        const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept
     {
         DBG_LOG_ENTER();
 
@@ -147,7 +147,7 @@ namespace mvlt
 
     template <class T>
     VaultOperationResult VaultRecordSet::RequestGreater(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
-        const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const
+        const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept
     {
         DBG_LOG_ENTER();
 
@@ -156,7 +156,7 @@ namespace mvlt
 
     template <class T>
     VaultOperationResult VaultRecordSet::RequestGreaterOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, 
-        const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const
+        const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept
     {
         DBG_LOG_ENTER();
 
@@ -165,7 +165,7 @@ namespace mvlt
 
     template <class T>
     VaultOperationResult VaultRecordSet::RequestLess(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
-        const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const
+        const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept
     {
         DBG_LOG_ENTER();
 
@@ -174,7 +174,7 @@ namespace mvlt
 
     template <class T>
     VaultOperationResult VaultRecordSet::RequestLessOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
-        const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const
+        const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept
     {
         DBG_LOG_ENTER();
 
@@ -185,7 +185,7 @@ namespace mvlt
     VaultOperationResult VaultRecordSet::RequestInterval(const std::string& key, const T& beginKeyValue,
         const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue, 
         const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords,
-        const std::function<bool(const VaultRecordRef&)>& requestPredicat) const
+        const std::function<bool(const VaultRecordRef&)>& requestPredicat) const noexcept
     {
         DBG_LOG_ENTER();
 

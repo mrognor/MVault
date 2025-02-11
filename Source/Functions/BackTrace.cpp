@@ -7,14 +7,14 @@ namespace mvlt
 
     BackTraceFormat TraceFormat = BackTraceFormat::Compact;
 
-    void SetBackTraceFormat(const BackTraceFormat& traceFormat)
+    void SetBackTraceFormat(const BackTraceFormat& traceFormat) noexcept
     {
         TraceFormat = traceFormat;
     }
 
     #ifndef _WIN32
 
-    void PrintBackTrace()
+    void PrintBackTrace() noexcept
     {
         if (TraceFormat != BackTraceFormat::None)
         {
@@ -69,7 +69,7 @@ namespace mvlt
 
     #else
 
-    void PrintBackTrace()
+    void PrintBackTrace() noexcept
     {
         if (TraceFormat != BackTraceFormat::None)
         {
@@ -85,12 +85,12 @@ namespace mvlt
 
     #endif
 
-    TraceLogger::TraceLogger(const std::string& funcName) : FuncName(funcName)
+    TraceLogger::TraceLogger(const std::string& funcName) noexcept : FuncName(funcName)
     {
         Trace.emplace_back(FuncName);
     }
 
-    TraceLogger::~TraceLogger()
+    TraceLogger::~TraceLogger() noexcept
     {
         if (FuncName == Trace.back()) Trace.pop_back();
     }

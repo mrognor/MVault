@@ -50,10 +50,10 @@ namespace mvlt
 
         \param [in] traceFormat debug message format
     */
-    void SetBackTraceFormat(const BackTraceFormat& traceFormat);
+    void SetBackTraceFormat(const BackTraceFormat& traceFormat) noexcept;
 
     /// \brief Backtrace printing function
-    void PrintBackTrace();
+    void PrintBackTrace() noexcept;
 
     /// \brief A class for logging inputs and outputs from functions
     class TraceLogger
@@ -63,28 +63,28 @@ namespace mvlt
         std::string FuncName;
     public:
         /// \brief Default constructor
-        TraceLogger() = default;
+        TraceLogger() noexcept = delete;
 
         /**
             \brief Copy constructor
 
             \param [in] other object to copy
         */
-        TraceLogger(const TraceLogger& other) = default;
+        TraceLogger(const TraceLogger& other) noexcept = delete;
 
         /**
             \brief Move constructor
 
             \param [in] other object to move
         */
-        TraceLogger(TraceLogger&& other) = default;
+        TraceLogger(TraceLogger&& other) noexcept = delete;
 
         /**
             \brief Constructor to store function name
 
             \param [in] funcName the name of the function in which the class object was created
         */
-        explicit TraceLogger(const std::string& funcName);
+        explicit TraceLogger(const std::string& funcName) noexcept;
 
         /**
             \brief Assignment operator
@@ -92,7 +92,7 @@ namespace mvlt
             \param [in] other object to copy
             \return returns a new object, with data from other
         */
-        TraceLogger& operator=(const TraceLogger& other) = default;
+        TraceLogger& operator=(const TraceLogger& other) noexcept = delete;
 
         /**
             \brief Move assignment operator
@@ -100,11 +100,11 @@ namespace mvlt
             \param [in] other object to move
             \return returns a new object, with data from other
         */
-        TraceLogger& operator=(TraceLogger&& other) = default;
+        TraceLogger& operator=(TraceLogger&& other) noexcept = delete;
 
  
         /// \brief Default destructor
-        ~TraceLogger();
+        ~TraceLogger() noexcept;
     };
 
 

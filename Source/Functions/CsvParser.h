@@ -46,21 +46,21 @@ namespace mvlt
     public:
 
         /// \brief Default constructor
-        CsvParser() = default;
+        CsvParser() noexcept = default;
 
         /**
             \brief Deleted copy constructor
 
             \param [in] other object to copy
         */
-        CsvParser(const CsvParser& other) = delete;
+        CsvParser(const CsvParser& other) noexcept = delete;
 
         /**
             \brief Deleted move constructor
 
             \param [in] other object to move
         */
-        CsvParser(CsvParser&& other) = delete;
+        CsvParser(CsvParser&& other) noexcept = delete;
 
         /**
             \brief Deleted assignment operator
@@ -68,7 +68,7 @@ namespace mvlt
             \param [in] other object to copy
             \return returns a new object, with data from other
         */
-        CsvParser& operator=(const CsvParser& other) = delete;
+        CsvParser& operator=(const CsvParser& other) noexcept = delete;
 
         /**
             \brief Deleted move assignment operator
@@ -76,7 +76,7 @@ namespace mvlt
             \param [in] other object to move
             \return returns a new object, with data from other
         */
-        CsvParser& operator=(CsvParser&& other) = delete;
+        CsvParser& operator=(CsvParser&& other) noexcept = delete;
 
         /**
             \brief The method for opening the file

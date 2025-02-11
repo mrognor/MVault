@@ -8,7 +8,7 @@ namespace mvlt
 {
     template <VaultRequestType Type>
     template <class T>
-    VaultRequest<Type>::VaultRequest(const std::string& key, const T& keyValue, const std::function<bool(const VaultRecordRef&)>& requestPredicat) : Key(key), RequestPredicat(requestPredicat)
+    VaultRequest<Type>::VaultRequest(const std::string& key, const T& keyValue, const std::function<bool(const VaultRecordRef&)>& requestPredicat) noexcept : Key(key), RequestPredicat(requestPredicat)
     {
         DBG_LOG_ENTER();
 

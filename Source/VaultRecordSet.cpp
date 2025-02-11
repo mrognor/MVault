@@ -540,7 +540,7 @@ namespace mvlt
     }
 
 
-    bool operator==(const VaultRecordSet& a, const VaultRecordSet& b)
+    bool operator==(const VaultRecordSet& a, const VaultRecordSet& b) noexcept
     {
         DBG_LOG_ENTER();
 

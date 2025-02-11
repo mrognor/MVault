@@ -28,14 +28,14 @@ namespace mvlt
     public:
 
         /// \brief Default constructor
-        AllMapIterator() = default;
+        AllMapIterator() noexcept = default;
 
         /**
             \brief Copy constructor
 
             \param [in] other object to copy data from
         */
-        AllMapIterator(const AllMapIterator& other)
+        AllMapIterator(const AllMapIterator& other) noexcept
         {
             IsMultiMap = other.IsMultiMap;
             DataMultiMapIt = other.DataMultiMapIt;
@@ -62,7 +62,7 @@ namespace mvlt
             \param [in] isMultiMap is this Map multi 
         */
         AllMapIterator(const MultiContainerIterator& dataMultiMapIt,
-            const ContainerIterator& dataMapIt, const bool& isMultiMap)
+            const ContainerIterator& dataMapIt, const bool& isMultiMap) noexcept
         {
             IsMultiMap = isMultiMap;
             DataMultiMapIt = dataMultiMapIt;
@@ -76,7 +76,7 @@ namespace mvlt
 
             \return assigned object
         */
-        AllMapIterator& operator=(const AllMapIterator& other)
+        AllMapIterator& operator=(const AllMapIterator& other) noexcept
         {
             if (&other != this)
             {
@@ -114,7 +114,7 @@ namespace mvlt
 
             \return true it other and this not equal
         */
-        bool operator!=(const AllMapIterator& other) const
+        bool operator!=(const AllMapIterator& other) const noexcept
         { 
             if (IsMultiMap)
                 return DataMultiMapIt != other.DataMultiMapIt;
@@ -129,7 +129,7 @@ namespace mvlt
 
             \return true it other and this equal
         */
-        bool operator==(const AllMapIterator& other) const
+        bool operator==(const AllMapIterator& other) const noexcept
         {
             if (IsMultiMap)
                 return DataMultiMapIt == other.DataMultiMapIt;
@@ -142,7 +142,7 @@ namespace mvlt
 
             \return incremented iterator
         */
-        AllMapIterator& operator++()
+        AllMapIterator& operator++() noexcept
         {
             if (IsMultiMap)
                 ++DataMultiMapIt;
@@ -156,7 +156,7 @@ namespace mvlt
 
             \return decremented iterator
         */
-        AllMapIterator& operator--()
+        AllMapIterator& operator--() noexcept
         {
             if (IsMultiMap)
                 --DataMultiMapIt;
@@ -170,7 +170,7 @@ namespace mvlt
 
             \return pair with iterator key and value
         */
-        std::pair<KeyType, ValueType> operator*() const
+        std::pair<KeyType, ValueType> operator*() const noexcept
         {
             if (IsMultiMap)
                 return *DataMultiMapIt;
@@ -183,7 +183,7 @@ namespace mvlt
 
             \return stl container iterator
         */
-        ContainerIterator GetContainerIterator() const
+        ContainerIterator GetContainerIterator() const noexcept
         {
             return DataMapIt;
         }
@@ -193,7 +193,7 @@ namespace mvlt
 
             \return stl multi container iterator
         */
-        MultiContainerIterator GetMultiContainerIterator() const
+        MultiContainerIterator GetMultiContainerIterator() const noexcept
         {
             return DataMultiMapIt;
         }
@@ -257,7 +257,7 @@ namespace mvlt
 
             \return Firtst map container iterator
         */
-        Iterator begin()
+        Iterator begin() noexcept
         {
             return Iterator(DataMultiMap.begin(), DataMap.begin(), IsMultiMap);
         }
@@ -269,7 +269,7 @@ namespace mvlt
 
             \return Last map container iterator
         */
-        Iterator end()
+        Iterator end() noexcept
         {
             return Iterator(DataMultiMap.end(), DataMap.end(), IsMultiMap);
         }
@@ -279,7 +279,7 @@ namespace mvlt
 
             \return Firtst map container iterator
         */
-        Iterator Begin()
+        Iterator Begin() noexcept
         {
             return Iterator(DataMultiMap.begin(), DataMap.begin(), IsMultiMap);
         }
@@ -289,7 +289,7 @@ namespace mvlt
 
             \return Last map container iterator
         */
-        Iterator End()
+        Iterator End() noexcept
         {
             return Iterator(DataMultiMap.end(), DataMap.end(), IsMultiMap);
         }
@@ -307,7 +307,7 @@ namespace mvlt
             (or to the element that prevented the insertion) and a bool value set to true if and only if the insertion took place.
         */
         template <class EmplaceKeyType, class EmplaceValueType>
-        std::pair<Iterator, bool> Emplace(EmplaceKeyType&& key, EmplaceValueType&& value)
+        std::pair<Iterator, bool> Emplace(EmplaceKeyType&& key, EmplaceValueType&& value) noexcept
         {
             if (IsMultiMap)
             {
@@ -328,7 +328,7 @@ namespace mvlt
 
             \return Pair with first and last iterator with key equals to data
         */
-        std::pair<Iterator, Iterator> EqualRange(const KeyType& data)
+        std::pair<Iterator, Iterator> EqualRange(const KeyType& data) noexcept
         {
             if (IsMultiMap)
             {
@@ -349,7 +349,7 @@ namespace mvlt
 
             \return Iterator with key equals to data
         */
-        Iterator Find(const KeyType& data)
+        Iterator Find(const KeyType& data) noexcept
         {
             if (IsMultiMap)
             {
@@ -370,7 +370,7 @@ namespace mvlt
 
             \return Number of deleted items
         */
-        std::size_t Erase(const KeyType& data)
+        std::size_t Erase(const KeyType& data) noexcept
         {
             std::size_t res;
             if (IsMultiMap)
@@ -388,7 +388,7 @@ namespace mvlt
 
             \return Iterator following the last removed element.
         */
-        Iterator Erase(const Iterator& dataIt)
+        Iterator Erase(const Iterator& dataIt) noexcept
         {
             if (IsMultiMap)
             {
@@ -403,7 +403,7 @@ namespace mvlt
         }
 
         /// \brief The method for clear Map
-        void Clear()
+        void Clear() noexcept
         {
             if (IsMultiMap)
                 DataMultiMap.clear();
@@ -416,7 +416,7 @@ namespace mvlt
 
             \return Map size
         */
-        std::size_t Size()
+        std::size_t Size() noexcept
         {
             if (IsMultiMap)
                 return DataMultiMap.size();
@@ -438,7 +438,7 @@ namespace mvlt
 
             \param [in] isMultiMap is this UnorderedMap store data in std::multimap
         */
-        explicit Map(const bool& isMultiMap)
+        explicit Map(const bool& isMultiMap) noexcept
         {
             ParentMap<std::multimap<KeyType, ValueType>, std::map<KeyType, ValueType>, MapIterator<KeyType, ValueType>, KeyType, ValueType>::IsMultiMap = isMultiMap;
         }
@@ -451,7 +451,7 @@ namespace mvlt
             \return Iterator pointing to the first element that is not less than key. If no such element is found, a End() is returned.
 
         */
-        MapIterator<KeyType, ValueType> LowerBound(const KeyType& data)
+        MapIterator<KeyType, ValueType> LowerBound(const KeyType& data) noexcept
         {
             return MapIterator<KeyType, ValueType>(ParentMap<std::multimap<KeyType, ValueType>, std::map<KeyType, ValueType>, MapIterator<KeyType, ValueType>, KeyType, ValueType>::DataMultiMap.lower_bound(data), 
                 ParentMap<std::multimap<KeyType, ValueType>, std::map<KeyType, ValueType>, MapIterator<KeyType, ValueType>, KeyType, ValueType>::DataMap.lower_bound(data),
@@ -466,7 +466,7 @@ namespace mvlt
             \return Iterator pointing to the first element that is greater than key. If no such element is found, End() iterator is returned.
 
         */
-        MapIterator<KeyType, ValueType> UpperBound(const KeyType& data)
+        MapIterator<KeyType, ValueType> UpperBound(const KeyType& data) noexcept
         {
             return MapIterator<KeyType, ValueType>(ParentMap<std::multimap<KeyType, ValueType>, std::map<KeyType, ValueType>, MapIterator<KeyType, ValueType>, KeyType, ValueType>::DataMultiMap.upper_bound(data), 
                 ParentMap<std::multimap<KeyType, ValueType>, std::map<KeyType, ValueType>, MapIterator<KeyType, ValueType>, KeyType, ValueType>::DataMap.upper_bound(data),
@@ -478,7 +478,7 @@ namespace mvlt
 
             \return Last map container iterator
         */
-        ReverseMapIterator<KeyType, ValueType> Rbegin()
+        ReverseMapIterator<KeyType, ValueType> Rbegin() noexcept
         {
             return ReverseMapIterator<KeyType, ValueType>(ParentMap<std::multimap<KeyType, ValueType>, std::map<KeyType, ValueType>, MapIterator<KeyType, ValueType>, KeyType, ValueType>::DataMultiMap.rbegin(), 
                 ParentMap<std::multimap<KeyType, ValueType>, std::map<KeyType, ValueType>, MapIterator<KeyType, ValueType>, KeyType, ValueType>::DataMap.rbegin(),
@@ -490,7 +490,7 @@ namespace mvlt
 
             \return First map container iterator
         */
-        ReverseMapIterator<KeyType, ValueType> Rend()
+        ReverseMapIterator<KeyType, ValueType> Rend() noexcept
         {
             return ReverseMapIterator<KeyType, ValueType>(ParentMap<std::multimap<KeyType, ValueType>, std::map<KeyType, ValueType>, MapIterator<KeyType, ValueType>, KeyType, ValueType>::DataMultiMap.rend(), 
             ParentMap<std::multimap<KeyType, ValueType>, std::map<KeyType, ValueType>, MapIterator<KeyType, ValueType>, KeyType, ValueType>::DataMap.rend(), 
@@ -511,7 +511,7 @@ namespace mvlt
 
             \param [in] isMultiMap is this UnorderedMap store data in std::unordered_multimap
         */
-        explicit UnorderedMap(const bool& isMultiMap)
+        explicit UnorderedMap(const bool& isMultiMap) noexcept
         {
             ParentMap<std::unordered_multimap<KeyType, ValueType>, std::unordered_map<KeyType, ValueType>, UnorderedMapIterator<KeyType, ValueType>, KeyType, ValueType>::IsMultiMap = isMultiMap;
         }

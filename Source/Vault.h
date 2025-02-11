@@ -230,7 +230,7 @@ namespace mvlt
         friend class VaultRequest;
 
         /// Making VaultRecordSet operator comparison function friendly
-        friend bool operator==(const VaultRecordSet& a, const VaultRecordSet& b);
+        friend bool operator==(const VaultRecordSet& a, const VaultRecordSet& b) noexcept;
 
         /// \brief Default constructor
         Vault() noexcept;

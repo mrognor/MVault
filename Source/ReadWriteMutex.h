@@ -126,21 +126,21 @@ namespace mvlt
     public:
     
         /// \brief Deleted default constructor
-        ReadLock() = delete;
+        ReadLock() noexcept = delete;
 
         /**
             \brief Deleted copy constructor
 
             \param [in] other object to copy
         */
-        ReadLock(const ReadLock<Mutex>& other) = delete;
+        ReadLock(const ReadLock<Mutex>& other) noexcept = delete;
 
         /**
             \brief Deleted move constructor
 
             \param [in] other object to move
         */
-        ReadLock(ReadLock<Mutex>&& other) = delete;
+        ReadLock(ReadLock<Mutex>&& other) noexcept = delete;
 
         /**
             \brief Constructor
@@ -149,7 +149,7 @@ namespace mvlt
 
             \param [in] mtx mutex to capture and lock
         */
-        explicit ReadLock(Mutex& mtx) : Mtx(&mtx) 
+        explicit ReadLock(Mutex& mtx) noexcept : Mtx(&mtx) 
         {
             Mtx->ReadLock();
         }
@@ -160,7 +160,7 @@ namespace mvlt
             \param [in] other object to copy
             \return returns a new object, with data from other
         */
-        ReadLock<Mutex>& operator=(const ReadLock<Mutex>& other) = delete;
+        ReadLock<Mutex>& operator=(const ReadLock<Mutex>& other) noexcept = delete;
 
         /**
             \brief Deleted move assignment operator
@@ -168,14 +168,14 @@ namespace mvlt
             \param [in] other object to move
             \return returns a new object, with data from other
         */
-        ReadLock<Mutex>& operator=(ReadLock<Mutex>&& other) = delete;
+        ReadLock<Mutex>& operator=(ReadLock<Mutex>&& other) noexcept = delete;
 
         /**
             \brief Destructor
 
             Unlock captured mutex
         */
-        ~ReadLock()
+        ~ReadLock() noexcept
         {
             Mtx->ReadUnlock();
         } 
@@ -198,21 +198,21 @@ namespace mvlt
     public:
         
         /// \brief Deleted default constructor
-        WriteLock() = delete;
+        WriteLock() noexcept = delete;
 
         /**
             \brief Deleted copy constructor
 
             \param [in] other object to copy
         */
-        WriteLock(const WriteLock<Mutex>& other) = delete;
+        WriteLock(const WriteLock<Mutex>& other) noexcept = delete;
 
         /**
             \brief Deleted move constructor
 
             \param [in] other object to move
         */
-        WriteLock(WriteLock<Mutex>&& other) = delete;
+        WriteLock(WriteLock<Mutex>&& other) noexcept = delete;
 
         /**
             \brief Constructor
@@ -221,7 +221,7 @@ namespace mvlt
 
             \param [in] mtx mutex to capture and lock
         */
-        explicit WriteLock(Mutex& mtx) : Mtx(&mtx) 
+        explicit WriteLock(Mutex& mtx) noexcept : Mtx(&mtx) 
         {
             Mtx->WriteLock();
         }
@@ -232,7 +232,7 @@ namespace mvlt
             \param [in] other object to copy
             \return returns a new object, with data from other
         */
-        WriteLock<Mutex>& operator=(const WriteLock<Mutex>& other) = delete;
+        WriteLock<Mutex>& operator=(const WriteLock<Mutex>& other) noexcept = delete;
 
         /**
             \brief Deleted move assignment operator
@@ -240,14 +240,14 @@ namespace mvlt
             \param [in] other object to move
             \return returns a new object, with data from other
         */
-        WriteLock<Mutex>& operator=(WriteLock<Mutex>&& other) = delete;
+        WriteLock<Mutex>& operator=(WriteLock<Mutex>&& other) noexcept = delete;
 
         /**
             \brief Destructor
 
             Unlock captured mutex
         */
-        ~WriteLock()
+        ~WriteLock() noexcept
         {
             Mtx->WriteUnlock();
         } 

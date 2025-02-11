@@ -57,7 +57,7 @@ namespace mvlt
 
             \param [in] dataSaver object to be moved
         */
-        DataSaver(DataSaver&& other) = delete;
+        DataSaver(DataSaver&& other) noexcept = delete;
         
         /**
             \brief A template constructor that accepts a variable to store inside DataSaver
@@ -104,7 +104,7 @@ namespace mvlt
             \param [in] dataSaver object to be moved
             \return returns a new object, with data from dataSaver
         */
-        DataSaver& operator=(DataSaver&& other) = delete;
+        DataSaver& operator=(DataSaver&& other) noexcept = delete;
 
         /**
             \brief Template method to save data inside DataSaver
