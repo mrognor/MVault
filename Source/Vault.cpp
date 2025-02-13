@@ -156,10 +156,10 @@ namespace mvlt
             // If at least one unique key adding fail
             if (addedUniqueKeys.size() != UniqueKeys.size())
             {
-                // Removed added unique keys
+                // Remove added unique keys
                 for (const std::string& uniqueKey : addedUniqueKeys)
                     VaultRecordErasers.find(uniqueKey)->second(newRecord);
-                
+
                 // codechecker_intentional [all] false positive warning from clangsa
                 InvalidFileRecords.emplace_back(lineCounter, *uniqueKeyIt);
                 delete newRecord;
@@ -709,6 +709,8 @@ namespace mvlt
                 DataSaver dataSaver;
                 record->GetDataSaver(key, dataSaver);
 
+                res << "\"" << key << "\":";
+
                 std::type_index dataType = dataSaver.GetDataType();
                 if (dataType == typeid(std::int8_t) ||
                     dataType == typeid(std::uint8_t) ||
@@ -719,19 +721,16 @@ namespace mvlt
                     dataType == typeid(std::int64_t) ||
                     dataType == typeid(std::uint64_t) ||
                     dataType == typeid(float) ||
-                    dataType == typeid(double))
+                    dataType == typeid(double) ||
+                    dataType == typeid(bool))
                 {
-                    if (isFormat)
-                        res << "\"" << key << "\": " << dataSaver.Str();
-                    else
-                        res << "\"" << key << "\":" << dataSaver.Str();
+                    if (isFormat) res << " ";
+                    res << dataSaver.Str();
                 }
                 else
                 {
-                    if (isFormat)
-                        res << "\"" << key << "\": \"" << dataSaver.Str() << "\"";
-                    else
-                        res << "\"" << key << "\":\"" << dataSaver.Str() << "\"";
+                    if (isFormat) res << " ";
+                    res << "\"" << dataSaver.Str() << "\"";
                 }
 
                 ++keyCounter;

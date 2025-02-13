@@ -61,7 +61,8 @@ void Vault_OperatorAssignment_Test()
     for (std::size_t i = 0; i < 10; ++i)
         vlt1.CreateRecord({{"A", static_cast<int>(i * i * i)}, {"B", "test" + std::to_string(i)}, {"C", i}});    
 
-    Vault vlt2 = vlt1;
+    Vault vlt2;
+    vlt2 = vlt1;
 
     std::vector<VaultRecordRef> refs1, refs2;
 
@@ -1139,15 +1140,7 @@ void Vault_ReadFromFile_Test()
     vlt.ReadFile("Csv/ReadFile_Test4.csv", ';', true);
     TEST_ASSERT(vlt.Size() == 12, "Error in reading vault!");
 
-    bool res = vlt.ReadFile("Csv/NoneExisted.csv", ';', true, [](const std::vector<std::string>& keys, std::vector<std::string>& values) 
-    {
-        for (std::size_t i = 0; i < keys.size(); ++i)
-        {
-            if (keys[i] == "B")
-                values[i] += "Preprocess";
-        }
-    });
-
+    bool res = vlt.ReadFile("Csv/NoneExisted.csv", ';', true);
     TEST_ASSERT(res == false, "Error in reading vault!");
 
     vlt.ReadFile("Csv/ReadFile_Test4.csv", ';', true, [](const std::vector<std::string>& keys, std::vector<std::string>& values) 
@@ -1169,10 +1162,8 @@ void Vault_ReadFromFile_Test()
 
     // Read unique keys
     vlt.DropVault();
-    vlt.AddUniqueKey<std::size_t>("A", {[](std::size_t counter, const VaultRecordRef& ref) -> std::size_t
-    {
-        return counter;
-    }});
+    vlt.AddUniqueKey<std::size_t>("A");
+    vlt.AddUniqueKey<std::size_t>("I");
 
     vlt.ReadFile("Csv/ReadFile_Test5.csv");
     TEST_ASSERT(vlt.Size() == 10, "Error in reading vault!");
@@ -1180,7 +1171,7 @@ void Vault_ReadFromFile_Test()
     std::vector<std::pair<std::size_t, std::string>> errors = vlt.GetErrorsInLastReadedFile();
     TEST_ASSERT(errors.size() == 6, "Error in reading vault!");
     TEST_ASSERT(errors[0].first == 7, "Error in reading vault!");
-    TEST_ASSERT(errors[1].second == "A", "Error in reading vault!");
+    TEST_ASSERT(errors[1].second == "I", "Error in reading vault!");
 }
 
 void Vault_GetErrorsInLastReadedFile_Test()

@@ -594,7 +594,7 @@ namespace mvlt
             If you want to use a string as a key, you must specialize the function with a string. Like this: \n\
             AddUniqueKey<std::string>(\"Key\")");
 
-        return AddKey(key, T(), true, true, {[&](std::size_t counter, const VaultRecordRef&) -> T{ return T(); }});
+        return AddKey(key, T{}, true, true, {[&](std::size_t counter, const VaultRecordRef&) -> T{ return T{}; }});
     }
 
     template <class T>
@@ -602,7 +602,7 @@ namespace mvlt
     {
         DBG_LOG_ENTER();
 
-        return AddKey(key, T(), true, false, uniqueKeyFunction);
+        return AddKey(key, T{}, true, false, uniqueKeyFunction);
     }
 
     template <class T>

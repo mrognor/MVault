@@ -108,16 +108,18 @@ int main()
     std::vector<std::string> names = {"Alice", "Bob", "Charlie", "Diana", "Evan", "Frank", "Grace", "Henry", "Ivy", "Jack"};
     std::vector<std::string> surnames = {"Smith", "Johnson", "Williams", "Brown", "Jones", "Davis", "Miller", "Wilson", "Moore", "Taylor"};
     std::vector<std::string> cities = {"London", "Paris", "Tokyo", "Sydney", "Cape Town", "Rio de Janeiro", "Berlin", "Dubai", "Moscow", "Bangkok"};
-    
+    std::vector<bool> genders = {0, 1, 1, 0, 1, 1, 0, 1, 0, 1};
+
     vlt.AddUniqueKey<std::size_t>("Id");
     vlt.AddKey<std::string>("Name", "none");
     vlt.AddKey<std::string>("Surname", "none");
     vlt.AddKey<std::string>("City", "none");
+    vlt.AddKey<bool>("Gender", true);
 
-    for (std::size_t i = 0; i < 10; ++i) vlt.CreateRecord({ {"Id", i}, {"Name", names[i]}, {"Surname", surnames[i]}, {"City", cities[i]} });
+    for (std::size_t i = 0; i < 10; ++i) vlt.CreateRecord({ {"Id", i}, {"Name", names[i]}, {"Surname", surnames[i]}, {"City", cities[i]}, {"Gender", static_cast<bool>(genders[i])} });
 
     vlt.PrintAsTable();
-    std::cout << vlt.ToJson(false, 2, true, "Rec") << std::endl;
+    std::cout << vlt.ToJson(true, 2, true, "Rec") << std::endl;
 
     vlt.GetRecord<std::string>("Name", "Evan", vrf);
     std::cout << vrf.ToJson(false) << std::endl;
