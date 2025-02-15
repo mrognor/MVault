@@ -18,12 +18,14 @@ set(MVaultHeaders
     DataSaver.h
     ReadWriteMutex.h
 
-    Functions/ToString.h
-    Functions/BackTrace.h
-    Functions/CsvParser.h
-    Functions/FromString.h
-    Functions/PrintAsTable.h
-    Functions/StreamFileReader.h
+    Strings/ToString.h
+    Strings/FromString.h
+    Strings/PrintAsTable.h
+
+    BackTrace/BackTrace.h
+
+    CsvParser/CsvParser.h
+    CsvParser/StreamFileReader.h
 )
 
 set(MVaultTemplates
@@ -46,10 +48,11 @@ set(MVaultSource
     DataSaver.cpp
     ReadWriteMutex.cpp
     VaultRecordSet.cpp
-    
-    Functions/CsvParser.cpp
-    Functions/BackTrace.cpp
-    Functions/StreamFileReader.cpp
+
+    BackTrace/BackTrace.cpp
+
+    CsvParser/CsvParser.cpp
+    CsvParser/StreamFileReader.cpp
 )
 
 project(MVault)

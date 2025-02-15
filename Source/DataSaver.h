@@ -4,8 +4,8 @@
 #include <iostream>
 #include <typeindex>
 
-#include "Functions/ToString.h"
-#include "Functions/FromString.h"
+#include "Strings/ToString.h"
+#include "Strings/FromString.h"
 
 namespace mvlt
 {

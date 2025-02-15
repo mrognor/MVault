@@ -13,8 +13,12 @@ make MVault -j
 # Create include folder
 mkdir -p include
 cp -rf ../Source/*.h* include/
-mkdir -p include/Functions
-cp -rf ../Source/Functions/*.h* include/Functions/
+mkdir -p include/BackTrace
+cp -rf ../Source/BackTrace/*.h* include/BackTrace/
+mkdir -p include/CsvParser
+cp -rf ../Source/CsvParser/*.h* include/CsvParser/
+mkdir -p include/Strings
+cp -rf ../Source/Strings/*.h* include/Strings/
 
 # Create bin folder
 mkdir -p bin

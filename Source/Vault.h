@@ -13,8 +13,8 @@
 #include "VaultParamInput.h"
 #include "VaultOperationResult.h"
 
-#include "Functions/CsvParser.h"
-#include "Functions/PrintAsTable.h"
+#include "CsvParser/CsvParser.h"
+#include "Strings/PrintAsTable.h"
 
 namespace mvlt
 {

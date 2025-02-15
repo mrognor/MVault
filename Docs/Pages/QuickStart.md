@@ -87,7 +87,7 @@ std::string mvlt::ToString(const Nationality& nation)
 
 Also, for example, the function of printing variables of the bool type has been changed. 
 It is defined in the template in <em> .h </em> the file and therefore it can be changed to a custom one, 
-which is done to display the gender of a person. The function is located in the folder *Functions* in *include*.
+which is done to display the gender of a person. The function is located in the folder *Strings* in *include*.
 
 Let's create a Vault and add 5 keys to it:
 ```cpp

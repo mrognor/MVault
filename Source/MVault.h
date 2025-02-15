@@ -10,9 +10,14 @@
 #include "DataContainer.h"
 #include "ReadWriteMutex.h"
 
-#include "Functions/ToString.h"
-#include "Functions/CsvParser.h"
-#include "Functions/PrintAsTable.h"
+#include "BackTrace/BackTrace.h"
+
+#include "CsvParser/CsvParser.h"
+#include "CsvParser/StreamFileReader.h"
+
+#include "Strings/ToString.h"
+#include "Strings/FromString.h"
+#include "Strings/PrintAsTable.h"
 
 #include "Vault.hpp"
 #include "VaultRequest.hpp"
