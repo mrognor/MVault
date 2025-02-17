@@ -3,9 +3,11 @@
 std::size_t TestLog::TestCounter = 0;
 std::size_t TestLog::ErrorCounter = 0;
 
-TestLog::TestLog(const std::string& functionName, const std::size_t& lineNumber, const std::string& testModuleName) : FunctionName(functionName)
+TestLog::TestLog(const std::string& className, const std::string& functionName, const std::size_t& lineNumber, const std::string& testModuleName) 
+    : FunctionName(functionName)
 {
-    if (FunctionName != "main") ColorizedPrint("\t" + functionName + " started: ", ConsoleTextColor::Default, "");
+    if (FunctionName != "main") ColorizedPrint(className + "::" + functionName + " started: ", ConsoleTextColor::Default, "");;
+
     std::size_t slashPos = testModuleName.rfind("/");
     TestModuleName = testModuleName.substr(slashPos + 1, testModuleName.rfind(".") - slashPos - 1);
 }

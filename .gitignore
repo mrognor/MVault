@@ -4,7 +4,7 @@ Docs/Examples
 Build
 Release
 Coverage
-Sast
+/Sast
 Resources/Telegram/BotToken
 Resources/Telegram/env
 compile_commands.json

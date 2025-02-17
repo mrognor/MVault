@@ -30,7 +30,7 @@ jobs:
         run: sudo pipx install CodeChecker --force
  
       - name: Run sast
-        run: ./Scripts/RunSast.sh
+        run: ./Scripts/Sast/RunSast.sh
 
       # Upload sast artifacts
       - uses: actions/upload-artifact@v4

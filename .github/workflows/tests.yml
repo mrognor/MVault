@@ -70,7 +70,7 @@ jobs:
           path: ./Build
 
       - name: Run test coverage
-        run: ./Scripts/TestCoverage.sh
+        run: ./Scripts/Tests/RunCoverage.sh
 
       # Upload coverage artifacts
       - uses: actions/upload-artifact@v4
