@@ -5,6 +5,7 @@
 #include "../MTests/TestLog.h"
 #include "../MTests/TestSuite.h"
 #include "../MTests/TestAssert.h"
+#include "../MTests/CompareVault.h"
 
 using namespace mvlt;
 

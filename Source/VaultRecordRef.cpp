@@ -279,27 +279,8 @@ namespace mvlt
 
                     res += "\"" + key + "\":";
 
-                    std::type_index dataType = dataSaver.GetDataType();
-                    if (dataType == typeid(std::int8_t) ||
-                        dataType == typeid(std::uint8_t) ||
-                        dataType == typeid(std::int16_t) ||
-                        dataType == typeid(std::uint16_t) ||
-                        dataType == typeid(std::int32_t) ||
-                        dataType == typeid(std::uint32_t) ||
-                        dataType == typeid(std::int64_t) ||
-                        dataType == typeid(std::uint64_t) ||
-                        dataType == typeid(float) ||
-                        dataType == typeid(double) ||
-                        dataType == typeid(bool))
-                    {
-                        if (isFormat) res += " ";
-                        res += dataSaver.Str();
-                    }
-                    else
-                    {
-                        if (isFormat) res += " \"";
-                        res += "\"" + dataSaver.Str() + "\"";
-                    }
+                    if (isFormat) res += " ";
+                    res += mvlt::ToJson(dataSaver);
 
                     ++keyCounter;
                     if (keyCounter != Vlt->KeysOrder.size()) res += ",";

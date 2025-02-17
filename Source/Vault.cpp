@@ -674,7 +674,7 @@ namespace mvlt
     }
 
     std::string Vault::ToJson(const bool& isFormat, const std::size_t& tabSize, const bool& isUseRecordTemplate,
-            const std::string& recordTemplate) const noexcept
+            const std::string& recordTemplate, const bool& isArray) const noexcept
     {
         DBG_LOG_ENTER();
 
@@ -686,15 +686,22 @@ namespace mvlt
         std::size_t counter = 0, keysAmount = KeysOrder.size(), recordsAmount = RecordsSet.size();
         const std::string tab(tabSize, ' ');
 
-        res << "{";
+        if (isArray)
+            res << "[";
+        else
+            res << "{";
 
         for (const auto& record : RecordsSet)
         {
             if (isFormat) res << "\n" << tab;
-            if (isUseRecordTemplate)
-                res << "\"" << recordTemplate << counter << "\":";
-            else
-                res << "\"" << record << "\":";
+
+            if (!isArray)
+            {
+                if (isUseRecordTemplate)
+                    res << "\"" << recordTemplate << counter << "\":";
+                else
+                    res << "\"" << record << "\":";
+            }
 
             if (isFormat)
                 res << " {";
@@ -711,27 +718,8 @@ namespace mvlt
 
                 res << "\"" << key << "\":";
 
-                std::type_index dataType = dataSaver.GetDataType();
-                if (dataType == typeid(std::int8_t) ||
-                    dataType == typeid(std::uint8_t) ||
-                    dataType == typeid(std::int16_t) ||
-                    dataType == typeid(std::uint16_t) ||
-                    dataType == typeid(std::int32_t) ||
-                    dataType == typeid(std::uint32_t) ||
-                    dataType == typeid(std::int64_t) ||
-                    dataType == typeid(std::uint64_t) ||
-                    dataType == typeid(float) ||
-                    dataType == typeid(double) ||
-                    dataType == typeid(bool))
-                {
-                    if (isFormat) res << " ";
-                    res << dataSaver.Str();
-                }
-                else
-                {
-                    if (isFormat) res << " ";
-                    res << "\"" << dataSaver.Str() << "\"";
-                }
+                if (isFormat) res << " ";
+                res << mvlt::ToJson(dataSaver);
 
                 ++keyCounter;
                 if (keyCounter != keysAmount) res << ",";
@@ -745,7 +733,12 @@ namespace mvlt
         }
 
         if (isFormat) res << "\n";
-        res << "}";
+
+        if (isArray)
+            res << "]";
+        else
+            res << "}";
+
         return res.str();
     }
 

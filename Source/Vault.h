@@ -14,6 +14,8 @@
 #include "VaultOperationResult.h"
 
 #include "CsvParser/CsvParser.h"
+
+#include "Strings/ToJson.h"
 #include "Strings/PrintAsTable.h"
 
 namespace mvlt
@@ -703,11 +705,12 @@ namespace mvlt
             \param [in] tabSize the number of spaces when tabbing
             \param [in] isUseRecordTemplate will recordTemplate be used for the title of the record or will an internal unique identifier be used
             \param [in] recordTemplate a template for the record name to which the record number will be added
+            \param [in] isArray is save as array of json objects, one record is one json object or as single json object
 
             \return json string
         */
         std::string ToJson(const bool& isFormat = false, const std::size_t& tabSize = 2, const bool& isUseRecordTemplate = true,
-            const std::string& recordTemplate = "Record") const noexcept;
+            const std::string& recordTemplate = "Record", const bool& isArray = false) const noexcept;
 
         /**
             \brief A method for displaying the contents of a Vault on the screen

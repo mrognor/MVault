@@ -18,6 +18,7 @@ set(MVaultHeaders
     DataSaver.h
     ReadWriteMutex.h
 
+    Strings/ToJson.h
     Strings/ToString.h
     Strings/FromString.h
     Strings/PrintAsTable.h
@@ -48,6 +49,8 @@ set(MVaultSource
     DataSaver.cpp
     ReadWriteMutex.cpp
     VaultRecordSet.cpp
+
+    Strings/ToJson.cpp
 
     BackTrace/BackTrace.cpp
 

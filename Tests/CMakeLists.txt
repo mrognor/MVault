@@ -2,9 +2,21 @@ cmake_minimum_required(VERSION 3.10)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(MTestsHeaders MTests/ColorizedPrint.h MTests/TestAssert.h MTests/Starter.h MTests/GetLine.h MTests/TestLog.h MTests/TestSuite.h)
+set(MTestsHeaders
+    MTests/Starter.h
+    MTests/GetLine.h
+    MTests/TestLog.h
+    MTests/TestSuite.h
+    MTests/TestAssert.h
+    MTests/CompareVault.h
+    MTests/ColorizedPrint.h)
 
-set(MTestsSource MTests/ColorizedPrint.cpp MTests/Starter.cpp MTests/GetLine.cpp MTests/TestLog.cpp)
+set(MTestsSource
+    MTests/Starter.cpp
+    MTests/GetLine.cpp
+    MTests/TestLog.cpp
+    MTests/CompareVault.cpp
+    MTests/ColorizedPrint.cpp)
 
 project(MTests)
 
