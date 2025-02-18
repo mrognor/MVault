@@ -8,7 +8,7 @@ std::string MTestsToJson(const std::vector<std::vector<std::pair<std::string, Ty
     {
         std::size_t start = res.length();
         for (const auto& field : record)
-            res += ",\"" + field.first + "\":" + field.second.Str; 
+            res += ",\"" + field.first + "\":" + field.second.Str;
 
         res[start] = '{';
         res += "},";
