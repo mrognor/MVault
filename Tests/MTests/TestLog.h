@@ -14,11 +14,10 @@ public:
     static std::size_t ErrorCounter;
 
     std::string FunctionName;
-    std::string TestModuleName;
 
-    TestLog(const std::string& className, const std::string& functionName, const std::size_t& lineNumber, const std::string& testModuleName);
+    TestLog(const std::string& className, const std::string& functionName, const std::size_t& lineNumber);
 
     ~TestLog();
 };
 
-#define TEST_LOG(className) TestLog testLog(className, __FUNCTION__, __LINE__, __FILE__);
+#define TEST_LOG(className) TestLog testLog(className, __FUNCTION__, __LINE__);

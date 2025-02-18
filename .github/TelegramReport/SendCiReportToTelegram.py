@@ -16,25 +16,15 @@ def CalculateLinesOfCode(directory, file_types):
     return lines
 
 
-with open("../../Build/Tests/report.md") as reportFile:
+with open("../../Build/report.md") as reportFile:
     # Tests
-    report = reportFile.read()
+    testsData = [line.rstrip() for line in reportFile.readlines()]
 
-    totalTests = 0
-    passedTests = 0
-    failedTests = 0
+    totalTests = int(testsData[0].split(" ")[1])
+    passedTests = int(testsData[1].split(" ")[1])
+    failedTests = int(testsData[2].split(" ")[1])
 
-    words = report.split(" ")
-    for i in range(len(words)):
-        if words[i] == "Tests:":
-            totalTests += int(words[i + 1][3:-5])
-        if words[i] == "Passed:":
-            passedTests += int(words[i + 1][3:-5])
-        if words[i] == "Failed:":
-            failedTests += int(words[i + 1][3:-5])
-
-
-    report = "  Passed tests: <b>" + str(passedTests) + "</b>\n\n" + report
+    report = "  Passed tests: <b>" + str(passedTests) + "</b>\n\n"
     report = "  Failed tests: <b>" + str(failedTests) + "</b>\n" + report
     report = "Total tests: <b>" + str(totalTests) + "</b>\n" + report
 
@@ -53,7 +43,7 @@ with open("../../Build/Tests/report.md") as reportFile:
     tests = CalculateLinesOfCode("../../Tests", file_types)
     examples = CalculateLinesOfCode("../../Examples", file_types)
 
-    report += "\nLines\n"
+    report += "Lines\n"
     report += "Total: " + str(src + tests + examples) + "\n"
     report += "Source: " + str(src) + "\n"
     report += "Tests: " + str(tests) + "\n"

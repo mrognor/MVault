@@ -43,4 +43,15 @@ int main(int argc, char** argv)
 
     if ((requiredTests & ~VaultUnitTestsKey) == 0) VaultUnitTests();
     if ((requiredTests & ~VaultRecordSetUnitTestsKey) == 0) VaultRecordSetUnitTests();
+
+
+    ColorizedPrint("============================================================");
+    ColorizedPrint("Total tests: " + std::to_string(TestLog::TestCounter) + ". ", ConsoleTextColor::Default, "");
+    ColorizedPrint("Passed: " + std::to_string(TestLog::TestCounter - TestLog::ErrorCounter) + ". ", ConsoleTextColor::Green, "");
+    ColorizedPrint("Failed: " + std::to_string(TestLog::ErrorCounter) + ". ", ConsoleTextColor::Red);
+    ColorizedPrint("============================================================");
+
+    std::ofstream reportFile("report.md");
+    reportFile << "Tests: " << std::to_string(TestLog::TestCounter) << "\nPassed: " << std::to_string(TestLog::TestCounter - TestLog::ErrorCounter) 
+        << "\nFailed: " << std::to_string(TestLog::ErrorCounter);
 }
