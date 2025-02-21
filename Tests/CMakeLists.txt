@@ -9,7 +9,8 @@ set(MTestsHeaders
     MTests/TestSuite.h
     MTests/TestAssert.h
     MTests/CompareVault.h
-    MTests/ColorizedPrint.h)
+    MTests/ColorizedPrint.h
+    MTests/CompareVaultOperationResult.h)
 
 set(MTestsSource
     MTests/Starter.cpp

@@ -6,7 +6,7 @@
 #include "TestSuite.h"
 #include "TestAssert.h"
 
-#define COMPARE_VAULT(vlt, ...) TEST_ASSERT(vlt.ToJson(false, 2, false, "", true) == MTestsToJson(__VA_ARGS__))
+#define COMPARE_VAULT(vlt, ...) TEST_ASSERT(CompareVault(vlt, __VA_ARGS__))
 
 struct TypeWrapper
 {
@@ -15,8 +15,8 @@ struct TypeWrapper
     template<class T>
     TypeWrapper(const T& t)
     {
-        Str = mvlt::ToJson(t);
+        Str = mvlt::ToString(t);
     }
 };
 
-std::string MTestsToJson(const std::vector<std::vector<std::pair<std::string, TypeWrapper>>>& records);
+bool CompareVault(const mvlt::Vault& vlt, const std::vector<std::vector<std::pair<std::string, TypeWrapper>>>& records);

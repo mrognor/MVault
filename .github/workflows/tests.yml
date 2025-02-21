@@ -15,9 +15,9 @@ permissions:
   id-token: write
 
 jobs:
-  # Run project tests
-  tests:
-    name: Build and run tests
+  # Build project
+  build:
+    name: Build project
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
@@ -26,7 +26,33 @@ jobs:
       - name: Install packages
         run: sudo apt-get update && sudo apt-get upgrade && sudo apt-get -y install cmake lcov
 
-      - name: Build and run tests
+      - name: Configure project
+        run: ./Configure.sh
+      
+      - name: Build project
+        run: cd Build && make -j
+
+      # Upload artifacts to reuse it in next jobs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: BuildArtifacts
+          path: ./Build
+
+  # Run project tests
+  tests:
+    name: Run tests
+    needs: build
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: BuildArtifacts
+          path: ./Build
+
+      - name: Run tests
         run: ./Scripts/Tests/RunUnitTests.sh
 
       # Upload artifacts to reuse it in next jobs

@@ -6,6 +6,7 @@
 #include "../MTests/TestSuite.h"
 #include "../MTests/TestAssert.h"
 #include "../MTests/CompareVault.h"
+#include "../MTests/CompareVaultOperationResult.h"
 
 using namespace mvlt;
 
@@ -62,6 +63,29 @@ TEST_SUITE(MoveAssignmentOperator,
     /// \brief Assign empty vault to filled
     /// This test required to check vault clearing on assigning
     TEST_CASE(AssignEmptyToFilled)
+)
+
+/// \brief Vault add key test
+TEST_SUITE(AddKey,
+
+    /// \brief Correct key adding
+    TEST_CASE(CorrectAddKey)
+
+    /// \brief Incorrect key adding
+    TEST_CASE(IncorrectAddKey)
+
+    /// \brief Correct key adding to non-empty vault
+    TEST_CASE(CorrectAddToNonEmpty)
+
+    /// \brief Incorrect key adding to non-empty vault
+    TEST_CASE(IncorrectAddToNonEmpty)
+)
+
+TEST_SUITE(AddUniqueKey,
+
+    /// \brief Add key to empty vault
+    TEST_CASE(AddKeyToEmptyVault)
+
 )
 
 void VaultUnitTests();

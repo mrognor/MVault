@@ -5,15 +5,17 @@ from git import Repo
 
 def CalculateLinesOfCode(directory, file_types):
     lines = 0
+    files = 0
 
     for file_name in glob.glob(directory + "/**/*", recursive=True):
         for file_type in file_types:
             if (file_name.endswith(file_type)):
                 with open(file_name, 'r') as file:
                     lines += len(file.readlines())
+                    files += 1
                 break
 
-    return lines
+    return lines, files
 
 
 with open("../../Build/report.md") as reportFile:
@@ -39,15 +41,21 @@ with open("../../Build/report.md") as reportFile:
 
     # Code lines
     file_types = [".h", ".c", ".hpp", ".cpp"]
-    src = CalculateLinesOfCode("../../Source", file_types)
-    tests = CalculateLinesOfCode("../../Tests", file_types)
-    examples = CalculateLinesOfCode("../../Examples", file_types)
+    srcLines, srcFiles = CalculateLinesOfCode("../../Source", file_types)
+    testsLines, testsFiles = CalculateLinesOfCode("../../Tests", file_types)
+    examplesLines, examplesFiles = CalculateLinesOfCode("../../Examples", file_types)
 
     report += "Lines\n"
-    report += "Total: " + str(src + tests + examples) + "\n"
-    report += "Source: " + str(src) + "\n"
-    report += "Tests: " + str(tests) + "\n"
-    report += "Examples: " + str(examples)
+    report += "  Total: " + str(srcLines + testsLines + examplesLines) + "\n"
+    report += "  Source: " + str(srcLines) + "\n"
+    report += "  Tests: " + str(testsLines) + "\n"
+    report += "  Examples: " + str(examplesLines) + "\n\n"
+
+    report += "Files\n"
+    report += "  Total: " + str(srcFiles + testsFiles + examplesFiles) + "\n"
+    report += "  Source: " + str(srcFiles) + "\n"
+    report += "  Tests: " + str(testsFiles) + "\n"
+    report += "  Examples: " + str(examplesFiles)
 
     # Telegram
     botTimeWeb = telebot.TeleBot(sys.argv[1])

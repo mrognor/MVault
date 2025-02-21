@@ -742,6 +742,33 @@ namespace mvlt
         return res.str();
     }
 
+    std::vector<std::vector<std::pair<std::string, std::string>>> Vault::ToStrings() const noexcept
+    {
+        DBG_LOG_ENTER();
+
+        std::vector<std::vector<std::pair<std::string, std::string>>> res;
+
+        // Lock Vault to read
+        ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
+
+        for (const auto& record : RecordsSet)
+        {
+            std::vector<std::pair<std::string, std::string>> rec;
+
+            for(const std::string& key : KeysOrder)
+            {
+                DataSaver dataSaver;
+                record->GetDataSaver(key, dataSaver);
+
+                rec.emplace_back(std::pair<std::string, std::string>(key, ToString(dataSaver.Str())));
+            }
+
+            res.emplace_back(std::move(rec));
+        }
+
+        return res;
+    }
+
     void Vault::PrintVault(const std::size_t& amountOfRecords) const noexcept
     {
         DBG_LOG_ENTER();
