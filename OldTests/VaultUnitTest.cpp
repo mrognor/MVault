@@ -360,7 +360,7 @@ void Vault_UpdateKey_Test()
 
     // Try to update unique key
     VaultOperationResult vrs = vlt.UpdateKey<std::size_t>("C", 250);
-    TEST_ASSERT(vrs.ResultCode == VaultOperationResultCode::TryToUpdateUniqueKey, "Cannot update unique key");
+    TEST_ASSERT(vrs.ResultCode == VaultOperationResultCode::UniqueKey, "Cannot update unique key");
 }
 
 void Vault_IsKeyExist_Test()

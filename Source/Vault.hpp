@@ -372,10 +372,12 @@ namespace mvlt
         WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
 
         // If the key was added earlier
-        if (KeysTypes.find(key) != KeysTypes.end())
+        auto keyType = KeysTypes.find(key);
+        if (keyType != KeysTypes.end())
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::DuplicateKey;
+            res.SavedType = keyType->second;
             return res;
         }
 
@@ -644,13 +646,15 @@ namespace mvlt
         {
             res.SavedType = keyTypeIt->second;
             res.IsOperationSuccess = false;
-            res.ResultCode = VaultOperationResultCode::TryToUpdateUniqueKey;
+            res.ResultCode = VaultOperationResultCode::UniqueKey;
             return res;
         }
 
         // Change data in template
         RecordTemplate.SetData(key, defaultKeyValue);
 
+        res.SavedType = res.RequestedType;
+        res.ResultCode = VaultOperationResultCode::Success;
         return res;
     }
 
@@ -684,16 +688,11 @@ namespace mvlt
             return res;
         }
 
-        for (auto& it : UniqueKeys)
-        {
-            std::cout << it << "\n";
-        }
-
         // Check if it is unique key
         if (UniqueKeys.find(key) != UniqueKeys.end())
         {
             res.IsOperationSuccess = false;
-            res.ResultCode = VaultOperationResultCode::TryToUpdateUniqueKey;
+            res.ResultCode = VaultOperationResultCode::UniqueKey;
             return res;
         }
 

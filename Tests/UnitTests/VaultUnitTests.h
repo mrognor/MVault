@@ -10,82 +10,141 @@
 
 using namespace mvlt;
 
-/// \brief Vault default constructor test
 TEST_SUITE(DefaultConstructor,
 
-    /// \brief Default constructor test
     TEST_CASE(Default)
 )
 
-/// \brief Vault copy constructor test
 TEST_SUITE(CopyConstructor,
 
-    /// \brief Empty vault copy constructor test
     TEST_CASE(CopyEmptyVault)
 
-    /// \brief Filled vault copy constructor test
     TEST_CASE(CopyFilledVault)
 )
 
-/// \brief Vault assignment operator test
 TEST_SUITE(AssignmentOperator,
 
-    /// \brief Empty vault assign test
     TEST_CASE(AssignEmptyVault)
 
-    /// \brief Assign filled vault to empty
     TEST_CASE(AssignFilledToEmpty)
 
-    /// \brief Assign empty vault to filled
-    /// This test required to check vault clearing on assigning
+    // This test required to check vault clearing on assigning
     TEST_CASE(AssignEmptyToFilled)
 )
 
-/// \brief Vault move constructor test
 TEST_SUITE(MoveConstructor,
 
-    /// \brief Empty vault move test
     TEST_CASE(MoveEmptyConstructor)
 
-    /// \brief Move filled vault to empty
     TEST_CASE(MoveFilledConstructor)
 )
 
-/// \brief Vault move assignment operator test
 TEST_SUITE(MoveAssignmentOperator,
 
-    /// \brief Empty vault assign test
     TEST_CASE(AssignEmptyVault)
 
-    /// \brief Assign filled vault to empty
     TEST_CASE(AssignFilledToEmpty)
 
-    /// \brief Assign empty vault to filled
     /// This test required to check vault clearing on assigning
     TEST_CASE(AssignEmptyToFilled)
 )
 
-/// \brief Vault add key test
 TEST_SUITE(AddKey,
 
-    /// \brief Correct key adding
     TEST_CASE(CorrectAddKey)
 
-    /// \brief Incorrect key adding
     TEST_CASE(IncorrectAddKey)
 
-    /// \brief Correct key adding to non-empty vault
     TEST_CASE(CorrectAddToNonEmpty)
 
-    /// \brief Incorrect key adding to non-empty vault
     TEST_CASE(IncorrectAddToNonEmpty)
 )
 
 TEST_SUITE(AddUniqueKey,
 
-    /// \brief Add key to empty vault
-    TEST_CASE(AddKeyToEmptyVault)
+    TEST_CASE(CorrectAddKeyToEmptyVault)
 
+    TEST_CASE(IncorrectAddKeyToEmptyVault);
+
+    TEST_CASE(CorrectAddKeyToNonEmptyVault);
+
+    TEST_CASE(IncorrectAddKeyToNonEmptyVault);
+
+    TEST_CASE(CorrectAddKeyToNonEmptyVaultWithDuplicate);
+)
+
+TEST_SUITE(UpdateKey,
+
+    TEST_CASE(CorrectUpdateNonUniqueKey)
+
+    TEST_CASE(WrongKeyUpdate)
+
+    TEST_CASE(WrongType)
+
+    TEST_CASE(UniqueKey)
+)
+
+TEST_SUITE(IsKeyExist,
+
+    TEST_CASE(ExistingKey)
+
+    TEST_CASE(NonExistingKey)
+)
+
+TEST_SUITE(GetKeyValue,
+
+    TEST_CASE(ExistingKey)
+
+    TEST_CASE(NonExistingKey)
+
+    TEST_CASE(WrongType)
+
+    TEST_CASE(UniqueKey)
+)
+
+TEST_SUITE(GetKeyType,
+
+    TEST_CASE(ExistingKey)
+
+    TEST_CASE(NonExistingKey)
+)
+
+TEST_SUITE(GetKeys,
+
+    TEST_CASE(Keys)
+)
+
+TEST_SUITE(GetUniqueKeys,
+
+    TEST_CASE(UniqueKeys)
+)
+
+TEST_SUITE(RemoveKey,
+
+    TEST_CASE(CorrectRemoveFromEmptyVault)
+
+    TEST_CASE(CorrectRemoveFromNonEmptyVault)
+
+    TEST_CASE(IncorrectRemoveFromEmptyVault)
+
+    TEST_CASE(IncorrectRemoveFromNonEmptyVault)
+)
+
+TEST_SUITE(CreateKey,
+
+    TEST_CASE(CorrectParamsWithoutUniqueKey)
+
+    TEST_CASE(CorrectParamsWithUniqueKey)
+
+    TEST_CASE(WrongKeyWithoutUniqueKey)
+
+    TEST_CASE(WrongTypeWithoutUniqueKey)
+
+    TEST_CASE(WrongKeyWithUniqueKey)
+
+    TEST_CASE(WrongTypeWithUniqueKey)
+
+    TEST_CASE(DuplicateUniqueKeyValue)
 )
 
 void VaultUnitTests();

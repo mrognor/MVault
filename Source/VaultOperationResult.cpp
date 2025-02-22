@@ -36,7 +36,7 @@ namespace mvlt
         case VaultOperationResultCode::DuplicateKey:
             return "This key is alredy in vault";
 
-        case VaultOperationResultCode::TryToUpdateUniqueKey:
+        case VaultOperationResultCode::UniqueKey:
             return "The key is unique and you can not update it default value.";
 
         case VaultOperationResultCode::RecordAlredyInSet:
@@ -74,6 +74,13 @@ namespace mvlt
         }
 
         return "";
+    }
+
+    void VaultOperationResult::Print() const noexcept
+    {
+        if (IsOperationSuccess) std::cout << "Success! ";
+        else std::cout << "Failed! ";
+        std::cout << ResultCodeString() << " Key: " << Key << " Saved type: " << SavedType.name() << " Requested type: " << RequestedType.name() << "\n";
     }
 
     bool operator== (const VaultOperationResult& resA, const VaultOperationResult& resB) noexcept

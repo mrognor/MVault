@@ -24,7 +24,7 @@ namespace mvlt
         SameVaultRecordSet,                            ///< This code is returned when trying to call operations on the VaultRecordSet object itself
         TryToAddUniqueKeyInNonEmptyVaultWithoutLambda, ///< This code is returned when trying to add unique key without lamda in non-empty vault
         DuplicateKey,                                  ///< This code is returned when trying to add key which alredy in vault
-        TryToUpdateUniqueKey,                          ///< This code is returned when trying to update default value in an unique key
+        UniqueKey,                                     ///< This code is returned when trying to update default value in an unique key
         RecordAlredyInSet,                             ///< This code is returned when trying to add an record to the set when it is already in it
         ParentVaultNotMatch,                           ///< This code is returned during operations on VaultRecordSet when objects depend on different Vaults
         ParentVaultNotValid,                           ///< This code is returned when calling VaultRecordSet operations when the parent Vault is not valid
@@ -69,6 +69,9 @@ namespace mvlt
             \return Operation description string
         */
         std::string ResultCodeString() const noexcept;
+
+        /// \brief Method for printing operation result
+        void Print() const noexcept;
 
         /**
             \brief Friend comparison operator

@@ -457,7 +457,7 @@ namespace mvlt
             // Check if key exist in record template
             if (newRecord->GetDataSaver(paramsIt.first, ds))
             {
-                res.RequestedType = KeysTypes.find(paramsIt.first)->second;
+                res.SavedType = KeysTypes.find(paramsIt.first)->second;
 
                 // Check if type in params match type in record template
                 if (ds.GetDataType() == paramsIt.second.GetDataType())
@@ -467,7 +467,6 @@ namespace mvlt
                 else
                 {   // If the type in param not match type in record template
                     res.IsOperationSuccess = false;
-                    res.SavedType = paramsIt.second.GetDataType();
                     res.SetOpResult(VaultOperationResultCode::WrongType);
                     isCorrectParams = false;
                     break;
@@ -477,7 +476,7 @@ namespace mvlt
             {   // If key not exist then stop set data from params
                 res.IsOperationSuccess = false;
                 res.SavedType = typeid(void);
-                res.RequestedType = typeid(void);
+                res.RequestedType = paramsIt.second.GetDataType();
                 res.ResultCode = VaultOperationResultCode::WrongKey;
                 isCorrectParams = false;
                 break;
@@ -512,8 +511,8 @@ namespace mvlt
 
                 res.IsOperationSuccess = false;
                 res.Key = incorrectUniqueKey;
-                res.SavedType = KeysTypes.find(incorrectUniqueKey)->second;
-                res.RequestedType = res.SavedType;
+                res.SavedType = typeid(void);
+                res.RequestedType = KeysTypes.find(incorrectUniqueKey)->second;
                 res.ResultCode = VaultOperationResultCode::UniqueKeyValueAlredyInSet;
                 delete newRecord;
             }
@@ -529,6 +528,7 @@ namespace mvlt
                 vaultRecordRef.SetRecord(newRecord, this);
 
                 res.IsOperationSuccess = true;
+                res.SavedType = typeid(void);
                 res.ResultCode = VaultOperationResultCode::Success;
             }
         }
