@@ -341,6 +341,19 @@ namespace mvlt
             return "{}";
     }
 
+    std::vector<std::vector<std::pair<std::string, std::string>>> VaultRecordSet::ToStrings() const noexcept
+    {
+        DBG_LOG_ENTER();
+
+        if (GetIsParentVaultValid())
+        {
+            ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
+            return Vault::ToStrings();
+        }
+        else
+            return std::vector<std::vector<std::pair<std::string, std::string>>> ();
+    }
+
     void VaultRecordSet::PrintSet(const std::size_t& amountOfRecords) const noexcept
     {
         DBG_LOG_ENTER();

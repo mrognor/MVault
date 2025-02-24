@@ -814,6 +814,9 @@ namespace mvlt
                 recordsRefs.emplace_back(VaultRecordRef((*equalRangeIt).second, const_cast<Vault*>(this)));
                 if (counter >= amountOfRecords) break;
             }
+
+            res.IsOperationSuccess = true;
+            res.ResultCode = VaultOperationResultCode::Success;
         }
         else
         {

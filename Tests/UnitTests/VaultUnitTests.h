@@ -6,6 +6,7 @@
 #include "../MTests/TestSuite.h"
 #include "../MTests/TestAssert.h"
 #include "../MTests/CompareVault.h"
+#include "../MTests/CompareVaultRecordRef.h"
 #include "../MTests/CompareVaultOperationResult.h"
 
 using namespace mvlt;
@@ -136,6 +137,8 @@ TEST_SUITE(CreateKey,
 
     TEST_CASE(CorrectParamsWithUniqueKey)
 
+    TEST_CASE(DuplicateParams)
+
     TEST_CASE(WrongKeyWithoutUniqueKey)
 
     TEST_CASE(WrongTypeWithoutUniqueKey)
@@ -145,6 +148,45 @@ TEST_SUITE(CreateKey,
     TEST_CASE(WrongTypeWithUniqueKey)
 
     TEST_CASE(DuplicateUniqueKeyValue)
+)
+
+TEST_SUITE(GetRecord,
+
+    TEST_CASE(CorrectGetRecord)
+
+    TEST_CASE(WrongKey)
+
+    TEST_CASE(WrongType)
+
+    TEST_CASE(WrongValue)
+)
+
+TEST_SUITE(GetRecords,
+
+    TEST_CASE(CorrectGetRecords)
+
+    TEST_CASE(CorrectGetNotAllRecords)
+
+    TEST_CASE(WrongKey)
+
+    TEST_CASE(WrongType)
+
+    TEST_CASE(WrongValue)
+)
+
+TEST_SUITE(RequestEqual,
+
+    TEST_CASE(CorrectRequest)
+
+    TEST_CASE(CorrectRequestNotAllRecords)
+
+    TEST_CASE(CorrectRequestWithPredicat)
+
+    TEST_CASE(WrongKey)
+
+    TEST_CASE(WrongType)
+
+    TEST_CASE(ValueNotInVault)
 )
 
 void VaultUnitTests();

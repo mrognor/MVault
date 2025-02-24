@@ -8,16 +8,18 @@ set(MTestsHeaders
     MTests/TestLog.h
     MTests/TestSuite.h
     MTests/TestAssert.h
+    MTests/TypeWrapper.h
     MTests/CompareVault.h
     MTests/ColorizedPrint.h
+    MTests/CompareVaultRecordRef.h
     MTests/CompareVaultOperationResult.h)
 
 set(MTestsSource
     MTests/Starter.cpp
     MTests/GetLine.cpp
     MTests/TestLog.cpp
-    MTests/CompareVault.cpp
-    MTests/ColorizedPrint.cpp)
+    MTests/ColorizedPrint.cpp
+    MTests/CompareVaultRecordRef.cpp)
 
 project(MTests)
 

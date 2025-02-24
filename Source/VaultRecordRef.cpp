@@ -298,6 +298,38 @@ namespace mvlt
         return res;
     }
 
+    std::vector<std::pair<std::string, std::string>> VaultRecordRef::ToStrings() const noexcept
+    {
+        DBG_LOG_ENTER();
+
+        std::vector<std::pair<std::string, std::string>> res;
+
+        if (VaultRecordPtr != nullptr)
+        {
+            VaultRecordPtr->VaultRecordMutex.lock();
+
+            // Check if Vault still accessable
+            if (VaultRecordPtr->GetIsValid())
+            {
+                Vlt->RecursiveReadWriteMtx.ReadLock();
+
+                for(const std::string& key : Vlt->KeysOrder)
+                {
+                    DataSaver dataSaver;
+                    VaultRecordPtr->GetDataSaver(key, dataSaver);
+
+                    res.emplace_back(std::pair<std::string, std::string>(key, dataSaver.Str()));
+                }
+
+                Vlt->RecursiveReadWriteMtx.ReadUnlock();
+            }
+
+            VaultRecordPtr->VaultRecordMutex.unlock();
+        }
+
+        return res;
+    }
+
     VaultRecordRef::~VaultRecordRef() noexcept
     {
         DBG_LOG_ENTER();

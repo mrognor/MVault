@@ -1,22 +1,33 @@
 #pragma once
 
-#include "../../Source/MVault.h"
-
-#include "TestLog.h"
-#include "TestSuite.h"
-#include "TestAssert.h"
+#include "TypeWrapper.h"
 
 #define COMPARE_VAULT(vlt, ...) TEST_ASSERT(CompareVault(vlt, __VA_ARGS__))
 
-struct TypeWrapper
+template <class VaultClass>
+bool CompareVault(const VaultClass& vlt, const std::vector<std::vector<std::pair<std::string, TypeWrapper>>>& records)
 {
-    std::string Str;
+    std::multiset<std::multiset<std::pair<std::string, std::string>>> vaultRecords, inputRecords;
 
-    template<class T>
-    TypeWrapper(const T& t)
+    for (const std::vector<std::pair<std::string, std::string>>& record : vlt.ToStrings())
     {
-        Str = mvlt::ToString(t);
-    }
-};
+        std::multiset<std::pair<std::string, std::string>> recordSet;
 
-bool CompareVault(const mvlt::Vault& vlt, const std::vector<std::vector<std::pair<std::string, TypeWrapper>>>& records);
+        for (const auto& recPair : record)
+            recordSet.emplace(recPair);
+
+        vaultRecords.emplace(recordSet);
+    }
+
+    for (const std::vector<std::pair<std::string, TypeWrapper>>& record : records)
+    {
+        std::multiset<std::pair<std::string, std::string>> recordSet;
+
+        for (const auto& recPair : record)
+            recordSet.emplace(std::pair<std::string, std::string>(recPair.first, recPair.second.Str));
+
+        inputRecords.emplace(recordSet);
+    }
+
+    return vaultRecords == inputRecords;
+}

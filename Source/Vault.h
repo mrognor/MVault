@@ -713,7 +713,7 @@ namespace mvlt
             const std::string& recordTemplate = "Record", const bool& isArray = false) const noexcept;
 
         /**
-            \brief Method for conver vault to strings
+            \brief Method for convert vault to strings
 
             \return vector with records. Each record is a vector of key and value string pairs
         */

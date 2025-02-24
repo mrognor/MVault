@@ -192,7 +192,7 @@ namespace mvlt
         void Reset() noexcept;
 
         /**
-            \brief Method for conver ref to json
+            \brief Method for convert ref to json
 
             \param [in] isFormat is format json message
             \param [in] tabSize size of tab
@@ -200,6 +200,13 @@ namespace mvlt
             \return json string with data from ref
         */
         std::string ToJson(const bool& isFormat = true, const std::size_t& tabSize = 2) const noexcept;
+
+        /**
+            \brief Method for convert vault record ref to strings
+
+            \return vector with record poles. Each pole is a key and value string pair
+        */
+        std::vector<std::pair<std::string, std::string>> ToStrings() const noexcept;
 
         /// \brief Default destructor
         ~VaultRecordRef() noexcept;

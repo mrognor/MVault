@@ -450,6 +450,13 @@ namespace mvlt
             const std::string& recordTemplate = "Record") const noexcept;
 
         /**
+            \brief Method for convert vault record set to strings
+
+            \return vector with records. Each record is a vector of key and value string pairs
+        */
+        std::vector<std::vector<std::pair<std::string, std::string>>> ToStrings() const noexcept;
+
+        /**
             \brief A method for displaying the contents of a Vault on the screen
             
             \param [in] amountOfRecords The number of records to be printed. The default value is -1, which means that all entries will be output

@@ -688,6 +688,27 @@ TEST_BODY(CreateKey, CorrectParamsWithUniqueKey,
         RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(void));
 )
 
+TEST_BODY(CreateKey, DuplicateParams,
+    Vault vlt;
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+
+    vlt.CreateRecord({{"A", 1}, {"A", 2}});
+    vlt.CreateRecord({{"A", 1}, {"A", 2}, {"A", 3}});
+    vor = vlt.CreateRecord({{"A", 2}, {"A", 1}});
+
+    COMPARE_VAULT(vlt, {
+        {{"A", 1}},
+        {{"A", 2}},
+        {{"A", 3}},
+    })
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(void));
+)
+
 TEST_BODY(CreateKey, WrongKeyWithoutUniqueKey,
     Vault vlt;
     VaultRecordRef vrr;
@@ -779,6 +800,404 @@ TEST_BODY(CreateKey, DuplicateUniqueKeyValue,
         RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::UniqueKeyValueAlredyInSet, SavedType == typeid(void));
 )
 
+TEST_BODY(GetRecord, CorrectGetRecord,
+    Vault vlt;
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<std::string>("B");
+
+    vlt.CreateRecord({{"A", 1}, {"B", std::string("a")}});
+    vlt.CreateRecord({{"A", 2}, {"B", std::string("b")}});
+    vlt.CreateRecord({{"A", 3}, {"B", std::string("c")}});
+
+    vor = vlt.GetRecord("A", 1, vrr);
+    
+    COMPARE_REF(vrr, {{{"A", 1}, {"B", std::string("a")}}});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(int));
+
+
+    vor = vlt.GetRecord<std::string>("B", "c", vrr);
+    
+    COMPARE_REF(vrr, {{{"A", 3}, {"B", std::string("c")}}});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "B", 
+        RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(std::string));
+)
+
+TEST_BODY(GetRecord, WrongKey,
+    Vault vlt;
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<std::string>("B");
+
+    vlt.CreateRecord({{"A", 1}, {"B", std::string("a")}});
+    vlt.CreateRecord({{"A", 2}, {"B", std::string("b")}});
+    vlt.CreateRecord({{"A", 3}, {"B", std::string("c")}});
+
+    vor = vlt.GetRecord("Z", 1, vrr);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "Z", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongKey, SavedType == typeid(void));
+)
+
+TEST_BODY(GetRecord, WrongType,
+    Vault vlt;
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<std::string>("B");
+
+    vlt.CreateRecord({{"A", 1}, {"B", std::string("a")}});
+    vlt.CreateRecord({{"A", 2}, {"B", std::string("b")}});
+    vlt.CreateRecord({{"A", 3}, {"B", std::string("c")}});
+
+    vor = vlt.GetRecord("B", 1, vrr);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "B", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongType, SavedType == typeid(std::string));
+)
+
+TEST_BODY(GetRecord, WrongValue,
+    Vault vlt;
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<std::string>("B");
+
+    vlt.CreateRecord({{"A", 1}, {"B", std::string("a")}});
+    vlt.CreateRecord({{"A", 2}, {"B", std::string("b")}});
+    vlt.CreateRecord({{"A", 3}, {"B", std::string("c")}});
+
+    vor = vlt.GetRecord("A", 99, vrr);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongValue, SavedType == typeid(int));
+)
+
+TEST_BODY(GetRecords, CorrectGetRecords,
+    Vault vlt;
+    std::vector<VaultRecordRef> records;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<std::string>("B");
+
+    vlt.CreateRecord({{"A", 1}, {"B", std::string("a")}});
+    vlt.CreateRecord({{"A", 2}, {"B", std::string("b")}});
+    vlt.CreateRecord({{"A", 2}, {"B", std::string("bb")}});
+    vlt.CreateRecord({{"A", 2}, {"B", std::string("bbb")}});
+
+    vor = vlt.GetRecords("A", 1, records);
+    
+    TEST_ASSERT(records.size() == 1);
+    COMPARE_REF(records[0], {{{"A", 1}, {"B", std::string("a")}}});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(int));
+
+
+    vor = vlt.GetRecords("A", 2, records);
+    
+    TEST_ASSERT(records.size() == 3);
+
+    int resI = 0;
+    std::string resS;
+
+    for (const VaultRecordRef& ref : records)
+    {
+        int i = 0;
+        std::string s;
+
+        ref.GetData("A", i);
+        ref.GetData("B", s);
+
+        resI += i;
+        resS += s;
+    }
+
+    TEST_ASSERT(resI == 6);
+    TEST_ASSERT(resS == "bbbbbb");
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(int));
+)
+
+TEST_BODY(GetRecords, CorrectGetNotAllRecords,
+    Vault vlt;
+    std::vector<VaultRecordRef> records;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<std::string>("B");
+
+    vlt.CreateRecord({{"A", 1}, {"B", std::string("a")}});
+    vlt.CreateRecord({{"A", 2}, {"B", std::string("b")}});
+    vlt.CreateRecord({{"A", 2}, {"B", std::string("bb")}});
+    vlt.CreateRecord({{"A", 2}, {"B", std::string("bbb")}});
+
+    vor = vlt.GetRecords("A", 1, records, 2);
+    
+    TEST_ASSERT(records.size() == 1);
+    COMPARE_REF(records[0], {{{"A", 1}, {"B", std::string("a")}}});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "A", 
+    RequestedType == typeid(int), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(int));
+
+
+    vor = vlt.GetRecords("A", 2, records, 2);
+
+    TEST_ASSERT(records.size() == 2);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(int));
+)
+
+TEST_BODY(GetRecords, WrongKey,
+    Vault vlt;
+    std::vector<VaultRecordRef> records;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<std::string>("B");
+
+    vlt.CreateRecord({{"A", 1}, {"B", std::string("a")}});
+    vlt.CreateRecord({{"A", 2}, {"B", std::string("b")}});
+    vlt.CreateRecord({{"A", 2}, {"B", std::string("bb")}});
+    vlt.CreateRecord({{"A", 2}, {"B", std::string("bbb")}});
+
+    vor = vlt.GetRecords("Z", 1, records);
+    
+    TEST_ASSERT(records.size() == 0);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "Z", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongKey, SavedType == typeid(void));
+)
+
+TEST_BODY(GetRecords, WrongType,
+    Vault vlt;
+    std::vector<VaultRecordRef> records;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<std::string>("B");
+
+    vlt.CreateRecord({{"A", 1}, {"B", std::string("a")}});
+    vlt.CreateRecord({{"A", 2}, {"B", std::string("b")}});
+    vlt.CreateRecord({{"A", 2}, {"B", std::string("bb")}});
+    vlt.CreateRecord({{"A", 2}, {"B", std::string("bbb")}});
+
+    vor = vlt.GetRecords("B", 1, records);
+    
+    TEST_ASSERT(records.size() == 0);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "B", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongType, SavedType == typeid(std::string));
+)
+
+TEST_BODY(GetRecords, WrongValue,
+    Vault vlt;
+    std::vector<VaultRecordRef> records;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<std::string>("B");
+
+    vlt.CreateRecord({{"A", 1}, {"B", std::string("a")}});
+    vlt.CreateRecord({{"A", 2}, {"B", std::string("b")}});
+    vlt.CreateRecord({{"A", 2}, {"B", std::string("bb")}});
+    vlt.CreateRecord({{"A", 2}, {"B", std::string("bbb")}});
+
+    vor = vlt.GetRecords("A", 99, records);
+    
+    TEST_ASSERT(records.size() == 0);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongValue, SavedType == typeid(int));
+)
+
+TEST_BODY(RequestEqual, CorrectRequest,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<std::string>("B");
+
+    vlt.CreateRecord({{"A", 1}, {"B", std::string("a")}});
+    vlt.CreateRecord({{"A", 2}, {"B", std::string("b")}});
+    vlt.CreateRecord({{"A", 2}, {"B", std::string("bb")}});
+    vlt.CreateRecord({{"A", 2}, {"B", std::string("bbb")}});
+    vlt.CreateRecord({{"A", 3}, {"B", std::string("c")}});
+
+    vor = vlt.RequestEqual("A", 1, vrs);
+
+    TEST_ASSERT(vrs.Size() == 1);
+
+    COMPARE_VAULT(vrs, {{{"A", 1}, {"B", std::string("a")}}});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(int));
+
+
+    vor = vlt.RequestEqual("A", 2, vrs);
+
+    TEST_ASSERT(vrs.Size() == 3);
+
+    COMPARE_VAULT(vrs, {
+        {{"A", 2}, {"B", std::string("b")}},
+        {{"A", 2}, {"B", std::string("bb")}},
+        {{"A", 2}, {"B", std::string("bbb")}},
+    });
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(int));
+)
+
+TEST_BODY(RequestEqual, CorrectRequestNotAllRecords,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<std::string>("B");
+
+    vlt.CreateRecord({{"A", 1}, {"B", std::string("a")}});
+    vlt.CreateRecord({{"A", 2}, {"B", std::string("b")}});
+    vlt.CreateRecord({{"A", 2}, {"B", std::string("bb")}});
+    vlt.CreateRecord({{"A", 2}, {"B", std::string("bbb")}});
+    vlt.CreateRecord({{"A", 3}, {"B", std::string("c")}});
+
+    vor = vlt.RequestEqual("A", 1, vrs, 2);
+
+    TEST_ASSERT(vrs.Size() == 1);
+
+    COMPARE_VAULT(vrs, {{{"A", 1}, {"B", std::string("a")}}});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(int));
+
+
+    vor = vlt.RequestEqual("A", 2, vrs, 2);
+
+    TEST_ASSERT(vrs.Size() == 2);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(int));
+)
+
+TEST_BODY(RequestEqual, CorrectRequestWithPredicat,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<std::string>("B");
+
+    vlt.CreateRecord({{"A", 1}, {"B", std::string("a")}});
+    vlt.CreateRecord({{"A", 2}, {"B", std::string("b")}});
+    vlt.CreateRecord({{"A", 2}, {"B", std::string("bb")}});
+    vlt.CreateRecord({{"A", 2}, {"B", std::string("bbb")}});
+    vlt.CreateRecord({{"A", 3}, {"B", std::string("c")}});
+
+    vor = vlt.RequestEqual("A", 2, vrs, -1, [](const VaultRecordRef& ref) -> bool
+    {
+        std::string s;
+        ref.GetData("B", s);
+        if (s.length() <= 2) return true;
+        else return false;
+    });
+
+    TEST_ASSERT(vrs.Size() == 2);
+
+    COMPARE_VAULT(vrs, {
+        {{"A", 2}, {"B", std::string("b")}},
+        {{"A", 2}, {"B", std::string("bb")}},
+    });
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(int));
+)
+
+TEST_BODY(RequestEqual, WrongKey,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<std::string>("B");
+
+    vlt.CreateRecord({{"A", 1}, {"B", std::string("a")}});
+    vlt.CreateRecord({{"A", 2}, {"B", std::string("b")}});
+    vlt.CreateRecord({{"A", 3}, {"B", std::string("c")}});
+
+    vor = vlt.RequestEqual("Z", 1, vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "Z", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongKey, SavedType == typeid(void));
+)
+
+TEST_BODY(RequestEqual, WrongType,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<std::string>("B");
+
+    vlt.CreateRecord({{"A", 1}, {"B", std::string("a")}});
+    vlt.CreateRecord({{"A", 2}, {"B", std::string("b")}});
+    vlt.CreateRecord({{"A", 3}, {"B", std::string("c")}});
+
+    vor = vlt.RequestEqual("B", 1, vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "B", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongType, SavedType == typeid(std::string));
+)
+
+TEST_BODY(RequestEqual, ValueNotInVault,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<std::string>("B");
+
+    vlt.CreateRecord({{"A", 1}, {"B", std::string("a")}});
+    vlt.CreateRecord({{"A", 2}, {"B", std::string("b")}});
+    vlt.CreateRecord({{"A", 3}, {"B", std::string("c")}});
+
+    vor = vlt.RequestEqual("A", 4, vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(int));
+)
+
 void VaultUnitTests()
 {
     DBG_LOG_ENTER();
@@ -838,9 +1257,28 @@ void VaultUnitTests()
 
     CreateKey::CorrectParamsWithoutUniqueKey();
     CreateKey::CorrectParamsWithUniqueKey();
+    CreateKey::DuplicateParams();
     CreateKey::WrongKeyWithoutUniqueKey();
     CreateKey::WrongTypeWithoutUniqueKey();
     CreateKey::WrongKeyWithUniqueKey();
     CreateKey::WrongTypeWithUniqueKey();
     CreateKey::DuplicateUniqueKeyValue();
+
+    GetRecord::CorrectGetRecord();
+    GetRecord::WrongKey();
+    GetRecord::WrongType();
+    GetRecord::WrongValue();
+
+    GetRecords::CorrectGetRecords();
+    GetRecords::CorrectGetNotAllRecords();
+    GetRecords::WrongKey();
+    GetRecords::WrongType();
+    GetRecords::WrongValue();
+
+    RequestEqual::CorrectRequest();
+    RequestEqual::CorrectRequestNotAllRecords();
+    RequestEqual::CorrectRequestWithPredicat();
+    RequestEqual::WrongKey();
+    RequestEqual::WrongType();
+    RequestEqual::ValueNotInVault();
 }
