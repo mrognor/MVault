@@ -190,52 +190,6 @@ namespace mvlt
             // Iterator to set it in switch
             decltype(TtoVaultRecordMap->End()) startIt{}, endIt{};
 
-            // Lambda function for finding greater value iterator
-            auto findGreater = [&]()
-                {
-                    bool flag = false;
-                    startIt = TtoVaultRecordMap->LowerBound(beginKeyValue);
-
-                    // If it is not beginKeyValue in map and it is value bigger than beginKeyValue in map
-                    if (startIt != TtoVaultRecordMap->End() && (*startIt).first > beginKeyValue)
-                        return;
-                        
-                    // Iterate to the next value
-                    for (auto TtoVaultRecordMapIt = startIt; TtoVaultRecordMapIt != TtoVaultRecordMap->End(); ++TtoVaultRecordMapIt)
-                    {
-                        if ((*TtoVaultRecordMapIt).first != (*startIt).first) 
-                        {
-                            startIt = TtoVaultRecordMapIt;
-                            flag = true;
-                            break;
-                        }
-                    }
-                
-                    // Check if it is any record with key value greater than beginKeyValue 
-                    if (!flag) startIt = TtoVaultRecordMap->End();
-                };
-
-            // Lambda function for finding less value iterator
-            auto findLess = [&]()
-                {
-                    endIt = TtoVaultRecordMap->UpperBound(endKeyValue);
-
-                    // Check if TtoVaultRecordMap size not zero and endIt not last iterator
-                    if (endIt != TtoVaultRecordMap->Begin() && TtoVaultRecordMap->Size() > 0)
-                    {
-                        // Upper bound return next iterator with value greater then endKeyValue
-                        --endIt;
-
-                        // Iterate to previous value
-                        while(endIt != (*TtoVaultRecordMap).Begin() && (*endIt).first == endKeyValue)
-                            --endIt;
-                        
-                        // Increase iterator to add later last element in vaultRecords
-                        if (endIt != TtoVaultRecordMap->Begin())
-                            ++endIt;
-                    }
-                };
-
             // Switch by request type
             switch (requestType) 
             {
@@ -245,13 +199,13 @@ namespace mvlt
                 break;
             
             case VaultRequestType::Greater:
-                findGreater();
+                startIt = TtoVaultRecordMap->UpperBound(beginKeyValue);
                 endIt = TtoVaultRecordMap->End();
                 break;
             
             case VaultRequestType::Less:
                 startIt = TtoVaultRecordMap->Begin();
-                findLess();
+                endIt = TtoVaultRecordMap->LowerBound(endKeyValue);
                 break;
             
             case VaultRequestType::LessOrEqual:
@@ -268,9 +222,9 @@ namespace mvlt
                 }
 
                 if(isIncludeBeginKeyValue) startIt = TtoVaultRecordMap->LowerBound(beginKeyValue);
-                else findGreater();
+                else startIt = TtoVaultRecordMap->UpperBound(beginKeyValue);
                 if(isIncludeEndKeyValue) endIt = TtoVaultRecordMap->UpperBound(endKeyValue);
-                else findLess();
+                else endIt = TtoVaultRecordMap->LowerBound(endKeyValue);
                 break;
 
             case VaultRequestType::Equal:

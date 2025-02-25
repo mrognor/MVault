@@ -189,4 +189,72 @@ TEST_SUITE(RequestEqual,
     TEST_CASE(ValueNotInVault)
 )
 
+TEST_SUITE(RequestGreater,
+
+    TEST_CASE(CorrectRequest)
+
+    TEST_CASE(CorrectRequestNotAllRecords)
+
+    TEST_CASE(CorrectRequestWithPredicat)
+
+    TEST_CASE(BoundaryValues)
+
+    TEST_CASE(WrongKey)
+
+    TEST_CASE(WrongType)
+
+    TEST_CASE(ValueNotInVault)
+)
+
+TEST_SUITE(RequestGreaterOrEqual,
+
+    TEST_CASE(CorrectRequest)
+
+    TEST_CASE(CorrectRequestNotAllRecords)
+
+    TEST_CASE(CorrectRequestWithPredicat)
+
+    TEST_CASE(BoundaryValues)
+
+    TEST_CASE(WrongKey)
+
+    TEST_CASE(WrongType)
+
+    TEST_CASE(ValueNotInVault)
+)
+
+TEST_SUITE(RequestLess,
+
+    TEST_CASE(CorrectRequest)
+
+    TEST_CASE(CorrectRequestNotAllRecords)
+
+    TEST_CASE(CorrectRequestWithPredicat)
+
+    TEST_CASE(BoundaryValues)
+
+    TEST_CASE(WrongKey)
+
+    TEST_CASE(WrongType)
+
+    TEST_CASE(ValueNotInVault)
+)
+
+TEST_SUITE(RequestLessOrEqual,
+
+    TEST_CASE(CorrectRequest)
+
+    TEST_CASE(CorrectRequestNotAllRecords)
+
+    TEST_CASE(CorrectRequestWithPredicat)
+
+    TEST_CASE(BoundaryValues)
+
+    TEST_CASE(WrongKey)
+
+    TEST_CASE(WrongType)
+
+    TEST_CASE(ValueNotInVault)
+)
+
 void VaultUnitTests();
