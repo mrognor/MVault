@@ -11,6 +11,7 @@ set(MTestsHeaders
     MTests/TypeWrapper.h
     MTests/CompareVault.h
     MTests/ColorizedPrint.h
+    MTests/CompareRequest.h
     MTests/CompareVaultRecordRef.h
     MTests/CompareVaultOperationResult.h)
 

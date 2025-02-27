@@ -1026,7 +1026,6 @@ TEST_BODY(GetRecords, WrongValue,
 TEST_BODY(RequestEqual, CorrectRequest,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -1065,7 +1064,6 @@ TEST_BODY(RequestEqual, CorrectRequest,
 TEST_BODY(RequestEqual, CorrectRequestNotAllRecords,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -1098,7 +1096,6 @@ TEST_BODY(RequestEqual, CorrectRequestNotAllRecords,
 TEST_BODY(RequestEqual, CorrectRequestWithPredicat,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -1132,7 +1129,6 @@ TEST_BODY(RequestEqual, CorrectRequestWithPredicat,
 TEST_BODY(RequestEqual, WrongKey,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -1155,7 +1151,6 @@ TEST_BODY(RequestEqual, WrongKey,
 TEST_BODY(RequestEqual, WrongType,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -1178,7 +1173,6 @@ TEST_BODY(RequestEqual, WrongType,
 TEST_BODY(RequestEqual, ValueNotInVault,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -1201,7 +1195,6 @@ TEST_BODY(RequestEqual, ValueNotInVault,
 TEST_BODY(RequestGreater, CorrectRequest,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -1241,7 +1234,6 @@ TEST_BODY(RequestGreater, CorrectRequest,
 TEST_BODY(RequestGreater, CorrectRequestNotAllRecords,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -1274,7 +1266,6 @@ TEST_BODY(RequestGreater, CorrectRequestNotAllRecords,
 TEST_BODY(RequestGreater, CorrectRequestWithPredicat,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -1355,7 +1346,6 @@ TEST_BODY(RequestGreater, BoundaryValues,
 TEST_BODY(RequestGreater, WrongKey,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -1378,7 +1368,6 @@ TEST_BODY(RequestGreater, WrongKey,
 TEST_BODY(RequestGreater, WrongType,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -1401,7 +1390,6 @@ TEST_BODY(RequestGreater, WrongType,
 TEST_BODY(RequestGreater, ValueNotInVault,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -1424,7 +1412,6 @@ TEST_BODY(RequestGreater, ValueNotInVault,
 TEST_BODY(RequestGreaterOrEqual, CorrectRequest,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -1465,7 +1452,6 @@ TEST_BODY(RequestGreaterOrEqual, CorrectRequest,
 TEST_BODY(RequestGreaterOrEqual, CorrectRequestNotAllRecords,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -1498,7 +1484,6 @@ TEST_BODY(RequestGreaterOrEqual, CorrectRequestNotAllRecords,
 TEST_BODY(RequestGreaterOrEqual, CorrectRequestWithPredicat,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -1579,7 +1564,6 @@ TEST_BODY(RequestGreaterOrEqual, BoundaryValues,
 TEST_BODY(RequestGreaterOrEqual, WrongKey,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -1602,7 +1586,6 @@ TEST_BODY(RequestGreaterOrEqual, WrongKey,
 TEST_BODY(RequestGreaterOrEqual, WrongType,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -1625,7 +1608,6 @@ TEST_BODY(RequestGreaterOrEqual, WrongType,
 TEST_BODY(RequestGreaterOrEqual, ValueNotInVault,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -1648,7 +1630,6 @@ TEST_BODY(RequestGreaterOrEqual, ValueNotInVault,
 TEST_BODY(RequestLess, CorrectRequest,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -1687,7 +1668,6 @@ TEST_BODY(RequestLess, CorrectRequest,
 TEST_BODY(RequestLess, CorrectRequestNotAllRecords,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -1720,7 +1700,6 @@ TEST_BODY(RequestLess, CorrectRequestNotAllRecords,
 TEST_BODY(RequestLess, CorrectRequestWithPredicat,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -1801,7 +1780,6 @@ TEST_BODY(RequestLess, BoundaryValues,
 TEST_BODY(RequestLess, WrongKey,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -1824,7 +1802,6 @@ TEST_BODY(RequestLess, WrongKey,
 TEST_BODY(RequestLess, WrongType,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -1847,7 +1824,6 @@ TEST_BODY(RequestLess, WrongType,
 TEST_BODY(RequestLess, ValueNotInVault,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -1870,7 +1846,6 @@ TEST_BODY(RequestLess, ValueNotInVault,
 TEST_BODY(RequestLessOrEqual, CorrectRequest,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -1909,7 +1884,6 @@ TEST_BODY(RequestLessOrEqual, CorrectRequest,
 TEST_BODY(RequestLessOrEqual, CorrectRequestNotAllRecords,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -1942,7 +1916,6 @@ TEST_BODY(RequestLessOrEqual, CorrectRequestNotAllRecords,
 TEST_BODY(RequestLessOrEqual, CorrectRequestWithPredicat,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -2023,7 +1996,6 @@ TEST_BODY(RequestLessOrEqual, BoundaryValues,
 TEST_BODY(RequestLessOrEqual, WrongKey,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -2046,7 +2018,6 @@ TEST_BODY(RequestLessOrEqual, WrongKey,
 TEST_BODY(RequestLessOrEqual, WrongType,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -2069,7 +2040,6 @@ TEST_BODY(RequestLessOrEqual, WrongType,
 TEST_BODY(RequestLessOrEqual, ValueNotInVault,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -2092,7 +2062,6 @@ TEST_BODY(RequestLessOrEqual, ValueNotInVault,
 TEST_BODY(RequestInterval, CorrectRequest,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -2125,7 +2094,6 @@ TEST_BODY(RequestInterval, CorrectRequest,
 TEST_BODY(RequestInterval, CorrectRequestWithoutLeftBoundary,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -2156,7 +2124,6 @@ TEST_BODY(RequestInterval, CorrectRequestWithoutLeftBoundary,
 TEST_BODY(RequestInterval, CorrectRequestWithoutRightBoundary,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -2187,7 +2154,6 @@ TEST_BODY(RequestInterval, CorrectRequestWithoutRightBoundary,
 TEST_BODY(RequestInterval, CorrectRequestWithoutBoundaries,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -2216,7 +2182,6 @@ TEST_BODY(RequestInterval, CorrectRequestWithoutBoundaries,
 TEST_BODY(RequestInterval, CorrectRequestNotAllRecords,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -2249,7 +2214,6 @@ TEST_BODY(RequestInterval, CorrectRequestNotAllRecords,
 TEST_BODY(RequestInterval, CorrectRequestWithPredicat,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -2479,7 +2443,6 @@ TEST_BODY(RequestInterval, BoundaryValues,
 TEST_BODY(RequestInterval, SameBoundaries,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -2533,7 +2496,6 @@ TEST_BODY(RequestInterval, SameBoundaries,
 TEST_BODY(RequestInterval, IncorrectBoundaries,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -2556,7 +2518,6 @@ TEST_BODY(RequestInterval, IncorrectBoundaries,
 TEST_BODY(RequestInterval, WrongKey,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -2579,7 +2540,6 @@ TEST_BODY(RequestInterval, WrongKey,
 TEST_BODY(RequestInterval, WrongType,
     Vault vlt;
     VaultRecordSet vrs;
-    VaultRecordRef vrr;
     VaultOperationResult vor;
 
     vlt.AddKey("A", 0);
@@ -2597,6 +2557,589 @@ TEST_BODY(RequestInterval, WrongType,
 
     COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "B", 
         RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongType, SavedType == typeid(std::string));
+)
+
+TEST_BODY(Request, CorrectRequest,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultOperationResult vor;
+    std::vector<std::vector<std::pair<std::string, TypeWrapper>>> records;
+
+    vlt.AddKey("A", 0);
+
+    for (int i = 0; i < 10; ++i) vlt.CreateRecord({{"A", i}});
+
+    // Equal
+    COMPARE_CORRECT_REQUEST(Equal("A", 2), {{{"A", 2}}})
+
+    // Greater
+    COMPARE_CORRECT_REQUEST(Greater("A", 7), {{{"A", 8}}, {{"A", 9}}});
+
+    // Greater or equal
+    COMPARE_CORRECT_REQUEST(GreaterOrEqual("A", 7), {{{"A", 7}}, {{"A", 8}}, {{"A", 9}}});
+
+    // Less
+    COMPARE_CORRECT_REQUEST(Less("A", 2), {{{"A", 0}}, {{"A", 1}}});
+
+    // Less or equal
+    COMPARE_CORRECT_REQUEST(LessOrEqual("A", 2), {{{"A", 0}}, {{"A", 1}}, {{"A", 2}}});
+)
+
+TEST_BODY(Request, CorrectRequestWithPredicat,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+
+    for (int i = 0; i < 10; ++i) vlt.CreateRecord({{"A", i}, {"B", 100 - i}});
+
+    for (int i = 0; i < 4; ++i) vlt.CreateRecord({{"A", 5}, {"B", i}});
+
+    // Equal
+    vor = vlt.Request(Equal("A", 5, [](const VaultRecordRef& ref) -> bool
+    {
+        int b = 0;
+        ref.GetData("B", b);
+        if (b % 2 == 0) return true;
+        else return false;
+    }), vrs);
+
+    TEST_ASSERT(vrs.Size() == 2);
+
+    COMPARE_VAULT(vrs, {
+        {{"A", 5}, {"B", 0}},
+        {{"A", 5}, {"B", 2}},
+    });
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, ResultCode == VaultOperationResultCode::Success);
+
+
+    // Greater
+    vor = vlt.Request(Greater("A", 7, [](const VaultRecordRef& ref) -> bool
+    {
+        int b = 0;
+        ref.GetData("B", b);
+        if (b % 2 == 0) return true;
+        else return false;
+    }), vrs);
+
+    TEST_ASSERT(vrs.Size() == 1);
+
+    COMPARE_VAULT(vrs, {{{"A", 8}, {"B", 92}}});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, ResultCode == VaultOperationResultCode::Success);
+
+
+    // Greater or equal
+    vor = vlt.Request(GreaterOrEqual("A", 7, [](const VaultRecordRef& ref) -> bool
+    {
+        int b = 0;
+        ref.GetData("B", b);
+        if (b % 2 == 0) return true;
+        else return false;
+    }), vrs);
+
+    TEST_ASSERT(vrs.Size() == 1);
+
+    COMPARE_VAULT(vrs, {{{"A", 8}, {"B", 92}}});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, ResultCode == VaultOperationResultCode::Success);
+
+
+    // Less
+    vor = vlt.Request(Less("A", 2, [](const VaultRecordRef& ref) -> bool
+    {
+        int b = 0;
+        ref.GetData("B", b);
+        if (b % 2 == 0) return true;
+        else return false;
+    }), vrs);
+
+    TEST_ASSERT(vrs.Size() == 1);
+
+    COMPARE_VAULT(vrs, {{{"A", 0}, {"B", 100}}});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, ResultCode == VaultOperationResultCode::Success);
+
+
+    // Less or equal
+    vor = vlt.Request(LessOrEqual("A", 2, [](const VaultRecordRef& ref) -> bool
+    {
+        int b = 0;
+        ref.GetData("B", b);
+        if (b % 2 == 0) return true;
+        else return false;
+    }), vrs);
+
+    TEST_ASSERT(vrs.Size() == 2);
+
+    COMPARE_VAULT(vrs, {{{"A", 0}, {"B", 100}}, {{"A", 2}, {"B", 98}}});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, ResultCode == VaultOperationResultCode::Success);
+)
+
+TEST_BODY(Request, BoundaryValues,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultOperationResult vor;
+    std::vector<std::vector<std::pair<std::string, TypeWrapper>>> records;
+
+    vlt.AddKey("A", 0);
+
+    // ...1...3...
+    vlt.CreateRecord({{"A", 1}});
+    vlt.CreateRecord({{"A", 3}});
+
+
+    // Greater
+    //  x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST(Greater("A", 0), {{{"A", 1}}, {{"A", 3}}});
+
+    //    x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST(Greater("A", 1), {{{"A", 3}}});
+
+    //      x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST(Greater("A", 2), {{{"A", 3}}});
+
+    //        x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST(Greater("A", 3), {});
+
+    //          x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST(Greater("A", 4), {});
+
+
+    // Greater or equal
+    //  x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST(GreaterOrEqual("A", 0), {{{"A", 1}}, {{"A", 3}}});
+
+    //    x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST(GreaterOrEqual("A", 1), {{{"A", 1}}, {{"A", 3}}});
+
+    //      x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST(GreaterOrEqual("A", 2), {{{"A", 3}}});
+
+    //        x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST(GreaterOrEqual("A", 3), {{{"A", 3}}});
+
+    //          x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST(GreaterOrEqual("A", 4), {});
+
+
+    // Less
+    //  x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST(Less("A", 0), {});
+
+    //    x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST(Less("A", 1), {});
+
+    //      x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST(Less("A", 2), {{{"A", 1}}});
+
+    //        x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST(Less("A", 3), {{{"A", 1}}});
+
+    //          x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST(Less("A", 4), {{{"A", 1}}, {{"A", 3}}});
+
+
+    // Less or equal
+    //  x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST(LessOrEqual("A", 0), {});
+
+    //    x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST(LessOrEqual("A", 1), {{{"A", 1}}});
+
+    //      x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST(LessOrEqual("A", 2), {{{"A", 1}}});
+
+    //        x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST(LessOrEqual("A", 3), {{{"A", 1}}, {{"A", 3}}});
+
+    //          x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST(LessOrEqual("A", 4), {{{"A", 1}}, {{"A", 3}}});
+)
+
+TEST_BODY(Request, WrongKey,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+
+    for (int i = 0; i < 10; ++i) vlt.CreateRecord({{"A", i}});
+
+    // Equal
+    vor = vlt.Request(Equal("Z", 2), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "Z", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongKey, SavedType == typeid(void));
+
+
+    // Greater
+    vor = vlt.Request(Greater("Z", 7), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "Z", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongKey, SavedType == typeid(void));
+
+
+    // Greater or equal
+    vor = vlt.Request(GreaterOrEqual("Z", 7), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "Z", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongKey, SavedType == typeid(void));
+
+
+    // Less
+    vor = vlt.Request(Less("Z", 2), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "Z", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongKey, SavedType == typeid(void));
+
+
+    // Less or equal
+    vor = vlt.Request(LessOrEqual("Z", 2), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "Z", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongKey, SavedType == typeid(void));
+)
+
+TEST_BODY(Request, WrongType,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultOperationResult vor;
+    std::string s;
+
+    vlt.AddKey("A", 0);
+
+    for (int i = 0; i < 10; ++i) vlt.CreateRecord({{"A", i}});
+
+    // Equal
+    vor = vlt.Request(Equal("A", s), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::WrongType, SavedType == typeid(int));
+
+
+    // Greater
+    vor = vlt.Request(Greater("A", s), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::WrongType, SavedType == typeid(int));
+
+
+    // Greater or equal
+    vor = vlt.Request(GreaterOrEqual("A", s), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::WrongType, SavedType == typeid(int));
+
+
+    // Less
+    vor = vlt.Request(Less("A", s), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::WrongType, SavedType == typeid(int));
+
+
+    // Less or equal
+    vor = vlt.Request(LessOrEqual("A", s), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::WrongType, SavedType == typeid(int));
+)
+
+TEST_BODY(Request, ComplexRequestAnd,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultOperationResult vor;
+    std::vector<std::vector<std::pair<std::string, TypeWrapper>>> records;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+
+    for (int i = 0; i < 10; ++i) vlt.CreateRecord({{"A", i}, {"B", i}});
+
+    // Equal
+    COMPARE_CORRECT_REQUEST(Equal("A", 2) && Equal("B", 2), {{{"A", 2}, {"B", 2}}});
+
+    COMPARE_CORRECT_REQUEST(Equal("A", 2) && Equal("B", 3), {});
+
+    COMPARE_CORRECT_REQUEST(Equal("A", 2) && Greater("B", 1), {{{"A", 2}, {"B", 2}}});
+
+    COMPARE_CORRECT_REQUEST(Equal("A", 2) && GreaterOrEqual("B", 2), {{{"A", 2}, {"B", 2}}});
+
+    COMPARE_CORRECT_REQUEST(Equal("A", 2) && Less("B", 5), {{{"A", 2}, {"B", 2}}});
+
+    COMPARE_CORRECT_REQUEST(Equal("A", 2) && LessOrEqual("B", 2), {{{"A", 2}, {"B", 2}}});
+
+
+    // Greater
+    COMPARE_CORRECT_REQUEST(Greater("A", 2) && Equal("B", 9), {{{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST(Greater("A", 7) && Greater("B", 1), {{{"A", 8}, {"B", 8}}, {{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST(Greater("A", 8) && GreaterOrEqual("B", 8), {{{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST(Greater("A", 2) && Less("B", 4), {{{"A", 3}, {"B", 3}}});
+
+    COMPARE_CORRECT_REQUEST(Greater("A", 2) && LessOrEqual("B", 3), {{{"A", 3}, {"B", 3}}});
+
+
+    // Greater or equal
+    COMPARE_CORRECT_REQUEST(GreaterOrEqual("A", 2) && Equal("B", 5), {{{"A", 5}, {"B", 5}}});
+
+    COMPARE_CORRECT_REQUEST(GreaterOrEqual("A", 8) && Greater("B", 1), {{{"A", 8}, {"B", 8}}, {{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST(GreaterOrEqual("A", 8) && GreaterOrEqual("B", 9), {{{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST(GreaterOrEqual("A", 2) && Less("B", 4), {{{"A", 2}, {"B", 2}}, {{"A", 3}, {"B", 3}}});
+
+    COMPARE_CORRECT_REQUEST(GreaterOrEqual("A", 2) && LessOrEqual("B", 3), {{{"A", 2}, {"B", 2}}, {{"A", 3}, {"B", 3}}});
+
+
+    // Less
+    COMPARE_CORRECT_REQUEST(Less("A", 7) && Equal("B", 5), {{{"A", 5}, {"B", 5}}});
+
+    COMPARE_CORRECT_REQUEST(Less("A", 3) && Greater("B", 1), {{{"A", 2}, {"B", 2}}});
+
+    COMPARE_CORRECT_REQUEST(Less("A", 8) && GreaterOrEqual("B", 7), {{{"A", 7}, {"B", 7}}});
+
+    COMPARE_CORRECT_REQUEST(Less("A", 2) && Less("B", 4), {{{"A", 0}, {"B", 0}}, {{"A", 1}, {"B", 1}}});
+
+    COMPARE_CORRECT_REQUEST(Less("A", 2) && LessOrEqual("B", 1), {{{"A", 0}, {"B", 0}}, {{"A", 1}, {"B", 1}}});
+
+
+    // Less or equal
+    COMPARE_CORRECT_REQUEST(LessOrEqual("A", 7) && Equal("B", 5), {{{"A", 5}, {"B", 5}}});
+
+    COMPARE_CORRECT_REQUEST(LessOrEqual("A", 3) && Greater("B", 2), {{{"A", 3}, {"B", 3}}});
+
+    COMPARE_CORRECT_REQUEST(LessOrEqual("A", 8) && GreaterOrEqual("B", 8), {{{"A", 8}, {"B", 8}}});
+
+    COMPARE_CORRECT_REQUEST(LessOrEqual("A", 2) && Less("B", 4), {{{"A", 0}, {"B", 0}}, {{"A", 1}, {"B", 1}}, {{"A", 2}, {"B", 2}}});
+
+    COMPARE_CORRECT_REQUEST(LessOrEqual("A", 2) && LessOrEqual("B", 1), {{{"A", 0}, {"B", 0}}, {{"A", 1}, {"B", 1}}});
+)
+
+TEST_BODY(Request, ComplexRequestOr,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultOperationResult vor;
+    std::vector<std::vector<std::pair<std::string, TypeWrapper>>> records;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+
+    for (int i = 0; i < 10; ++i) vlt.CreateRecord({{"A", i}, {"B", i}});
+
+    // Equal
+    COMPARE_CORRECT_REQUEST(Equal("A", 2) || Equal("B", 3), {{{"A", 2}, {"B", 2}}, {{"A", 3}, {"B", 3}}});
+
+    COMPARE_CORRECT_REQUEST(Equal("A", 2) || Greater("B", 8), {{{"A", 2}, {"B", 2}}, {{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST(Equal("A", 2) || GreaterOrEqual("B", 9), {{{"A", 2}, {"B", 2}}, {{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST(Equal("A", 2) || Less("B", 2), {{{"A", 0}, {"B", 0}}, {{"A", 1}, {"B", 1}}, {{"A", 2}, {"B", 2}}});
+
+    COMPARE_CORRECT_REQUEST(Equal("A", 2) || LessOrEqual("B", 1), {{{"A", 0}, {"B", 0}}, {{"A", 1}, {"B", 1}}, {{"A", 2}, {"B", 2}}});
+
+
+    // Greater
+    COMPARE_CORRECT_REQUEST(Greater("A", 8) || Equal("B", 0), {{{"A", 0}, {"B", 0}}, {{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST(Greater("A", 8) || Greater("B", 10), {{{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST(Greater("A", 8) || GreaterOrEqual("B", 9), {{{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST(Greater("A", 8) || Less("B", 1), {{{"A", 0}, {"B", 0}}, {{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST(Greater("A", 8) || LessOrEqual("B", 0), {{{"A", 0}, {"B", 0}}, {{"A", 9}, {"B", 9}}});
+
+
+    // Greater or equal
+    COMPARE_CORRECT_REQUEST(GreaterOrEqual("A", 9) || Equal("B", 5), {{{"A", 5}, {"B", 5}}, {{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST(GreaterOrEqual("A", 8) || Greater("B", 8), {{{"A", 8}, {"B", 8}}, {{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST(GreaterOrEqual("A", 8) || GreaterOrEqual("B", 9), {{{"A", 8}, {"B", 8}}, {{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST(GreaterOrEqual("A", 9) || Less("B", 1), {{{"A", 0}, {"B", 0}}, {{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST(GreaterOrEqual("A", 9) || LessOrEqual("B", 0), {{{"A", 0}, {"B", 0}}, {{"A", 9}, {"B", 9}}});
+
+
+    // Less
+    COMPARE_CORRECT_REQUEST(Less("A", 1) || Equal("B", 5), {{{"A", 0}, {"B", 0}}, {{"A", 5}, {"B", 5}}});
+
+    COMPARE_CORRECT_REQUEST(Less("A", 1) || Greater("B", 8), {{{"A", 0}, {"B", 0}}, {{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST(Less("A", 1) || GreaterOrEqual("B", 9), {{{"A", 0}, {"B", 0}}, {{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST(Less("A", 2) || Less("B", 1), {{{"A", 0}, {"B", 0}}, {{"A", 1}, {"B", 1}}});
+
+    COMPARE_CORRECT_REQUEST(Less("A", 1) || LessOrEqual("B", 1), {{{"A", 0}, {"B", 0}}, {{"A", 1}, {"B", 1}}});
+
+
+    // Less or equal
+    COMPARE_CORRECT_REQUEST(LessOrEqual("A", 1) || Equal("B", 5), {{{"A", 0}, {"B", 0}}, {{"A", 1}, {"B", 1}}, {{"A", 5}, {"B", 5}}});
+
+    COMPARE_CORRECT_REQUEST(LessOrEqual("A", 1) || Greater("B", 8), {{{"A", 0}, {"B", 0}}, {{"A", 1}, {"B", 1}}, {{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST(LessOrEqual("A", 1) || GreaterOrEqual("B", 9), {{{"A", 0}, {"B", 0}}, {{"A", 1}, {"B", 1}}, {{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST(LessOrEqual("A", 1) || Less("B", 3), {{{"A", 0}, {"B", 0}}, {{"A", 1}, {"B", 1}}, {{"A", 2}, {"B", 2}}});
+
+    COMPARE_CORRECT_REQUEST(LessOrEqual("A", 2) || LessOrEqual("B", 1), {{{"A", 0}, {"B", 0}}, {{"A", 1}, {"B", 1}}, {{"A", 2}, {"B", 2}}});
+)
+
+TEST_BODY(Request, ComplexRequest,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultOperationResult vor;
+    VaultRecordRef vrr;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+    vlt.AddKey<std::string>("C", "");
+    vlt.AddKey<bool>("D", false);
+
+    for (int i = 0; i < 10; ++i)
+    {
+        vlt.CreateRecord(vrr, {{"A", i}, {"B", i}, {"C", std::to_string(i)}});
+        if (i == 5 || i == 9) vrr.SetData("D", true);
+    }
+    
+    vlt.Request(Greater("A", 2) && Less("B", 8) && (Equal("C", std::string("3")) || Equal("C", std::string("4"))) || Equal("D", true), vrs);
+    
+    CompareVault(vrs, {
+        {{"A", 3}, {"B", 3}, {"C", std::string("3")}, {"D", false}},
+        {{"A", 4}, {"B", 4}, {"C", std::string("4")}, {"D", false}},
+        {{"A", 5}, {"B", 5}, {"C", std::string("5")}, {"D", true}},
+        {{"A", 9}, {"B", 9}, {"C", std::string("9")}, {"D", true}},
+    });
+)
+
+TEST_BODY(Request, ComplexRequestWrongKey,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+
+    for (int i = 0; i < 10; ++i) vlt.CreateRecord({{"A", i}, {"B", i}});
+
+    vor = vlt.Request(Equal("A", 0) && Equal("Z", 0), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "Z", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongKey, SavedType == typeid(void));
+
+
+    vor = vlt.Request(Equal("Z", 0) && Equal("Y", 0), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "Z", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongKey, SavedType == typeid(void));
+)
+
+TEST_BODY(Request, ComplexRequestWrongType,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultOperationResult vor;
+    std::string s;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+
+    for (int i = 0; i < 10; ++i) vlt.CreateRecord({{"A", i}, {"B", i}});
+
+    vor = vlt.Request(Equal("A", 0) && Equal("B", s), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "B", 
+        RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::WrongType, SavedType == typeid(int));
+
+
+    vor = vlt.Request(Equal("A", s) && Equal("B", 0), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::WrongType, SavedType == typeid(int));
 )
 
 void VaultUnitTests()
@@ -2726,4 +3269,15 @@ void VaultUnitTests()
     RequestInterval::IncorrectBoundaries();
     RequestInterval::WrongKey();
     RequestInterval::WrongType();
+
+    Request::CorrectRequest();
+    Request::CorrectRequestWithPredicat();
+    Request::BoundaryValues();
+    Request::WrongKey();
+    Request::WrongType();
+    Request::ComplexRequestAnd();
+    Request::ComplexRequestOr();
+    Request::ComplexRequest();
+    Request::ComplexRequestWrongKey();
+    Request::ComplexRequestWrongType();
 }

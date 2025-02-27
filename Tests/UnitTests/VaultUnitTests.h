@@ -6,6 +6,7 @@
 #include "../MTests/TestSuite.h"
 #include "../MTests/TestAssert.h"
 #include "../MTests/CompareVault.h"
+#include "../MTests/CompareRequest.h"
 #include "../MTests/CompareVaultRecordRef.h"
 #include "../MTests/CompareVaultOperationResult.h"
 
@@ -280,6 +281,29 @@ TEST_SUITE(RequestInterval,
     TEST_CASE(WrongKey)
 
     TEST_CASE(WrongType)
+)
+
+TEST_SUITE(Request,
+
+    TEST_CASE(CorrectRequest)
+
+    TEST_CASE(CorrectRequestWithPredicat)
+
+    TEST_CASE(BoundaryValues)
+
+    TEST_CASE(WrongKey)
+
+    TEST_CASE(WrongType)
+
+    TEST_CASE(ComplexRequestAnd)
+
+    TEST_CASE(ComplexRequestOr)
+
+    TEST_CASE(ComplexRequest)
+
+    TEST_CASE(ComplexRequestWrongKey)
+
+    TEST_CASE(ComplexRequestWrongType)
 )
 
 void VaultUnitTests();
