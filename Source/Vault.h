@@ -680,8 +680,6 @@ namespace mvlt
         /**
             \brief Method for handle sorted records
 
-            \tparam <T> A function that takes const VaultRecordRef& as a parameter and returns bool.
-            
             \param [in] key The key by which the data should be sorted
             \param [in] func A function takes const VaultRecordRef& as a parameter. If you need the function to be called again for the next record, 
             then this function call should return true. To stop the loop and interrupt the processing of sorted data, the function must return false. 
@@ -689,14 +687,13 @@ namespace mvlt
             \param [in] isReverse Sort in descending order or descending order. By default, ascending
             \param [in] amountOfRecords The number of records. By default, everything is
 
-            If func returns false, then SortBy will return.
+            If func returns false, then SortBy will stop.
             The function iterate over all records sorted by the key parameter, in the order specified by the isReverse parameter. 
             For each record, the function passed in the func parameter is called.
             This function does not sort the data when it is called, the sorted data is already stored inside the Vault.
             If the key is missing in the vault, the function will be called 0 times
         */
-        template<class F>
-        void SortBy(const std::string& key, F&& func, const bool& isReverse = false, const std::size_t& amountOfRecords = -1) const noexcept;
+        void SortBy(const std::string& key, const std::function<bool(const VaultRecordRef& ref)>& func, const bool& isReverse = false, const std::size_t& amountOfRecords = -1) const noexcept;
 
         /**
             \brief Method for saving the contents of the Vault in json

@@ -62,7 +62,7 @@ namespace mvlt
                 std::string command =  "addr2line -e " + std::string(buf) + " " + sstream.str();
 
                 // codechecker_intentional [all] its not a problem to use system because it is not input from user and it is only for debug
-                system(command.c_str());
+                int res = system(command.c_str());
             }
         }
     }

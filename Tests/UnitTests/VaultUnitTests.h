@@ -306,4 +306,84 @@ TEST_SUITE(Request,
     TEST_CASE(ComplexRequestWrongType)
 )
 
+TEST_SUITE(DropVault,
+    TEST_CASE(Drop)
+
+    TEST_CASE(DropEmpty)
+
+    TEST_CASE(DropSecond)
+)
+
+TEST_SUITE(DropData,
+    TEST_CASE(Drop)
+
+    TEST_CASE(DropEmpty)
+
+    TEST_CASE(DropSecond)
+)
+
+TEST_SUITE(EraseRecord,
+    TEST_CASE(CorrectEraseByRef)
+
+    TEST_CASE(IncorrectEraseByRef)
+
+    TEST_CASE(CorrectEraseByKeyAndValue)
+
+    TEST_CASE(WrongKeyEraseByKeyAndValue)
+
+    TEST_CASE(WrongTypeEraseByKeyAndValue)
+
+    TEST_CASE(WrongValueEraseByKeyAndValue)
+)
+
+TEST_SUITE(EraseRecords,
+    TEST_CASE(Erase)
+
+    TEST_CASE(WrongKeyErase)
+
+    TEST_CASE(WrongTypeErase)
+
+    TEST_CASE(WrongValueErase)
+)
+
+TEST_SUITE(Size,
+    TEST_CASE(Default)
+)
+
+TEST_SUITE(GetSortedRecords,
+    TEST_CASE(GetRecords)
+
+    TEST_CASE(GetRecordsReverse)
+
+    TEST_CASE(GetNotAllRecords)
+
+    TEST_CASE(WrongKey)
+)
+
+TEST_SUITE(SortBy,
+    TEST_CASE(Sort)
+
+    TEST_CASE(SortReverse)
+
+    TEST_CASE(SortNotAllRecords)
+
+    TEST_CASE(WrongKey)
+)
+
+TEST_SUITE(ToJson,
+    TEST_CASE(Default)
+
+    TEST_CASE(Format)
+
+    TEST_CASE(DiffTabSize)
+
+    TEST_CASE(RecordTemplate)
+
+    TEST_CASE(Array)
+
+    TEST_CASE(ArrayFormat)
+
+    TEST_CASE(ArrayDiffTabSize)
+)
+
 void VaultUnitTests();

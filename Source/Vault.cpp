@@ -673,6 +673,30 @@ namespace mvlt
         return res;
     }
 
+    void Vault::SortBy(const std::string& key, const std::function<bool (const VaultRecordRef& ref)>& func, const bool& isReverse, const std::size_t& amountOfRecords) const noexcept
+    {
+        DBG_LOG_ENTER();
+
+        std::size_t counter = 0;
+
+        // Lock Vault to read
+        ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
+        
+        auto findResIt = VaultRecordSorters.find(key);
+        if (findResIt != VaultRecordSorters.end())
+        {
+            VaultRecordSorters.find(key)->second([&](const VaultRecordRef& vaultRecordRef)
+                {
+                    if (counter >= amountOfRecords) return false;
+                    
+                    if (!func(vaultRecordRef)) return false;
+
+                    ++counter;
+                    return true;
+                }, const_cast<Vault*>(this), isReverse);
+        }
+    }
+
     std::string Vault::ToJson(const bool& isFormat, const std::size_t& tabSize, const bool& isUseRecordTemplate,
             const std::string& recordTemplate, const bool& isArray) const noexcept
     {
@@ -703,7 +727,7 @@ namespace mvlt
                     res << "\"" << record << "\":";
             }
 
-            if (isFormat)
+            if (isFormat && !isArray)
                 res << " {";
             else
                 res << "{";

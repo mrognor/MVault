@@ -3142,6 +3142,673 @@ TEST_BODY(Request, ComplexRequestWrongType,
         RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::WrongType, SavedType == typeid(int));
 )
 
+TEST_BODY(DropVault, Drop,
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<int>("B");
+
+    for (int i = 0; i < 1000; ++i) vlt.CreateRecord({{"A", i}, {"B", i}});
+
+    vlt.DropVault();
+
+    TEST_ASSERT(vlt.Size() == 0);
+    TEST_ASSERT(vlt.GetKeys() == std::vector<std::string>());
+    TEST_ASSERT(vlt.GetUniqueKeys() == std::vector<std::string>());
+
+    COMPARE_VAULT(vlt, {});
+)
+
+TEST_BODY(DropVault, DropEmpty,
+    Vault vlt;
+
+    vlt.DropVault();
+
+    TEST_ASSERT(vlt.Size() == 0);
+    TEST_ASSERT(vlt.GetKeys() == std::vector<std::string>());
+    TEST_ASSERT(vlt.GetUniqueKeys() == std::vector<std::string>());
+
+    COMPARE_VAULT(vlt, {});
+)
+
+TEST_BODY(DropVault, DropSecond,
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<int>("B");
+
+    for (int i = 0; i < 1000; ++i) vlt.CreateRecord({{"A", i}, {"B", i}});
+
+    vlt.DropVault();
+    vlt.DropVault();
+
+    TEST_ASSERT(vlt.Size() == 0);
+    TEST_ASSERT(vlt.GetKeys() == std::vector<std::string>());
+    TEST_ASSERT(vlt.GetUniqueKeys() == std::vector<std::string>());
+
+    COMPARE_VAULT(vlt, {});
+)
+
+TEST_BODY(DropData, Drop,
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<int>("B");
+
+    for (int i = 0; i < 1000; ++i) vlt.CreateRecord({{"A", i}, {"B", i}});
+
+    vlt.DropData();
+
+    TEST_ASSERT(vlt.Size() == 0);
+    TEST_ASSERT(vlt.GetKeys() == std::vector<std::string>({"A", "B"}));
+    TEST_ASSERT(vlt.GetUniqueKeys() == std::vector<std::string>({"B"}));
+
+    COMPARE_VAULT(vlt, {});
+)
+
+TEST_BODY(DropData, DropEmpty,
+    Vault vlt;
+
+    vlt.DropData();
+
+    TEST_ASSERT(vlt.Size() == 0);
+    TEST_ASSERT(vlt.GetKeys() == std::vector<std::string>());
+    TEST_ASSERT(vlt.GetUniqueKeys() == std::vector<std::string>());
+
+    COMPARE_VAULT(vlt, {});
+)
+
+TEST_BODY(DropData, DropSecond,
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<int>("B");
+
+    for (int i = 0; i < 1000; ++i) vlt.CreateRecord({{"A", i}, {"B", i}});
+
+    vlt.DropData();
+    vlt.DropData();
+
+    TEST_ASSERT(vlt.Size() == 0);
+    TEST_ASSERT(vlt.GetKeys() == std::vector<std::string>({"A", "B"}));
+    TEST_ASSERT(vlt.GetUniqueKeys() == std::vector<std::string>({"B"}));
+
+    COMPARE_VAULT(vlt, {});
+)
+
+TEST_BODY(EraseRecord, CorrectEraseByRef,
+    Vault vlt;
+    VaultRecordRef vrr;
+    bool res = false;
+
+    vlt.AddKey("A", 0);
+
+    vlt.CreateRecord(vrr, {{"A", 0}});
+
+    res = vlt.EraseRecord(vrr);
+
+    TEST_ASSERT(res);
+
+    TEST_ASSERT(vlt.Size() == 0);
+
+    COMPARE_VAULT(vlt, {});
+
+
+    for (int i = 0; i < 1000; ++i) vlt.CreateRecord({{"A", i}});
+
+    for (int i = 0; i < 1000; ++i) 
+    {
+        vlt.GetRecord("A", i, vrr);
+        vlt.EraseRecord(vrr);
+    }
+
+    TEST_ASSERT(vlt.Size() == 0);
+
+    COMPARE_VAULT(vlt, {});
+)
+
+TEST_BODY(EraseRecord, IncorrectEraseByRef,
+    Vault vlt;
+    VaultRecordRef vrr;
+    bool res = false;
+
+    res = vlt.EraseRecord(vrr);
+
+    TEST_ASSERT(res == false);
+
+
+    vlt.AddKey("A", 0);
+
+    vlt.CreateRecord(vrr, {{"A", 0}});
+
+    vlt.EraseRecord(vrr);
+    res = vlt.EraseRecord(vrr);
+
+    TEST_ASSERT(res == false);
+
+    TEST_ASSERT(vlt.Size() == 0);
+
+    COMPARE_VAULT(vlt, {});
+)
+
+TEST_BODY(EraseRecord, CorrectEraseByKeyAndValue,
+    Vault vlt;
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+
+    vlt.CreateRecord(vrr, {{"A", 0}});
+
+    vor = vlt.EraseRecord("A", 0);
+
+    TEST_ASSERT(vlt.Size() == 0);
+
+    COMPARE_VAULT(vlt, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(int));
+
+
+    for (int i = 0; i < 1000; ++i) vlt.CreateRecord({{"A", i}});
+
+    for (int i = 0; i < 1000; ++i) 
+        vlt.EraseRecord("A", i);
+    
+
+    TEST_ASSERT(vlt.Size() == 0);
+
+    COMPARE_VAULT(vlt, {});
+)
+
+TEST_BODY(EraseRecord, WrongKeyEraseByKeyAndValue,
+    Vault vlt;
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+
+    vlt.CreateRecord(vrr, {{"A", 0}});
+
+    vor = vlt.EraseRecord("Z", 0);
+
+    TEST_ASSERT(vlt.Size() == 1);
+
+    COMPARE_VAULT(vlt, {{{"A", 0}}});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "Z", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongKey, SavedType == typeid(void));
+)
+
+TEST_BODY(EraseRecord, WrongTypeEraseByKeyAndValue,
+    Vault vlt;
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+    std::string s;
+
+    vlt.AddKey("A", 0);
+
+    vlt.CreateRecord(vrr, {{"A", 0}});
+
+    vor = vlt.EraseRecord("A", s);
+
+    TEST_ASSERT(vlt.Size() == 1);
+
+    COMPARE_VAULT(vlt, {{{"A", 0}}});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::WrongType, SavedType == typeid(int));
+)
+
+TEST_BODY(EraseRecord, WrongValueEraseByKeyAndValue,
+    Vault vlt;
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+
+    vlt.CreateRecord(vrr, {{"A", 0}});
+
+    vor = vlt.EraseRecord("A", 1);
+
+    TEST_ASSERT(vlt.Size() == 1);
+
+    COMPARE_VAULT(vlt, {{{"A", 0}}});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongValue, SavedType == typeid(int));
+)
+
+TEST_BODY(EraseRecords, Erase,
+    Vault vlt;
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+
+    for (int i = 0; i < 1000; ++i) vlt.CreateRecord({{"A", 0}});
+
+    vor = vlt.EraseRecords("A", 0);
+
+    TEST_ASSERT(vlt.Size() == 0);
+
+    COMPARE_VAULT(vlt, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(int));
+)
+
+TEST_BODY(EraseRecords, WrongKeyErase,
+    Vault vlt;
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+
+    vlt.CreateRecord(vrr, {{"A", 0}});
+
+    vor = vlt.EraseRecords("Z", 0);
+
+    TEST_ASSERT(vlt.Size() == 1);
+
+    COMPARE_VAULT(vlt, {{{"A", 0}}});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "Z", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongKey, SavedType == typeid(void));
+)
+
+TEST_BODY(EraseRecords, WrongTypeErase,
+    Vault vlt;
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+    std::string s;
+
+    vlt.AddKey("A", 0);
+
+    vlt.CreateRecord(vrr, {{"A", 0}});
+
+    vor = vlt.EraseRecords("A", s);
+
+    TEST_ASSERT(vlt.Size() == 1);
+
+    COMPARE_VAULT(vlt, {{{"A", 0}}});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::WrongType, SavedType == typeid(int));
+)
+
+TEST_BODY(EraseRecords, WrongValueErase,
+    Vault vlt;
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+
+    vlt.CreateRecord(vrr, {{"A", 0}});
+
+    vor = vlt.EraseRecords("A", 1);
+
+    TEST_ASSERT(vlt.Size() == 1);
+
+    COMPARE_VAULT(vlt, {{{"A", 0}}});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongValue, SavedType == typeid(int));
+)
+
+TEST_BODY(Size, Default,
+    Vault vlt;
+
+    vlt.AddKey<std::size_t>("A", 0);
+
+    for (std::size_t i = 0; i < 1000; ++i) 
+    {
+        TEST_ASSERT(vlt.Size() == i);
+        vlt.CreateRecord({{"A", i}});
+    }
+
+    for (std::size_t i = 0; i < 1000; ++i)
+    {
+        TEST_ASSERT(vlt.Size() == 1000 - i);
+        vlt.EraseRecord("A", i);
+    }
+)
+
+TEST_BODY(GetSortedRecords, GetRecords,
+    Vault vlt;
+    std::vector<VaultRecordRef> refs;
+
+    vlt.AddKey("A", 0);
+
+    refs = vlt.GetSortedRecords("A");
+
+    TEST_ASSERT(refs.size() == 0);
+
+
+    for (int i = 0; i < 1000; ++i) vlt.CreateRecord({{"A", i}});
+    
+    refs = vlt.GetSortedRecords("A");
+
+    TEST_ASSERT(refs.size() == 1000);
+
+    for (int i = 0; i < 1000; ++i)
+    {
+        int a = 0;
+        refs[i].GetData("A", a);
+        TEST_ASSERT(a == i);
+    }
+)
+
+TEST_BODY(GetSortedRecords, GetRecordsReverse,
+    Vault vlt;
+    std::vector<VaultRecordRef> refs;
+
+    vlt.AddKey("A", 0);
+
+    for (int i = 0; i < 1000; ++i) vlt.CreateRecord({{"A", i}});
+    
+    refs = vlt.GetSortedRecords("A", true);
+
+    TEST_ASSERT(refs.size() == 1000);
+
+    for (int i = 0; i < 1000; ++i)
+    {
+        int a = 0;
+        refs[i].GetData("A", a);
+        TEST_ASSERT(a == 999 - i);
+    }
+)
+
+TEST_BODY(GetSortedRecords, GetNotAllRecords,
+    Vault vlt;
+    std::vector<VaultRecordRef> refs;
+
+    vlt.AddKey("A", 0);
+
+    for (int i = 0; i < 1000; ++i) vlt.CreateRecord({{"A", i}});
+    
+    refs = vlt.GetSortedRecords("A", false, 100);
+
+    TEST_ASSERT(refs.size() == 100);
+
+    for (int i = 0; i < 100; ++i)
+    {
+        int a = 0;
+        refs[i].GetData("A", a);
+        TEST_ASSERT(a == i);
+    }
+)
+
+TEST_BODY(GetSortedRecords, WrongKey,
+    Vault vlt;
+    std::vector<VaultRecordRef> refs;
+
+    vlt.AddKey("A", 0);
+
+    for (int i = 0; i < 1000; ++i) vlt.CreateRecord({{"A", i}});
+    
+    refs = vlt.GetSortedRecords("Z");
+
+    TEST_ASSERT(refs.size() == 0);
+)
+
+TEST_BODY(SortBy, Sort,
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+
+    for (int i = 0; i < 1000; ++i) vlt.CreateRecord({{"A", i}});
+
+    int counter = 0;
+    vlt.SortBy("A", [&](const VaultRecordRef& ref) -> bool
+    {
+        int i = 0;
+        ref.GetData("A", i);
+        TEST_ASSERT(counter == i);
+        ++counter;
+        return true;
+    });
+
+    TEST_ASSERT(counter == 1000);
+)
+
+TEST_BODY(SortBy, SortReverse,
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+
+    for (int i = 0; i < 1000; ++i) vlt.CreateRecord({{"A", i}});
+
+    int counter = 999;
+    vlt.SortBy("A", [&](const VaultRecordRef& ref) -> bool
+    {
+        int i = 0;
+        ref.GetData("A", i);
+        TEST_ASSERT(counter == i);
+        --counter;
+        return true;
+    }, true);
+
+    TEST_ASSERT(counter == -1);
+)
+
+TEST_BODY(SortBy, SortNotAllRecords,
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+
+    for (int i = 0; i < 1000; ++i) vlt.CreateRecord({{"A", i}});
+
+    int counter = 0;
+    vlt.SortBy("A", [&](const VaultRecordRef& ref) -> bool
+    {
+        int i = 0;
+        ref.GetData("A", i);
+        TEST_ASSERT(counter == i);
+        ++counter;
+        return true;
+    }, false, 100);
+
+    TEST_ASSERT(counter == 100);
+)
+
+TEST_BODY(SortBy, WrongKey,
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+
+    for (int i = 0; i < 1000; ++i) vlt.CreateRecord({{"A", i}});
+
+    int counter = 0;
+    vlt.SortBy("Z", [&](const VaultRecordRef& ref) -> bool
+    {
+        int i = 0;
+        ref.GetData("A", i);
+        TEST_ASSERT(counter == i);
+        ++counter;
+        return true;
+    });
+
+    TEST_ASSERT(counter == 0);
+)
+
+TEST_BODY(ToJson, Default,
+    Vault vlt;
+
+    vlt.AddUniqueKey<std::size_t>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    vlt.CreateRecord({ {"A", std::size_t(1)}, {"B", std::string("a")} });
+    vlt.CreateRecord({ {"A", std::size_t(2)}, {"B", std::string("b")} });
+    vlt.CreateRecord({ {"A", std::size_t(3)}, {"B", std::string("c")} });
+
+    std::string res;
+    res = vlt.ToJson();
+
+    TEST_ASSERT(res == R"({"Record0":{"A":3,"B":"c"},"Record1":{"A":2,"B":"b"},"Record2":{"A":1,"B":"a"}})");
+)
+
+TEST_BODY(ToJson, Format,
+    Vault vlt;
+
+    vlt.AddUniqueKey<std::size_t>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    vlt.CreateRecord({ {"A", std::size_t(1)}, {"B", std::string("a")} });
+    vlt.CreateRecord({ {"A", std::size_t(2)}, {"B", std::string("b")} });
+    vlt.CreateRecord({ {"A", std::size_t(3)}, {"B", std::string("c")} });
+
+    std::string res;
+    res = vlt.ToJson(true);
+
+    TEST_ASSERT(res == R"({
+  "Record0": {
+    "A": 3,
+    "B": "c"
+  },
+  "Record1": {
+    "A": 2,
+    "B": "b"
+  },
+  "Record2": {
+    "A": 1,
+    "B": "a"
+  }
+})");
+)
+
+TEST_BODY(ToJson, DiffTabSize,
+    Vault vlt;
+
+    vlt.AddUniqueKey<std::size_t>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    vlt.CreateRecord({ {"A", std::size_t(1)}, {"B", std::string("a")} });
+    vlt.CreateRecord({ {"A", std::size_t(2)}, {"B", std::string("b")} });
+    vlt.CreateRecord({ {"A", std::size_t(3)}, {"B", std::string("c")} });
+
+    std::string res;
+    res = vlt.ToJson(true, 1);
+
+    TEST_ASSERT(res == R"({
+ "Record0": {
+  "A": 3,
+  "B": "c"
+ },
+ "Record1": {
+  "A": 2,
+  "B": "b"
+ },
+ "Record2": {
+  "A": 1,
+  "B": "a"
+ }
+})");
+)
+
+TEST_BODY(ToJson, RecordTemplate,
+    Vault vlt;
+
+    vlt.AddUniqueKey<std::size_t>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    vlt.CreateRecord({ {"A", std::size_t(1)}, {"B", std::string("a")} });
+    vlt.CreateRecord({ {"A", std::size_t(2)}, {"B", std::string("b")} });
+    vlt.CreateRecord({ {"A", std::size_t(3)}, {"B", std::string("c")} });
+
+    std::string res;
+    res = vlt.ToJson(true, 2, true, "Rec");
+
+    TEST_ASSERT(res == R"({
+  "Rec0": {
+    "A": 3,
+    "B": "c"
+  },
+  "Rec1": {
+    "A": 2,
+    "B": "b"
+  },
+  "Rec2": {
+    "A": 1,
+    "B": "a"
+  }
+})");
+)
+
+TEST_BODY(ToJson, Array,
+    Vault vlt;
+
+    vlt.AddUniqueKey<std::size_t>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    vlt.CreateRecord({ {"A", std::size_t(1)}, {"B", std::string("a")} });
+    vlt.CreateRecord({ {"A", std::size_t(2)}, {"B", std::string("b")} });
+    vlt.CreateRecord({ {"A", std::size_t(3)}, {"B", std::string("c")} });
+
+    std::string res;
+    res = vlt.ToJson(false, 2, true, "Record", true);
+
+    TEST_ASSERT(res == R"([{"A":3,"B":"c"},{"A":2,"B":"b"},{"A":1,"B":"a"}])");
+)
+
+TEST_BODY(ToJson, ArrayFormat,
+    Vault vlt;
+
+    vlt.AddUniqueKey<std::size_t>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    vlt.CreateRecord({ {"A", std::size_t(1)}, {"B", std::string("a")} });
+    vlt.CreateRecord({ {"A", std::size_t(2)}, {"B", std::string("b")} });
+    vlt.CreateRecord({ {"A", std::size_t(3)}, {"B", std::string("c")} });
+
+    std::string res;
+    res = vlt.ToJson(true, 2, true, "Record", true);
+
+    TEST_ASSERT(res == R"([
+  {
+    "A": 3,
+    "B": "c"
+  },
+  {
+    "A": 2,
+    "B": "b"
+  },
+  {
+    "A": 1,
+    "B": "a"
+  }
+])");
+)
+
+TEST_BODY(ToJson, ArrayDiffTabSize,
+    Vault vlt;
+
+    vlt.AddUniqueKey<std::size_t>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    vlt.CreateRecord({ {"A", std::size_t(1)}, {"B", std::string("a")} });
+    vlt.CreateRecord({ {"A", std::size_t(2)}, {"B", std::string("b")} });
+    vlt.CreateRecord({ {"A", std::size_t(3)}, {"B", std::string("c")} });
+
+    std::string res;
+    res = vlt.ToJson(true, 1, true, "Record", true);
+
+    TEST_ASSERT(res == R"([
+ {
+  "A": 3,
+  "B": "c"
+ },
+ {
+  "A": 2,
+  "B": "b"
+ },
+ {
+  "A": 1,
+  "B": "a"
+ }
+])");
+)
+
 void VaultUnitTests()
 {
     DBG_LOG_ENTER();
@@ -3280,4 +3947,44 @@ void VaultUnitTests()
     Request::ComplexRequest();
     Request::ComplexRequestWrongKey();
     Request::ComplexRequestWrongType();
+
+    DropVault::Drop();
+    DropVault::DropEmpty();
+    DropVault::DropSecond();
+
+    DropData::Drop();
+    DropData::DropEmpty();
+    DropData::DropSecond();
+
+    EraseRecord::CorrectEraseByRef();
+    EraseRecord::IncorrectEraseByRef();
+    EraseRecord::CorrectEraseByKeyAndValue();
+    EraseRecord::WrongKeyEraseByKeyAndValue();
+    EraseRecord::WrongTypeEraseByKeyAndValue();
+    EraseRecord::WrongValueEraseByKeyAndValue();
+
+    EraseRecords::Erase();
+    EraseRecords::WrongKeyErase();
+    EraseRecords::WrongTypeErase();
+    EraseRecords::WrongValueErase();
+
+    Size::Default();
+
+    GetSortedRecords::GetRecords();
+    GetSortedRecords::GetRecordsReverse();
+    GetSortedRecords::GetNotAllRecords();
+    GetSortedRecords::WrongKey();
+
+    SortBy::Sort();
+    SortBy::SortReverse();
+    SortBy::SortNotAllRecords();
+    SortBy::WrongKey();
+
+    ToJson::Default();
+    ToJson::Format();
+    ToJson::DiffTabSize();
+    ToJson::RecordTemplate();
+    ToJson::Array();
+    ToJson::ArrayFormat();
+    ToJson::ArrayDiffTabSize();
 }
