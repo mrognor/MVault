@@ -19,6 +19,8 @@
 #include "Strings/FromString.h"
 #include "Strings/PrintAsTable.h"
 
+#include "Uuid/Uuid.h"
+
 #include "Vault.hpp"
 #include "VaultRequest.hpp"
 #include "VaultRecordSet.hpp"

@@ -27,6 +27,8 @@ set(MVaultHeaders
 
     CsvParser/CsvParser.h
     CsvParser/StreamFileReader.h
+
+    Uuid/Uuid.h
 )
 
 set(MVaultTemplates
@@ -56,6 +58,8 @@ set(MVaultSource
 
     CsvParser/CsvParser.cpp
     CsvParser/StreamFileReader.cpp
+
+    Uuid/Uuid.cpp
 )
 
 project(MVault)
