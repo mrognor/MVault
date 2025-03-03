@@ -50,4 +50,23 @@ namespace mvlt
     
         return res;
     }
+
+    std::string GenTmpFileName(const std::string& prefix) noexcept
+    {
+        #ifndef _WIN32
+
+        if (prefix.empty())
+            return "/tmp/" + Uuid();
+        else
+            return prefix + "/tmp/" + Uuid();
+        
+        #else
+        
+        if (prefix.empty())
+            return "C:\\Windows\\Temp\\" + Uuid();
+        else
+            return prefix + "C:\\Windows\\Temp\\" + Uuid();
+
+        #endif
+    }
 }

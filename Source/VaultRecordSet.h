@@ -455,16 +455,9 @@ namespace mvlt
             \return vector with records. Each record is a vector of key and value string pairs
         */
         std::vector<std::vector<std::pair<std::string, std::string>>> ToStrings() const noexcept;
-
-        /**
-            \brief A method for displaying the contents of a Vault on the screen
-            
-            \param [in] amountOfRecords The number of records to be printed. The default value is -1, which means that all entries will be output
-        */
-        void PrintSet(const std::size_t& amountOfRecords = -1) const noexcept;
         
         /**
-            \brief A method for displaying the contents of a Vault as a table on the screen
+            \brief A method for displaying the contents of a VaultRecordSet as a table on the screen
             
             \param [in] isPrintId will the unique IDs be printed in the table
             \param [in] amountOfRecords The number of records to be printed. The default value is -1, which means that all entries will be output
@@ -472,7 +465,7 @@ namespace mvlt
             \param [in] isReverse The sorting direction. If true, the data will be output from the larger to the smaller
             \param [in] keys list of keys to be printed. By default, the list is empty, which means that all keys will be output
         */
-        void PrintAsTable(const bool& isPrintId = false, const std::size_t& amountOfRecords = -1, const std::string& primaryKey = "", const bool& isReverse = false,
+        void Print(const bool& isPrintId = false, const std::size_t& amountOfRecords = -1, const std::string& primaryKey = "", const bool& isReverse = false,
             const std::list<std::string>& keys = {}) const noexcept;
 
         /**

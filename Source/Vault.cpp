@@ -793,33 +793,7 @@ namespace mvlt
         return res;
     }
 
-    void Vault::PrintVault(const std::size_t& amountOfRecords) const noexcept
-    {
-        DBG_LOG_ENTER();
-
-        // Lock Vault to read
-        ReadLock<RecursiveReadWriteMutex> readLock(RecursiveReadWriteMtx);
-
-        std::size_t counter = 0;
-
-        for (const auto& record : RecordsSet)
-        {
-            std::cout << "Vault record " << record << ":" << "\n";
-
-            for (const std::string& key : KeysOrder)
-            {
-                DataSaver dataSaver;
-                record->GetDataSaver(key, dataSaver);
-
-                std::cout << "\t" << key << " = " << dataSaver.Str() << "\n";
-            }
-
-            ++counter;
-            if (counter == amountOfRecords) break;
-        }
-    }
-
-    void Vault::PrintAsTable(const bool& isPrintId, const std::size_t& amountOfRecords, const std::string& primaryKey, const bool& isReverse,
+    void Vault::Print(const bool& isPrintId, const std::size_t& amountOfRecords, const std::string& primaryKey, const bool& isReverse,
         const std::list<std::string>& keys) const noexcept
     {
         DBG_LOG_ENTER();

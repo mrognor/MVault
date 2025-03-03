@@ -42,7 +42,7 @@ int main()
     vlt.CreateRecord({ {"id", 1}, {"name", std::string("B")}, {"gender", false} });
     vlt.CreateRecord({ {"id", 2}, {"name", std::string("C")}, {"gender", true} });
     vlt.CreateRecord({ {"id", 3}, {"name", std::string("D")}, {"gender", false}, {"slaves", std::vector<int>{1, 2, 3}} });
-    vlt.PrintAsTable();
+    vlt.Print();
 
     mvlt::VaultRecordRef vrf;
     vlt.GetRecord("id", 2, vrf);
@@ -60,10 +60,10 @@ int main()
     vlt.GetKeyType("slaves", ti);
     std::cout << ti.name() << std::endl;
 
-    vlt.PrintAsTable();
+    vlt.Print();
     vlt.EraseRecord("id", 1);
-    vlt.PrintAsTable();
-    vlt.PrintAsTable();
+    vlt.Print();
+    vlt.Print();
 
     vlt.CreateRecord(vrf, {});
 
@@ -76,10 +76,10 @@ int main()
 
     vlt.AddKey("id", -1);
     vlt.CreateRecord({});
-    vlt.PrintAsTable(true);
+    vlt.Print(true);
     vlt.UpdateKey("id", 0);
     vlt.CreateRecord({});
-    vlt.PrintAsTable(true);
+    vlt.Print(true);
 
     vlt.DropVault();
     vlt.AddKey("A", -1);
@@ -91,7 +91,7 @@ int main()
         vlt.CreateRecord({{"A", i * i}});
     }
     
-    vlt.PrintAsTable();
+    vlt.Print();
     
     vlt.AddUniqueKey<std::string>("D", {[&](const std::size_t& counter, const mvlt::VaultRecordRef& vrf) -> std::string 
     {
@@ -100,7 +100,7 @@ int main()
         return "Number: " + std::to_string(i * 2) + " index: " + std::to_string(counter);
     }});
 
-    vlt.PrintAsTable();
+    vlt.Print();
     vlt.CreateRecord({});
 
     vlt.DropVault();
@@ -118,7 +118,7 @@ int main()
 
     for (std::size_t i = 0; i < 10; ++i) vlt.CreateRecord({ {"Id", i}, {"Name", names[i]}, {"Surname", surnames[i]}, {"City", cities[i]}, {"Gender", static_cast<bool>(genders[i])} });
 
-    vlt.PrintAsTable();
+    vlt.Print();
     std::cout << vlt.ToJson(true, 2, true, "Rec") << std::endl;
 
     vlt.GetRecord<std::string>("Name", "Evan", vrf);

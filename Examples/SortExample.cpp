@@ -59,7 +59,7 @@ int main()
 
     // startcode{.cpp}
     std::cout << "Vault: " << std::endl;
-    vlt.PrintAsTable();
+    vlt.Print();
     // endcode
 
     /**

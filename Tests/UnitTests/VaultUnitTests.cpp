@@ -3809,6 +3809,266 @@ TEST_BODY(ToJson, ArrayDiffTabSize,
 ])");
 )
 
+TEST_BODY(ToStrings, EmptyVault,
+    Vault vlt;
+
+    TEST_ASSERT(vlt.ToStrings() == decltype(vlt.ToStrings())());
+)
+
+TEST_BODY(ToStrings, KeysWithoutRecords,
+    Vault vlt;
+
+    vlt.AddUniqueKey<int>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    TEST_ASSERT(vlt.ToStrings() == decltype(vlt.ToStrings())());
+)
+
+TEST_BODY(ToStrings, FilledVault,
+    Vault vlt;
+
+    vlt.AddUniqueKey<int>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    vlt.CreateRecord({ {"A", 1}, {"B", std::string("a")} });
+    vlt.CreateRecord({ {"A", 2}, {"B", std::string("b")} });
+    vlt.CreateRecord({ {"A", 3}, {"B", std::string("c")} });
+
+    // Compare vault use ToStrings
+    COMPARE_VAULT(vlt, {
+        {{"A", 1}, {"B", std::string("a")}},
+        {{"A", 2}, {"B", std::string("b")}},
+        {{"A", 3}, {"B", std::string("c")}},
+    });
+)
+
+TEST_BODY(Print, Empty,
+    Vault vlt;
+
+    TEST_COUT(vlt.Print(), R"{{{(Vault does not contain keys!
+ (0 records)
+){{{");
+)
+
+TEST_BODY(Print, KeysWithoutRecords,
+    Vault vlt;
+
+    vlt.AddUniqueKey<int>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    TEST_COUT(vlt.Print(), R"{{{(+---+---+
+| A | B |
++---+---+
++---+---+
+ (0 records)
+){{{");
+)
+
+TEST_BODY(Print, FilledVaultWithDefaultArgs,
+    Vault vlt;
+
+    vlt.AddUniqueKey<int>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    vlt.CreateRecord({ {"A", 1}, {"B", std::string("a")} });
+    vlt.CreateRecord({ {"A", 2}, {"B", std::string("b")} });
+    vlt.CreateRecord({ {"A", 3}, {"B", std::string("c")} });
+
+    TEST_COUT(vlt.Print(), R"{{{(+---+---+
+| A | B |
++---+---+
+| 1 | a |
+| 2 | b |
+| 3 | c |
++---+---+
+ (3 records)
+){{{");
+)
+
+TEST_BODY(Print, NotAllRecords,
+    Vault vlt;
+
+    vlt.AddUniqueKey<int>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    vlt.CreateRecord({ {"A", 1}, {"B", std::string("a")} });
+    vlt.CreateRecord({ {"A", 2}, {"B", std::string("b")} });
+    vlt.CreateRecord({ {"A", 3}, {"B", std::string("c")} });
+
+    TEST_COUT(vlt.Print(false, 2), R"{{{(+---+---+
+| A | B |
++---+---+
+| 1 | a |
+| 2 | b |
+$~~~$~~~$
+ (3 records)
+){{{");
+)
+
+TEST_BODY(Print, PrimaryKey,
+    Vault vlt;
+
+    vlt.AddUniqueKey<int>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    vlt.CreateRecord({ {"A", 1}, {"B", std::string("c")} });
+    vlt.CreateRecord({ {"A", 2}, {"B", std::string("b")} });
+    vlt.CreateRecord({ {"A", 3}, {"B", std::string("a")} });
+
+    TEST_COUT(vlt.Print(false, 2, "B"), R"{{{(+---+---+
+| A | B |
++---+---+
+| 3 | a |
+| 2 | b |
+$~~~$~~~$
+ (3 records)
+){{{");
+)
+
+TEST_BODY(Print, Reverse,
+    Vault vlt;
+
+    vlt.AddUniqueKey<int>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    vlt.CreateRecord({ {"A", 1}, {"B", std::string("a")} });
+    vlt.CreateRecord({ {"A", 2}, {"B", std::string("b")} });
+    vlt.CreateRecord({ {"A", 3}, {"B", std::string("c")} });
+
+    TEST_COUT(vlt.Print(false, 2, "B", true), R"{{{(+---+---+
+| A | B |
++---+---+
+| 3 | c |
+| 2 | b |
+$~~~$~~~$
+ (3 records)
+){{{");
+)
+
+TEST_BODY(Print, NotAllKeys,
+    Vault vlt;
+
+    vlt.AddUniqueKey<int>("A");
+    vlt.AddKey<std::string>("B", "none");
+    vlt.AddKey("C", false);
+
+    vlt.CreateRecord({ {"A", 1}, {"B", std::string("a")}, {"C", true} });
+    vlt.CreateRecord({ {"A", 2}, {"B", std::string("b")}, {"C", false} });
+    vlt.CreateRecord({ {"A", 3}, {"B", std::string("c")}, {"C", true} });
+
+    TEST_COUT(vlt.Print(false, 2, "B", true, {"C", "B"}), R"{{{(+-------+---+
+| C     | B |
++-------+---+
+| true  | c |
+| false | b |
+$~~~~~~~$~~~$
+ (3 records)
+){{{");
+)
+
+TEST_BODY(SaveToFile, Empty,
+    Vault vlt;
+    std::string fileName = GenTmpFileName();
+    bool res = false;
+
+    res = vlt.SaveToFile(fileName);
+
+    TEST_ASSERT(res == true);
+
+    COMPARE_FILE(fileName, true, "\r\n");
+)
+
+TEST_BODY(SaveToFile, KeysWithoutRecords,
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+
+    std::string fileName = GenTmpFileName();
+    bool res = false;
+
+    res = vlt.SaveToFile(fileName);
+
+    TEST_ASSERT(res == true);
+
+    COMPARE_FILE(fileName, true, "A\r\n");
+)
+
+TEST_BODY(SaveToFile, FilledVault,
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+    vlt.CreateRecord({{"A", 0}});
+
+    std::string fileName = GenTmpFileName();
+    bool res = false;
+
+    res = vlt.SaveToFile(fileName);
+
+    TEST_ASSERT(res == true);
+
+    COMPARE_FILE(fileName, true, "A\r\n"
+                                 "0\r\n");
+)
+
+TEST_BODY(SaveToFile, ReverseNotAllKeys,
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+    vlt.AddUniqueKey<int>("C");
+
+    vlt.CreateRecord({{"A", 0}, {"B", 1}, {"C", 2}});
+
+    std::string fileName = GenTmpFileName();
+    bool res = false;
+
+    res = vlt.SaveToFile(fileName, {"C", "A"});
+
+    TEST_ASSERT(res == true);
+
+    COMPARE_FILE(fileName, true, "C,A\r\n"
+                                 "2,0\r\n");
+)
+
+TEST_BODY(SaveToFile, Separator,
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+    vlt.AddUniqueKey<int>("C");
+
+    vlt.CreateRecord({{"A", 0}, {"B", 1}, {"C", 2}});
+
+    std::string fileName = GenTmpFileName();
+    bool res = false;
+
+    res = vlt.SaveToFile(fileName, {}, ";");
+
+    TEST_ASSERT(res == true);
+
+    COMPARE_FILE(fileName, true, "A;B;C\r\n"
+                                 "0;1;2\r\n");
+)
+
+TEST_BODY(SaveToFile, NotSaveKeys,
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+    vlt.AddUniqueKey<int>("C");
+
+    vlt.CreateRecord({{"A", 0}, {"B", 1}, {"C", 2}});
+
+    std::string fileName = GenTmpFileName();
+    bool res = false;
+
+    res = vlt.SaveToFile(fileName, {}, ",", false);
+
+    TEST_ASSERT(res == true);
+
+    COMPARE_FILE(fileName, true, "0,1,2\r\n");
+)
+
 void VaultUnitTests()
 {
     DBG_LOG_ENTER();
@@ -3987,4 +4247,23 @@ void VaultUnitTests()
     ToJson::Array();
     ToJson::ArrayFormat();
     ToJson::ArrayDiffTabSize();
+
+    ToStrings::EmptyVault();
+    ToStrings::KeysWithoutRecords();
+    ToStrings::FilledVault();
+
+    Print::Empty();
+    Print::KeysWithoutRecords();
+    Print::FilledVaultWithDefaultArgs();
+    Print::NotAllRecords();
+    Print::PrimaryKey();
+    Print::Reverse();
+    Print::NotAllKeys();
+
+    SaveToFile::Empty();
+    SaveToFile::KeysWithoutRecords();
+    SaveToFile::FilledVault();
+    SaveToFile::ReverseNotAllKeys();
+    SaveToFile::Separator();
+    SaveToFile::NotSaveKeys();
 }

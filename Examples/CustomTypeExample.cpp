@@ -154,7 +154,7 @@ int main()
     vlt.CreateRecord({ {"Human", Human(190, "Mendeleev", true)} });
     vlt.CreateRecord({ {"Human", Human(174, "Kovalevskaya", false)} });
 
-    vlt.PrintAsTable();
+    vlt.Print();
     // endcode
 
     /**

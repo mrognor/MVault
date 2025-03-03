@@ -12,7 +12,7 @@ int main()
     vlt.CreateRecord({ {"id", 1}, {"name", std::string("B")}, {"gender", false} });
     vlt.CreateRecord({ {"id", 2}, {"name", std::string("C")}, {"gender", true} });
     vlt.CreateRecord({ {"id", 3}, {"name", std::string("D")}, {"gender", false} });
-    vlt.PrintAsTable();
+    vlt.Print();
 
     vlt.SaveToFile("CsvResult.csv", {}, ";");
     vlt.DropVault();
@@ -27,7 +27,7 @@ int main()
         else if (values[2] == "false") values[2] = "Woman";
     });
 
-    vlt.PrintAsTable();
+    vlt.Print();
     vlt.DropVault();
 
     vlt.AddKey("cpuName", std::string());    
@@ -44,5 +44,5 @@ int main()
     vlt.AddKey("category", std::string());
 
     vlt.ReadFile("Csv/CPU_benchmark_v4.csv", ',', true);
-    vlt.PrintAsTable(false, 10, "cpuMark", true);
+    vlt.Print(false, 10, "cpuMark", true);
 }

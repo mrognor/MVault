@@ -25,7 +25,7 @@ int main()
     for (int i = 0; i < 10; ++i)
         vlt.CreateRecord({ {"A", i}, {"B", 10 - i} });
 
-    vlt.PrintAsTable();
+    vlt.Print();
 }
 ```
 To build it, use the command:
@@ -115,10 +115,10 @@ humans.CreateRecord({ {"Name", std::string("Diana")}, {"Gender", false}, {"Age",
 humans.CreateRecord({ {"Name", std::string("Baro")}, {"Gender", true}, {"Age", 28}, {"Nationality", Nationality::Earth} });
 ```
 
-You can display records on the screen using the *PrintAsTable* function.
+You can display records on the screen using the *Print* function.
 
 ```cpp
-humans.PrintAsTable();
+humans.Print();
 ```
 
 And get the following result:
@@ -216,13 +216,13 @@ int main()
     humans.CreateRecord({ {"Name", std::string("Diana")}, {"Gender", false}, {"Age", 26}, {"Nationality", Nationality::Britain} });
     humans.CreateRecord({ {"Name", std::string("Baro")}, {"Gender", true}, {"Age", 28}, {"Nationality", Nationality::Earth} });
 
-    humans.PrintAsTable();
+    humans.Print();
 
     mvlt::VaultRecordSet vrs;
     humans.Request(mvlt::And(
             mvlt::Or(mvlt::Equal("Nationality", Nationality::Russia), mvlt::Equal("Nationality", Nationality::Britain)),
             mvlt::And(mvlt::Equal("Gender", true), (mvlt::Greater("Age", 35)))), 
         vrs);
-    vrs.PrintAsTable();
+    vrs.Print();
 }
 ```

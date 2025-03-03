@@ -354,20 +354,7 @@ namespace mvlt
             return std::vector<std::vector<std::pair<std::string, std::string>>> ();
     }
 
-    void VaultRecordSet::PrintSet(const std::size_t& amountOfRecords) const noexcept
-    {
-        DBG_LOG_ENTER();
-
-        if (GetIsParentVaultValid())
-        {
-            ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
-            Vault::PrintVault(amountOfRecords);
-        }
-        else
-            std::cout << "The parent Vault is not valid!" << "\n";
-    }
-
-    void VaultRecordSet::PrintAsTable(const bool& isPrintId, const std::size_t& amountOfRecords, const std::string& primaryKey, const bool& isReverse,
+    void VaultRecordSet::Print(const bool& isPrintId, const std::size_t& amountOfRecords, const std::string& primaryKey, const bool& isReverse,
             const std::list<std::string>& keys) const noexcept
     {
         DBG_LOG_ENTER();
@@ -375,7 +362,7 @@ namespace mvlt
         if (GetIsParentVaultValid())
         {
             ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
-            Vault::PrintAsTable(isPrintId, amountOfRecords, primaryKey, isReverse, keys);
+            Vault::Print(isPrintId, amountOfRecords, primaryKey, isReverse, keys);
         }
         else
             std::cout << "The parent Vault is not valid!" << "\n";

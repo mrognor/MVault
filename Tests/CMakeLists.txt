@@ -6,9 +6,11 @@ set(MTestsHeaders
     MTests/Starter.h
     MTests/GetLine.h
     MTests/TestLog.h
+    MTests/TestCout.h
     MTests/TestSuite.h
     MTests/TestAssert.h
     MTests/TypeWrapper.h
+    MTests/CompareFile.h
     MTests/CompareVault.h
     MTests/ColorizedPrint.h
     MTests/CompareRequest.h

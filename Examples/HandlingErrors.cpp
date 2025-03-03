@@ -141,7 +141,7 @@ int main()
     std::cout << "VaultRecordRef::SetData:" << std::endl;
 
     vlt.CreateRecord(vrr, { {"Key", 333} });
-    vlt.PrintAsTable();
+    vlt.Print();
 
     std::cout << vrr.GetRecordUniqueId() << std::endl;
 
@@ -174,7 +174,7 @@ int main()
     else
         std::cout << "\t\tSuccess! Requested record: " << vrr.GetRecordUniqueId() << std::endl;
 
-    vlt.PrintAsTable();
+    vlt.Print();
 
     // ============================================================================== //
     // ============================================================================== //

@@ -12,14 +12,14 @@ int main()
     vlt.CreateRecord({ {"B", 1} });
 
     std::cout << "Origin vault: " << std::endl;
-    vlt.PrintAsTable(true);
+    vlt.Print(true);
 
 
     mvlt::VaultRecordSet vrs, vrs2;
     vlt.RequestEqual("A", 0, vrs);
     vrs2 = vrs;
     std::cout << "Requested vault: " << std::endl;
-    vrs.PrintAsTable(true);
+    vrs.Print(true);
 
     std::cout << "Get record: " << std::endl;
 
@@ -31,61 +31,61 @@ int main()
     vrr.SetData("A", 2);
 
     std::cout << "Origin vault: " << std::endl;
-    vlt.PrintAsTable(true);
+    vlt.Print(true);
 
     std::cout << "Requested vault: " << std::endl;
-    vrs.PrintAsTable(true);
+    vrs.Print(true);
 
     std::cout << "Copied vault: " << std::endl;
-    vrs2.PrintAsTable(true);
+    vrs2.Print(true);
 
     std::cout << "Subrequest" << std::endl;
     vrs.RequestEqual("A", 2, vrs2);
-    vrs2.PrintAsTable(true);
+    vrs2.Print(true);
 
     vrr.SetData("B", 3);
     std::cout << "SetData in ref" << std::endl;
-    vlt.PrintAsTable(true);
-    vrs.PrintAsTable(true);
-    vrs2.PrintAsTable(true);
+    vlt.Print(true);
+    vrs.Print(true);
+    vrs2.Print(true);
 
     std::cout << "Add record to RecordSet" << std::endl;
     vlt.GetRecord("A", 1, vrr);
     vrs2.AddRecord(vrr);
-    vrs2.PrintAsTable(true);
+    vrs2.Print(true);
 
     std::cout << "Erase record from vault. 1" << std::endl;
     std::cout << "Before:" << std::endl;
-    vlt.PrintAsTable(true);
-    vrs.PrintAsTable(true);
+    vlt.Print(true);
+    vrs.Print(true);
 
     vrs2.GetRecord("A", 2, vrr);
     vlt.EraseRecord(vrr);
 
     std::cout << "After:" << std::endl;
-    vlt.PrintAsTable(true);
-    vrs.PrintAsTable(true);
+    vlt.Print(true);
+    vrs.Print(true);
 
     std::cout << "Erase record from vault. 2" << std::endl;
     std::cout << "Before:" << std::endl;
-    vlt.PrintAsTable(true);
-    vrs.PrintAsTable(true);
+    vlt.Print(true);
+    vrs.Print(true);
 
     vlt.EraseRecord("A", 0);
 
     std::cout << "After:" << std::endl;
-    vlt.PrintAsTable(true);
-    vrs.PrintAsTable(true);
+    vlt.Print(true);
+    vrs.Print(true);
 
     std::cout << "Drop vault" << std::endl;
     vlt.DropData();
-    vrs.PrintAsTable();
+    vrs.Print();
     
     std::cout << "Clear and reset" << std::endl;
     vrs.Clear();
-    vrs.PrintAsTable();
+    vrs.Print();
     vrs2.Reset();
-    vrs2.PrintAsTable();
+    vrs2.Print();
 
     std::cout << "Erase records" << std::endl;
 
@@ -96,27 +96,27 @@ int main()
     vlt.RequestEqual("A", 0, vrs);
 
     std::cout << "Before" << std::endl;
-    vlt.PrintAsTable(true);
-    vrs.PrintAsTable(true);
+    vlt.Print(true);
+    vrs.Print(true);
 
     std::cout << "After" << std::endl;
     
     vlt.EraseRecords("A", 0);
-    vlt.PrintAsTable(true);
-    vrs.PrintAsTable(true);
+    vlt.Print(true);
+    vrs.Print(true);
 
     std::cout << "Adding keys" << std::endl;
     std::cout << "Before" << std::endl; 
-    vlt.PrintAsTable();
-    vrs.PrintAsTable();
+    vlt.Print();
+    vrs.Print();
     
     std::cout << "After 1" << std::endl;
     vlt.AddKey("C", -1);
-    vlt.PrintAsTable();
-    vrs.PrintAsTable();
+    vlt.Print();
+    vrs.Print();
 
     std::cout << "After 2" << std::endl;
     vlt.RemoveKey("B");
-    vlt.PrintAsTable();
-    vrs.PrintAsTable();
+    vlt.Print();
+    vrs.Print();
 }

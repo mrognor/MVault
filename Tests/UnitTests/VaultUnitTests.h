@@ -3,8 +3,10 @@
 #include "../../Source/MVault.h"
 
 #include "../MTests/TestLog.h"
+#include "../MTests/TestCout.h"
 #include "../MTests/TestSuite.h"
 #include "../MTests/TestAssert.h"
+#include "../MTests/CompareFile.h"
 #include "../MTests/CompareVault.h"
 #include "../MTests/CompareRequest.h"
 #include "../MTests/CompareVaultRecordRef.h"
@@ -384,6 +386,44 @@ TEST_SUITE(ToJson,
     TEST_CASE(ArrayFormat)
 
     TEST_CASE(ArrayDiffTabSize)
+)
+
+TEST_SUITE(ToStrings, 
+    TEST_CASE(EmptyVault)
+
+    TEST_CASE(KeysWithoutRecords)
+
+    TEST_CASE(FilledVault)
+)
+
+TEST_SUITE(Print,
+    TEST_CASE(Empty)
+
+    TEST_CASE(KeysWithoutRecords)
+
+    TEST_CASE(FilledVaultWithDefaultArgs)
+
+    TEST_CASE(NotAllRecords)
+
+    TEST_CASE(PrimaryKey)
+
+    TEST_CASE(Reverse)
+
+    TEST_CASE(NotAllKeys)
+)
+
+TEST_SUITE(SaveToFile,
+    TEST_CASE(Empty)
+
+    TEST_CASE(KeysWithoutRecords)
+
+    TEST_CASE(FilledVault)
+
+    TEST_CASE(ReverseNotAllKeys)
+
+    TEST_CASE(Separator)
+
+    TEST_CASE(NotSaveKeys)
 )
 
 void VaultUnitTests();
