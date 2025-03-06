@@ -608,7 +608,7 @@ TEST_BODY(RemoveKey, IncorrectRemoveFromNonEmptyVault,
     })
 )
 
-TEST_BODY(CreateKey, CorrectParamsWithoutUniqueKey,
+TEST_BODY(CreateRecord, CorrectParamsWithoutUniqueKey,
     Vault vlt;
     VaultRecordRef vrr;
     VaultOperationResult vor;
@@ -651,7 +651,7 @@ TEST_BODY(CreateKey, CorrectParamsWithoutUniqueKey,
         RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(void));
 )
 
-TEST_BODY(CreateKey, CorrectParamsWithUniqueKey,
+TEST_BODY(CreateRecord, CorrectParamsWithUniqueKey,
     Vault vlt;
     VaultRecordRef vrr;
     VaultOperationResult vor;
@@ -688,7 +688,7 @@ TEST_BODY(CreateKey, CorrectParamsWithUniqueKey,
         RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(void));
 )
 
-TEST_BODY(CreateKey, DuplicateParams,
+TEST_BODY(CreateRecord, DuplicateParams,
     Vault vlt;
     VaultRecordRef vrr;
     VaultOperationResult vor;
@@ -709,7 +709,7 @@ TEST_BODY(CreateKey, DuplicateParams,
         RequestedType == typeid(int), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(void));
 )
 
-TEST_BODY(CreateKey, WrongKeyWithoutUniqueKey,
+TEST_BODY(CreateRecord, WrongKeyWithoutUniqueKey,
     Vault vlt;
     VaultRecordRef vrr;
     VaultOperationResult vor;
@@ -725,7 +725,7 @@ TEST_BODY(CreateKey, WrongKeyWithoutUniqueKey,
         RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongKey, SavedType == typeid(void));
 )
 
-TEST_BODY(CreateKey, WrongTypeWithoutUniqueKey,
+TEST_BODY(CreateRecord, WrongTypeWithoutUniqueKey,
     Vault vlt;
     VaultRecordRef vrr;
     VaultOperationResult vor;
@@ -741,7 +741,7 @@ TEST_BODY(CreateKey, WrongTypeWithoutUniqueKey,
         RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongType, SavedType == typeid(std::string));
 )
 
-TEST_BODY(CreateKey, WrongKeyWithUniqueKey,
+TEST_BODY(CreateRecord, WrongKeyWithUniqueKey,
     Vault vlt;
     VaultRecordRef vrr;
     VaultOperationResult vor;
@@ -757,7 +757,7 @@ TEST_BODY(CreateKey, WrongKeyWithUniqueKey,
         RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongKey, SavedType == typeid(void));
 )
 
-TEST_BODY(CreateKey, WrongTypeWithUniqueKey,
+TEST_BODY(CreateRecord, WrongTypeWithUniqueKey,
     Vault vlt;
     VaultRecordRef vrr;
     VaultOperationResult vor;
@@ -773,7 +773,7 @@ TEST_BODY(CreateKey, WrongTypeWithUniqueKey,
         RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongType, SavedType == typeid(std::string));
 )
 
-TEST_BODY(CreateKey, DuplicateUniqueKeyValue,
+TEST_BODY(CreateRecord, DuplicateUniqueKeyValue,
     Vault vlt;
     VaultRecordRef vrr;
     VaultOperationResult vor;
@@ -795,6 +795,30 @@ TEST_BODY(CreateKey, DuplicateUniqueKeyValue,
     vor = vlt.CreateRecord({{"A", 2}, {"B", std::string("none")}});
 
     COMPARE_VAULT(vlt, {{{"A", 1}, {"B", std::string("none")}}});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "B", 
+        RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::UniqueKeyValueAlredyInSet, SavedType == typeid(void));
+)
+
+TEST_BODY(CreateRecord, EmptyUniqueKeyValue,
+    Vault vlt;
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<std::string>("B");
+
+    vor = vlt.CreateRecord({{"A", 1}});
+
+    COMPARE_VAULT(vlt, {{{"A", 1}, {"B", std::string("")}}});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(void));
+    
+
+    vor = vlt.CreateRecord({{"A", 1}});
+
+    COMPARE_VAULT(vlt, {{{"A", 1}, {"B", std::string("")}}});
 
     COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "B", 
         RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::UniqueKeyValueAlredyInSet, SavedType == typeid(void));
@@ -3968,7 +3992,7 @@ $~~~~~~~$~~~$
 
 TEST_BODY(SaveToFile, Empty,
     Vault vlt;
-    std::string fileName = GenTmpFileName();
+    std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
     bool res = false;
 
     res = vlt.SaveToFile(fileName);
@@ -3983,7 +4007,7 @@ TEST_BODY(SaveToFile, KeysWithoutRecords,
 
     vlt.AddKey("A", 0);
 
-    std::string fileName = GenTmpFileName();
+    std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
     bool res = false;
 
     res = vlt.SaveToFile(fileName);
@@ -3999,7 +4023,7 @@ TEST_BODY(SaveToFile, FilledVault,
     vlt.AddKey("A", 0);
     vlt.CreateRecord({{"A", 0}});
 
-    std::string fileName = GenTmpFileName();
+    std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
     bool res = false;
 
     res = vlt.SaveToFile(fileName);
@@ -4019,7 +4043,7 @@ TEST_BODY(SaveToFile, ReverseNotAllKeys,
 
     vlt.CreateRecord({{"A", 0}, {"B", 1}, {"C", 2}});
 
-    std::string fileName = GenTmpFileName();
+    std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
     bool res = false;
 
     res = vlt.SaveToFile(fileName, {"C", "A"});
@@ -4039,7 +4063,7 @@ TEST_BODY(SaveToFile, Separator,
 
     vlt.CreateRecord({{"A", 0}, {"B", 1}, {"C", 2}});
 
-    std::string fileName = GenTmpFileName();
+    std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
     bool res = false;
 
     res = vlt.SaveToFile(fileName, {}, ";");
@@ -4059,7 +4083,7 @@ TEST_BODY(SaveToFile, NotSaveKeys,
 
     vlt.CreateRecord({{"A", 0}, {"B", 1}, {"C", 2}});
 
-    std::string fileName = GenTmpFileName();
+    std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
     bool res = false;
 
     res = vlt.SaveToFile(fileName, {}, ",", false);
@@ -4067,6 +4091,379 @@ TEST_BODY(SaveToFile, NotSaveKeys,
     TEST_ASSERT(res == true);
 
     COMPARE_FILE(fileName, true, "0,1,2\r\n");
+)
+
+TEST_BODY(ReadFile, CorrectCrLf,
+    std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
+    SAVE_FILE("A,B\r\n1,1\r\n2,2");
+
+
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<int>("B");
+
+    vlt.CreateRecord({{"A", 0}, {"B", 0}});
+
+    TEST_ASSERT(vlt.ReadFile(fileName));
+
+    COMPARE_VAULT(vlt, {
+        {{"A", 0}, {"B", 0}},
+        {{"A", 1}, {"B", 1}},
+        {{"A", 2}, {"B", 2}},
+    });
+)
+
+TEST_BODY(ReadFile, CorrectLf,
+    std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
+    SAVE_FILE("A,B\n1,1\n2,2");
+
+
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<int>("B");
+
+    vlt.CreateRecord({{"A", 0}, {"B", 0}});
+
+    TEST_ASSERT(vlt.ReadFile(fileName));
+
+    COMPARE_VAULT(vlt, {
+        {{"A", 0}, {"B", 0}},
+        {{"A", 1}, {"B", 1}},
+        {{"A", 2}, {"B", 2}},
+    });
+)
+
+TEST_BODY(ReadFile, LoadTypes,
+    std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
+    SAVE_FILE("A,B,C\n1,0.9,true\n-2,-1.2,false");
+
+
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0.0);
+    vlt.AddKey("C", true);
+
+    TEST_ASSERT(vlt.ReadFile(fileName));
+
+    COMPARE_VAULT(vlt, {
+        {{"A", 1}, {"B", 0.9}, {"C", true}},
+        {{"A", -2}, {"B", -1.2}, {"C", false}},
+    });
+)
+
+TEST_BODY(ReadFile, SemicolonSeparator,
+    std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
+    SAVE_FILE("A;B\r\n1;1\r\n2;2");
+
+
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<int>("B");
+
+    vlt.CreateRecord({{"A", 0}, {"B", 0}});
+
+    TEST_ASSERT(vlt.ReadFile(fileName, ';'));
+
+    COMPARE_VAULT(vlt, {
+        {{"A", 0}, {"B", 0}},
+        {{"A", 1}, {"B", 1}},
+        {{"A", 2}, {"B", 2}},
+    });
+)
+
+TEST_BODY(ReadFile, NotLoadKeys,
+    std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
+    SAVE_FILE("1,1\r\n2,2");
+
+
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<int>("B");
+
+    vlt.CreateRecord({{"A", 0}, {"B", 0}});
+
+    TEST_ASSERT(vlt.ReadFile(fileName, ',', false));
+
+    COMPARE_VAULT(vlt, {
+        {{"A", 0}, {"B", 0}},
+        {{"A", 1}, {"B", 1}},
+        {{"A", 2}, {"B", 2}},
+    });
+)
+
+TEST_BODY(ReadFile, NotAllKeys,
+    std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
+    SAVE_FILE("1,9\r\n2,8");
+
+
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+    vlt.AddUniqueKey<int>("C");
+    
+
+    vlt.CreateRecord({{"A", 0}, {"B", 0}, {"C", 0}});
+
+    TEST_ASSERT(vlt.ReadFile(fileName, ',', false, {"C", "A"}));
+
+    COMPARE_VAULT(vlt, {
+        {{"A", 0}, {"B", 0}, {"C", 0}},
+        {{"A", 9}, {"B", 0}, {"C", 1}},
+        {{"A", 8}, {"B", 0}, {"C", 2}},
+    });
+)
+
+TEST_BODY(ReadFile, HandleRecords,
+    std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
+    SAVE_FILE("A,B\r\n1,1\r\n2,2");
+
+
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<int>("B");
+
+    vlt.CreateRecord({{"A", 0}, {"B", 0}});
+
+    TEST_ASSERT(vlt.ReadFile(fileName, ',', [&](const std::vector<std::string>& keys, std::vector<std::string>& values) -> void
+    {
+        for (std::size_t i = 0; i < keys.size(); ++i)
+        {
+            if (keys[i] == "A") values[i] += "0";
+            else values[i] += "00";
+        }
+    }));
+
+    COMPARE_VAULT(vlt, {
+        {{"A", 0}, {"B", 0}},
+        {{"A", 10}, {"B", 100}},
+        {{"A", 20}, {"B", 200}},
+    });
+)
+
+TEST_BODY(ReadFile, NotExistedFile,
+    Vault vlt;
+    TEST_ASSERT(vlt.ReadFile(Uuid()) == false);
+)
+
+TEST_BODY(ReadFile, AllIncorrectRecords,
+    std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
+    SAVE_FILE("A,B\r\na,1\r\nb,2");
+
+
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<int>("B");
+
+    vlt.CreateRecord({{"A", 0}, {"B", 0}});
+
+    TEST_ASSERT(vlt.ReadFile(fileName));
+
+    COMPARE_VAULT(vlt, {{{"A", 0}, {"B", 0}}});
+)
+
+TEST_BODY(ReadFile, NotAllIncorrectRecords,
+    std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
+    SAVE_FILE("A,B\r\na,1\r\n2,2");
+
+
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<int>("B");
+
+    vlt.CreateRecord({{"A", 0}, {"B", 0}});
+
+    TEST_ASSERT(vlt.ReadFile(fileName));
+
+    COMPARE_VAULT(vlt, {{{"A", 0}, {"B", 0}}, {{"A", 2}, {"B", 2}}});
+)
+
+TEST_BODY(ReadFile, DuplicateUniqueKeyValue,
+    std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
+    SAVE_FILE("A,B\r\n1,1\r\n1,1");
+
+
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<int>("B");
+
+    vlt.CreateRecord({{"A", 0}, {"B", 0}});
+
+    TEST_ASSERT(vlt.ReadFile(fileName));
+
+    COMPARE_VAULT(vlt, {{{"A", 0}, {"B", 0}}, {{"A", 1}, {"B", 1}}});
+)
+
+TEST_BODY(GetErrorsInLastReadedFile, Correct,
+    std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
+    SAVE_FILE("A,B\r\n1,1\r\n2,2");
+
+
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<int>("B");
+
+    TEST_ASSERT(vlt.ReadFile(fileName));
+
+    std::vector<std::pair<std::size_t, std::string>> res = {};
+    TEST_ASSERT(vlt.GetErrorsInLastReadedFile() == res);
+)
+
+TEST_BODY(GetErrorsInLastReadedFile, AllIncorrectRecords,
+    std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
+    SAVE_FILE("A,B\r\na,1\r\n2,b");
+
+
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<int>("B");
+
+    TEST_ASSERT(vlt.ReadFile(fileName));
+
+    std::vector<std::pair<std::size_t, std::string>> res = {{2, "A"}, {3, "B"}};
+    TEST_ASSERT(vlt.GetErrorsInLastReadedFile() == res);
+)
+
+TEST_BODY(GetErrorsInLastReadedFile, NotAllIncorrectRecords,
+    std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
+    SAVE_FILE("A,B\r\n1,1\r\na,2");
+
+
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<int>("B");
+
+    TEST_ASSERT(vlt.ReadFile(fileName));
+
+    std::vector<std::pair<std::size_t, std::string>> res = {{3, "A"}};
+    TEST_ASSERT(vlt.GetErrorsInLastReadedFile() == res);
+)
+
+TEST_BODY(GetErrorsInLastReadedFile, DuplicateUniqueKeyValue,
+    std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
+    SAVE_FILE("A,B\r\n1,1\r\n1,1");
+
+
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<int>("B");
+
+    TEST_ASSERT(vlt.ReadFile(fileName));
+
+    std::vector<std::pair<std::size_t, std::string>> res = {{2, "B"}};
+    TEST_ASSERT(vlt.GetErrorsInLastReadedFile() == res);
+)
+
+TEST_BODY(GetErrorsInLastReadedFile, AllIncorrectRecordsWithoutKeys,
+    std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
+    SAVE_FILE("a,1\r\n2,b");
+
+
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<int>("B");
+
+    TEST_ASSERT(vlt.ReadFile(fileName, ',', false));
+
+    std::vector<std::pair<std::size_t, std::string>> res = {{1, "A"}, {2, "B"}};
+    TEST_ASSERT(vlt.GetErrorsInLastReadedFile() == res);
+)
+
+TEST_BODY(GetErrorsInLastReadedFile, NotAllIncorrectRecordsWithoutKeys,
+    std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
+    SAVE_FILE("1,1\r\na,2");
+
+
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<int>("B");
+
+    TEST_ASSERT(vlt.ReadFile(fileName, ',', false));
+
+    std::vector<std::pair<std::size_t, std::string>> res = {{2, "A"}};
+    TEST_ASSERT(vlt.GetErrorsInLastReadedFile() == res);
+)
+
+TEST_BODY(GetErrorsInLastReadedFile, DuplicateUniqueKeyValueWithoutKeys,
+    std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
+    SAVE_FILE("1,1\r\n1,1");
+
+
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<int>("B");
+
+    TEST_ASSERT(vlt.ReadFile(fileName, ',', false));
+
+    std::vector<std::pair<std::size_t, std::string>> res = {{2, "B"}};
+    TEST_ASSERT(vlt.GetErrorsInLastReadedFile() == res);
+)
+
+TEST_BODY(GetErrorsInLastReadedFile, AllIncorrectRecordsNotAllKeys,
+    std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
+    SAVE_FILE("a,1\r\n2,b");
+
+
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+    vlt.AddUniqueKey<int>("C");
+
+    TEST_ASSERT(vlt.ReadFile(fileName, ',', false, {"C", "A"}));
+
+    std::vector<std::pair<std::size_t, std::string>> res = {{1, "C"}, {2, "A"}};
+    TEST_ASSERT(vlt.GetErrorsInLastReadedFile() == res);
+)
+
+TEST_BODY(GetErrorsInLastReadedFile, NotAllIncorrectRecordsNotAllKeys,
+    std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
+    SAVE_FILE("1,1\r\na,2");
+
+
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+    vlt.AddUniqueKey<int>("C");
+
+    TEST_ASSERT(vlt.ReadFile(fileName, ',', false, {"C", "A"}));
+
+    std::vector<std::pair<std::size_t, std::string>> res = {{2, "C"}};
+    TEST_ASSERT(vlt.GetErrorsInLastReadedFile() == res);
+)
+
+TEST_BODY(GetErrorsInLastReadedFile, DuplicateUniqueKeyValueNotAllKeys,
+    std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
+    SAVE_FILE("1,1\r\n1,1");
+
+
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+    vlt.AddUniqueKey<int>("C");
+
+    TEST_ASSERT(vlt.ReadFile(fileName, ',', false, {"C", "A"}));
+
+    std::vector<std::pair<std::size_t, std::string>> res = {{2, "C"}};
+    TEST_ASSERT(vlt.GetErrorsInLastReadedFile() == res);
 )
 
 void VaultUnitTests()
@@ -4126,14 +4523,15 @@ void VaultUnitTests()
     RemoveKey::IncorrectRemoveFromEmptyVault();
     RemoveKey::IncorrectRemoveFromNonEmptyVault();
 
-    CreateKey::CorrectParamsWithoutUniqueKey();
-    CreateKey::CorrectParamsWithUniqueKey();
-    CreateKey::DuplicateParams();
-    CreateKey::WrongKeyWithoutUniqueKey();
-    CreateKey::WrongTypeWithoutUniqueKey();
-    CreateKey::WrongKeyWithUniqueKey();
-    CreateKey::WrongTypeWithUniqueKey();
-    CreateKey::DuplicateUniqueKeyValue();
+    CreateRecord::CorrectParamsWithoutUniqueKey();
+    CreateRecord::CorrectParamsWithUniqueKey();
+    CreateRecord::DuplicateParams();
+    CreateRecord::WrongKeyWithoutUniqueKey();
+    CreateRecord::WrongTypeWithoutUniqueKey();
+    CreateRecord::WrongKeyWithUniqueKey();
+    CreateRecord::WrongTypeWithUniqueKey();
+    CreateRecord::DuplicateUniqueKeyValue();
+    CreateRecord::EmptyUniqueKeyValue();
 
     GetRecord::CorrectGetRecord();
     GetRecord::WrongKey();
@@ -4266,4 +4664,27 @@ void VaultUnitTests()
     SaveToFile::ReverseNotAllKeys();
     SaveToFile::Separator();
     SaveToFile::NotSaveKeys();
+
+    ReadFile::CorrectCrLf();
+    ReadFile::CorrectLf();
+    ReadFile::LoadTypes();
+    ReadFile::SemicolonSeparator();
+    ReadFile::NotLoadKeys();
+    ReadFile::NotAllKeys();
+    ReadFile::HandleRecords();
+    ReadFile::NotExistedFile();
+    ReadFile::AllIncorrectRecords();
+    ReadFile::NotAllIncorrectRecords();
+    ReadFile::DuplicateUniqueKeyValue();
+
+    GetErrorsInLastReadedFile::Correct();
+    GetErrorsInLastReadedFile::AllIncorrectRecords();
+    GetErrorsInLastReadedFile::NotAllIncorrectRecords();
+    GetErrorsInLastReadedFile::DuplicateUniqueKeyValue();
+    GetErrorsInLastReadedFile::AllIncorrectRecordsWithoutKeys();
+    GetErrorsInLastReadedFile::NotAllIncorrectRecordsWithoutKeys();
+    GetErrorsInLastReadedFile::DuplicateUniqueKeyValueWithoutKeys();
+    GetErrorsInLastReadedFile::AllIncorrectRecordsNotAllKeys();
+    GetErrorsInLastReadedFile::NotAllIncorrectRecordsNotAllKeys();
+    GetErrorsInLastReadedFile::DuplicateUniqueKeyValueNotAllKeys();
 }

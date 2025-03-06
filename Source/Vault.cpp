@@ -37,21 +37,22 @@ namespace mvlt
         return dataIt;
     }
 
-    bool Vault::ReadFile(const std::string& fileName, const bool& isPreprocessRecord, const std::function<void (const std::vector<std::string>& keys, std::vector<std::string>& values)>& recordHandler, 
-            const char& separator, const bool& isLoadKeys, const std::vector<std::string>& userKeys) noexcept
+    bool Vault::ReadFile(const std::string& fileName, const bool& isPreprocessRecord,
+            const char& separator, const bool& isLoadKeys, const std::vector<std::string>& userKeys,
+            const std::function<void (const std::vector<std::string>& keys, std::vector<std::string>& values)>& recordHandler) noexcept
     {
         DBG_LOG_ENTER();
+
+        // Write lock because new records will be added
+        WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
+
+        InvalidFileRecords.clear();
 
         // Open and parse file
         CsvParser parser;
         if (!parser.OpenFile(fileName)) return false;
 
-        // Write lock because new records will be added
-        WriteLock<RecursiveReadWriteMutex> writeLock(RecursiveReadWriteMtx);
-
         std::vector<std::string> keys;
-
-        InvalidFileRecords.clear();
 
         std::size_t lineCounter = 0;
 
@@ -83,7 +84,7 @@ namespace mvlt
 
                         if (!isCorrectRecordInFile) 
                         {
-                            InvalidFileRecords.emplace_back(std::pair<std::size_t, std::string>(lineCounter - 1, keys[i]));
+                            InvalidFileRecords.emplace_back(std::pair<std::size_t, std::string>(lineCounter + 1, keys[i]));
                             break;
                         }
                     }
@@ -104,7 +105,7 @@ namespace mvlt
 
                         if (!isCorrectRecordInFile) 
                         {
-                            InvalidFileRecords.emplace_back(std::pair<std::size_t, std::string>(lineCounter - 1, *keyOrderIt));
+                            InvalidFileRecords.emplace_back(std::pair<std::size_t, std::string>(lineCounter, *keyOrderIt));
                             break;
                         }
 
@@ -124,7 +125,7 @@ namespace mvlt
 
                         if (!isCorrectRecordInFile) 
                         {
-                            InvalidFileRecords.emplace_back(std::pair<std::size_t, std::string>(lineCounter - 1, *keyOrderIt));
+                            InvalidFileRecords.emplace_back(std::pair<std::size_t, std::string>(lineCounter, *keyOrderIt));
                             break;
                         }
 
@@ -1035,14 +1036,14 @@ namespace mvlt
     {
         DBG_LOG_ENTER();
 
-        return ReadFile(fileName, false, [](const std::vector<std::string>&, std::vector<std::string>&) {}, separator, isLoadKeys, keys);
+        return ReadFile(fileName, false, separator, isLoadKeys, keys, [](const std::vector<std::string>&, std::vector<std::string>&) {});
     }
 
-    bool Vault::ReadFile(const std::string& fileName, const char& separator, const bool& isLoadKeys, const std::function<void (const std::vector<std::string>& keys, std::vector<std::string>& values)>& recordHandler) noexcept
+    bool Vault::ReadFile(const std::string& fileName, const char& separator, const std::function<void (const std::vector<std::string>& keys, std::vector<std::string>& values)>& recordHandler) noexcept
     {
         DBG_LOG_ENTER();
 
-        return ReadFile(fileName, true, recordHandler, separator, isLoadKeys, {});
+        return ReadFile(fileName, true, separator, true, {}, recordHandler);
     }
 
     std::vector<std::pair<std::size_t, std::string>> Vault::GetErrorsInLastReadedFile() const noexcept

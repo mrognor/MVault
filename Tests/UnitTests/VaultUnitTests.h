@@ -134,7 +134,7 @@ TEST_SUITE(RemoveKey,
     TEST_CASE(IncorrectRemoveFromNonEmptyVault)
 )
 
-TEST_SUITE(CreateKey,
+TEST_SUITE(CreateRecord,
 
     TEST_CASE(CorrectParamsWithoutUniqueKey)
 
@@ -151,6 +151,8 @@ TEST_SUITE(CreateKey,
     TEST_CASE(WrongTypeWithUniqueKey)
 
     TEST_CASE(DuplicateUniqueKeyValue)
+
+    TEST_CASE(EmptyUniqueKeyValue)
 )
 
 TEST_SUITE(GetRecord,
@@ -424,6 +426,52 @@ TEST_SUITE(SaveToFile,
     TEST_CASE(Separator)
 
     TEST_CASE(NotSaveKeys)
+)
+
+TEST_SUITE(ReadFile,
+    TEST_CASE(CorrectCrLf)
+
+    TEST_CASE(CorrectLf)
+
+    TEST_CASE(LoadTypes)
+
+    TEST_CASE(SemicolonSeparator)
+
+    TEST_CASE(NotLoadKeys)
+
+    TEST_CASE(NotAllKeys)
+
+    TEST_CASE(HandleRecords)
+
+    TEST_CASE(NotExistedFile)
+
+    TEST_CASE(AllIncorrectRecords)
+
+    TEST_CASE(NotAllIncorrectRecords)
+
+    TEST_CASE(DuplicateUniqueKeyValue)
+)
+
+TEST_SUITE(GetErrorsInLastReadedFile,
+    TEST_CASE(Correct)
+
+    TEST_CASE(AllIncorrectRecords)
+
+    TEST_CASE(NotAllIncorrectRecords)
+
+    TEST_CASE(DuplicateUniqueKeyValue)
+
+    TEST_CASE(AllIncorrectRecordsWithoutKeys)
+
+    TEST_CASE(NotAllIncorrectRecordsWithoutKeys)
+
+    TEST_CASE(DuplicateUniqueKeyValueWithoutKeys)
+
+    TEST_CASE(AllIncorrectRecordsNotAllKeys)
+
+    TEST_CASE(NotAllIncorrectRecordsNotAllKeys)
+
+    TEST_CASE(DuplicateUniqueKeyValueNotAllKeys)
 )
 
 void VaultUnitTests();

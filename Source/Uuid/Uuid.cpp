@@ -58,14 +58,14 @@ namespace mvlt
         if (prefix.empty())
             return "/tmp/" + Uuid();
         else
-            return prefix + "/tmp/" + Uuid();
+            return "/tmp/" + prefix + Uuid();
         
         #else
         
         if (prefix.empty())
             return "C:\\Windows\\Temp\\" + Uuid();
         else
-            return prefix + "C:\\Windows\\Temp\\" + Uuid();
+            return "C:\\Windows\\Temp\\" + prefix + Uuid();
 
         #endif
     }

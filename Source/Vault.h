@@ -216,8 +216,9 @@ namespace mvlt
 
             \return returns true if it was possible to read the file, otherwise it returns false
         */
-        bool ReadFile(const std::string& fileName, const bool& isPreprocessRecord, const std::function<void (const std::vector<std::string>& keys, std::vector<std::string>& values)>& recordHandler, 
-            const char& separator, const bool& isLoadKeys, const std::vector<std::string>& userKeys) noexcept;
+        bool ReadFile(const std::string& fileName, const bool& isPreprocessRecord, 
+            const char& separator, const bool& isLoadKeys, const std::vector<std::string>& userKeys,
+            const std::function<void (const std::vector<std::string>& keys, std::vector<std::string>& values)>& recordHandler) noexcept;
 
     public:
 
@@ -308,7 +309,7 @@ namespace mvlt
 
             The basic syntax of the method is as follows:
             \code{.cpp}
-                vlt.AddUniqueKey<int>("A", {[](std::size_t counter, const VaultRecordRef& vrf) -> int { return static_cast<int>(counter); }});
+                vlt.AddUniqueKey<int>("A", {[](std::size_t counter, const VaultRecordRef& vrr) -> int { return static_cast<int>(counter); }});
             \endcode
             Note that the lambda function is enclosed in {} and the return value is specified via ->
 
@@ -756,15 +757,13 @@ namespace mvlt
 
             \param [in] fileName the name of the file to read the data from
             \param [in] separator The symbol to be used as a data separator in the file
-            \param [in] isLoadKeys Are there any keys in the file
             \param [in] recordHandler a function for preprocessing the recording. Accepts two vectors with strings. 
             The first vector contains the keys in the order in which they are specified in the file. 
             If the file does not contain keys, then this vector will be empty. The second vector is a vector of values.
 
             \return returns true if it was possible to read the file, otherwise it returns false
         */
-        bool ReadFile(const std::string& fileName, const char& separator, const bool& isLoadKeys,
-            const std::function<void (const std::vector<std::string>& keys, std::vector<std::string>& values)>& recordHandler) noexcept;
+        bool ReadFile(const std::string& fileName, const char& separator, const std::function<void (const std::vector<std::string>& keys, std::vector<std::string>& values)>& recordHandler) noexcept;
 
         /**
             \brief A method for getting errors in the last read file

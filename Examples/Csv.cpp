@@ -21,7 +21,7 @@ int main()
     vlt.AddKey<std::string>("name", "");
     vlt.AddKey<std::string>("gender", "");
 
-    vlt.ReadFile("CsvResult.csv", ';', true, [](const std::vector<std::string>& keys, std::vector<std::string>& values) 
+    vlt.ReadFile("CsvResult.csv", ';', [=](const std::vector<std::string>& keys, std::vector<std::string>& values) -> void
     {
         if (values[2] == "true") values[2] = "Man";
         else if (values[2] == "false") values[2] = "Woman";

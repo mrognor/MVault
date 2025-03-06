@@ -15,3 +15,8 @@
         TEST_ASSERT(data == fileData); \
     } \
 }
+
+#define SAVE_FILE(...) \
+std::ofstream oFile(fileName); \
+oFile << __VA_ARGS__; \
+std::flush(oFile);
