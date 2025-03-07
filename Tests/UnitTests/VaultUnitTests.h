@@ -62,6 +62,10 @@ TEST_SUITE(AddKey,
     TEST_CASE(CorrectAddToNonEmpty)
 
     TEST_CASE(IncorrectAddToNonEmpty)
+
+    TEST_CASE(AddKeyWithDependentSets)
+
+    TEST_CASE(IncorrectAddKeyWithDependentSets)
 )
 
 TEST_SUITE(AddUniqueKey,
@@ -75,6 +79,12 @@ TEST_SUITE(AddUniqueKey,
     TEST_CASE(IncorrectAddKeyToNonEmptyVault);
 
     TEST_CASE(CorrectAddKeyToNonEmptyVaultWithDuplicate);
+
+    TEST_CASE(AddUniqueKeyWithDependentSets);
+
+    TEST_CASE(IncorrectAddKeyWithDependentSets);
+
+    TEST_CASE(CorrectAddKeyWithDependentSetsWithDuplicate);
 )
 
 TEST_SUITE(UpdateKey,

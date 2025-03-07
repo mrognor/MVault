@@ -195,12 +195,14 @@ TEST_BODY(AddKey, CorrectAddKey,
     bool res = false;
 
     res = vlt.AddKey("A", 0);
+
     TEST_ASSERT(res);
-    TEST_ASSERT(vlt.GetKeys().size() == 1);
+    TEST_ASSERT(vlt.GetKeys() == std::vector<std::string>({"A"}));
 
     res = vlt.AddKey<std::string>("B", "");
+
     TEST_ASSERT(res);
-    TEST_ASSERT(vlt.GetKeys().size() == 2);
+    TEST_ASSERT(vlt.GetKeys() == std::vector<std::string>({"A", "B"}));
 )
 
 TEST_BODY(AddKey, IncorrectAddKey,
@@ -209,7 +211,9 @@ TEST_BODY(AddKey, IncorrectAddKey,
 
     vlt.AddKey("A", 0);
     res = vlt.AddKey<std::string>("A", "");
+
     TEST_ASSERT(res == false);
+    TEST_ASSERT(vlt.GetKeys() == std::vector<std::string>({"A"}));
 )
 
 TEST_BODY(AddKey, CorrectAddToNonEmpty,
@@ -223,7 +227,7 @@ TEST_BODY(AddKey, CorrectAddToNonEmpty,
 
     vlt.AddKey<std::string>("B", "added");
 
-    TEST_ASSERT(vlt.GetKeys().size() == 2);
+    TEST_ASSERT(vlt.GetKeys() == std::vector<std::string>({"A", "B"}));
 
     COMPARE_VAULT(vlt, {
         {{"A", 1}, {"B",  std::string("added")}},
@@ -243,7 +247,63 @@ TEST_BODY(AddKey, IncorrectAddToNonEmpty,
     vlt.CreateRecord({{"A", 3}});
 
     res = vlt.AddKey<std::string>("A", "added");
+
     TEST_ASSERT(res == false);
+    TEST_ASSERT(vlt.GetKeys() == std::vector<std::string>({"A"}));
+)
+
+TEST_BODY(AddKey, AddKeyWithDependentSets,
+    Vault vlt;
+    VaultRecordSet vrs;
+    bool res = false;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+
+    vlt.CreateRecord({{"A", 1}});
+    vlt.CreateRecord({{"A", 2}});
+    vlt.CreateRecord({{"A", 3}});
+
+    vlt.RequestEqual("B", 0, vrs);
+
+    res = vlt.AddKey<std::string>("C", "added");
+
+    TEST_ASSERT(res == true);
+
+    TEST_ASSERT(vrs.GetKeys() == std::vector<std::string>({"A", "B", "C"}));
+
+    COMPARE_VAULT(vrs, {
+        {{"A", 1}, {"B", 0}, {"C", std::string("added")}},
+        {{"A", 2}, {"B", 0}, {"C", std::string("added")}},
+        {{"A", 3}, {"B", 0}, {"C", std::string("added")}},
+    });
+)
+
+TEST_BODY(AddKey, IncorrectAddKeyWithDependentSets,
+    Vault vlt;
+    VaultRecordSet vrs;
+    bool res = false;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+
+    vlt.CreateRecord({{"A", 1}});
+    vlt.CreateRecord({{"A", 2}});
+    vlt.CreateRecord({{"A", 3}});
+
+    vlt.RequestEqual("B", 0, vrs);
+
+    res = vlt.AddKey<std::string>("A", "added");
+
+    TEST_ASSERT(res == false);
+
+    TEST_ASSERT(vlt.GetKeys() == std::vector<std::string>({"A", "B"}));
+
+    COMPARE_VAULT(vrs, {
+        {{"A", 1}, {"B", 0}},
+        {{"A", 2}, {"B", 0}},
+        {{"A", 3}, {"B", 0}},
+    });
 )
 
 TEST_BODY(AddUniqueKey, CorrectAddKeyToEmptyVault,
@@ -353,6 +413,104 @@ TEST_BODY(AddUniqueKey, CorrectAddKeyToNonEmptyVaultWithDuplicate,
 
     COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "B", 
         RequestedType == typeid(int), ResultCode == VaultOperationResultCode::UniqueKeyValueAlredyInSet, SavedType == typeid(void));
+)
+
+TEST_BODY(AddUniqueKey, AddUniqueKeyWithDependentSets,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+
+    vlt.CreateRecord({{"A", 1}});
+    vlt.CreateRecord({{"A", 2}});
+    vlt.CreateRecord({{"A", 3}});
+
+    vlt.RequestEqual("B", 0, vrs);
+
+    vor = vlt.AddUniqueKey<std::string>("C", [](const std::size_t& counter, const VaultRecordRef& ref) -> std::string
+    {
+        int a = 0;
+        ref.GetData("A", a);
+        return std::to_string(a);
+    });
+
+    TEST_ASSERT(vlt.GetKeys() == std::vector<std::string>({"A", "B", "C"}));
+
+    COMPARE_VAULT(vrs, {
+        {{"A", 1}, {"B", 0}, {"C", std::string("1")}},
+        {{"A", 2}, {"B", 0}, {"C", std::string("2")}},
+        {{"A", 3}, {"B", 0}, {"C", std::string("3")}},
+    });
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "C", 
+        RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(void));
+)
+
+TEST_BODY(AddUniqueKey, IncorrectAddKeyWithDependentSets,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+
+    vlt.CreateRecord({{"A", 1}});
+    vlt.CreateRecord({{"A", 2}});
+    vlt.CreateRecord({{"A", 3}});
+
+    vlt.RequestEqual("B", 0, vrs);
+
+    vor = vlt.AddUniqueKey<std::string>("A", [](const std::size_t& counter, const VaultRecordRef& ref) -> std::string
+    {
+        int a = 0;
+        ref.GetData("A", a);
+        return std::to_string(a);
+    });
+
+    TEST_ASSERT(vlt.GetKeys() == std::vector<std::string>({"A", "B"}));
+
+    COMPARE_VAULT(vrs, {
+        {{"A", 1}, {"B", 0}},
+        {{"A", 2}, {"B", 0}},
+        {{"A", 3}, {"B", 0}},
+    });
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::DuplicateKey, SavedType == typeid(int));
+)
+
+TEST_BODY(AddUniqueKey, CorrectAddKeyWithDependentSetsWithDuplicate,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+
+    vlt.CreateRecord({{"A", 1}});
+    vlt.CreateRecord({{"A", 2}});
+    vlt.CreateRecord({{"A", 3}});
+
+    vlt.RequestEqual("B", 0, vrs);
+
+    vor = vlt.AddUniqueKey<std::string>("C", [](const std::size_t& counter, const VaultRecordRef& ref) -> std::string
+    {
+        if (counter > 0) return std::to_string(1);
+        else return std::to_string(counter);
+    });
+
+    TEST_ASSERT(vlt.GetKeys() == std::vector<std::string>({"A", "B"}));
+
+    COMPARE_VAULT(vrs, {
+        {{"A", 1}, {"B", 0}},
+        {{"A", 2}, {"B", 0}},
+        {{"A", 3}, {"B", 0}},
+    });
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "C", 
+        RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::UniqueKeyValueAlredyInSet, SavedType == typeid(void));
 )
 
 TEST_BODY(UpdateKey, CorrectUpdateNonUniqueKey,
@@ -4491,12 +4649,17 @@ void VaultUnitTests()
     AddKey::IncorrectAddKey();
     AddKey::CorrectAddToNonEmpty();
     AddKey::IncorrectAddToNonEmpty();
+    AddKey::AddKeyWithDependentSets();
+    AddKey::IncorrectAddKeyWithDependentSets();
 
     AddUniqueKey::CorrectAddKeyToEmptyVault();
     AddUniqueKey::IncorrectAddKeyToEmptyVault();
     AddUniqueKey::CorrectAddKeyToNonEmptyVault();
     AddUniqueKey::IncorrectAddKeyToNonEmptyVault();
     AddUniqueKey::CorrectAddKeyToNonEmptyVaultWithDuplicate();
+    AddUniqueKey::AddUniqueKeyWithDependentSets();
+    AddUniqueKey::IncorrectAddKeyWithDependentSets();
+    AddUniqueKey::CorrectAddKeyWithDependentSetsWithDuplicate();
 
     UpdateKey::CorrectUpdateNonUniqueKey();
     UpdateKey::WrongKeyUpdate();
