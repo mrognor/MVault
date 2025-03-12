@@ -812,8 +812,7 @@ namespace mvlt
 
             case VaultDerivedClasses::VaultRecordSetDerived:
                 std::cout << "VaultRecordSet does not contain keys!" << "\n";
-                break;
-            
+
             default:
                 break;
             }

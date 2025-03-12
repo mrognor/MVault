@@ -403,6 +403,13 @@ namespace mvlt
         std::vector<std::string> GetKeys() const noexcept;
 
         /**
+            \brief The method for getting the unique keys
+
+            \return vector with keys
+        */
+        std::vector<std::string> GetUniqueKeys() const noexcept;
+
+        /**
             \brief Method for getting sorted records
 
             \param [in] key The key by which the data should be sorted

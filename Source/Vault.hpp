@@ -225,7 +225,7 @@ namespace mvlt
                 else startIt = TtoVaultRecordMap->UpperBound(beginKeyValue);
                 if(isIncludeEndKeyValue) endIt = TtoVaultRecordMap->UpperBound(endKeyValue);
                 else endIt = TtoVaultRecordMap->LowerBound(endKeyValue);
-                break;
+                // Dont forget to put break here if you adding logic to next cases
 
             case VaultRequestType::Equal:
             case VaultRequestType::Or:

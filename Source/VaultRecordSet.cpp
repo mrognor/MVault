@@ -312,6 +312,18 @@ namespace mvlt
         return res;
     }
 
+    std::vector<std::string> VaultRecordSet::GetUniqueKeys() const noexcept
+    {
+        DBG_LOG_ENTER();
+
+        std::vector<std::string> res;
+
+        if (GetIsParentVaultValid())
+            res = ParentVault->GetUniqueKeys();
+
+        return res;
+    }
+
     std::vector<VaultRecordRef> VaultRecordSet::GetSortedRecords(const std::string& key, const bool& isReverse, const std::size_t& amountOfRecords) const noexcept
     {
         DBG_LOG_ENTER();

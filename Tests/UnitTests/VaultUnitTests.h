@@ -14,6 +14,14 @@
 
 using namespace mvlt;
 
+TEST_SUITE(SetDataToRecord,
+    TEST_CASE(IncorrectDataRecord)
+
+    TEST_CASE(NotExistedKey)
+
+    TEST_CASE(IncorrectType)
+)
+
 TEST_SUITE(DefaultConstructor,
 
     TEST_CASE(Default)
@@ -138,6 +146,8 @@ TEST_SUITE(RemoveKey,
     TEST_CASE(CorrectRemoveFromEmptyVault)
 
     TEST_CASE(CorrectRemoveFromNonEmptyVault)
+
+    TEST_CASE(CorrectRemoveWithDependentSets)
 
     TEST_CASE(IncorrectRemoveFromEmptyVault)
 
@@ -326,6 +336,8 @@ TEST_SUITE(DropVault,
     TEST_CASE(DropEmpty)
 
     TEST_CASE(DropSecond)
+
+    TEST_CASE(DropWithDependent)
 )
 
 TEST_SUITE(DropData,
@@ -334,6 +346,8 @@ TEST_SUITE(DropData,
     TEST_CASE(DropEmpty)
 
     TEST_CASE(DropSecond)
+
+    TEST_CASE(DropWithDependent)
 )
 
 TEST_SUITE(EraseRecord,
@@ -398,6 +412,8 @@ TEST_SUITE(ToJson,
     TEST_CASE(ArrayFormat)
 
     TEST_CASE(ArrayDiffTabSize)
+
+    TEST_CASE(RecordId)
 )
 
 TEST_SUITE(ToStrings, 
@@ -422,6 +438,10 @@ TEST_SUITE(Print,
     TEST_CASE(Reverse)
 
     TEST_CASE(NotAllKeys)
+
+    TEST_CASE(PrintSet)
+
+    TEST_CASE(PrintId)
 )
 
 TEST_SUITE(SaveToFile,
@@ -436,6 +456,8 @@ TEST_SUITE(SaveToFile,
     TEST_CASE(Separator)
 
     TEST_CASE(NotSaveKeys)
+
+    TEST_CASE(FailedToOpenFile)
 )
 
 TEST_SUITE(ReadFile,

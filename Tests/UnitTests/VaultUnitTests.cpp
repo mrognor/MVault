@@ -1,5 +1,51 @@
 #include "VaultUnitTests.h"
 
+class VaultSetDataToRecordTest : public Vault
+{
+public:
+    template <class T>
+    VaultOperationResult SetDataToRecord(VaultRecord* dataRecord, const std::string& key, const T& data) noexcept
+    {
+        return Vault::SetDataToRecord(dataRecord, key, data);
+    }
+};
+
+TEST_BODY(SetDataToRecord, IncorrectDataRecord,
+    VaultSetDataToRecordTest vlt;
+    VaultOperationResult vor;
+
+    VaultRecord* recordPtr = nullptr;
+    vor = vlt.SetDataToRecord(recordPtr, "A", 0);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::DataRecordNotValid, SavedType == typeid(void));
+)
+
+TEST_BODY(SetDataToRecord, NotExistedKey,
+    VaultSetDataToRecordTest vlt;
+    VaultOperationResult vor;
+    VaultRecord record;
+
+    vor = vlt.SetDataToRecord(&record, "A", 0);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongKey, SavedType == typeid(void));
+)
+
+TEST_BODY(SetDataToRecord, IncorrectType,
+    VaultSetDataToRecordTest vlt;
+    VaultOperationResult vor;
+    VaultRecord record;
+
+    vlt.AddKey("A", 0);
+
+    vor = vlt.SetDataToRecord(&record, "A", std::string(""));
+
+    vor.Print();
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::WrongType, SavedType == typeid(int));
+)
+
 TEST_BODY(DefaultConstructor, Default,
     Vault vlt;
 
@@ -733,6 +779,31 @@ TEST_BODY(RemoveKey, CorrectRemoveFromNonEmptyVault,
     })
 )
 
+TEST_BODY(RemoveKey, CorrectRemoveWithDependentSets,
+    Vault vlt;
+    VaultRecordSet vrs;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+    vlt.AddUniqueKey<std::string>("C");
+
+    vlt.CreateRecord({{"A", 0}, {"B", 3}, {"C", std::string("a")}});
+    vlt.CreateRecord({{"A", 0}, {"B", 2}, {"C", std::string("b")}});
+    vlt.CreateRecord({{"A", 0}, {"B", 1}, {"C", std::string("c")}});
+
+    vlt.RequestEqual("A", 0, vrs);
+
+    TEST_ASSERT(vlt.RemoveKey("B"));
+    TEST_ASSERT(vlt.RemoveKey("C"));
+
+    TEST_ASSERT(vrs.GetKeys().size() == 1);
+    COMPARE_VAULT(vrs, {
+        {{"A", 0}},
+        {{"A", 0}},
+        {{"A", 0}},
+    })
+)
+
 TEST_BODY(RemoveKey, IncorrectRemoveFromEmptyVault,
     Vault vlt;
 
@@ -938,13 +1009,14 @@ TEST_BODY(CreateRecord, DuplicateUniqueKeyValue,
 
     vlt.AddKey("A", 0);
     vlt.AddUniqueKey<std::string>("B");
+    vlt.AddUniqueKey<int>("C");
 
-    vlt.CreateRecord({{"A", 1}, {"B", std::string("none")}});
+    vlt.CreateRecord({{"A", 1}, {"B", std::string("none")}, {"C", 0}});
 
 
     vor = vlt.CreateRecord({{"B", std::string("none")}});
 
-    COMPARE_VAULT(vlt, {{{"A", 1}, {"B", std::string("none")}}});
+    COMPARE_VAULT(vlt, {{{"A", 1}, {"B", std::string("none")}, {"C", 0}}});
 
     COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "B", 
         RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::UniqueKeyValueAlredyInSet, SavedType == typeid(void));
@@ -952,10 +1024,18 @@ TEST_BODY(CreateRecord, DuplicateUniqueKeyValue,
 
     vor = vlt.CreateRecord({{"A", 2}, {"B", std::string("none")}});
 
-    COMPARE_VAULT(vlt, {{{"A", 1}, {"B", std::string("none")}}});
+    COMPARE_VAULT(vlt, {{{"A", 1}, {"B", std::string("none")}, {"C", 0}}});
 
     COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "B", 
         RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::UniqueKeyValueAlredyInSet, SavedType == typeid(void));
+
+
+    vor = vlt.CreateRecord({{"A", 2}, {"B", std::string("none2")}, {"C", 0}});
+
+    COMPARE_VAULT(vlt, {{{"A", 1}, {"B", std::string("none")}, {"C", 0}}});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "C", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::UniqueKeyValueAlredyInSet, SavedType == typeid(void));
 )
 
 TEST_BODY(CreateRecord, EmptyUniqueKeyValue,
@@ -3371,6 +3451,27 @@ TEST_BODY(DropVault, DropSecond,
     COMPARE_VAULT(vlt, {});
 )
 
+TEST_BODY(DropVault, DropWithDependent,
+    Vault vlt;
+    VaultRecordSet vrs;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<int>("B");
+
+    for (int i = 0; i < 1000; ++i) vlt.CreateRecord({{"A", 0}, {"B", i}});
+
+    vlt.RequestEqual("A", 0, vrs);
+    TEST_ASSERT(vrs.Size() == 1000);
+
+    vlt.DropVault();
+
+    TEST_ASSERT(vrs.Size() == 0);
+    TEST_ASSERT(vrs.GetKeys() == std::vector<std::string>());
+    TEST_ASSERT(vrs.GetUniqueKeys() == std::vector<std::string>());
+
+    COMPARE_VAULT(vrs, {});
+)
+
 TEST_BODY(DropData, Drop,
     Vault vlt;
 
@@ -3418,9 +3519,31 @@ TEST_BODY(DropData, DropSecond,
     COMPARE_VAULT(vlt, {});
 )
 
+TEST_BODY(DropData, DropWithDependent,
+    Vault vlt;
+    VaultRecordSet vrs;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<int>("B");
+
+    for (int i = 0; i < 1000; ++i) vlt.CreateRecord({{"A", 0}, {"B", i}});
+
+    vlt.RequestEqual("A", 0, vrs);
+    TEST_ASSERT(vrs.Size() == 1000);
+
+    vlt.DropData();
+
+    TEST_ASSERT(vrs.Size() == 0);
+    TEST_ASSERT(vrs.GetKeys() == std::vector<std::string>({"A", "B"}));
+    TEST_ASSERT(vrs.GetUniqueKeys() == std::vector<std::string>({"B"}));
+
+    COMPARE_VAULT(vrs, {});
+)
+
 TEST_BODY(EraseRecord, CorrectEraseByRef,
     Vault vlt;
     VaultRecordRef vrr;
+    VaultOperationResult vor;
     bool res = false;
 
     vlt.AddKey("A", 0);
@@ -3441,7 +3564,14 @@ TEST_BODY(EraseRecord, CorrectEraseByRef,
     for (int i = 0; i < 1000; ++i) 
     {
         vlt.GetRecord("A", i, vrr);
-        vlt.EraseRecord(vrr);
+        res = vlt.EraseRecord(vrr);
+
+        TEST_ASSERT(res == true);
+        TEST_ASSERT(vrr.IsValid() == false);
+
+        vor = vlt.GetRecord("A", i, vrr);
+        COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+            RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongValue, SavedType == typeid(int));
     }
 
     TEST_ASSERT(vlt.Size() == 0);
@@ -3991,6 +4121,20 @@ TEST_BODY(ToJson, ArrayDiffTabSize,
 ])");
 )
 
+TEST_BODY(ToJson, RecordId,
+    Vault vlt;
+
+    vlt.AddUniqueKey<std::size_t>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    vlt.CreateRecord({ {"A", std::size_t(1)}, {"B", std::string("a")} });
+    vlt.CreateRecord({ {"A", std::size_t(2)}, {"B", std::string("b")} });
+    vlt.CreateRecord({ {"A", std::size_t(3)}, {"B", std::string("c")} });
+
+    std::string res;
+    res = vlt.ToJson(true, 1, false);
+)
+
 TEST_BODY(ToStrings, EmptyVault,
     Vault vlt;
 
@@ -4148,6 +4292,35 @@ $~~~~~~~$~~~$
 ){{{");
 )
 
+TEST_BODY(Print, PrintSet,
+    Vault vlt;
+    VaultRecordSet vrs;
+
+    vlt.AddKey("A", 0);
+    
+    vlt.CreateRecord({});
+
+    vlt.RequestEqual("A", 0, vrs);
+
+    vlt.EraseRecord("A", 0);
+    vlt.RemoveKey("A");
+
+    TEST_COUT(vrs.Print(), "VaultRecordSet does not contain keys!\n (0 records)\n");
+)
+
+TEST_BODY(Print, PrintId,
+    Vault vlt;
+
+    vlt.AddUniqueKey<int>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    vlt.CreateRecord({ {"A", 1}, {"B", std::string("a")} });
+    vlt.CreateRecord({ {"A", 2}, {"B", std::string("b")} });
+    vlt.CreateRecord({ {"A", 3}, {"B", std::string("c")} });
+
+    SUPPRESS_COUT(vlt.Print(true));
+)
+
 TEST_BODY(SaveToFile, Empty,
     Vault vlt;
     std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
@@ -4249,6 +4422,18 @@ TEST_BODY(SaveToFile, NotSaveKeys,
     TEST_ASSERT(res == true);
 
     COMPARE_FILE(fileName, true, "0,1,2\r\n");
+)
+
+TEST_BODY(SaveToFile, FailedToOpenFile,
+    Vault vlt;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+    vlt.AddUniqueKey<int>("C");
+
+    vlt.CreateRecord({{"A", 0}, {"B", 1}, {"C", 2}});
+
+    TEST_ASSERT(vlt.SaveToFile("") == false);
 )
 
 TEST_BODY(ReadFile, CorrectCrLf,
@@ -4446,19 +4631,20 @@ TEST_BODY(ReadFile, NotAllIncorrectRecords,
 
 TEST_BODY(ReadFile, DuplicateUniqueKeyValue,
     std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
-    SAVE_FILE("A,B\r\n1,1\r\n1,1");
+    SAVE_FILE("A,B,C\r\n1,1,1\r\n2,2,1");
 
 
     Vault vlt;
 
     vlt.AddKey("A", 0);
     vlt.AddUniqueKey<int>("B");
+    vlt.AddUniqueKey<int>("C");
 
-    vlt.CreateRecord({{"A", 0}, {"B", 0}});
+    vlt.CreateRecord({{"A", 0}, {"B", 0}, {"C", 0}});
 
     TEST_ASSERT(vlt.ReadFile(fileName));
 
-    COMPARE_VAULT(vlt, {{{"A", 0}, {"B", 0}}, {{"A", 1}, {"B", 1}}});
+    COMPARE_VAULT(vlt, {{{"A", 0}, {"B", 0}, {"C", 0}}, {{"A", 1}, {"B", 1}, {"C", 1}}});
 )
 
 TEST_BODY(GetErrorsInLastReadedFile, Correct,
@@ -4629,6 +4815,10 @@ void VaultUnitTests()
     DBG_LOG_ENTER();
     SetBackTraceFormat(BackTraceFormat::None);
 
+    SetDataToRecord::IncorrectDataRecord();
+    SetDataToRecord::NotExistedKey();
+    SetDataToRecord::IncorrectType();
+
     DefaultConstructor::Default();
 
     CopyConstructor::CopyEmptyVault();
@@ -4683,6 +4873,7 @@ void VaultUnitTests()
 
     RemoveKey::CorrectRemoveFromEmptyVault();
     RemoveKey::CorrectRemoveFromNonEmptyVault();
+    RemoveKey::CorrectRemoveWithDependentSets();
     RemoveKey::IncorrectRemoveFromEmptyVault();
     RemoveKey::IncorrectRemoveFromNonEmptyVault();
 
@@ -4772,10 +4963,12 @@ void VaultUnitTests()
     DropVault::Drop();
     DropVault::DropEmpty();
     DropVault::DropSecond();
+    DropVault::DropWithDependent();
 
     DropData::Drop();
     DropData::DropEmpty();
     DropData::DropSecond();
+    DropData::DropWithDependent();
 
     EraseRecord::CorrectEraseByRef();
     EraseRecord::IncorrectEraseByRef();
@@ -4808,6 +5001,7 @@ void VaultUnitTests()
     ToJson::Array();
     ToJson::ArrayFormat();
     ToJson::ArrayDiffTabSize();
+    ToJson::RecordId();
 
     ToStrings::EmptyVault();
     ToStrings::KeysWithoutRecords();
@@ -4820,6 +5014,8 @@ void VaultUnitTests()
     Print::PrimaryKey();
     Print::Reverse();
     Print::NotAllKeys();
+    Print::PrintSet();
+    Print::PrintId();
 
     SaveToFile::Empty();
     SaveToFile::KeysWithoutRecords();
@@ -4827,6 +5023,7 @@ void VaultUnitTests()
     SaveToFile::ReverseNotAllKeys();
     SaveToFile::Separator();
     SaveToFile::NotSaveKeys();
+    SaveToFile::FailedToOpenFile();
 
     ReadFile::CorrectCrLf();
     ReadFile::CorrectLf();
