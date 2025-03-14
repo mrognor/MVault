@@ -41,9 +41,16 @@ int main(int argc, char** argv)
         }
     }
 
-    if ((requiredTests & ~VaultUnitTestsKey) == 0) VaultUnitTests();
-    if ((requiredTests & ~VaultRecordSetUnitTestsKey) == 0) VaultRecordSetUnitTests();
-
+    if ((requiredTests & ~VaultUnitTestsKey) == 0) 
+    {
+        std::cout << "============================Vault===========================" << std::endl;
+        VaultUnitTests();
+    }
+    if ((requiredTests & ~VaultRecordSetUnitTestsKey) == 0) 
+    {
+        std::cout << "========================VaultRecordSet======================" << std::endl;
+        VaultRecordSetUnitTests();
+    }
 
     ColorizedPrint("============================================================");
     ColorizedPrint("Total tests: " + std::to_string(TestLog::TestCounter) + ". ", ConsoleTextColor::Default, "");

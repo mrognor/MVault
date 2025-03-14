@@ -1,5 +1,7 @@
 #include "VaultUnitTests.h"
 
+using namespace VaultTestNs;
+
 class VaultSetDataToRecordTest : public Vault
 {
 public:
