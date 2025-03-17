@@ -29,6 +29,37 @@ namespace VaultRecordSetTestNs
 
         TEST_CASE(CopyFilledSet)
     )
+
+    TEST_SUITE(AssignmentOperator,
+
+        TEST_CASE(AssignWithoutParents)
+
+        TEST_CASE(AssignWithParentsToWithoutParent)
+
+        TEST_CASE(AssignEmpty)
+
+        TEST_CASE(AssignFilledSet)
+    )
+
+    TEST_SUITE(MoveConstructor,
+    
+        TEST_CASE(MoveWithoutParents)
+
+        TEST_CASE(MoveEmpty)
+
+        TEST_CASE(MoveFilled)
+    )
+
+    TEST_SUITE(MoveAssignmentOperator,
+
+        TEST_CASE(AssignWithoutParents)
+
+        TEST_CASE(AssignWithParentsToWithoutParent)
+
+        TEST_CASE(AssignEmpty)
+
+        TEST_CASE(AssignFilledSet)
+    )
 }
 
 void VaultRecordSetUnitTests();
