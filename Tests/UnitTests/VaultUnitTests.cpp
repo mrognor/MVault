@@ -43,7 +43,6 @@ TEST_BODY(SetDataToRecord, IncorrectType,
 
     vor = vlt.SetDataToRecord(&record, "A", std::string(""));
 
-    vor.Print();
     COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
         RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::WrongType, SavedType == typeid(int));
 )
@@ -4812,6 +4811,23 @@ TEST_BODY(GetErrorsInLastReadedFile, DuplicateUniqueKeyValueNotAllKeys,
     TEST_ASSERT(vlt.GetErrorsInLastReadedFile() == res);
 )
 
+TEST_BODY(Destructor, Default,
+    Vault* vlt = new Vault;
+    VaultRecordSet vrs;
+    VaultRecordRef vrf;
+
+    vlt->AddKey("A", 0);
+    vlt->CreateRecord({{"A", 1}});
+
+    vlt->GetRecord("A", 1, vrf);
+    vlt->RequestEqual("A", 1, vrs);
+
+    delete vlt;
+
+    TEST_ASSERT(vrf.IsValid() == false);
+    TEST_ASSERT(vrs.GetIsParentVaultValid() == false);
+)
+
 void VaultUnitTests()
 {
     DBG_LOG_ENTER();
@@ -5049,4 +5065,6 @@ void VaultUnitTests()
     GetErrorsInLastReadedFile::AllIncorrectRecordsNotAllKeys();
     GetErrorsInLastReadedFile::NotAllIncorrectRecordsNotAllKeys();
     GetErrorsInLastReadedFile::DuplicateUniqueKeyValueNotAllKeys();
+
+    Destructor::Default();
 }

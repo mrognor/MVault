@@ -41,24 +41,50 @@ int main(int argc, char** argv)
         }
     }
 
+    auto beg = std::chrono::high_resolution_clock::now();
+
     if ((requiredTests & ~VaultUnitTestsKey) == 0) 
     {
-        std::cout << "============================Vault===========================" << std::endl;
+        ColorizedPrint("[----------]", ConsoleTextColor::Green, "");
+        ColorizedPrint(" Tests for Vault");
         VaultUnitTests();
+        std::cout << std::endl;
     }
     if ((requiredTests & ~VaultRecordSetUnitTestsKey) == 0) 
     {
-        std::cout << "========================VaultRecordSet======================" << std::endl;
+        ColorizedPrint("[----------]", ConsoleTextColor::Green, "");
+        ColorizedPrint(" Tests for VaultRecordSet");
         VaultRecordSetUnitTests();
+        std::cout << std::endl;
     }
 
-    ColorizedPrint("============================================================");
-    ColorizedPrint("Total tests: " + std::to_string(TestLog::TestCounter) + ". ", ConsoleTextColor::Default, "");
-    ColorizedPrint("Passed: " + std::to_string(TestLog::TestCounter - TestLog::ErrorCounter) + ". ", ConsoleTextColor::Green, "");
-    ColorizedPrint("Failed: " + std::to_string(TestLog::ErrorCounter) + ". ", ConsoleTextColor::Red);
-    ColorizedPrint("============================================================");
+    auto end = std::chrono::high_resolution_clock::now();
+
+    ColorizedPrint("[==========]", ConsoleTextColor::Green, "");
+    ColorizedPrint(" " + std::to_string(TestCounter) + " tests from 2 files ran. (" + 
+        std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(end - beg).count()) +
+        " ms total)");
+    ColorizedPrint("[  PASSED  ]" , ConsoleTextColor::Green, "");
+    ColorizedPrint(" " + std::to_string(TestCounter - ErrorCounter) + " tests.", ConsoleTextColor::Default);
+
+    if (!FailedTests.empty())
+    {
+        ColorizedPrint("[  FAILED  ]" , ConsoleTextColor::Red, "");
+
+        if (FailedTests.size() == 1)
+            ColorizedPrint(" " + std::to_string(ErrorCounter) + " test, listed below:", ConsoleTextColor::Default);
+        else
+            ColorizedPrint(" " + std::to_string(ErrorCounter) + " tests, listed below:", ConsoleTextColor::Default);
+
+        for (const std::string& testName : FailedTests)
+        {
+            ColorizedPrint("[  FAILED  ]" , ConsoleTextColor::Red, "");
+            ColorizedPrint(" " + testName, ConsoleTextColor::Default);
+        }
+    }
 
     std::ofstream reportFile("report.md");
-    reportFile << "Tests: " << std::to_string(TestLog::TestCounter) << "\nPassed: " << std::to_string(TestLog::TestCounter - TestLog::ErrorCounter) 
-        << "\nFailed: " << std::to_string(TestLog::ErrorCounter);
+    reportFile << "Tests: " << TestCounter << "\nPassed: " << (TestCounter - ErrorCounter) 
+        << "\nFailed: " << ErrorCounter << "\n" 
+        << std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(end - beg).count()) << " ms" << std::endl;
 }

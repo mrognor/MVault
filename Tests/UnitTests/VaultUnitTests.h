@@ -333,6 +333,7 @@ namespace VaultTestNs
     )
 
     TEST_SUITE(DropVault,
+
         TEST_CASE(Drop)
 
         TEST_CASE(DropEmpty)
@@ -343,6 +344,7 @@ namespace VaultTestNs
     )
 
     TEST_SUITE(DropData,
+
         TEST_CASE(Drop)
 
         TEST_CASE(DropEmpty)
@@ -353,6 +355,7 @@ namespace VaultTestNs
     )
 
     TEST_SUITE(EraseRecord,
+
         TEST_CASE(CorrectEraseByRef)
 
         TEST_CASE(IncorrectEraseByRef)
@@ -367,6 +370,7 @@ namespace VaultTestNs
     )
 
     TEST_SUITE(EraseRecords,
+
         TEST_CASE(Erase)
 
         TEST_CASE(WrongKeyErase)
@@ -377,10 +381,12 @@ namespace VaultTestNs
     )
 
     TEST_SUITE(Size,
+
         TEST_CASE(Default)
     )
 
     TEST_SUITE(GetSortedRecords,
+
         TEST_CASE(GetRecords)
 
         TEST_CASE(GetRecordsReverse)
@@ -391,6 +397,7 @@ namespace VaultTestNs
     )
 
     TEST_SUITE(SortBy,
+
         TEST_CASE(Sort)
 
         TEST_CASE(SortReverse)
@@ -401,6 +408,7 @@ namespace VaultTestNs
     )
 
     TEST_SUITE(ToJson,
+
         TEST_CASE(Default)
 
         TEST_CASE(Format)
@@ -418,7 +426,8 @@ namespace VaultTestNs
         TEST_CASE(RecordId)
     )
 
-    TEST_SUITE(ToStrings, 
+    TEST_SUITE(ToStrings,
+
         TEST_CASE(EmptyVault)
 
         TEST_CASE(KeysWithoutRecords)
@@ -427,6 +436,7 @@ namespace VaultTestNs
     )
 
     TEST_SUITE(Print,
+
         TEST_CASE(Empty)
 
         TEST_CASE(KeysWithoutRecords)
@@ -447,6 +457,7 @@ namespace VaultTestNs
     )
 
     TEST_SUITE(SaveToFile,
+
         TEST_CASE(Empty)
 
         TEST_CASE(KeysWithoutRecords)
@@ -463,6 +474,7 @@ namespace VaultTestNs
     )
 
     TEST_SUITE(ReadFile,
+
         TEST_CASE(CorrectCrLf)
 
         TEST_CASE(CorrectLf)
@@ -487,6 +499,7 @@ namespace VaultTestNs
     )
 
     TEST_SUITE(GetErrorsInLastReadedFile,
+
         TEST_CASE(Correct)
 
         TEST_CASE(AllIncorrectRecords)
@@ -506,6 +519,11 @@ namespace VaultTestNs
         TEST_CASE(NotAllIncorrectRecordsNotAllKeys)
 
         TEST_CASE(DuplicateUniqueKeyValueNotAllKeys)
+    )
+
+    TEST_SUITE(Destructor,
+
+        TEST_CASE(Default)
     )
 }
 

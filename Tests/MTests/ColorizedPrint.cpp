@@ -1,7 +1,7 @@
 #include "ColorizedPrint.h"
 #include <string>
 
-void ColorizedPrint(const std::string text, const ConsoleTextColor& color, const std::string& end)
+void ColorizedPrint(const std::string& text, const ConsoleTextColor& color, const std::string& end)
 {
     if (color != ConsoleTextColor::Default)
     {
