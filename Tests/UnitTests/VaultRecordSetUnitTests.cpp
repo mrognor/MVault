@@ -307,6 +307,66 @@ TEST_BODY(MoveAssignmentOperator, AssignFilledSet,
     COMPARE_VAULT(vrs1, {});
 )
 
+TEST_BODY(GetIsParentVaultValid, Invalid,
+    VaultRecordSet vrs;
+
+    TEST_ASSERT(vrs.GetIsParentVaultValid() == false);
+)
+
+TEST_BODY(GetIsParentVaultValid, Valid,
+    Vault vlt;
+    GENERATE_SET(vrs);
+
+    TEST_ASSERT(vrs.GetIsParentVaultValid() == true);
+)
+
+TEST_BODY(GetIsParentVaultValid, Invalidate,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    vlt.DropVault();
+
+    TEST_ASSERT(vrs.GetIsParentVaultValid() == false);
+)
+
+TEST_BODY(GetParentVaultUniqueId, Invalid,
+    VaultRecordSet vrs;
+
+    TEST_ASSERT(vrs.GetParentVaultUniqueId() == "null");
+)
+
+TEST_BODY(GetParentVaultUniqueId, Valid,
+    Vault vlt;
+    GENERATE_SET(vrs);
+
+    TEST_ASSERT(vrs.GetParentVaultUniqueId() != "null");
+)
+
+TEST_BODY(GetParentVaultUniqueId, Invalidate,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    vlt.DropVault();
+
+    TEST_ASSERT(vrs.GetParentVaultUniqueId() == "null");
+)
+
+TEST_BODY(IsKeyExist, ExistingKey,
+    Vault vlt;
+    GENERATE_SET(vrs);
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<std::string>("B");
+
+    TEST_ASSERT(vrs.IsKeyExist("A") == true);
+    TEST_ASSERT(vrs.IsKeyExist("B") == true);
+)
+
+TEST_BODY(IsKeyExist, NonExistingKey,
+    Vault vlt;
+    GENERATE_SET(vrs);
+
+    TEST_ASSERT(vrs.IsKeyExist("A") == false);
+)
+
 void VaultRecordSetUnitTests()
 {
     DefaultConstructor::Default();
@@ -328,4 +388,15 @@ void VaultRecordSetUnitTests()
     MoveAssignmentOperator::AssignWithParentsToWithoutParent();
     MoveAssignmentOperator::AssignEmpty();
     MoveAssignmentOperator::AssignFilledSet();
+
+    GetIsParentVaultValid::Invalid();
+    GetIsParentVaultValid::Valid();
+    GetIsParentVaultValid::Invalidate();
+
+    GetParentVaultUniqueId::Invalid();
+    GetParentVaultUniqueId::Valid();
+    GetParentVaultUniqueId::Invalidate();
+
+    IsKeyExist::ExistingKey();
+    IsKeyExist::NonExistingKey();
 }

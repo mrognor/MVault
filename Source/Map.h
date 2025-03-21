@@ -205,21 +205,21 @@ namespace mvlt
     /**
         \brief Declaring the UnorderedMapIterator class
     */
-    template <class  KeyType, class ValueType>
+    template <class KeyType, class ValueType>
     using UnorderedMapIterator = AllMapIterator<typename std::unordered_multimap<KeyType, ValueType>::iterator, 
         typename std::unordered_map<KeyType, ValueType>::iterator, KeyType, ValueType>;
 
     /**
         \brief Declaring the MapIterator class
     */
-    template <class  KeyType, class ValueType>
+    template <class KeyType, class ValueType>
     using MapIterator = AllMapIterator<typename std::multimap<KeyType, ValueType>::iterator, 
         typename std::map<KeyType, ValueType>::iterator, KeyType, ValueType>;
 
     /**
         \brief Declaring the ReverseMapIterator class
     */
-    template <class  KeyType, class ValueType>
+    template <class KeyType, class ValueType>
     using ReverseMapIterator = AllMapIterator<typename std::multimap<KeyType, ValueType>::reverse_iterator, 
         typename std::map<KeyType, ValueType>::reverse_iterator, KeyType, ValueType>;
 

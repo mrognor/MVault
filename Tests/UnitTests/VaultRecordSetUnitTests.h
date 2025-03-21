@@ -60,6 +60,49 @@ namespace VaultRecordSetTestNs
 
         TEST_CASE(AssignFilledSet)
     )
+
+    TEST_SUITE(GetIsParentVaultValid,
+        
+        TEST_CASE(Invalid)
+
+        TEST_CASE(Valid)
+
+        TEST_CASE(Invalidate)
+    )
+
+    TEST_SUITE(GetParentVaultUniqueId,
+        
+        TEST_CASE(Invalid)
+
+        TEST_CASE(Valid)
+
+        TEST_CASE(Invalidate)
+    )
+
+    TEST_SUITE(IsKeyExist,
+
+        TEST_CASE(ExistingKey)
+
+        TEST_CASE(NonExistingKey)
+    )
+
+    TEST_SUITE(GetKeyValue,
+
+        TEST_CASE(ExistingKey)
+
+        TEST_CASE(NonExistingKey)
+
+        TEST_CASE(WrongType)
+
+        TEST_CASE(UniqueKey)
+    )
+
+    TEST_SUITE(GetKeyType,
+
+        TEST_CASE(ExistingKey)
+
+        TEST_CASE(NonExistingKey)
+    )
 }
 
 void VaultRecordSetUnitTests();
