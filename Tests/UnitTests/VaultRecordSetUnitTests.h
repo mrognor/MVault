@@ -81,12 +81,16 @@ namespace VaultRecordSetTestNs
 
     TEST_SUITE(IsKeyExist,
 
+        TEST_CASE(Invalid)
+
         TEST_CASE(ExistingKey)
 
         TEST_CASE(NonExistingKey)
     )
 
     TEST_SUITE(GetKeyValue,
+
+        TEST_CASE(Invalid)
 
         TEST_CASE(ExistingKey)
 
@@ -99,9 +103,35 @@ namespace VaultRecordSetTestNs
 
     TEST_SUITE(GetKeyType,
 
+        TEST_CASE(Invalid)
+
         TEST_CASE(ExistingKey)
 
         TEST_CASE(NonExistingKey)
+    )
+
+    TEST_SUITE(AddRecord,
+
+        TEST_CASE(Invalid)
+
+        TEST_CASE(Correct)
+
+        TEST_CASE(InvalidRef)
+
+        TEST_CASE(OtherVaultParent)
+    )
+
+    TEST_SUITE(GetRecord,
+    
+        TEST_CASE(Invalid)
+
+        TEST_CASE(CorrectGetRecord)
+
+        TEST_CASE(WrongKey)
+
+        TEST_CASE(WrongType)
+
+        TEST_CASE(WrongValue)
     )
 }
 
