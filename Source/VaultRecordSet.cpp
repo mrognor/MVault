@@ -236,9 +236,13 @@ namespace mvlt
     {
         DBG_LOG_ENTER();
 
-        ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
-        if (Vault::RecordsSet.find(ref.VaultRecordPtr) != Vault::RecordsSet.end()) return true;
-        else return false;
+        if (GetIsParentVaultValid())
+        {
+            ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
+            if (Vault::RecordsSet.find(ref.VaultRecordPtr) != Vault::RecordsSet.end()) 
+                return true;
+        }
+        return false;
     }
 
     void VaultRecordSet::Reset() noexcept

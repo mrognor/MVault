@@ -2791,6 +2791,769 @@ TEST_BODY(RequestInterval, WrongType,
         RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongType, SavedType == typeid(std::string));
 )
 
+TEST_BODY(Request, CorrectRequest,
+    Vault vlt;
+    GENERATE_SET(parentVrs);
+    VaultRecordSet vrs;
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+    std::vector<std::vector<std::pair<std::string, TypeWrapper>>> records;
+
+    vlt.AddKey("A", 0);
+
+    for (int i = 0; i < 10; ++i) 
+    {
+        vlt.CreateRecord(vrr, {{"A", i}});
+        parentVrs.AddRecord(vrr);
+    }
+
+    // Equal
+    COMPARE_CORRECT_REQUEST_SET(Equal("A", 2), {{{"A", 2}}})
+
+    // Greater
+    COMPARE_CORRECT_REQUEST_SET(Greater("A", 7), {{{"A", 8}}, {{"A", 9}}});
+
+    // Greater or equal
+    COMPARE_CORRECT_REQUEST_SET(GreaterOrEqual("A", 7), {{{"A", 7}}, {{"A", 8}}, {{"A", 9}}});
+
+    // Less
+    COMPARE_CORRECT_REQUEST_SET(Less("A", 2), {{{"A", 0}}, {{"A", 1}}});
+
+    // Less or equal
+    COMPARE_CORRECT_REQUEST_SET(LessOrEqual("A", 2), {{{"A", 0}}, {{"A", 1}}, {{"A", 2}}});
+)
+
+TEST_BODY(Request, CorrectRequestWithPredicat,
+    Vault vlt;
+    GENERATE_SET(parentVrs);
+    VaultRecordSet vrs;
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+
+    for (int i = 0; i < 10; ++i) 
+    {
+        vlt.CreateRecord(vrr, {{"A", i}, {"B", 100 - i}});
+        parentVrs.AddRecord(vrr);
+    }
+
+    for (int i = 0; i < 4; ++i) 
+    {
+        vlt.CreateRecord(vrr, {{"A", 5}, {"B", i}});
+        parentVrs.AddRecord(vrr);
+    }
+
+    // Equal
+    vor = parentVrs.Request(Equal("A", 5, [](const VaultRecordRef& ref) -> bool
+    {
+        int b = 0;
+        ref.GetData("B", b);
+        if (b % 2 == 0) return true;
+        else return false;
+    }), vrs);
+
+    TEST_ASSERT(vrs.Size() == 2);
+
+    COMPARE_VAULT(vrs, {
+        {{"A", 5}, {"B", 0}},
+        {{"A", 5}, {"B", 2}},
+    });
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, ResultCode == VaultOperationResultCode::Success);
+
+
+    // Greater
+    vor = parentVrs.Request(Greater("A", 7, [](const VaultRecordRef& ref) -> bool
+    {
+        int b = 0;
+        ref.GetData("B", b);
+        if (b % 2 == 0) return true;
+        else return false;
+    }), vrs);
+
+    TEST_ASSERT(vrs.Size() == 1);
+
+    COMPARE_VAULT(vrs, {{{"A", 8}, {"B", 92}}});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, ResultCode == VaultOperationResultCode::Success);
+
+
+    // Greater or equal
+    vor = parentVrs.Request(GreaterOrEqual("A", 7, [](const VaultRecordRef& ref) -> bool
+    {
+        int b = 0;
+        ref.GetData("B", b);
+        if (b % 2 == 0) return true;
+        else return false;
+    }), vrs);
+
+    TEST_ASSERT(vrs.Size() == 1);
+
+    COMPARE_VAULT(vrs, {{{"A", 8}, {"B", 92}}});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, ResultCode == VaultOperationResultCode::Success);
+
+
+    // Less
+    vor = parentVrs.Request(Less("A", 2, [](const VaultRecordRef& ref) -> bool
+    {
+        int b = 0;
+        ref.GetData("B", b);
+        if (b % 2 == 0) return true;
+        else return false;
+    }), vrs);
+
+    TEST_ASSERT(vrs.Size() == 1);
+
+    COMPARE_VAULT(vrs, {{{"A", 0}, {"B", 100}}});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, ResultCode == VaultOperationResultCode::Success);
+
+
+    // Less or equal
+    vor = parentVrs.Request(LessOrEqual("A", 2, [](const VaultRecordRef& ref) -> bool
+    {
+        int b = 0;
+        ref.GetData("B", b);
+        if (b % 2 == 0) return true;
+        else return false;
+    }), vrs);
+
+    TEST_ASSERT(vrs.Size() == 2);
+
+    COMPARE_VAULT(vrs, {{{"A", 0}, {"B", 100}}, {{"A", 2}, {"B", 98}}});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, ResultCode == VaultOperationResultCode::Success);
+)
+
+TEST_BODY(Request, BoundaryValues,
+    Vault vlt;
+    GENERATE_SET(parentVrs);
+    VaultRecordSet vrs;
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+    std::vector<std::vector<std::pair<std::string, TypeWrapper>>> records;
+
+    vlt.AddKey("A", 0);
+
+    // ...1...3...
+    vlt.CreateRecord(vrr, {{"A", 1}});
+    parentVrs.AddRecord(vrr);
+    vlt.CreateRecord(vrr, {{"A", 3}});
+    parentVrs.AddRecord(vrr);
+
+    // Greater
+    //  x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST_SET(Greater("A", 0), {{{"A", 1}}, {{"A", 3}}});
+
+    //    x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST_SET(Greater("A", 1), {{{"A", 3}}});
+
+    //      x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST_SET(Greater("A", 2), {{{"A", 3}}});
+
+    //        x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST_SET(Greater("A", 3), {});
+
+    //          x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST_SET(Greater("A", 4), {});
+
+
+    // Greater or equal
+    //  x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST_SET(GreaterOrEqual("A", 0), {{{"A", 1}}, {{"A", 3}}});
+
+    //    x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST_SET(GreaterOrEqual("A", 1), {{{"A", 1}}, {{"A", 3}}});
+
+    //      x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST_SET(GreaterOrEqual("A", 2), {{{"A", 3}}});
+
+    //        x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST_SET(GreaterOrEqual("A", 3), {{{"A", 3}}});
+
+    //          x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST_SET(GreaterOrEqual("A", 4), {});
+
+
+    // Less
+    //  x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST_SET(Less("A", 0), {});
+
+    //    x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST_SET(Less("A", 1), {});
+
+    //      x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST_SET(Less("A", 2), {{{"A", 1}}});
+
+    //        x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST_SET(Less("A", 3), {{{"A", 1}}});
+
+    //          x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST_SET(Less("A", 4), {{{"A", 1}}, {{"A", 3}}});
+
+
+    // Less or equal
+    //  x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST_SET(LessOrEqual("A", 0), {});
+
+    //    x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST_SET(LessOrEqual("A", 1), {{{"A", 1}}});
+
+    //      x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST_SET(LessOrEqual("A", 2), {{{"A", 1}}});
+
+    //        x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST_SET(LessOrEqual("A", 3), {{{"A", 1}}, {{"A", 3}}});
+
+    //          x
+    // ...1...3...
+    COMPARE_CORRECT_REQUEST_SET(LessOrEqual("A", 4), {{{"A", 1}}, {{"A", 3}}});
+)
+
+TEST_BODY(Request, WrongKey,
+    Vault vlt;
+    GENERATE_SET(parentVrs);
+    VaultRecordSet vrs;
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+
+    for (int i = 0; i < 10; ++i) 
+    {
+        vlt.CreateRecord(vrr, {{"A", i}});
+        parentVrs.AddRecord(vrr);
+    }
+
+    // Equal
+    vor = parentVrs.Request(Equal("Z", 2), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "Z", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongKey, SavedType == typeid(void));
+
+
+    // Greater
+    vor = parentVrs.Request(Greater("Z", 7), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "Z", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongKey, SavedType == typeid(void));
+
+
+    // Greater or equal
+    vor = parentVrs.Request(GreaterOrEqual("Z", 7), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "Z", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongKey, SavedType == typeid(void));
+
+
+    // Less
+    vor = parentVrs.Request(Less("Z", 2), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "Z", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongKey, SavedType == typeid(void));
+
+
+    // Less or equal
+    vor = parentVrs.Request(LessOrEqual("Z", 2), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "Z", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongKey, SavedType == typeid(void));
+)
+
+TEST_BODY(Request, WrongType,
+    Vault vlt;
+    GENERATE_SET(parentVrs);
+    VaultRecordSet vrs;
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+    std::string s;
+
+    vlt.AddKey("A", 0);
+
+    for (int i = 0; i < 10; ++i) vlt.CreateRecord({{"A", i}});
+
+    // Equal
+    vor = parentVrs.Request(Equal("A", s), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::WrongType, SavedType == typeid(int));
+
+
+    // Greater
+    vor = parentVrs.Request(Greater("A", s), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::WrongType, SavedType == typeid(int));
+
+
+    // Greater or equal
+    vor = parentVrs.Request(GreaterOrEqual("A", s), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::WrongType, SavedType == typeid(int));
+
+
+    // Less
+    vor = parentVrs.Request(Less("A", s), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::WrongType, SavedType == typeid(int));
+
+
+    // Less or equal
+    vor = parentVrs.Request(LessOrEqual("A", s), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::WrongType, SavedType == typeid(int));
+)
+
+TEST_BODY(Request, ComplexRequestAnd,
+    Vault vlt;
+    GENERATE_SET(parentVrs);
+    VaultRecordSet vrs;
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+    std::vector<std::vector<std::pair<std::string, TypeWrapper>>> records;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+
+    for (int i = 0; i < 10; ++i) 
+    {
+        vlt.CreateRecord(vrr, {{"A", i}, {"B", i}});
+        parentVrs.AddRecord(vrr);
+    }
+
+    // Equal
+    COMPARE_CORRECT_REQUEST_SET(Equal("A", 2) && Equal("B", 2), {{{"A", 2}, {"B", 2}}});
+
+    COMPARE_CORRECT_REQUEST_SET(Equal("A", 2) && Equal("B", 3), {});
+
+    COMPARE_CORRECT_REQUEST_SET(Equal("A", 2) && Greater("B", 1), {{{"A", 2}, {"B", 2}}});
+
+    COMPARE_CORRECT_REQUEST_SET(Equal("A", 2) && GreaterOrEqual("B", 2), {{{"A", 2}, {"B", 2}}});
+
+    COMPARE_CORRECT_REQUEST_SET(Equal("A", 2) && Less("B", 5), {{{"A", 2}, {"B", 2}}});
+
+    COMPARE_CORRECT_REQUEST_SET(Equal("A", 2) && LessOrEqual("B", 2), {{{"A", 2}, {"B", 2}}});
+
+
+    // Greater
+    COMPARE_CORRECT_REQUEST_SET(Greater("A", 2) && Equal("B", 9), {{{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST_SET(Greater("A", 7) && Greater("B", 1), {{{"A", 8}, {"B", 8}}, {{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST_SET(Greater("A", 8) && GreaterOrEqual("B", 8), {{{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST_SET(Greater("A", 2) && Less("B", 4), {{{"A", 3}, {"B", 3}}});
+
+    COMPARE_CORRECT_REQUEST_SET(Greater("A", 2) && LessOrEqual("B", 3), {{{"A", 3}, {"B", 3}}});
+
+
+    // Greater or equal
+    COMPARE_CORRECT_REQUEST_SET(GreaterOrEqual("A", 2) && Equal("B", 5), {{{"A", 5}, {"B", 5}}});
+
+    COMPARE_CORRECT_REQUEST_SET(GreaterOrEqual("A", 8) && Greater("B", 1), {{{"A", 8}, {"B", 8}}, {{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST_SET(GreaterOrEqual("A", 8) && GreaterOrEqual("B", 9), {{{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST_SET(GreaterOrEqual("A", 2) && Less("B", 4), {{{"A", 2}, {"B", 2}}, {{"A", 3}, {"B", 3}}});
+
+    COMPARE_CORRECT_REQUEST_SET(GreaterOrEqual("A", 2) && LessOrEqual("B", 3), {{{"A", 2}, {"B", 2}}, {{"A", 3}, {"B", 3}}});
+
+
+    // Less
+    COMPARE_CORRECT_REQUEST_SET(Less("A", 7) && Equal("B", 5), {{{"A", 5}, {"B", 5}}});
+
+    COMPARE_CORRECT_REQUEST_SET(Less("A", 3) && Greater("B", 1), {{{"A", 2}, {"B", 2}}});
+
+    COMPARE_CORRECT_REQUEST_SET(Less("A", 8) && GreaterOrEqual("B", 7), {{{"A", 7}, {"B", 7}}});
+
+    COMPARE_CORRECT_REQUEST_SET(Less("A", 2) && Less("B", 4), {{{"A", 0}, {"B", 0}}, {{"A", 1}, {"B", 1}}});
+
+    COMPARE_CORRECT_REQUEST_SET(Less("A", 2) && LessOrEqual("B", 1), {{{"A", 0}, {"B", 0}}, {{"A", 1}, {"B", 1}}});
+
+
+    // Less or equal
+    COMPARE_CORRECT_REQUEST_SET(LessOrEqual("A", 7) && Equal("B", 5), {{{"A", 5}, {"B", 5}}});
+
+    COMPARE_CORRECT_REQUEST_SET(LessOrEqual("A", 3) && Greater("B", 2), {{{"A", 3}, {"B", 3}}});
+
+    COMPARE_CORRECT_REQUEST_SET(LessOrEqual("A", 8) && GreaterOrEqual("B", 8), {{{"A", 8}, {"B", 8}}});
+
+    COMPARE_CORRECT_REQUEST_SET(LessOrEqual("A", 2) && Less("B", 4), {{{"A", 0}, {"B", 0}}, {{"A", 1}, {"B", 1}}, {{"A", 2}, {"B", 2}}});
+
+    COMPARE_CORRECT_REQUEST_SET(LessOrEqual("A", 2) && LessOrEqual("B", 1), {{{"A", 0}, {"B", 0}}, {{"A", 1}, {"B", 1}}});
+)
+
+TEST_BODY(Request, ComplexRequestOr,
+    Vault vlt;
+    GENERATE_SET(parentVrs);
+    VaultRecordSet vrs;
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+    std::vector<std::vector<std::pair<std::string, TypeWrapper>>> records;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+
+    for (int i = 0; i < 10; ++i) 
+    {
+        vlt.CreateRecord(vrr, {{"A", i}, {"B", i}});
+        parentVrs.AddRecord(vrr);
+    }
+
+    // Equal
+    COMPARE_CORRECT_REQUEST_SET(Equal("A", 2) || Equal("B", 3), {{{"A", 2}, {"B", 2}}, {{"A", 3}, {"B", 3}}});
+
+    COMPARE_CORRECT_REQUEST_SET(Equal("A", 2) || Greater("B", 8), {{{"A", 2}, {"B", 2}}, {{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST_SET(Equal("A", 2) || GreaterOrEqual("B", 9), {{{"A", 2}, {"B", 2}}, {{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST_SET(Equal("A", 2) || Less("B", 2), {{{"A", 0}, {"B", 0}}, {{"A", 1}, {"B", 1}}, {{"A", 2}, {"B", 2}}});
+
+    COMPARE_CORRECT_REQUEST_SET(Equal("A", 2) || LessOrEqual("B", 1), {{{"A", 0}, {"B", 0}}, {{"A", 1}, {"B", 1}}, {{"A", 2}, {"B", 2}}});
+
+
+    // Greater
+    COMPARE_CORRECT_REQUEST_SET(Greater("A", 8) || Equal("B", 0), {{{"A", 0}, {"B", 0}}, {{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST_SET(Greater("A", 8) || Greater("B", 10), {{{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST_SET(Greater("A", 8) || GreaterOrEqual("B", 9), {{{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST_SET(Greater("A", 8) || Less("B", 1), {{{"A", 0}, {"B", 0}}, {{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST_SET(Greater("A", 8) || LessOrEqual("B", 0), {{{"A", 0}, {"B", 0}}, {{"A", 9}, {"B", 9}}});
+
+
+    // Greater or equal
+    COMPARE_CORRECT_REQUEST_SET(GreaterOrEqual("A", 9) || Equal("B", 5), {{{"A", 5}, {"B", 5}}, {{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST_SET(GreaterOrEqual("A", 8) || Greater("B", 8), {{{"A", 8}, {"B", 8}}, {{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST_SET(GreaterOrEqual("A", 8) || GreaterOrEqual("B", 9), {{{"A", 8}, {"B", 8}}, {{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST_SET(GreaterOrEqual("A", 9) || Less("B", 1), {{{"A", 0}, {"B", 0}}, {{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST_SET(GreaterOrEqual("A", 9) || LessOrEqual("B", 0), {{{"A", 0}, {"B", 0}}, {{"A", 9}, {"B", 9}}});
+
+
+    // Less
+    COMPARE_CORRECT_REQUEST_SET(Less("A", 1) || Equal("B", 5), {{{"A", 0}, {"B", 0}}, {{"A", 5}, {"B", 5}}});
+
+    COMPARE_CORRECT_REQUEST_SET(Less("A", 1) || Greater("B", 8), {{{"A", 0}, {"B", 0}}, {{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST_SET(Less("A", 1) || GreaterOrEqual("B", 9), {{{"A", 0}, {"B", 0}}, {{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST_SET(Less("A", 2) || Less("B", 1), {{{"A", 0}, {"B", 0}}, {{"A", 1}, {"B", 1}}});
+
+    COMPARE_CORRECT_REQUEST_SET(Less("A", 1) || LessOrEqual("B", 1), {{{"A", 0}, {"B", 0}}, {{"A", 1}, {"B", 1}}});
+
+
+    // Less or equal
+    COMPARE_CORRECT_REQUEST_SET(LessOrEqual("A", 1) || Equal("B", 5), {{{"A", 0}, {"B", 0}}, {{"A", 1}, {"B", 1}}, {{"A", 5}, {"B", 5}}});
+
+    COMPARE_CORRECT_REQUEST_SET(LessOrEqual("A", 1) || Greater("B", 8), {{{"A", 0}, {"B", 0}}, {{"A", 1}, {"B", 1}}, {{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST_SET(LessOrEqual("A", 1) || GreaterOrEqual("B", 9), {{{"A", 0}, {"B", 0}}, {{"A", 1}, {"B", 1}}, {{"A", 9}, {"B", 9}}});
+
+    COMPARE_CORRECT_REQUEST_SET(LessOrEqual("A", 1) || Less("B", 3), {{{"A", 0}, {"B", 0}}, {{"A", 1}, {"B", 1}}, {{"A", 2}, {"B", 2}}});
+
+    COMPARE_CORRECT_REQUEST_SET(LessOrEqual("A", 2) || LessOrEqual("B", 1), {{{"A", 0}, {"B", 0}}, {{"A", 1}, {"B", 1}}, {{"A", 2}, {"B", 2}}});
+)
+
+TEST_BODY(Request, ComplexRequest,
+    Vault vlt;
+    GENERATE_SET(parentVrs);
+    VaultRecordSet vrs;
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+    vlt.AddKey<std::string>("C", "");
+    vlt.AddKey<bool>("D", false);
+
+    for (int i = 0; i < 10; ++i)
+    {
+        vlt.CreateRecord(vrr, {{"A", i}, {"B", i}, {"C", std::to_string(i)}});
+        parentVrs.AddRecord(vrr);
+        if (i == 5 || i == 9) vrr.SetData("D", true);
+    }
+    
+    parentVrs.Request(Greater("A", 2) && Less("B", 8) && (Equal("C", std::string("3")) || Equal("C", std::string("4"))) || Equal("D", true), vrs);
+    
+    CompareVault(vrs, {
+        {{"A", 3}, {"B", 3}, {"C", std::string("3")}, {"D", false}},
+        {{"A", 4}, {"B", 4}, {"C", std::string("4")}, {"D", false}},
+        {{"A", 5}, {"B", 5}, {"C", std::string("5")}, {"D", true}},
+        {{"A", 9}, {"B", 9}, {"C", std::string("9")}, {"D", true}},
+    });
+)
+
+TEST_BODY(Request, ComplexRequestWrongKey,
+    Vault vlt;
+    GENERATE_SET(parentVrs);
+    VaultRecordSet vrs;
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+
+    for (int i = 0; i < 10; ++i) 
+    {
+        vlt.CreateRecord(vrr, {{"A", i}, {"B", i}});
+        parentVrs.AddRecord(vrr);
+    }
+
+    vor = parentVrs.Request(Equal("A", 0) && Equal("Z", 0), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "Z", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongKey, SavedType == typeid(void));
+
+
+    vor = parentVrs.Request(Equal("Z", 0) && Equal("Y", 0), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "Z", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongKey, SavedType == typeid(void));
+)
+
+TEST_BODY(Request, ComplexRequestWrongType,
+    Vault vlt;
+    GENERATE_SET(parentVrs);
+    VaultRecordSet vrs;
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+    std::string s;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+
+    for (int i = 0; i < 10; ++i) 
+    {
+        vlt.CreateRecord(vrr, {{"A", i}, {"B", i}});
+        parentVrs.AddRecord(vrr);
+    }
+
+    vor = parentVrs.Request(Equal("A", 0) && Equal("B", s), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "B", 
+        RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::WrongType, SavedType == typeid(int));
+
+
+    vor = parentVrs.Request(Equal("A", s) && Equal("B", 0), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::WrongType, SavedType == typeid(int));
+)
+
+TEST_BODY(CheckRecord, InvalidSet,
+    VaultRecordSet vrs;
+    VaultRecordRef vrr;
+
+    TEST_ASSERT(vrs.CheckRecord(vrr) == false);
+)
+
+TEST_BODY(CheckRecord, InvalidRef,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrr;
+
+    TEST_ASSERT(vrs.CheckRecord(vrr) == false);
+)
+
+TEST_BODY(CheckRecord, WrongRef,
+    Vault vlt;
+    GENERATE_SET(vrs1);
+    VaultRecordSet vrs2;
+    VaultRecordRef vrr;
+
+    vlt.AddKey("A", 0);
+    vlt.CreateRecord({});
+    vlt.RequestEqual("A", 0, vrs1);
+    vrs1.GetRecord("A", 0, vrr);
+
+    TEST_ASSERT(vrs2.CheckRecord(vrr) == false);
+)
+
+TEST_BODY(CheckRecord, Correct,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultRecordRef vrr;
+
+    vlt.AddKey("A", 0);
+    vlt.CreateRecord({});
+    vlt.RequestEqual("A", 0, vrs);
+    vrs.GetRecord("A", 0, vrr);
+
+    TEST_ASSERT(vrs.CheckRecord(vrr) == true);
+)
+
+// TEST_SUITE(Reset,
+        
+//     TEST_CASE(InvalidSet)
+
+//     TEST_CASE(EmptySet)
+
+//     TEST_CASE(FilledSet)
+// )
+
+TEST_BODY(Reset, InvalidSet,
+    VaultRecordSet vrs;
+    vrs.Reset();
+
+    TEST_ASSERT(vrs.GetIsParentVaultValid() == false);
+    TEST_ASSERT(vrs.GetParentVaultUniqueId() == "null");
+)
+
+TEST_BODY(Reset, EmptySet,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    vrs.Reset();
+
+    TEST_ASSERT(vrs.GetIsParentVaultValid() == false);
+    TEST_ASSERT(vrs.GetParentVaultUniqueId() == "null");
+    TEST_ASSERT(vrs.GetKeys() == std::vector<std::string>());
+    TEST_ASSERT(vrs.GetUniqueKeys() == std::vector<std::string>());
+    COMPARE_VAULT(vrs, {});
+)
+
+TEST_BODY(Reset, FilledSet,
+    Vault vlt;
+    VaultRecordSet vrs;
+
+    vlt.AddKey("A", 0);
+    vlt.CreateRecord({});
+    vlt.RequestEqual("A", 0, vrs);
+
+    vrs.Reset();
+
+    TEST_ASSERT(vrs.GetIsParentVaultValid() == false);
+    TEST_ASSERT(vrs.GetParentVaultUniqueId() == "null");
+    TEST_ASSERT(vrs.GetKeys() == std::vector<std::string>());
+    TEST_ASSERT(vrs.GetUniqueKeys() == std::vector<std::string>());
+    COMPARE_VAULT(vrs, {});
+)
+
+TEST_BODY(Clear, InvalidSet,
+    VaultRecordSet vrs;
+    vrs.Clear();
+
+    TEST_ASSERT(vrs.GetIsParentVaultValid() == false);
+    TEST_ASSERT(vrs.GetParentVaultUniqueId() == "null");
+)
+
+TEST_BODY(Clear, EmptySet,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    vrs.Clear();
+
+    TEST_ASSERT(vrs.GetIsParentVaultValid() == true);
+    TEST_ASSERT(vrs.GetKeys() == std::vector<std::string>());
+    TEST_ASSERT(vrs.GetUniqueKeys() == std::vector<std::string>());
+    COMPARE_VAULT(vrs, {});
+)
+
+TEST_BODY(Clear, FilledSet,
+    Vault vlt;
+    VaultRecordSet vrs;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<std::string>("B");
+    vlt.CreateRecord({{"A", 1}, {"B", std::string("str")}});
+    vlt.RequestEqual("A", 1, vrs);
+
+    COMPARE_VAULT(vrs, {
+        {{"A", 1}, {"B", std::string("str")}}
+    });
+    vrs.Clear();
+
+    TEST_ASSERT(vrs.GetIsParentVaultValid() == true);
+    TEST_ASSERT(vrs.GetKeys() == std::vector<std::string>({"A", "B"}));
+    TEST_ASSERT(vrs.GetUniqueKeys() == std::vector<std::string>({"B"}));
+    COMPARE_VAULT(vrs, {});
+)
+
 void VaultRecordSetUnitTests()
 {
     DefaultConstructor::Default();
@@ -2909,4 +3672,28 @@ void VaultRecordSetUnitTests()
     RequestInterval::IncorrectBoundaries();
     RequestInterval::WrongKey();
     RequestInterval::WrongType();
+
+    Request::CorrectRequest();
+    Request::CorrectRequestWithPredicat();
+    Request::BoundaryValues();
+    Request::WrongKey();
+    Request::WrongType();
+    Request::ComplexRequestAnd();
+    Request::ComplexRequestOr();
+    Request::ComplexRequest();
+    Request::ComplexRequestWrongKey();
+    Request::ComplexRequestWrongType();
+
+    CheckRecord::InvalidSet();
+    CheckRecord::InvalidRef();
+    CheckRecord::WrongRef();
+    CheckRecord::Correct();
+    
+    Reset::InvalidSet();
+    Reset::EmptySet();
+    Reset::FilledSet();
+
+    Clear::InvalidSet();
+    Clear::EmptySet();
+    Clear::FilledSet();
 }

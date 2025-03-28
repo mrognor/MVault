@@ -341,7 +341,7 @@ namespace mvlt
         void Clear() noexcept;
 
         /**
-            \brief Method for remove a record from a Vault
+            \brief Method for remove a record from a VaultRecordSet
 
             The record itself will not be changed in any way
 

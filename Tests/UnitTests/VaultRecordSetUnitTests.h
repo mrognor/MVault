@@ -268,6 +268,58 @@ namespace VaultRecordSetTestNs
 
         TEST_CASE(WrongType)
     )
+
+    TEST_SUITE(Request,
+
+        TEST_CASE(CorrectRequest)
+
+        TEST_CASE(CorrectRequestWithPredicat)
+
+        TEST_CASE(BoundaryValues)
+
+        TEST_CASE(WrongKey)
+
+        TEST_CASE(WrongType)
+
+        TEST_CASE(ComplexRequestAnd)
+
+        TEST_CASE(ComplexRequestOr)
+
+        TEST_CASE(ComplexRequest)
+
+        TEST_CASE(ComplexRequestWrongKey)
+
+        TEST_CASE(ComplexRequestWrongType)
+    )
+
+    TEST_SUITE(CheckRecord,
+        
+        TEST_CASE(InvalidSet)
+
+        TEST_CASE(InvalidRef)
+
+        TEST_CASE(WrongRef)
+
+        TEST_CASE(Correct)
+    )
+
+    TEST_SUITE(Reset,
+        
+        TEST_CASE(InvalidSet)
+
+        TEST_CASE(EmptySet)
+
+        TEST_CASE(FilledSet)
+    )
+
+    TEST_SUITE(Clear,
+        
+        TEST_CASE(InvalidSet)
+
+        TEST_CASE(EmptySet)
+
+        TEST_CASE(FilledSet)
+    )
 }
 
 void VaultRecordSetUnitTests();
