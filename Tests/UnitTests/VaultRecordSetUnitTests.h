@@ -133,6 +133,141 @@ namespace VaultRecordSetTestNs
 
         TEST_CASE(WrongValue)
     )
+
+    TEST_SUITE(GetRecords,
+    
+        TEST_CASE(Invalid)
+
+        TEST_CASE(CorrectGetRecords)
+
+        TEST_CASE(CorrectGetNotAllRecords)
+
+        TEST_CASE(WrongKey)
+
+        TEST_CASE(WrongType)
+
+        TEST_CASE(WrongValue)
+    )
+
+    TEST_SUITE(RequestEqual,
+
+        TEST_CASE(Invalid)
+
+        TEST_CASE(CorrectRequest)
+
+        TEST_CASE(CorrectRequestNotAllRecords)
+
+        TEST_CASE(CorrectRequestWithPredicat)
+
+        TEST_CASE(WrongKey)
+
+        TEST_CASE(WrongType)
+
+        TEST_CASE(ValueNotInVault)
+    )
+
+    TEST_SUITE(RequestGreater,
+
+        TEST_CASE(Invalid)
+
+        TEST_CASE(CorrectRequest)
+
+        TEST_CASE(CorrectRequestNotAllRecords)
+
+        TEST_CASE(CorrectRequestWithPredicat)
+
+        TEST_CASE(BoundaryValues)
+
+        TEST_CASE(WrongKey)
+
+        TEST_CASE(WrongType)
+
+        TEST_CASE(ValueNotInVault)
+    )
+
+    TEST_SUITE(RequestGreaterOrEqual,
+
+        TEST_CASE(Invalid)
+
+        TEST_CASE(CorrectRequest)
+
+        TEST_CASE(CorrectRequestNotAllRecords)
+
+        TEST_CASE(CorrectRequestWithPredicat)
+
+        TEST_CASE(BoundaryValues)
+
+        TEST_CASE(WrongKey)
+
+        TEST_CASE(WrongType)
+
+        TEST_CASE(ValueNotInVault)
+    )
+
+    TEST_SUITE(RequestLess,
+
+        TEST_CASE(Invalid)
+
+        TEST_CASE(CorrectRequest)
+
+        TEST_CASE(CorrectRequestNotAllRecords)
+
+        TEST_CASE(CorrectRequestWithPredicat)
+
+        TEST_CASE(BoundaryValues)
+
+        TEST_CASE(WrongKey)
+
+        TEST_CASE(WrongType)
+
+        TEST_CASE(ValueNotInVault)
+    )
+
+    TEST_SUITE(RequestLessOrEqual,
+
+        TEST_CASE(Invalid)
+
+        TEST_CASE(CorrectRequest)
+
+        TEST_CASE(CorrectRequestNotAllRecords)
+
+        TEST_CASE(CorrectRequestWithPredicat)
+
+        TEST_CASE(BoundaryValues)
+
+        TEST_CASE(WrongKey)
+
+        TEST_CASE(WrongType)
+
+        TEST_CASE(ValueNotInVault)
+    )
+
+    TEST_SUITE(RequestInterval,
+
+        TEST_CASE(Invalid)
+
+        TEST_CASE(CorrectRequest)
+
+        TEST_CASE(CorrectRequestWithoutLeftBoundary)
+
+        TEST_CASE(CorrectRequestWithoutRightBoundary)
+
+        TEST_CASE(CorrectRequestWithoutBoundaries)
+
+        TEST_CASE(CorrectRequestNotAllRecords)
+
+        TEST_CASE(CorrectRequestWithPredicat)
+
+        TEST_CASE(BoundaryValues)
+
+        TEST_CASE(SameBoundaries)
+
+        TEST_CASE(IncorrectBoundaries)
+
+        TEST_CASE(WrongKey)
+
+        TEST_CASE(WrongType)
+    )
 }
 
 void VaultRecordSetUnitTests();
