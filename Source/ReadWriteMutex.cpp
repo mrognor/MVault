@@ -3,7 +3,7 @@
 namespace mvlt
 {
     ReadWriteMutex::ReadWriteMutex() noexcept
-    { 
+    {
         ReadCounter.store(0);
         IsCondVarWaiting.store(false);
     }
@@ -33,8 +33,9 @@ namespace mvlt
             ReadCounter.fetch_sub(1);
 
             if (ReadCounter.load() == 0)
-                while (IsCondVarWaiting.load()) Cv.notify_all();
-            
+                while (IsCondVarWaiting.load())
+                    Cv.notify_all();
+
             ReadMutex.unlock();
         }
     }
@@ -47,11 +48,11 @@ namespace mvlt
             std::unique_lock<std::mutex> lk(mtx);
 
             WriteMutex.lock();
-            
+
             IsCondVarWaiting.store(true);
 
             if (ReadCounter > 0) Cv.wait(lk);
-            
+
             IsCondVarWaiting.store(false);
         }
     }
@@ -94,7 +95,7 @@ namespace mvlt
             {
                 if (LocalThreadReadLockCounter == 1)
                     Rwmx.ReadUnlock();
-                
+
                 --LocalThreadReadLockCounter;
             }
         }
@@ -108,14 +109,13 @@ namespace mvlt
             {
                 if (LocalThreadReadLockCounter > 0)
                     Rwmx.ReadUnlock();
-                
+
                 Rwmx.WriteLock();
             }
 
             ++LocalThreadWriteLockCounter;
         }
     }
-
 
     void RecursiveReadWriteMutex::WriteUnlock() noexcept
     {

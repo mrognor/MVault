@@ -20,8 +20,8 @@ namespace mvlt
     /**
         \brief A class for reading files as a stream
 
-        Small files will be fully loaded into RAM. A large file is considered to be a file larger than BIG_FILE_SIZE. 
-        Large files will be read in chunks, the size of FILE_BLOCK_SIZE. At the same time, 
+        Small files will be fully loaded into RAM. A large file is considered to be a file larger than BIG_FILE_SIZE.
+        Large files will be read in chunks, the size of FILE_BLOCK_SIZE. At the same time,
         there will be no difference in interaction for the user of the class.
     */
     class StreamFileReader
@@ -50,8 +50,8 @@ namespace mvlt
 
         // Pointer to store little files
         char* Data = nullptr;
-    public:
 
+    public:
         /// \brief Default constructor
         StreamFileReader() noexcept = default;
 

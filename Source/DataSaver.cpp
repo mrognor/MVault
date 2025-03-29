@@ -24,10 +24,10 @@ namespace mvlt
             {
                 // Create new DataType object copying data type from dataSaver
                 DataType = dataSaver.DataType;
-                
+
                 // Set new CopyFunc from dataSaver
                 CopyFunc = dataSaver.CopyFunc;
-                
+
                 // Call new copy func to copy data from dataSaver void pointer to local void pointer. Data to Ptr will be allocated inside function
                 CopyFunc(Ptr, dataSaver.Ptr);
 
@@ -36,7 +36,7 @@ namespace mvlt
 
                 // Set delete function from dataSaver
                 DeleteFunc = dataSaver.DeleteFunc;
-                
+
                 // Set custom delete function from dataSaver
                 CustomDeleteFunc = dataSaver.CustomDeleteFunc;
 

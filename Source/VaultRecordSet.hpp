@@ -6,8 +6,8 @@ namespace mvlt
 {
     template <class T>
     VaultOperationResult VaultRecordSet::RequestRecords(const VaultRequestType& requestType, const std::string& key, const T& beginKeyValue,
-            const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue, 
-            const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef& ref)>& requestPredicat) const noexcept
+        const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue,
+        const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef& ref)>& requestPredicat) const noexcept
     {
         DBG_LOG_ENTER();
 
@@ -20,7 +20,7 @@ namespace mvlt
                 res.IsOperationSuccess = false;
                 res.ResultCode = VaultOperationResultCode::SameVaultRecordSet;
             }
-            else 
+            else
             {
                 ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
 
@@ -51,7 +51,7 @@ namespace mvlt
                 vaultRecordSet.ParentVault = ParentVault;
             }
         }
-        else 
+        else
         {
             res.Key = key;
             res.RequestedType = typeid(beginKeyValue);
@@ -74,7 +74,7 @@ namespace mvlt
             ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
             res = Vault::GetKeyValue(key, defaultKeyValue);
         }
-        else 
+        else
         {
             res.Key = key;
             res.RequestedType = typeid(defaultKeyValue);
@@ -99,14 +99,14 @@ namespace mvlt
             res = Vault::GetRecord(key, keyValue, vaultRecordRef);
             vaultRecordRef.Vlt = ParentVault;
         }
-        else 
+        else
         {
             res.Key = key;
             res.RequestedType = typeid(keyValue);
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::ParentVaultNotValid;
         }
-        
+
         return res;
     }
 
@@ -122,22 +122,22 @@ namespace mvlt
             ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
 
             res = Vault::GetRecords(key, keyValue, recordsRefs, amountOfRecords);
-            for (VaultRecordRef& ref: recordsRefs)
+            for (VaultRecordRef& ref : recordsRefs)
                 ref.Vlt = ParentVault;
         }
-        else 
+        else
         {
             res.Key = key;
             res.RequestedType = typeid(keyValue);
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::ParentVaultNotValid;
         }
-        
+
         return res;
     }
-    
+
     template <class T>
-    VaultOperationResult VaultRecordSet::RequestEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, 
+    VaultOperationResult VaultRecordSet::RequestEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
         const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef& ref)>& requestPredicat) const noexcept
     {
         DBG_LOG_ENTER();
@@ -155,7 +155,7 @@ namespace mvlt
     }
 
     template <class T>
-    VaultOperationResult VaultRecordSet::RequestGreaterOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet, 
+    VaultOperationResult VaultRecordSet::RequestGreaterOrEqual(const std::string& key, const T& keyValue, VaultRecordSet& vaultRecordSet,
         const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef& ref)>& requestPredicat) const noexcept
     {
         DBG_LOG_ENTER();
@@ -183,14 +183,14 @@ namespace mvlt
 
     template <class T>
     VaultOperationResult VaultRecordSet::RequestInterval(const std::string& key, const T& beginKeyValue,
-        const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue, 
+        const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue,
         const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords,
         const std::function<bool(const VaultRecordRef& ref)>& requestPredicat) const noexcept
     {
         DBG_LOG_ENTER();
 
-        return RequestRecords(VaultRequestType::Interval, key, beginKeyValue, 
-            endKeyValue, vaultRecordSet, isIncludeBeginKeyValue, isIncludeEndKeyValue, 
+        return RequestRecords(VaultRequestType::Interval, key, beginKeyValue,
+            endKeyValue, vaultRecordSet, isIncludeBeginKeyValue, isIncludeEndKeyValue,
             amountOfRecords, requestPredicat);
     }
 
@@ -208,7 +208,7 @@ namespace mvlt
                 res.IsOperationSuccess = false;
                 res.ResultCode = VaultOperationResultCode::SameVaultRecordSet;
             }
-            else 
+            else
             {
                 ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
 
@@ -239,7 +239,7 @@ namespace mvlt
                 vaultRecordSet.ParentVault = ParentVault;
             }
         }
-        else 
+        else
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::ParentVaultNotValid;
@@ -264,14 +264,14 @@ namespace mvlt
             ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
             res = Vault::EraseRecord(key, keyValue);
         }
-        else 
+        else
         {
             res.Key = key;
             res.RequestedType = typeid(keyValue);
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::ParentVaultNotValid;
         }
-        
+
         return res;
     }
 
@@ -291,7 +291,7 @@ namespace mvlt
             ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
             res = Vault::EraseRecords(key, keyValue, amountOfRecords);
         }
-        else 
+        else
         {
             res.Key = key;
             res.RequestedType = typeid(keyValue);
@@ -302,7 +302,7 @@ namespace mvlt
         return res;
     }
 
-    template<class F>
+    template <class F>
     void VaultRecordSet::SortBy(const std::string& key, F&& func, const bool& isReverse, const std::size_t& amountOfRecords) const noexcept
     {
         DBG_LOG_ENTER();

@@ -9,15 +9,15 @@ namespace mvlt
         \defgroup FromStringFunctions From string functions
         \brief All functions for working with reading data from csv
 
-        @{      
+        @{
     */
 
     /**
         \brief A template method for providing an interface converting string to a any type
 
-        This function allows you to use the same interface inside the Vault for any class, 
-        since this function accepts any type. Therefore, if you do not plan to use the functionality of saving to files, 
-        then there will be no problems when using a custom type. At the same time, if you plan to work with files, 
+        This function allows you to use the same interface inside the Vault for any class,
+        since this function accepts any type. Therefore, if you do not plan to use the functionality of saving to files,
+        then there will be no problems when using a custom type. At the same time, if you plan to work with files,
         you can specialize this function for each required type.
 
         \tparam <T> Any type of data
@@ -42,7 +42,7 @@ namespace mvlt
     */
     template <>
     inline bool FromString(const std::string& stringToCopyDataFrom, std::string& data) noexcept
-    { 
+    {
         data = stringToCopyDataFrom;
         return true;
     }
@@ -64,12 +64,12 @@ namespace mvlt
     template <>
     inline bool FromString(const std::string& stringToCopyDataFrom, bool& data) noexcept
     {
-        if (stringToCopyDataFrom == "true") 
+        if (stringToCopyDataFrom == "true")
         {
             data = true;
             return true;
         }
-        if (stringToCopyDataFrom == "false") 
+        if (stringToCopyDataFrom == "false")
         {
             data = false;
             return true;
@@ -79,7 +79,7 @@ namespace mvlt
 
     /**
         \brief FromStringDoubleAndFloat template for working with float and double
-        
+
         \tparam <T> floatating type
         \tparam <float> float type
         \tparam <double> double type
@@ -99,7 +99,7 @@ namespace mvlt
         std::size_t i = 0;
         bool isNegative = false;
 
-        if (stringToCopyDataFrom[0] == '-' && stringToCopyDataFrom.length() > 1) 
+        if (stringToCopyDataFrom[0] == '-' && stringToCopyDataFrom.length() > 1)
         {
             isNegative = true;
             i = 1;
@@ -107,7 +107,7 @@ namespace mvlt
 
         for (; i < stringToCopyDataFrom.length(); ++i)
         {
-            if (stringToCopyDataFrom[i] == '.') 
+            if (stringToCopyDataFrom[i] == '.')
             {
                 ++i;
                 break;
@@ -136,7 +136,7 @@ namespace mvlt
 
     /**
         \brief FromString specialization for working with float
-        
+
         \tparam <float> float as a type
 
         \param [in] stringToCopyDataFrom the string to be converted to type float
@@ -152,7 +152,7 @@ namespace mvlt
 
     /**
         \brief FromString specialization for working with double
-        
+
         \tparam <double> double as a type
 
         \param [in] stringToCopyDataFrom the string to be converted to type float
@@ -168,7 +168,7 @@ namespace mvlt
 
     /**
         \brief FromStringSignedInt template for working with all signed integers
-        
+
         \tparam <T> signed integer as a type
         \tparam <std::int16_t> std::int16_t int as a type
         \tparam <std::int32_t> std::int32_t int as a type
@@ -185,11 +185,11 @@ namespace mvlt
         if (stringToCopyDataFrom.length() == 0) return false;
 
         T res = 0;
-        
+
         std::size_t i = 0;
         bool isNegative = false;
 
-        if (stringToCopyDataFrom[0] == '-' && stringToCopyDataFrom.length() > 1) 
+        if (stringToCopyDataFrom[0] == '-' && stringToCopyDataFrom.length() > 1)
         {
             isNegative = true;
             i = 1;
@@ -211,7 +211,7 @@ namespace mvlt
 
     /**
         \brief FromString specialization for working with std::int16_t int
-        
+
         \tparam <std::int16_t> int as a type
 
         \param [in] stringToCopyDataFrom the string to be converted to type int
@@ -227,7 +227,7 @@ namespace mvlt
 
     /**
         \brief FromString specialization for working with std::int32_t
-        
+
         \tparam <std::int32_t> int as a type
 
         \param [in] stringToCopyDataFrom the string to be converted to type int
@@ -243,7 +243,7 @@ namespace mvlt
 
     /**
         \brief FromString specialization for working with std::int64_t
-        
+
         \tparam <std::int64_t> int as a type
 
         \param [in] stringToCopyDataFrom the string to be converted to type std::int64_t
@@ -259,7 +259,7 @@ namespace mvlt
 
     /**
         \brief FromStringSignedInt template for working with all unsigned signed integers
-        
+
         \tparam <T> unsigned integer as a type
         \tparam <unsigned short> unsigned short int as a type
         \tparam <unsigned int> unsigned signed int as a type
@@ -291,7 +291,7 @@ namespace mvlt
 
     /**
         \brief FromString specialization for working with std::uint16_t
-        
+
         \tparam <std::uint16_t> int as a type
 
         \param [in] stringToCopyDataFrom the string to be converted to type unsigned int
@@ -307,7 +307,7 @@ namespace mvlt
 
     /**
         \brief FromString specialization for working with std::uint32_t
-        
+
         \tparam <std::uint32_t> int as a type
 
         \param [in] stringToCopyDataFrom the string to be converted to type unsigned int
@@ -323,7 +323,7 @@ namespace mvlt
 
     /**
         \brief FromString specialization for working with unsigned unsigned std::uint64_t
-        
+
         \tparam <std::uint64_t> int as a type
 
         \param [in] stringToCopyDataFrom the string to be converted to type unsigned long int

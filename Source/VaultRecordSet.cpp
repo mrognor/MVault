@@ -3,7 +3,7 @@
 
 namespace mvlt
 {
-    std::unordered_set<VaultRecord *>::iterator VaultRecordSet::RemoveRecord(VaultRecord* recordToErase, bool* wasDeleted) noexcept
+    std::unordered_set<VaultRecord*>::iterator VaultRecordSet::RemoveRecord(VaultRecord* recordToErase, bool* wasDeleted) noexcept
     {
         DBG_LOG_ENTER();
 
@@ -78,7 +78,7 @@ namespace mvlt
         RecursiveReadWriteMtx.Disable();
     }
 
-    VaultRecordSet::VaultRecordSet() noexcept 
+    VaultRecordSet::VaultRecordSet() noexcept
     {
         DBG_LOG_ENTER();
 
@@ -149,7 +149,7 @@ namespace mvlt
             ss << ParentVault;
         else
             ss << "null";
-        
+
         return ss.str();
     }
 
@@ -195,7 +195,7 @@ namespace mvlt
             {
                 // Add pointer to record from recordRef to this
                 std::pair<decltype(RecordsSet.begin()), bool> emplaceRes = RecordsSet.emplace(recordRef.VaultRecordPtr);
-                
+
                 if (emplaceRes.second)
                 {
                     // Add pointer to record from recordRef to this::vaultRecordRef structure
@@ -214,7 +214,7 @@ namespace mvlt
                     res.ResultCode = VaultOperationResultCode::RecordAlredyInSet;
                 }
             }
-            else 
+            else
             {
                 res.IsOperationSuccess = false;
                 if (!recordRef.IsValid())
@@ -223,7 +223,7 @@ namespace mvlt
                     res.ResultCode = VaultOperationResultCode::ParentVaultNotMatch;
             }
         }
-        else 
+        else
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::ParentVaultNotValid;
@@ -239,7 +239,7 @@ namespace mvlt
         if (GetIsParentVaultValid())
         {
             ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
-            if (Vault::RecordsSet.find(ref.VaultRecordPtr) != Vault::RecordsSet.end()) 
+            if (Vault::RecordsSet.find(ref.VaultRecordPtr) != Vault::RecordsSet.end())
                 return true;
         }
         return false;
@@ -284,7 +284,7 @@ namespace mvlt
         DBG_LOG_ENTER();
 
         if (!GetIsParentVaultValid()) return false;
-        
+
         ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
         return Vault::EraseRecord(recordRefToErase);
     }
@@ -367,11 +367,11 @@ namespace mvlt
             return Vault::ToStrings();
         }
         else
-            return std::vector<std::vector<std::pair<std::string, std::string>>> ();
+            return std::vector<std::vector<std::pair<std::string, std::string>>>();
     }
 
     void VaultRecordSet::Print(const bool& isPrintId, const std::size_t& amountOfRecords, const std::string& primaryKey, const bool& isReverse,
-            const std::list<std::string>& keys) const noexcept
+        const std::list<std::string>& keys) const noexcept
     {
         DBG_LOG_ENTER();
 
@@ -466,7 +466,7 @@ namespace mvlt
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::SameVaultRecordSet;
         }
-        
+
         if (res.IsOperationSuccess)
         {
             ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
@@ -515,7 +515,7 @@ namespace mvlt
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::SameVaultRecordSet;
         }
-        
+
         if (res.IsOperationSuccess)
         {
             ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
@@ -555,7 +555,6 @@ namespace mvlt
         Reset();
     }
 
-
     bool operator==(const VaultRecordSet& a, const VaultRecordSet& b) noexcept
     {
         DBG_LOG_ENTER();
@@ -579,7 +578,7 @@ namespace mvlt
             vor.IsOperationSuccess = false;
             vor.ResultCode = VaultOperationResultCode::SameVaultRecordSet;
         }
-        else 
+        else
         {
             res = a;
             vor = res.Join(b);
@@ -627,7 +626,7 @@ namespace mvlt
             a.ParentVault->RecursiveReadWriteMtx.ReadLock();
 
             res.ParentVault = a.ParentVault;
-            
+
             for (auto& keyCopierIt : a.VaultKeyCopiers)
                 keyCopierIt.second(&res);
 
@@ -639,7 +638,7 @@ namespace mvlt
 
             a.ParentVault->RecordSetsSet.emplace(&res);
 
-            // Pick less set to iterate 
+            // Pick less set to iterate
             if (a.RecordsSet.size() < b.RecordsSet.size())
             {
                 // Iterate over all records in a
@@ -649,13 +648,13 @@ namespace mvlt
                     if (b.RecordsSet.find(record) != b.RecordsSet.end())
                     {
                         res.RecordsSet.emplace(record);
-                    
+
                         for (auto& adder : res.VaultRecordAdders)
                             adder.second(record);
                     }
                 }
             }
-            else 
+            else
             {
                 // Iterate over all records in b
                 for (VaultRecord* record : b.RecordsSet)
@@ -664,7 +663,7 @@ namespace mvlt
                     if (a.RecordsSet.find(record) != a.RecordsSet.end())
                     {
                         res.RecordsSet.emplace(record);
-                    
+
                         for (auto& adder : res.VaultRecordAdders)
                             adder.second(record);
                     }

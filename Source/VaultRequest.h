@@ -8,22 +8,21 @@ namespace mvlt
 {
     /**
         \brief A class for requests to Vault
-        
+
         \tparam <VaultRequestType> type of the request
     */
     template <VaultRequestType Type>
-    class VaultRequest 
+    class VaultRequest
     {
     private:
-
         /// Request type
         VaultRequestType RequestType = Type;
 
         /// Function for requesting data
         void (*DataRequestFunc)(const std::string&, Vault*, std::unordered_set<VaultRecord*>&, void*, void*, bool, bool, const std::function<bool(const VaultRecordRef& ref)>&);
-        
+
         /// A variable for storing a logical request function
-        std::function<void (Vault* vlt, std::unordered_set<VaultRecord*>& setWithRecords)> LogicalRequestFunction;
+        std::function<void(Vault* vlt, std::unordered_set<VaultRecord*>& setWithRecords)> LogicalRequestFunction;
 
         /// A pointer to a function that delete data
         void (*DeleteFunc)(void*) = nullptr;
@@ -38,7 +37,6 @@ namespace mvlt
         std::function<bool(const VaultRecordRef& ref)> RequestPredicat;
 
     public:
-
         /// Making the all VaultRequest templates friendly
         template <VaultRequestType TType>
         friend class VaultRequest;
@@ -80,7 +78,7 @@ namespace mvlt
 
             \param [in] key requested key
             \param [in] keyValue requested data
-            \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request. 
+            \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request.
             When the function returns true, the record is added, and when false is not added.
         */
         template <class T>
@@ -94,7 +92,7 @@ namespace mvlt
 
             \param [in] request1 first request
             \param [in] request2 second request
-            \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request. 
+            \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request.
             When the function returns true, the record is added, and when false is not added.
         */
         template <VaultRequestType RequestType1, VaultRequestType RequestType2>
@@ -113,21 +111,21 @@ namespace mvlt
 
         /// \brief Friend operator&&
         template <VaultRequestType TType>
-        friend VaultRequest operator&& (const VaultRequest& lhs, const VaultRequest& rhs) noexcept;
+        friend VaultRequest operator&&(const VaultRequest& lhs, const VaultRequest& rhs) noexcept;
 
         /// \brief Friend operator||
         template <VaultRequestType TType>
-        friend VaultRequest operator|| (const VaultRequest& lhs, const VaultRequest& rhs) noexcept;
+        friend VaultRequest operator||(const VaultRequest& lhs, const VaultRequest& rhs) noexcept;
     };
 
     /**
         \brief Operator&& for requests
 
-        \tparam <LType> Specialization for a specific value with type VaultRequestType in lhs record 
-        \tparam <RType> Specialization for a specific value with type VaultRequestType in rhs record 
+        \tparam <LType> Specialization for a specific value with type VaultRequestType in lhs record
+        \tparam <RType> Specialization for a specific value with type VaultRequestType in rhs record
 
         Allows you to simply use && instead of calling And.
-        
+
         Instead of writing:
 
         \code{.cpp}
@@ -146,16 +144,16 @@ namespace mvlt
         \return new request equal to VaultRequest<VaultRequestType::And>
     */
     template <VaultRequestType LType, VaultRequestType RType>
-    VaultRequest<VaultRequestType::And> operator&& (const VaultRequest<LType>& lhs, const VaultRequest<RType>& rhs) noexcept;
+    VaultRequest<VaultRequestType::And> operator&&(const VaultRequest<LType>& lhs, const VaultRequest<RType>& rhs) noexcept;
 
     /**
         \brief Operator|| for requests
 
-        \tparam <LType> Specialization for a specific value with type VaultRequestType in lhs record 
-        \tparam <RType> Specialization for a specific value with type VaultRequestType in rhs record 
+        \tparam <LType> Specialization for a specific value with type VaultRequestType in lhs record
+        \tparam <RType> Specialization for a specific value with type VaultRequestType in rhs record
 
         Allows you to simply use && instead of calling Or.
-        
+
         Instead of writing:
 
         \code{.cpp}
@@ -174,5 +172,5 @@ namespace mvlt
         \return new request equal to VaultRequest<VaultRequestType::Or>
     */
     template <VaultRequestType LType, VaultRequestType RType>
-    VaultRequest<VaultRequestType::Or> operator|| (const VaultRequest<LType>& lhs, const VaultRequest<RType>& rhs) noexcept;
+    VaultRequest<VaultRequestType::Or> operator||(const VaultRequest<LType>& lhs, const VaultRequest<RType>& rhs) noexcept;
 }

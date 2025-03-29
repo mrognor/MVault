@@ -2,7 +2,7 @@
 #include "Vault.hpp"
 #include "VaultRecordRef.hpp"
 
-namespace mvlt 
+namespace mvlt
 {
     void VaultRecordRef::SetRecord(VaultRecord* vaultRecord, Vault* vlt) noexcept
     {
@@ -19,7 +19,7 @@ namespace mvlt
         vlt->RecursiveReadWriteMtx.ReadUnlock();
     }
 
-    VaultRecordRef::VaultRecordRef() noexcept 
+    VaultRecordRef::VaultRecordRef() noexcept
     {
         DBG_LOG_ENTER();
     }
@@ -59,14 +59,14 @@ namespace mvlt
                 VaultRecordPtr = other.VaultRecordPtr;
                 Vlt = other.Vlt;
             }
-            else 
+            else
             {
                 if (VaultRecordPtr != nullptr) VaultRecordPtr->RemoveRef();
                 Vlt = nullptr;
                 VaultRecordPtr = nullptr;
             }
         }
-        
+
         return *this;
     }
 
@@ -75,7 +75,7 @@ namespace mvlt
         DBG_LOG_ENTER();
 
         *this = other;
-        
+
         return *this;
     }
 
@@ -129,7 +129,7 @@ namespace mvlt
 
         return res;
     }
-                
+
     VaultOperationResult VaultRecordRef::GetDataAsString(const std::string& key, std::string& str) const noexcept
     {
         DBG_LOG_ENTER();
@@ -138,7 +138,7 @@ namespace mvlt
         VaultOperationResult res;
         res.Key = key;
         res.RequestedType = typeid(std::string);
-        
+
         if (VaultRecordPtr == nullptr)
         {
             res.IsOperationSuccess = false;
@@ -158,7 +158,7 @@ namespace mvlt
         }
 
         // If key not exist
-        if(!Vlt->GetKeyType(key, res.SavedType))
+        if (!Vlt->GetKeyType(key, res.SavedType))
         {
             res.IsOperationSuccess = false;
             res.ResultCode = VaultOperationResultCode::WrongKey;
@@ -229,7 +229,7 @@ namespace mvlt
                 {
                     DataSaver dataSaver;
                     VaultRecordPtr->GetDataSaver(keyPair.first, dataSaver);
-                
+
                     std::cout << "\t" << keyPair.first << " = " << dataSaver.Str() << "\n";
                 }
 
@@ -248,7 +248,7 @@ namespace mvlt
 
         if (VaultRecordPtr != nullptr)
             VaultRecordPtr->RemoveRef();
-        
+
         VaultRecordPtr = nullptr;
         Vlt = nullptr;
     }
@@ -270,7 +270,7 @@ namespace mvlt
             {
                 Vlt->RecursiveReadWriteMtx.ReadLock();
 
-                for(const std::string& key : Vlt->KeysOrder)
+                for (const std::string& key : Vlt->KeysOrder)
                 {
                     if (isFormat) res += "\n" + tab;
 
@@ -313,7 +313,7 @@ namespace mvlt
             {
                 Vlt->RecursiveReadWriteMtx.ReadLock();
 
-                for(const std::string& key : Vlt->KeysOrder)
+                for (const std::string& key : Vlt->KeysOrder)
                 {
                     DataSaver dataSaver;
                     VaultRecordPtr->GetDataSaver(key, dataSaver);

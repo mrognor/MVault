@@ -12,8 +12,8 @@ namespace mvlt
     /**
         \brief Template prototype of a container for storing different types of data.
 
-        \tparam <C> The container class for which this class will be the wrapper. 
-        Container have to support find(), begin(), end(), emplace(), erase().  
+        \tparam <C> The container class for which this class will be the wrapper.
+        Container have to support find(), begin(), end(), emplace(), erase().
         Types that are used in inheritors:
         \tparam <std::set> A container built on an avl tree.
         \tparam <std::map> A container built on an avl tree. Stores a pair of key and value.
@@ -21,7 +21,7 @@ namespace mvlt
         \tparam <std::unordered_map> A container built on a hash table. Stores a pair of key and value.
 
         The container should work according to the std::map type, i.e. store a key and value pair in itself.
-        Using class specialization, you can define an internal container. 
+        Using class specialization, you can define an internal container.
         If a pointer is written to one of the elements, then you can set a custom data deletion function.
     */
     template <class C>
@@ -86,7 +86,7 @@ namespace mvlt
             \brief Method for adding a new data to the container
 
             \param [in] key the key whose value needs to be changed
-            \param [in] dataSaver dataSaver with any type, the value from which will be copied to the container 
+            \param [in] dataSaver dataSaver with any type, the value from which will be copied to the container
         */
         void AddDataFromDataSaver(const std::string& key, const DataSaver& dataSaver) noexcept
         {
@@ -139,7 +139,7 @@ namespace mvlt
             If there was no data with such a key, it will be created
 
             \param [in] key the key whose value needs to be changed
-            \param [in] dataSaver dataSaver with any type, the value from which will be copied to the container 
+            \param [in] dataSaver dataSaver with any type, the value from which will be copied to the container
         */
         void SetDataFromDataSaver(const std::string& key, const DataSaver& dataSaver) noexcept
         {
@@ -183,7 +183,7 @@ namespace mvlt
             If the data was not found, then nothing will be written to the data
 
             \return Returns false if the key was not found, and otherwise returns true.
-        */ 
+        */
         template <class T>
         bool GetData(const std::string& key, T& data) const noexcept
         {
@@ -203,7 +203,7 @@ namespace mvlt
             If the data was not found, then nothing will be written to the dataSaver
 
             \return Returns false if the key was not found, and otherwise returns true.
-        */ 
+        */
         bool GetDataSaver(const std::string& key, DataSaver& dataSaver) const noexcept
         {
             auto findResIt = Container.find(key);
@@ -213,7 +213,7 @@ namespace mvlt
             dataSaver = findResIt->second;
             return true;
         }
-        
+
         /**
             \brief Method for getting data converted to string from a container using a key
 
@@ -222,7 +222,7 @@ namespace mvlt
             If the data was not found, then nothing will be written to the str
 
             \return Returns false if the key was not found, and otherwise returns true.
-        */ 
+        */
         bool GetDataAsString(const std::string& key, std::string& str) const noexcept
         {
             auto findResIt = Container.find(key);
@@ -284,7 +284,9 @@ namespace mvlt
     };
 
     /// Specialization of class DataContainer, used as a type std::unordered_map<std::string, DataSaver>
-    class DataHashMap : public DataContainer<std::unordered_map<std::string, DataSaver>> {};
+    class DataHashMap : public DataContainer<std::unordered_map<std::string, DataSaver>>
+    {
+    };
 
     /// Specialization of class DataContainer, used as a type std::unordered_multimap<std::string, DataSaver>
     class DataMultiHashMap : public DataContainer<std::unordered_multimap<std::string, DataSaver>>
@@ -306,7 +308,9 @@ namespace mvlt
     };
 
     /// Specialization of class DataContainer, used as a type std::map<std::string, DataSaver>
-    class DataMap : public DataContainer<std::map<std::string, DataSaver>> {};
+    class DataMap : public DataContainer<std::map<std::string, DataSaver>>
+    {
+    };
 
     /// Specialization of class DataContainer, used as a type std::multimap<std::string, DataSaver>
     class DataMultiMap : public DataContainer<std::multimap<std::string, DataSaver>>

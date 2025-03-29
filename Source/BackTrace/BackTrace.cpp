@@ -12,7 +12,7 @@ namespace mvlt
         TraceFormat = traceFormat;
     }
 
-    #ifndef _WIN32
+#ifndef _WIN32
 
     void PrintBackTrace() noexcept
     {
@@ -33,10 +33,10 @@ namespace mvlt
             for (; i < traceSize; ++i)
             {
                 Dl_info info;
-                link_map *extra_info;
+                link_map* extra_info;
                 dladdr1(array[i], &info, reinterpret_cast<void**>(&extra_info), RTLD_DL_LINKMAP);
                 // codechecker_intentional [all] no need to optimize it
-                info.dli_fbase = (void *) extra_info->l_addr;
+                info.dli_fbase = (void*)extra_info->l_addr;
 
                 if (info.dli_sname == NULL)
                     info.dli_saddr = info.dli_fbase;
@@ -58,8 +58,8 @@ namespace mvlt
                     Trace.pop_back();
                 }
                 else std::cout << "\t" << std::flush;
-                
-                std::string command =  "addr2line -e " + std::string(buf) + " " + sstream.str();
+
+                std::string command = "addr2line -e " + std::string(buf) + " " + sstream.str();
 
                 // codechecker_intentional [all] its not a problem to use system because it is not input from user and it is only for debug
                 int res = system(command.c_str());
@@ -67,7 +67,7 @@ namespace mvlt
         }
     }
 
-    #else
+#else
 
     void PrintBackTrace() noexcept
     {
@@ -83,7 +83,7 @@ namespace mvlt
         }
     }
 
-    #endif
+#endif
 
     TraceLogger::TraceLogger(const std::string& funcName) noexcept : FuncName(funcName)
     {

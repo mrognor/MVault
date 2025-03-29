@@ -11,16 +11,16 @@ namespace mvlt
         \defgroup CsvParserFunctions Csv parser functions
         \brief All functions for working with MVault and csv
 
-        @{      
+        @{
     */
 
     /**
         \brief A function for converting a string to a csv field format.
 
-        In csv files, the fields of one record are separated by commas. To store commas inside a field, the field is placed in double quotes.  
-        To store quotes inside a field, the fields are placed in quotation marks, and all quotes inside the field are duplicated.  
+        In csv files, the fields of one record are separated by commas. To store commas inside a field, the field is placed in double quotes.
+        To store quotes inside a field, the fields are placed in quotation marks, and all quotes inside the field are duplicated.
 
-        For example: string ",,"", will be turned into """,,""""".  
+        For example: string ",,"", will be turned into """,,""""".
         Detailed description of each symbol:
         - "  - a quotation mark to start escaping
         - "" - two quotation marks to indicate the quotation mark character inside the escape
@@ -39,12 +39,10 @@ namespace mvlt
     class CsvParser
     {
     private:
-
         // File reader that allow to read file by chunks
         StreamFileReader FileReader;
 
     public:
-
         /// \brief Default constructor
         CsvParser() noexcept = default;
 
@@ -64,7 +62,7 @@ namespace mvlt
 
         /**
             \brief Deleted assignment operator
-        
+
             \param [in] other object to copy
             \return returns a new object, with data from other
         */

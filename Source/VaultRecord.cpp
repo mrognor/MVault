@@ -3,7 +3,7 @@
 
 namespace mvlt
 {
-    VaultRecord::VaultRecord() noexcept 
+    VaultRecord::VaultRecord() noexcept
     {
         DBG_LOG_ENTER();
     }

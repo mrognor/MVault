@@ -58,7 +58,7 @@ namespace mvlt
             \param [in] dataSaver object to be moved
         */
         DataSaver(DataSaver&& other) noexcept = delete;
-        
+
         /**
             \brief A template constructor that accepts a variable to store inside DataSaver
 
@@ -66,7 +66,7 @@ namespace mvlt
 
             \param [in] data data to be stored inside DataSaver
         */
-        template<class T>
+        template <class T>
         explicit DataSaver(const T& data) noexcept : DataType(typeid(void))
         {
             SetData(data);
@@ -78,13 +78,13 @@ namespace mvlt
             \tparam <T> Any type of data except for c arrays
             \tparam <F> Function pointer or lambda function
 
-            The constructor allows you to set a function to delete data, 
+            The constructor allows you to set a function to delete data,
             which can be convenient when storing pointers, when the pointer type may be unknown, but it must be deleted.
 
             \param [in] data data to be stored inside the class
             \param [in] customDeleteFunc function to delete data
-        */ 
-        template<class T, class F>
+        */
+        template <class T, class F>
         DataSaver(const T& data, F&& customDeleteFunc) noexcept : DataType(typeid(void))
         {
             SetData(data, customDeleteFunc);
@@ -115,7 +115,7 @@ namespace mvlt
         */
         template <class T>
         void SetData(const T& data) noexcept
-        {   
+        {
             SetData(data, nullptr);
         }
 
@@ -150,43 +150,43 @@ namespace mvlt
 
             // Set new CopyFunc. It is get to void pointers and convert void pointers to T pointers and copy data.
             CopyFunc = [](void*& dst, void* src)
-                {
-                    // Convert src pointer to T pointer and get data from T pointer.
-                    // Use T copy constructor to create T object.
-                    // Allocate new memory to T type and convert it to void pointer.
-                    dst = static_cast<void*>(new T(*reinterpret_cast<T*>(src)));
-                };
+            {
+                // Convert src pointer to T pointer and get data from T pointer.
+                // Use T copy constructor to create T object.
+                // Allocate new memory to T type and convert it to void pointer.
+                dst = static_cast<void*>(new T(*reinterpret_cast<T*>(src)));
+            };
 
             // Set new DeleteFunc
             DeleteFunc = [](void*& ptrToDelete)
-                {
-                    delete static_cast<T*>(ptrToDelete);
-                };
+            {
+                delete static_cast<T*>(ptrToDelete);
+            };
 
             // Set new to string function
             ToStringFunc = [](void* ptrToPrint)
-                {
-                    return ToString(*static_cast<T*>(ptrToPrint));
-                };
+            {
+                return ToString(*static_cast<T*>(ptrToPrint));
+            };
 
             // Set custom delete function from dataSaver
             CustomDeleteFunc = customDeleteFunc;
 
             // Set new copy from string function
             SetDataFromStringFunc = [](void* ptrToStoreDataFromString, const std::string& str)
-                {
-                    return FromString(str, *static_cast<T*>(ptrToStoreDataFromString));
-                };
+            {
+                return FromString(str, *static_cast<T*>(ptrToStoreDataFromString));
+            };
         }
 
         /**
             \brief Template method to get data from DataSaver.
-        
+
             \tparam <T> Any type of data except for c arrays
 
             \param [out] data the ref to which the data will be written
 
-            \return return the true if it successfully recorded the data. 
+            \return return the true if it successfully recorded the data.
             If there was no data or they were of a different type it will return false
         */
         template <class T>

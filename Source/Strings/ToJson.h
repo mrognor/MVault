@@ -31,7 +31,7 @@ namespace mvlt
 
         \return json string with data
     */
-    template<class T>
+    template <class T>
     std::string ToJson(const T& data)
     {
         std::string res;

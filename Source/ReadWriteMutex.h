@@ -26,6 +26,7 @@ namespace mvlt
 
         // A variable for switching the operation of the mutex. It is needed so that you can disable the mutex during inheritance
         bool IsActive = true;
+
     public:
         /// \brief Default constructor
         ReadWriteMutex() noexcept;
@@ -73,8 +74,8 @@ namespace mvlt
 
         // A variable for switching the operation of the mutex. It is needed so that you can disable the mutex during inheritance
         bool IsActive = true;
-    public:
 
+    public:
         /// \brief A function to disable the mutex. It is needed so that you can disable the mutex during inheritance
         void Disable() noexcept;
 
@@ -83,7 +84,7 @@ namespace mvlt
 
             Using this method, you can lock the code section for reading, which means that all threads using the read lock will have access to data inside the code section
             but threads using the write lock will wait until all read operations are completed.
-            Note that, in fact, blocking for reading inside writing does not make sense, 
+            Note that, in fact, blocking for reading inside writing does not make sense,
             since the code section is already locked and therefore nothing will happen inside the function in such a situation.
         */
         void ReadLock() noexcept;
@@ -123,8 +124,8 @@ namespace mvlt
     {
     private:
         Mutex* Mtx = nullptr;
+
     public:
-    
         /// \brief Deleted default constructor
         ReadLock() noexcept = delete;
 
@@ -149,7 +150,7 @@ namespace mvlt
 
             \param [in] mtx mutex to capture and lock
         */
-        explicit ReadLock(Mutex& mtx) noexcept : Mtx(&mtx) 
+        explicit ReadLock(Mutex& mtx) noexcept : Mtx(&mtx)
         {
             Mtx->ReadLock();
         }
@@ -178,7 +179,7 @@ namespace mvlt
         ~ReadLock() noexcept
         {
             Mtx->ReadUnlock();
-        } 
+        }
     };
 
     /**
@@ -195,8 +196,8 @@ namespace mvlt
     {
     private:
         Mutex* Mtx = nullptr;
+
     public:
-        
         /// \brief Deleted default constructor
         WriteLock() noexcept = delete;
 
@@ -221,7 +222,7 @@ namespace mvlt
 
             \param [in] mtx mutex to capture and lock
         */
-        explicit WriteLock(Mutex& mtx) noexcept : Mtx(&mtx) 
+        explicit WriteLock(Mutex& mtx) noexcept : Mtx(&mtx)
         {
             Mtx->WriteLock();
         }
@@ -250,6 +251,6 @@ namespace mvlt
         ~WriteLock() noexcept
         {
             Mtx->WriteUnlock();
-        } 
+        }
     };
 }

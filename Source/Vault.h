@@ -26,7 +26,7 @@ namespace mvlt
         The class can be represented as a simple table with the ability to quickly search in O(1) for each field of the table.
         Each row of the table is called a record, and the VaultRecord class is used to store it. The column is called the key.
         Further, the keys will mean the columns of the table, and the records will mean the rows of the table.
-        The SetKey function is used to add new keys. There is a template record inside the class and when adding a 
+        The SetKey function is used to add new keys. There is a template record inside the class and when adding a
         key to the Vault, data will be added to this template record. When creating new records, they will be copied from this template record.
         Each record is unique, but the key values can be the same for many records.
         To work with records inside the Vault, the VaultRecordRef is used. You can use it to change the values of records inside the Vault.
@@ -34,7 +34,6 @@ namespace mvlt
     class Vault
     {
     private:
-
         // Template of data stored inside Vault
         VaultRecord RecordTemplate;
 
@@ -56,7 +55,7 @@ namespace mvlt
             The key type is same as the Vault key value type.
             The value is a pointer to VaultRecord.
 
-            Such a complex structure is necessary in order to quickly, in O(log n), 
+            Such a complex structure is necessary in order to quickly, in O(log n),
             find a set of elements that meet a certain requirement, for example, more than a certain value or less than this value
         */
         mutable DataMap VaultMapStructure;
@@ -76,8 +75,8 @@ namespace mvlt
         // Unordered_map of functions for getting sorted data.
         // The key is a string with the name of the key from the Vault.
         // The std::function is used as the value, in which the lambda function is written at the time of adding the key.
-        // Lambda accepts a function that is called for each record inside. VaultRecordRef and Vault pointer is passed to it. 
-        // By default, iteration by records occurs in ascending order. 
+        // Lambda accepts a function that is called for each record inside. VaultRecordRef and Vault pointer is passed to it.
+        // By default, iteration by records occurs in ascending order.
         // isReverse parameter is used for the reverse order.
         std::unordered_map<std::string, std::function<void(const std::function<bool(const VaultRecordRef& ref)>& functionToSortedData, Vault* vltPtr, const bool& isReverse)>> VaultRecordSorters;
 
@@ -95,8 +94,8 @@ namespace mvlt
 
         // Recursive mutex for thread safety
         mutable RecursiveReadWriteMutex RecursiveReadWriteMtx;
-    protected:
 
+    protected:
         /// \brief Enum for storing the object type during inheritance
         enum class VaultDerivedClasses : std::uint8_t
         {
@@ -115,7 +114,7 @@ namespace mvlt
 
         /**
             \brief Method for setting a new value in VaultRecord and Vault
-            
+
             \tparam <T> - any type except c arrays
 
             \param [in] dataRecord pointer to VaultRecord inside Vault
@@ -126,7 +125,7 @@ namespace mvlt
         */
         template <class T>
         VaultOperationResult SetDataToRecord(VaultRecord* dataRecord, const std::string& key, const T& data) noexcept;
-        
+
         /**
             \brief Method for removing a record from a Vault
 
@@ -134,10 +133,10 @@ namespace mvlt
 
             \param [in] recordToErase the reference to the record that needs to be deleted
             \param [out] wasDeleted indicates whether the record has been deleted
-            
+
             \return Returns an iterator to the RecordSet element immediately following the one being deleted. If the element to be deleted is not found, it returns RecordSet->end()
         */
-        std::unordered_set<VaultRecord *>::iterator RemoveRecord(VaultRecord* recordToErase, bool* wasDeleted) noexcept;
+        std::unordered_set<VaultRecord*>::iterator RemoveRecord(VaultRecord* recordToErase, bool* wasDeleted) noexcept;
 
         /**
             \brief The method for getting the result of the request in the std::set
@@ -150,16 +149,16 @@ namespace mvlt
             \param [in] endKeyValue the end value of the key to be found
             \param [in] isIncludeBeginKeyValue include beginKeyValue in the interval or not
             \param [in] isIncludeEndKeyValue include endKeyValue in the interval or not
-            \param [in] recordsSet A reference to std::set<VaultRecord*> 
+            \param [in] recordsSet A reference to std::set<VaultRecord*>
             \param [in] amountOfRecords The number of records requested. By default request all records
-            \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request. 
+            \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request.
             When the function returns true, the record is added, and when false is not added.
 
             \return VaultOperationResult object with RequestRecords result
         */
         template <class T>
         VaultOperationResult RequestRecordsSet(const VaultRequestType& requestType, const std::string& key, const T& beginKeyValue,
-            const T& endKeyValue, std::unordered_set<VaultRecord*>& recordsSet, const bool& isIncludeBeginKeyValue, 
+            const T& endKeyValue, std::unordered_set<VaultRecord*>& recordsSet, const bool& isIncludeBeginKeyValue,
             const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef& ref)>& requestPredicat) const noexcept;
 
         /**
@@ -175,14 +174,14 @@ namespace mvlt
             \param [in] isIncludeEndKeyValue include endKeyValue in the interval or not
             \param [in] vaultRecordSet A reference to VaultRecordSet
             \param [in] amountOfRecords The number of records requested. By default request all records
-            \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request. 
+            \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request.
             When the function returns true, the record is added, and when false is not added.
 
             \return VaultOperationResult object with RequestRecords result
         */
         template <class T>
         VaultOperationResult RequestRecords(const VaultRequestType& requestType, const std::string& key, const T& beginKeyValue,
-            const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue, 
+            const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue,
             const bool& isIncludeEndKeyValue, const std::size_t& amountOfRecords, const std::function<bool(const VaultRecordRef& ref)>& requestPredicat) const noexcept;
 
         /**
@@ -207,8 +206,8 @@ namespace mvlt
 
             \param [in] fileName the name of the file to read the data from
             \param [in] isPreprocessRecord a flag indicating the need to pre-process the record
-            \param [in] recordHandler a function for preprocessing the recording. Accepts two vectors with strings. 
-            The first vector contains the keys in the order in which they are specified in the file. 
+            \param [in] recordHandler a function for preprocessing the recording. Accepts two vectors with strings.
+            The first vector contains the keys in the order in which they are specified in the file.
             If the file does not contain keys, then this vector will be empty. The second vector is a vector of values.
             \param [in] separator the symbol to be used as a data separator in the file
             \param [in] isLoadKeys are there any keys in the file
@@ -216,12 +215,11 @@ namespace mvlt
 
             \return returns true if it was possible to read the file, otherwise it returns false
         */
-        bool ReadFile(const std::string& fileName, const bool& isPreprocessRecord, 
+        bool ReadFile(const std::string& fileName, const bool& isPreprocessRecord,
             const char& separator, const bool& isLoadKeys, const std::vector<std::string>& userKeys,
-            const std::function<void (const std::vector<std::string>& keys, std::vector<std::string>& values)>& recordHandler) noexcept;
+            const std::function<void(const std::vector<std::string>& keys, std::vector<std::string>& values)>& recordHandler) noexcept;
 
     public:
-
         /// Making the VaultRecordRef class friendly so that it has access to the internal members of the Vault class
         friend VaultRecordRef;
 
@@ -304,7 +302,7 @@ namespace mvlt
 
             \param [in] key new key name
             \param [in] uniqueKeyFunction A function to determine the value of the key that will be set
-             for an entry that has already been in vault. The function takes std::size_t as the index of the record. 
+             for an entry that has already been in vault. The function takes std::size_t as the index of the record.
              The same index value between runs is not guaranteed. The function should return an object of type T, which will be set to a record.
 
             The basic syntax of the method is as follows:
@@ -341,7 +339,7 @@ namespace mvlt
             \return returns true if the key was found otherwise returns false
         */
         bool IsKeyExist(const std::string& key) const noexcept;
-        
+
         /**
             \brief The method for getting a default key value
 
@@ -391,11 +389,11 @@ namespace mvlt
         /**
             \brief Method to create new VaultRecord.
 
-            The method accepts a vector of pairs, the first element of the pair is a string with a key, 
+            The method accepts a vector of pairs, the first element of the pair is a string with a key,
             and the second element of the pair are key values of any type.
-            The order of the pairs is not important, assignment takes place by key. The number of pairs can be any, 
+            The order of the pairs is not important, assignment takes place by key. The number of pairs can be any,
             for all keys for which no value has been specified, the default value will remain.
-            If there are unique keys in the vault, then when you try to add a record with a 
+            If there are unique keys in the vault, then when you try to add a record with a
             unique key value that is already in the vault, the new record will not be added.
 
             The Vault in the example has 2 keys. One is the id of the int type, and the second is the name of the std::string type
@@ -440,7 +438,7 @@ namespace mvlt
             \param [in] params a vector of pairs with data to be put in the Vault
 
             If there was an error in one of the parameters, the function will stop at this parameter and return an error for this parameter.
-            
+
             \return VaultOperationResult object with CreateRecord result
         */
         VaultOperationResult CreateRecord(const std::vector<std::pair<std::string, VaultParamInput>>& params) noexcept;
@@ -449,7 +447,7 @@ namespace mvlt
             \overload
             \brief Method to create new VaultRecord.
 
-            If there are unique keys in the vault, then when you try to add a record with a unique key value that is already in the vault, 
+            If there are unique keys in the vault, then when you try to add a record with a unique key value that is already in the vault,
             the new record will not be added, and the record created earlier will be placed in vaultRecordRef.
 
             \param [in] vaultRecordRef The reference to the VaultRecordRef to which the new record will be assigned
@@ -468,7 +466,7 @@ namespace mvlt
             \param [in] keyValue the value of the key to be found
             \param [in] vaultRecordRef A reference to VaultRecordRef, where information about the requested record will be recorded.
             If the key is not found, or the saved type does not match the type T, the parameter will not change.
-            If the key was found and the types matched, but the value was not found, 
+            If the key was found and the types matched, but the value was not found,
             a nullptr record will be saved to the ref and the vaultRecordRef.isValid() method returns false.
 
             \return VaultOperationResult object with GetRecord result
@@ -486,12 +484,12 @@ namespace mvlt
             \param [in] recordsRefs A reference to std::vector<VaultRecordRef?, where information about the requested records will be recorded.
             In case of errors, the vector will not change
             \param [in] amountOfRecords The number of records requested
-            
+
             \return VaultOperationResult object with GetRecords result
         */
         template <class T>
         VaultOperationResult GetRecords(const std::string& key, const T& keyValue, std::vector<VaultRecordRef>& recordsRefs, const std::size_t& amountOfRecords = -1) const noexcept;
-        
+
         /**
             \brief A method for getting all records that have a value equal to keyValue stored by the key key
 
@@ -501,7 +499,7 @@ namespace mvlt
             \param [in] keyValue the value of the key to be found
             \param [in] vaultRecordRef A reference to VaultRecordSet
             \param [in] amountOfRecords The number of records requested. By default request all records
-            \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request. 
+            \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request.
             When the function returns true, the record is added, and when false is not added.
 
             \return VaultOperationResult object with RequestRecords result
@@ -519,7 +517,7 @@ namespace mvlt
             \param [in] keyValue the value of the key to be found
             \param [in] vaultRecordRef A reference to VaultRecordSet
             \param [in] amountOfRecords The number of records requested. By default request all records
-            \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request. 
+            \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request.
             When the function returns true, the record is added, and when false is not added.
 
             \return VaultOperationResult object with RequestRecords result
@@ -537,7 +535,7 @@ namespace mvlt
             \param [in] keyValue the value of the key to be found
             \param [in] vaultRecordRef A reference to VaultRecordSet
             \param [in] amountOfRecords The number of records requested. By default request all records
-            \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request. 
+            \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request.
             When the function returns true, the record is added, and when false is not added.
 
             \return VaultOperationResult object with RequestRecords result
@@ -555,7 +553,7 @@ namespace mvlt
             \param [in] keyValue the value of the key to be found
             \param [in] vaultRecordRef A reference to VaultRecordSet
             \param [in] amountOfRecords The number of records requested. By default request all records
-            \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request. 
+            \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request.
             When the function returns true, the record is added, and when false is not added.
 
             \return VaultOperationResult object with RequestRecords result
@@ -573,7 +571,7 @@ namespace mvlt
             \param [in] keyValue the value of the key to be found
             \param [in] vaultRecordRef A reference to VaultRecordSet
             \param [in] amountOfRecords The number of records requested. By default request all records
-            \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request. 
+            \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request.
             When the function returns true, the record is added, and when false is not added.
 
             \return VaultOperationResult object with RequestRecords result
@@ -594,14 +592,14 @@ namespace mvlt
             \param [in] isIncludeEndKeyValue include endKeyValue in the interval or not
             \param [in] vaultRecordSet A reference to VaultRecordSet
             \param [in] amountOfRecords The number of records requested. By default request all records
-            \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request. 
+            \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request.
             When the function returns true, the record is added, and when false is not added.
 
             \return VaultOperationResult object with RequestRecords result
         */
         template <class T>
         VaultOperationResult RequestInterval(const std::string& key, const T& beginKeyValue,
-            const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue = true, 
+            const T& endKeyValue, VaultRecordSet& vaultRecordSet, const bool& isIncludeBeginKeyValue = true,
             const bool& isIncludeEndKeyValue = true, const std::size_t& amountOfRecords = -1,
             const std::function<bool(const VaultRecordRef& ref)>& requestPredicat = DefaultRequestPredicat) const noexcept;
 
@@ -616,7 +614,7 @@ namespace mvlt
 
         /**
             \brief A method for deleting all data and keys
-        
+
             \warning This method is not thread-safe! Call it only if you are sure that other threads are not working with VaultRecordSet or VaultRecordRef received from Vault
         */
         void DropVault() noexcept;
@@ -638,7 +636,7 @@ namespace mvlt
 
             \param [in] key the name of the key to search for
             \param [in] keyValue the value of the key to be found
-            
+
             \return VaultOperationResult object with EraseRecord result
         */
         template <class T>
@@ -652,7 +650,7 @@ namespace mvlt
             \param [in] key the name of the key to search for
             \param [in] keyValue the value of the key to be found
             \param [in] amountOfRecords The number of records to delete. By default set to minus one or all records.
-            
+
             If the amountOfRecords is greater than the number of records stored inside the Vault, then all records with this key and value will be deleted.
 
             \return VaultOperationResult object with EraseRecords result
@@ -682,14 +680,14 @@ namespace mvlt
             \brief Method for handle sorted records
 
             \param [in] key The key by which the data should be sorted
-            \param [in] func A function takes const VaultRecordRef& as a parameter. If you need the function to be called again for the next record, 
-            then this function call should return true. To stop the loop and interrupt the processing of sorted data, the function must return false. 
+            \param [in] func A function takes const VaultRecordRef& as a parameter. If you need the function to be called again for the next record,
+            then this function call should return true. To stop the loop and interrupt the processing of sorted data, the function must return false.
             To get values from a function, use lambdas and context capture
             \param [in] isReverse Sort in descending order or descending order. By default, ascending
             \param [in] amountOfRecords The number of records. By default, everything is
 
             If func returns false, then SortBy will stop.
-            The function iterate over all records sorted by the key parameter, in the order specified by the isReverse parameter. 
+            The function iterate over all records sorted by the key parameter, in the order specified by the isReverse parameter.
             For each record, the function passed in the func parameter is called.
             This function does not sort the data when it is called, the sorted data is already stored inside the Vault.
             If the key is missing in the vault, the function will be called 0 times
@@ -719,7 +717,7 @@ namespace mvlt
 
         /**
             \brief A method for displaying the contents of a Vault as a table on the screen
-            
+
             \param [in] isPrintId will the unique IDs be printed in the table
             \param [in] amountOfRecords The number of records to be printed. The default value is -1, which means that all entries will be output
             \param [in] primaryKey The key by which the data will be sorted
@@ -757,13 +755,13 @@ namespace mvlt
 
             \param [in] fileName the name of the file to read the data from
             \param [in] separator The symbol to be used as a data separator in the file
-            \param [in] recordHandler a function for preprocessing the recording. Accepts two vectors with strings. 
-            The first vector contains the keys in the order in which they are specified in the file. 
+            \param [in] recordHandler a function for preprocessing the recording. Accepts two vectors with strings.
+            The first vector contains the keys in the order in which they are specified in the file.
             If the file does not contain keys, then this vector will be empty. The second vector is a vector of values.
 
             \return returns true if it was possible to read the file, otherwise it returns false
         */
-        bool ReadFile(const std::string& fileName, const char& separator, const std::function<void (const std::vector<std::string>& keys, std::vector<std::string>& values)>& recordHandler) noexcept;
+        bool ReadFile(const std::string& fileName, const char& separator, const std::function<void(const std::vector<std::string>& keys, std::vector<std::string>& values)>& recordHandler) noexcept;
 
         /**
             \brief A method for getting errors in the last read file

@@ -16,7 +16,7 @@ namespace mvlt
 
         @{
     */
-    
+
     /// \brief Enum with all error handling codes
     enum class VaultOperationResultCode : std::int8_t
     {
@@ -36,7 +36,7 @@ namespace mvlt
         UniqueKeyValueAlredyInSet,                     ///< This value is returned when the key was found, the requested type and the saved type are equal, but the new value alredy in vault
         Success                                        ///< This value is returned when the request was completely successful
     };
-    
+
     /**@} */
 
     /// \brief Structure for storing the results of MVault operations
@@ -44,7 +44,7 @@ namespace mvlt
     {
         /// \brief A variable for determining whether the operation was successful
         bool IsOperationSuccess = true;
-        
+
         /// \brief The result code of the operation
         VaultOperationResultCode ResultCode = VaultOperationResultCode::Idle;
 
@@ -53,7 +53,7 @@ namespace mvlt
 
         /// \brief Requested key type
         std::type_index RequestedType = typeid(void);
-        
+
         /// \brief Saved key type
         std::type_index SavedType = typeid(void);
 
@@ -81,7 +81,7 @@ namespace mvlt
 
             \return true if objects equal otherwise return false
         */
-        friend bool operator== (const VaultOperationResult& resA, const VaultOperationResult& resB) noexcept;
+        friend bool operator==(const VaultOperationResult& resA, const VaultOperationResult& resB) noexcept;
     };
 
     /**
@@ -92,5 +92,5 @@ namespace mvlt
 
         \return true if objects equal otherwise return false
     */
-    bool operator== (const VaultOperationResult& resA, const VaultOperationResult& resB) noexcept;
+    bool operator==(const VaultOperationResult& resA, const VaultOperationResult& resB) noexcept;
 }

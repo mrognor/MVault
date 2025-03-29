@@ -8,14 +8,14 @@ namespace mvlt
 
         ResultCode = resultCode;
 
-        #ifndef NDEBUG
+#ifndef NDEBUG
         if (TraceFormat != BackTraceFormat::None)
         {
             std::cout << "Internal error! " << ResultCodeString() << "\n";
             std::cout << "\tRequested key: \x1B[31m" << Key << "\033[0m. Requested type: \x1B[31m" << RequestedType.name() << "\033[0m. SavedType: \x1B[31m" << SavedType.name() << "\033[0m.\n";
             PrintBackTrace();
         }
-        #endif
+#endif
     }
 
     std::string VaultOperationResult::ResultCodeString() const noexcept
@@ -32,7 +32,7 @@ namespace mvlt
 
         case VaultOperationResultCode::TryToAddUniqueKeyInNonEmptyVaultWithoutLambda:
             return "You can not add unique key without lambda in non-empty vault";
-             
+
         case VaultOperationResultCode::DuplicateKey:
             return "This key is alredy in vault";
 
@@ -50,7 +50,7 @@ namespace mvlt
 
         case VaultOperationResultCode::DataRecordNotValid:
             return "The record referenced by VaultRecordRef is not valid.";
-   
+
         case VaultOperationResultCode::WrongKey:
             return "The requested key was not found.";
 
@@ -83,12 +83,12 @@ namespace mvlt
         std::cout << ResultCodeString() << " Key: " << Key << " Saved type: " << SavedType.name() << " Requested type: " << RequestedType.name() << "\n";
     }
 
-    bool operator== (const VaultOperationResult& resA, const VaultOperationResult& resB) noexcept
+    bool operator==(const VaultOperationResult& resA, const VaultOperationResult& resB) noexcept
     {
         DBG_LOG_ENTER();
 
         return (resA.IsOperationSuccess == resB.IsOperationSuccess) && (resA.ResultCode == resB.ResultCode) &&
-            (resA.Key == resB.Key) && (resA.RequestedType == resB.RequestedType) &&
-            (resA.SavedType == resB.SavedType);
+               (resA.Key == resB.Key) && (resA.RequestedType == resB.RequestedType) &&
+               (resA.SavedType == resB.SavedType);
     }
 }

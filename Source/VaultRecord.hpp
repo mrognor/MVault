@@ -3,9 +3,9 @@
 #include "Vault.h"
 #include "VaultRecordSet.h"
 
-namespace mvlt 
+namespace mvlt
 {
-    template<class T>
+    template <class T>
     void VaultRecord::UpdateDependentSets(const std::string& key, const T& data) noexcept
     {
         DBG_LOG_ENTER();

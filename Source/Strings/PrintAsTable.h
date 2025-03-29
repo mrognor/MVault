@@ -14,7 +14,7 @@ namespace mvlt
     /**
         \brief A method for printing data as tables
 
-        \tparam <T> It takes the std container with VaultRecordRef objects. 
+        \tparam <T> It takes the std container with VaultRecordRef objects.
 
         Not thread safety.
 
@@ -22,11 +22,11 @@ namespace mvlt
         \param [in] isPrintId will the unique IDs be printed in the table
         \param [in] amountOfRecords The number of records to be printed. The default value is -1, which means that all entries will be output
         \param [in] keys vector of keys to be printed. By default, the vector is empty, which means that all keys will be output
-    */ 
+    */
     template <template <class E, class Alloc = std::allocator<E>> class T>
     void PrintAsTable(const T<VaultRecordRef>& container, const bool& isPrintId = false, const std::size_t& amountOfRecords = -1, const std::vector<std::string>& keys = {}) noexcept
     {
-        if (container.empty()) 
+        if (container.empty())
         {
             std::cout << "The keys could not be retrieved because the container is empty" << "\n";
             std::cout << " (0 records)" << "\n";
@@ -44,7 +44,7 @@ namespace mvlt
         // Fill each max length using key length
         for (std::size_t i = 0; i < realKeys->size(); ++i)
             maxLengths[i] = (*realKeys)[i].length();
-        
+
         // Find each real max length
         std::string dataString;
         for (std::size_t i = 0; i < realKeys->size(); ++i)
@@ -52,7 +52,7 @@ namespace mvlt
             for (const auto& record : container)
             {
                 record.GetDataAsString((*realKeys)[i], dataString);
-                if (dataString.length() > maxLengths[i]) maxLengths[i] = dataString.length();      
+                if (dataString.length() > maxLengths[i]) maxLengths[i] = dataString.length();
             }
         }
 
@@ -96,11 +96,11 @@ namespace mvlt
                 record.GetDataAsString((*realKeys)[i], dataString);
                 std::cout << " " << dataString;
                 for (std::size_t j = dataString.length(); j < maxLengths[i]; ++j) std::cout << " ";
-                    std::cout << " |";
+                std::cout << " |";
             }
             if (isPrintId)
                 std::cout << " " << record.GetRecordUniqueId() << "\n";
-            else 
+            else
                 std::cout << "\n";
 
             ++counter;

@@ -11,22 +11,21 @@ namespace mvlt
 {
     /**
         \brief A class for transferring data to the Vault
-        
+
         It is used for multiple data additions when creating a record in Vault and for multiple data changes when setting data in VaultRecordRef
     */
     class VaultParamInput
     {
     private:
-
         // Pointer to data type saver
         std::type_index DataType;
-        
+
         // Function for setting data to VaultRecordRef
         std::function<VaultOperationResult(const std::string& data, VaultRecordRef& ref)> SetDataToRefFunc;
-        
+
         // Function for settind data to VaultRecord
         std::function<void(const std::string& data, VaultRecord* record)> SetDataToRecordFunc;
-        
+
         /**
             \brief Method for setting key data in VaultRecordRef
 
@@ -45,27 +44,26 @@ namespace mvlt
         void SetDataToRecord(const std::string& key, VaultRecord* recordToSetData) const noexcept;
 
     public:
-        
         /// Making the Vault class friendly so that it has access to the internal members of the VaultParamInput class
         friend Vault;
 
         /// Making the VaultRecordRef class friendly so that it has access to the internal members of the VaultParamInput class
         friend VaultRecordRef;
-        
+
         /**
             \brief A template constructor that accepts a variable to store inside VaultParamInput
-            
+
             \tparam <T> Any type of data except for c arrays
-            
+
             \param [in] data data to be stored inside VaultParamInput
         */
-        template <class T> 
+        template <class T>
         // codechecker_intentional [all] its not explicit to simplify code
         VaultParamInput(const T& data) noexcept;
 
         /**
             \brief A method for getting the type of saved data.
-            
+
             \return std::type_index object with saved data type
         */
         std::type_index GetDataType() const noexcept;
