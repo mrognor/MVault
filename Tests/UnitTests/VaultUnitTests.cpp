@@ -4295,22 +4295,6 @@ $~~~~~~~$~~~$
 ){{{");
 )
 
-TEST_BODY(Print, PrintSet,
-    Vault vlt;
-    VaultRecordSet vrs;
-
-    vlt.AddKey("A", 0);
-    
-    vlt.CreateRecord({});
-
-    vlt.RequestEqual("A", 0, vrs);
-
-    vlt.EraseRecord("A", 0);
-    vlt.RemoveKey("A");
-
-    TEST_COUT(vrs.Print(), "VaultRecordSet does not contain keys!\n (0 records)\n");
-)
-
 TEST_BODY(Print, PrintId,
     Vault vlt;
 

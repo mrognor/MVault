@@ -452,7 +452,7 @@ namespace mvlt
             \return json string
         */
         std::string ToJson(const bool& isFormat = false, const std::size_t& tabSize = 2, const bool& isUseRecordTemplate = true,
-            const std::string& recordTemplate = "Record") const noexcept;
+            const std::string& recordTemplate = "Record", const bool& isArray = false) const noexcept;
 
         /**
             \brief Method for convert vault record set to strings

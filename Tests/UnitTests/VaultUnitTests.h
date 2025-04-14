@@ -451,8 +451,6 @@ namespace VaultTestNs
 
         TEST_CASE(NotAllKeys)
 
-        TEST_CASE(PrintSet)
-
         TEST_CASE(PrintId)
     )
 

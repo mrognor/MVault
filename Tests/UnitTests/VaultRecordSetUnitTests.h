@@ -320,6 +320,202 @@ namespace VaultRecordSetTestNs
 
         TEST_CASE(FilledSet)
     )
+
+    TEST_SUITE(RemoveRecordByRef,
+    
+        TEST_CASE(InvalidSet)
+
+        TEST_CASE(InvalidRef)
+
+        TEST_CASE(Default)
+
+        TEST_CASE(SecondDeletion)
+    )
+
+    TEST_SUITE(RemoveRecordByKeyAndValue,
+    
+        TEST_CASE(InvalidSet)
+
+        TEST_CASE(Default)
+
+        TEST_CASE(SecondDeletion)
+
+        TEST_CASE(WrongKey)
+
+        TEST_CASE(WrongType)
+
+        TEST_CASE(WrongValue)
+    )
+
+    TEST_SUITE(RemoveRecords,
+    
+        TEST_CASE(InvalidSet)
+
+        TEST_CASE(Default)
+
+        TEST_CASE(DeleteNotAll)
+
+        TEST_CASE(WrongKey)
+
+        TEST_CASE(WrongType)
+
+        TEST_CASE(WrongValue)
+    )
+
+    TEST_SUITE(Size,
+
+        TEST_CASE(Invalid)
+
+        TEST_CASE(Empty)
+
+        TEST_CASE(Default)
+    )
+
+    TEST_SUITE(GetKeys,
+    
+        TEST_CASE(Invalid)
+
+        TEST_CASE(Keys)
+    )
+
+    TEST_SUITE(GetUniqueKeys,
+
+        TEST_CASE(Invalid)
+
+        TEST_CASE(UniqueKeys)
+    )
+
+    TEST_SUITE(GetSortedRecords,
+
+        TEST_CASE(Invalid)
+
+        TEST_CASE(GetRecords)
+
+        TEST_CASE(GetRecordsReverse)
+
+        TEST_CASE(GetNotAllRecords)
+
+        TEST_CASE(WrongKey)
+    )
+
+    TEST_SUITE(SortBy,
+
+        TEST_CASE(Invalid)
+
+        TEST_CASE(Sort)
+
+        TEST_CASE(SortReverse)
+
+        TEST_CASE(SortNotAllRecords)
+
+        TEST_CASE(WrongKey)
+    )
+
+    TEST_SUITE(ToJson,
+
+        TEST_CASE(Invalid)
+
+        TEST_CASE(Default)
+
+        TEST_CASE(Format)
+
+        TEST_CASE(DiffTabSize)
+
+        TEST_CASE(RecordTemplate)
+
+        TEST_CASE(Array)
+
+        TEST_CASE(ArrayFormat)
+
+        TEST_CASE(ArrayDiffTabSize)
+
+        TEST_CASE(RecordId)
+    )
+
+    TEST_SUITE(ToStrings,
+
+        TEST_CASE(Invalid)
+
+        TEST_CASE(EmptySet)
+
+        TEST_CASE(KeysWithoutRecords)
+
+        TEST_CASE(FilledVault)
+    )
+
+    TEST_SUITE(Print,
+
+        TEST_CASE(Invalid)
+
+        TEST_CASE(Empty)
+
+        TEST_CASE(KeysWithoutRecords)
+
+        TEST_CASE(FilledVaultWithDefaultArgs)
+
+        TEST_CASE(NotAllRecords)
+
+        TEST_CASE(PrimaryKey)
+
+        TEST_CASE(Reverse)
+
+        TEST_CASE(NotAllKeys)
+
+        TEST_CASE(PrintId)
+    )
+
+    TEST_SUITE(Join,
+        
+        TEST_CASE(JoinInvalidToInvalid)
+
+        TEST_CASE(JoinValidToInvalid)
+
+        TEST_CASE(JoinInvalidToValid)
+
+        TEST_CASE(JoinFilledToEmpty)
+
+        TEST_CASE(JoinEmptyToFilled)
+
+        TEST_CASE(JoinFilled)
+
+        TEST_CASE(WrongParentVault)
+
+        TEST_CASE(Self)
+    )
+
+    TEST_SUITE(Exclude,
+    
+        TEST_CASE(ExcludeInvalidFromInvalid)
+
+        TEST_CASE(ExcludeValidFromInvalid)
+
+        TEST_CASE(ExcludeInvalidFromValid)
+
+        TEST_CASE(ExcludeFilledFromEmpty)
+
+        TEST_CASE(ExcludeEmptyFromFilled)
+
+        TEST_CASE(ExcludeFilled)
+
+        TEST_CASE(Self)
+    )
+
+    TEST_SUITE(Intersect,
+    
+        TEST_CASE(IntersectInvalidWithInvalid)
+
+        TEST_CASE(IntersectInvalidWithValid)
+
+        TEST_CASE(IntersectValidWithInvalid)
+
+        TEST_CASE(IntersectFilledFromEmpty)
+
+        TEST_CASE(IntersectEmptyFromFilled)
+
+        TEST_CASE(IntersectFilled)
+
+        TEST_CASE(Self)
+    )
 }
 
 void VaultRecordSetUnitTests();

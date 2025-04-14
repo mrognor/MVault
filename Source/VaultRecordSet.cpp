@@ -344,14 +344,14 @@ namespace mvlt
     }
 
     std::string VaultRecordSet::ToJson(const bool& isFormat, const std::size_t& tabSize, const bool& isUseRecordTemplate,
-        const std::string& recordTemplate) const noexcept
+        const std::string& recordTemplate, const bool& isArray) const noexcept
     {
         DBG_LOG_ENTER();
 
         if (GetIsParentVaultValid())
         {
             ReadLock<RecursiveReadWriteMutex> readLock(ParentVault->RecursiveReadWriteMtx);
-            return Vault::ToJson(isFormat, tabSize, isUseRecordTemplate, recordTemplate);
+            return Vault::ToJson(isFormat, tabSize, isUseRecordTemplate, recordTemplate, isArray);
         }
         else
             return "{}";
@@ -390,6 +390,7 @@ namespace mvlt
 
         VaultOperationResult res;
         res.IsOperationSuccess = true;
+        res.ResultCode = VaultOperationResultCode::Success;
 
         // Handle errors
         if (!GetIsParentVaultValid())
@@ -441,6 +442,7 @@ namespace mvlt
 
         VaultOperationResult res;
         res.IsOperationSuccess = true;
+        res.ResultCode = VaultOperationResultCode::Success;
 
         // Handle errors
         if (!GetIsParentVaultValid())
@@ -490,6 +492,7 @@ namespace mvlt
 
         VaultOperationResult res;
         res.IsOperationSuccess = true;
+        res.ResultCode = VaultOperationResultCode::Success;
 
         // Handle errors
         if (!GetIsParentVaultValid())

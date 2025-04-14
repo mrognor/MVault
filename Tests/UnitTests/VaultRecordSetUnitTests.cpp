@@ -3555,6 +3555,1413 @@ TEST_BODY(Clear, FilledSet,
     TEST_ASSERT(vrs.GetUniqueKeys() == std::vector<std::string>({"B"}));
     COMPARE_VAULT(vrs, {});
 )
+
+TEST_BODY(RemoveRecordByRef, InvalidSet,
+    VaultRecordSet vrs;
+    VaultRecordRef vrf;
+
+    TEST_ASSERT(vrs.RemoveRecord(vrf) == false);
+)
+
+TEST_BODY(RemoveRecordByRef, InvalidRef,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrf;
+
+    TEST_ASSERT(vrs.RemoveRecord(vrf) == false);
+)
+
+TEST_BODY(RemoveRecordByRef, Default,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultRecordRef vrf;
+
+    vlt.AddKey("A", 0);
+    vlt.CreateRecord({});
+    vlt.CreateRecord({});
+
+    vlt.RequestEqual("A", 0, vrs);
+    vrs.GetRecord("A", 0, vrf);
+
+    TEST_ASSERT(vrs.RemoveRecord(vrf) == true);
+    COMPARE_VAULT(vrs, {
+        {{"A", 0}}
+    });
+)
+
+TEST_BODY(RemoveRecordByRef, SecondDeletion,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultRecordRef vrf;
+
+    vlt.AddKey("A", 0);
+    vlt.CreateRecord({});
+    vlt.CreateRecord({});
+
+    vlt.RequestEqual("A", 0, vrs);
+    vrs.GetRecord("A", 0, vrf);
+
+    TEST_ASSERT(vrs.RemoveRecord(vrf) == true);
+    TEST_ASSERT(vrs.RemoveRecord(vrf) == false);
+
+    COMPARE_VAULT(vrs, {
+        {{"A", 0}}
+    });
+)
+
+TEST_BODY(RemoveRecordByKeyAndValue, InvalidSet,
+    VaultRecordSet vrs;
+    VaultOperationResult vor;
+
+    vor = vrs.RemoveRecord("A", 0);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::ParentVaultNotValid, SavedType == typeid(void));
+)
+
+TEST_BODY(RemoveRecordByKeyAndValue, Default,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.CreateRecord({});
+    vlt.CreateRecord({});
+
+    vlt.RequestEqual("A", 0, vrs);
+
+    vor = vrs.RemoveRecord("A", 0);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(int));
+
+    COMPARE_VAULT(vrs, {
+        {{"A", 0}}
+    });
+)
+
+TEST_BODY(RemoveRecordByKeyAndValue, SecondDeletion,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.CreateRecord({});
+    vlt.CreateRecord({});
+
+    vlt.RequestEqual("A", 0, vrs);
+
+    vor = vrs.RemoveRecord("A", 0);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(int));
+
+    vrs.RemoveRecord("A", 0);
+
+    COMPARE_VAULT(vrs, {});
+)
+
+TEST_BODY(RemoveRecordByKeyAndValue, WrongKey,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.CreateRecord({});
+    vlt.CreateRecord({});
+
+    vlt.RequestEqual("A", 0, vrs);
+
+    vor = vrs.RemoveRecord("B", 0);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "B", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongKey, SavedType == typeid(void));
+
+    COMPARE_VAULT(vrs, {
+        {{"A", 0}},
+        {{"A", 0}}
+    });
+)
+
+TEST_BODY(RemoveRecordByKeyAndValue, WrongType,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.CreateRecord({});
+    vlt.CreateRecord({});
+
+    vlt.RequestEqual("A", 0, vrs);
+
+    vor = vrs.RemoveRecord("A", std::string());
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::WrongType, SavedType == typeid(int));
+
+    COMPARE_VAULT(vrs, {
+        {{"A", 0}},
+        {{"A", 0}}
+    });
+)
+
+TEST_BODY(RemoveRecordByKeyAndValue, WrongValue,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.CreateRecord({});
+    vlt.CreateRecord({});
+
+    vlt.RequestEqual("A", 0, vrs);
+
+    vor = vrs.RemoveRecord("A", 1);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongValue, SavedType == typeid(int));
+
+    COMPARE_VAULT(vrs, {
+        {{"A", 0}},
+        {{"A", 0}}
+    });
+)
+
+TEST_BODY(RemoveRecords, InvalidSet,
+    VaultRecordSet vrs;
+    VaultOperationResult vor;
+
+    vor = vrs.RemoveRecords("A", 0);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::ParentVaultNotValid, SavedType == typeid(void));
+)
+
+TEST_BODY(RemoveRecords, Default,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.CreateRecord({});
+    vlt.CreateRecord({});
+
+    vlt.RequestEqual("A", 0, vrs);
+
+    vor = vrs.RemoveRecords("A", 0);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(int));
+
+    COMPARE_VAULT(vrs, {});
+)
+
+TEST_BODY(RemoveRecords, DeleteNotAll,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.CreateRecord({});
+    vlt.CreateRecord({});
+
+    vlt.RequestEqual("A", 0, vrs);
+
+    vor = vrs.RemoveRecords("A", 0, 1);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(int));
+
+    COMPARE_VAULT(vrs, {
+        {{"A", 0}}
+    });
+)
+
+TEST_BODY(RemoveRecords, WrongKey,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.CreateRecord({});
+    vlt.CreateRecord({});
+
+    vlt.RequestEqual("A", 0, vrs);
+
+    vor = vrs.RemoveRecords("B", 0);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "B", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongKey, SavedType == typeid(void));
+
+    COMPARE_VAULT(vrs, {
+        {{"A", 0}},
+        {{"A", 0}}
+    });
+)
+
+TEST_BODY(RemoveRecords, WrongType,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.CreateRecord({});
+    vlt.CreateRecord({});
+
+    vlt.RequestEqual("A", 0, vrs);
+
+    vor = vrs.RemoveRecords("A", std::string());
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::WrongType, SavedType == typeid(int));
+
+    COMPARE_VAULT(vrs, {
+        {{"A", 0}},
+        {{"A", 0}}
+    });
+)
+
+TEST_BODY(RemoveRecords, WrongValue,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.CreateRecord({});
+    vlt.CreateRecord({});
+
+    vlt.RequestEqual("A", 0, vrs);
+
+    vor = vrs.RemoveRecords("A", 1);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongValue, SavedType == typeid(int));
+
+    COMPARE_VAULT(vrs, {
+        {{"A", 0}},
+        {{"A", 0}}
+    });
+)
+
+TEST_BODY(Size, Invalid,
+    VaultRecordSet vrs;
+
+    TEST_ASSERT(vrs.Size() == 0);
+)
+
+TEST_BODY(Size, Empty,
+    Vault vlt;
+    GENERATE_SET(vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+)
+
+TEST_BODY(Size, Default,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrf;
+
+    vlt.AddKey("A", 0);
+    vlt.CreateRecord(vrf, {});
+    vrs.AddRecord(vrf);
+
+    TEST_ASSERT(vrs.Size() == 1);
+)
+
+TEST_BODY(GetKeys, Invalid,
+    VaultRecordSet vrs;
+    TEST_ASSERT(vrs.GetKeys() == std::vector<std::string>{});
+)
+
+TEST_BODY(GetKeys, Keys,
+    Vault vlt;
+    GENERATE_SET(vrs);
+
+    TEST_ASSERT(vrs.GetKeys() == std::vector<std::string>{});
+
+    vlt.AddKey("A", 0);
+    TEST_ASSERT(vrs.GetKeys() == std::vector<std::string>{"A"});
+
+    vlt.AddKey("B", 0);
+    TEST_ASSERT(vrs.GetKeys() == std::vector<std::string>({"A", "B"}));
+
+    vlt.AddUniqueKey<std::string>("C");
+    TEST_ASSERT(vrs.GetKeys() == std::vector<std::string>({"A", "B", "C"}));
+)
+
+TEST_BODY(GetUniqueKeys, Invalid,
+    VaultRecordSet vrs;
+    TEST_ASSERT(vrs.GetUniqueKeys() == std::vector<std::string>{});
+)
+
+TEST_BODY(GetUniqueKeys, UniqueKeys,
+    Vault vlt;
+    GENERATE_SET(vrs);
+
+    TEST_ASSERT(vrs.GetUniqueKeys() == std::vector<std::string>{});
+
+    vlt.AddKey("A", 0);
+    TEST_ASSERT(vrs.GetUniqueKeys() == std::vector<std::string>{});
+
+    vlt.AddUniqueKey<int>("B");
+    TEST_ASSERT(vrs.GetUniqueKeys() == std::vector<std::string>{"B"});
+
+    vlt.AddUniqueKey<std::string>("C");
+    TEST_ASSERT(vrs.GetUniqueKeys() == std::vector<std::string>({"B", "C"}));
+)
+
+TEST_BODY(GetSortedRecords, Invalid,
+    VaultRecordSet vrs;
+    std::vector<VaultRecordRef> refs = vrs.GetSortedRecords("A");
+    TEST_ASSERT(refs.size() == 0);
+)
+
+TEST_BODY(GetSortedRecords, GetRecords,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrf;
+    std::vector<VaultRecordRef> refs;
+
+    vlt.AddKey("A", 0);
+
+    refs = vrs.GetSortedRecords("A");
+
+    TEST_ASSERT(refs.size() == 0);
+
+
+    for (int i = 0; i < 1000; ++i) 
+    {
+        vlt.CreateRecord(vrf, {{"A", i}});
+        vrs.AddRecord(vrf);
+    }
+
+    refs = vrs.GetSortedRecords("A");
+
+    TEST_ASSERT(refs.size() == 1000);
+
+    for (int i = 0; i < 1000; ++i)
+    {
+        int a = 0;
+        refs[i].GetData("A", a);
+        TEST_ASSERT(a == i);
+    }
+)
+
+TEST_BODY(GetSortedRecords, GetRecordsReverse,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrf;
+    std::vector<VaultRecordRef> refs;
+
+    vlt.AddKey("A", 0);
+
+    for (int i = 0; i < 1000; ++i) 
+    {
+        vlt.CreateRecord(vrf, {{"A", i}});
+        vrs.AddRecord(vrf);
+    }
+
+    refs = vrs.GetSortedRecords("A", true);
+
+    TEST_ASSERT(refs.size() == 1000);
+
+    for (int i = 0; i < 1000; ++i)
+    {
+        int a = 0;
+        refs[i].GetData("A", a);
+        TEST_ASSERT(a == 999 - i);
+    }
+)
+
+TEST_BODY(GetSortedRecords, GetNotAllRecords,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrf;
+    std::vector<VaultRecordRef> refs;
+
+    vlt.AddKey("A", 0);
+
+    for (int i = 0; i < 1000; ++i) 
+    {
+        vlt.CreateRecord(vrf, {{"A", i}});
+        vrs.AddRecord(vrf);
+    }
+
+    refs = vrs.GetSortedRecords("A", false, 100);
+
+    TEST_ASSERT(refs.size() == 100);
+
+    for (int i = 0; i < 100; ++i)
+    {
+        int a = 0;
+        refs[i].GetData("A", a);
+        TEST_ASSERT(a == i);
+    }
+)
+
+TEST_BODY(GetSortedRecords, WrongKey,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrf;
+    std::vector<VaultRecordRef> refs;
+
+    vlt.AddKey("A", 0);
+
+    for (int i = 0; i < 1000; ++i) 
+    {
+        vlt.CreateRecord(vrf, {{"A", i}});
+        vrs.AddRecord(vrf);
+    }
+
+    refs = vrs.GetSortedRecords("Z");
+
+    TEST_ASSERT(refs.size() == 0);
+)
+
+TEST_BODY(SortBy, Invalid,
+    VaultRecordSet vrs;
+    std::size_t counter = 0;
+    vrs.SortBy("A", [&](const VaultRecordRef& vrf) -> bool { ++counter; return true;});
+    TEST_ASSERT(counter == 0);
+)
+
+TEST_BODY(SortBy, Sort,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrf;
+
+    vlt.AddKey("A", 0);
+
+    for (int i = 0; i < 1000; ++i) 
+    {
+        vlt.CreateRecord(vrf, {{"A", i}});
+        vrs.AddRecord(vrf);
+    }
+
+    int counter = 0;
+    vrs.SortBy("A", [&](const VaultRecordRef& ref) -> bool
+    {
+        int i = 0;
+        ref.GetData("A", i);
+        TEST_ASSERT(counter == i);
+        ++counter;
+        return true;
+    });
+
+    TEST_ASSERT(counter == 1000);
+)
+
+TEST_BODY(SortBy, SortReverse,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrf;
+
+    vlt.AddKey("A", 0);
+
+    for (int i = 0; i < 1000; ++i) 
+    {
+        vlt.CreateRecord(vrf, {{"A", i}});
+        vrs.AddRecord(vrf);
+    }
+
+    int counter = 999;
+    vrs.SortBy("A", [&](const VaultRecordRef& ref) -> bool
+    {
+        int i = 0;
+        ref.GetData("A", i);
+        TEST_ASSERT(counter == i);
+        --counter;
+        return true;
+    }, true);
+
+    TEST_ASSERT(counter == -1);
+)
+
+TEST_BODY(SortBy, SortNotAllRecords,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrf;
+
+    vlt.AddKey("A", 0);
+
+    for (int i = 0; i < 1000; ++i) 
+    {
+        vlt.CreateRecord(vrf, {{"A", i}});
+        vrs.AddRecord(vrf);
+    }
+
+    int counter = 0;
+    vrs.SortBy("A", [&](const VaultRecordRef& ref) -> bool
+    {
+        int i = 0;
+        ref.GetData("A", i);
+        TEST_ASSERT(counter == i);
+        ++counter;
+        return true;
+    }, false, 100);
+
+    TEST_ASSERT(counter == 100);
+)
+
+TEST_BODY(SortBy, WrongKey,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrf;
+
+    vlt.AddKey("A", 0);
+
+    for (int i = 0; i < 1000; ++i) 
+    {
+        vlt.CreateRecord(vrf, {{"A", i}});
+        vrs.AddRecord(vrf);
+    }
+
+    int counter = 0;
+    vrs.SortBy("Z", [&](const VaultRecordRef& ref) -> bool
+    {
+        int i = 0;
+        ref.GetData("A", i);
+        TEST_ASSERT(counter == i);
+        ++counter;
+        return true;
+    });
+
+    TEST_ASSERT(counter == 0);
+)
+
+TEST_BODY(ToJson, Invalid,
+    VaultRecordSet vrs;
+    TEST_ASSERT(vrs.ToJson() == "{}");
+)
+
+TEST_BODY(ToJson, Default,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrf;
+
+    vlt.AddUniqueKey<std::size_t>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    vlt.CreateRecord(vrf, { {"A", std::size_t(1)}, {"B", std::string("a")} });
+    vrs.AddRecord(vrf);
+    vlt.CreateRecord(vrf, { {"A", std::size_t(2)}, {"B", std::string("b")} });
+    vrs.AddRecord(vrf);
+    vlt.CreateRecord(vrf, { {"A", std::size_t(3)}, {"B", std::string("c")} });
+    vrs.AddRecord(vrf);
+
+    std::string res;
+    res = vrs.ToJson();
+
+    TEST_ASSERT(res == R"({"Record0":{"A":3,"B":"c"},"Record1":{"A":2,"B":"b"},"Record2":{"A":1,"B":"a"}})");
+)
+
+TEST_BODY(ToJson, Format,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrf;
+
+    vlt.AddUniqueKey<std::size_t>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    vlt.CreateRecord(vrf, { {"A", std::size_t(1)}, {"B", std::string("a")} });
+    vrs.AddRecord(vrf);
+    vlt.CreateRecord(vrf, { {"A", std::size_t(2)}, {"B", std::string("b")} });
+    vrs.AddRecord(vrf);
+    vlt.CreateRecord(vrf, { {"A", std::size_t(3)}, {"B", std::string("c")} });
+    vrs.AddRecord(vrf);
+
+    std::string res;
+    res = vrs.ToJson(true);
+
+    TEST_ASSERT(res == R"({
+  "Record0": {
+    "A": 3,
+    "B": "c"
+  },
+  "Record1": {
+    "A": 2,
+    "B": "b"
+  },
+  "Record2": {
+    "A": 1,
+    "B": "a"
+  }
+})");
+)
+
+TEST_BODY(ToJson, DiffTabSize,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrf;
+
+    vlt.AddUniqueKey<std::size_t>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    vlt.CreateRecord(vrf, { {"A", std::size_t(1)}, {"B", std::string("a")} });
+    vrs.AddRecord(vrf);
+    vlt.CreateRecord(vrf, { {"A", std::size_t(2)}, {"B", std::string("b")} });
+    vrs.AddRecord(vrf);
+    vlt.CreateRecord(vrf, { {"A", std::size_t(3)}, {"B", std::string("c")} });
+    vrs.AddRecord(vrf);
+
+    std::string res;
+    res = vrs.ToJson(true, 1);
+
+    TEST_ASSERT(res == R"({
+ "Record0": {
+  "A": 3,
+  "B": "c"
+ },
+ "Record1": {
+  "A": 2,
+  "B": "b"
+ },
+ "Record2": {
+  "A": 1,
+  "B": "a"
+ }
+})");
+)
+
+TEST_BODY(ToJson, RecordTemplate,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrf;
+
+    vlt.AddUniqueKey<std::size_t>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    vlt.CreateRecord(vrf, { {"A", std::size_t(1)}, {"B", std::string("a")} });
+    vrs.AddRecord(vrf);
+    vlt.CreateRecord(vrf, { {"A", std::size_t(2)}, {"B", std::string("b")} });
+    vrs.AddRecord(vrf);
+    vlt.CreateRecord(vrf, { {"A", std::size_t(3)}, {"B", std::string("c")} });
+    vrs.AddRecord(vrf);
+
+
+    std::string res;
+    res = vrs.ToJson(true, 2, true, "Rec");
+
+    TEST_ASSERT(res == R"({
+  "Rec0": {
+    "A": 3,
+    "B": "c"
+  },
+  "Rec1": {
+    "A": 2,
+    "B": "b"
+  },
+  "Rec2": {
+    "A": 1,
+    "B": "a"
+  }
+})");
+)
+
+TEST_BODY(ToJson, Array,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrf;
+
+    vlt.AddUniqueKey<std::size_t>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    vlt.CreateRecord(vrf, { {"A", std::size_t(1)}, {"B", std::string("a")} });
+    vrs.AddRecord(vrf);
+    vlt.CreateRecord(vrf, { {"A", std::size_t(2)}, {"B", std::string("b")} });
+    vrs.AddRecord(vrf);
+    vlt.CreateRecord(vrf, { {"A", std::size_t(3)}, {"B", std::string("c")} });
+    vrs.AddRecord(vrf);
+
+    std::string res;
+    res = vrs.ToJson(false, 2, true, "Record", true);
+
+    TEST_ASSERT(res == R"([{"A":3,"B":"c"},{"A":2,"B":"b"},{"A":1,"B":"a"}])");
+)
+
+TEST_BODY(ToJson, ArrayFormat,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrf;
+
+    vlt.AddUniqueKey<std::size_t>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    vlt.CreateRecord(vrf, { {"A", std::size_t(1)}, {"B", std::string("a")} });
+    vrs.AddRecord(vrf);
+    vlt.CreateRecord(vrf, { {"A", std::size_t(2)}, {"B", std::string("b")} });
+    vrs.AddRecord(vrf);
+    vlt.CreateRecord(vrf, { {"A", std::size_t(3)}, {"B", std::string("c")} });
+    vrs.AddRecord(vrf);
+
+    std::string res;
+    res = vrs.ToJson(true, 2, true, "Record", true);
+
+    TEST_ASSERT(res == R"([
+  {
+    "A": 3,
+    "B": "c"
+  },
+  {
+    "A": 2,
+    "B": "b"
+  },
+  {
+    "A": 1,
+    "B": "a"
+  }
+])");
+)
+
+TEST_BODY(ToJson, ArrayDiffTabSize,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrf;
+
+    vlt.AddUniqueKey<std::size_t>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    vlt.CreateRecord(vrf, { {"A", std::size_t(1)}, {"B", std::string("a")} });
+    vrs.AddRecord(vrf);
+    vlt.CreateRecord(vrf, { {"A", std::size_t(2)}, {"B", std::string("b")} });
+    vrs.AddRecord(vrf);
+    vlt.CreateRecord(vrf, { {"A", std::size_t(3)}, {"B", std::string("c")} });
+    vrs.AddRecord(vrf);
+
+    std::string res;
+    res = vrs.ToJson(true, 1, true, "Record", true);
+
+    TEST_ASSERT(res == R"([
+ {
+  "A": 3,
+  "B": "c"
+ },
+ {
+  "A": 2,
+  "B": "b"
+ },
+ {
+  "A": 1,
+  "B": "a"
+ }
+])");
+)
+
+TEST_BODY(ToJson, RecordId,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrf;
+
+    vlt.AddUniqueKey<std::size_t>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    vlt.CreateRecord(vrf, { {"A", std::size_t(1)}, {"B", std::string("a")} });
+    vrs.AddRecord(vrf);
+    vlt.CreateRecord(vrf, { {"A", std::size_t(2)}, {"B", std::string("b")} });
+    vrs.AddRecord(vrf);
+    vlt.CreateRecord(vrf, { {"A", std::size_t(3)}, {"B", std::string("c")} });
+    vrs.AddRecord(vrf);
+
+    std::string res;
+    res = vrs.ToJson(true, 1, false);
+)
+
+TEST_BODY(ToStrings, Invalid,
+    VaultRecordSet vrs;
+    TEST_ASSERT(vrs.ToStrings() == decltype(vrs.ToStrings())());
+)
+
+TEST_BODY(ToStrings, EmptySet,
+    Vault vlt;
+    GENERATE_SET(vrs);
+
+    TEST_ASSERT(vrs.ToStrings() == decltype(vrs.ToStrings())());
+)
+
+TEST_BODY(ToStrings, KeysWithoutRecords,
+    Vault vlt;
+    GENERATE_SET(vrs);
+
+    vlt.AddUniqueKey<int>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    TEST_ASSERT(vrs.ToStrings() == decltype(vrs.ToStrings())());
+)
+
+TEST_BODY(ToStrings, FilledVault,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrf;
+
+    vlt.AddUniqueKey<int>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    vlt.CreateRecord(vrf, { {"A", 1}, {"B", std::string("a")} });
+    vrs.AddRecord(vrf);
+    vlt.CreateRecord(vrf, { {"A", 2}, {"B", std::string("b")} });
+    vrs.AddRecord(vrf);
+    vlt.CreateRecord(vrf, { {"A", 3}, {"B", std::string("c")} });
+    vrs.AddRecord(vrf);
+
+    // Compare vault use ToStrings
+    COMPARE_VAULT(vrs, {
+        {{"A", 1}, {"B", std::string("a")}},
+        {{"A", 2}, {"B", std::string("b")}},
+        {{"A", 3}, {"B", std::string("c")}},
+    });
+)
+
+TEST_BODY(Print, Invalid, 
+    VaultRecordSet vrs;
+    
+    TEST_COUT(vrs.Print(), R"{{{(The parent Vault is not valid!
+){{{");
+)
+
+TEST_BODY(Print, Empty,
+    Vault vlt;
+    GENERATE_SET(vrs);
+
+    TEST_COUT(vrs.Print(), R"{{{(VaultRecordSet does not contain keys!
+ (0 records)
+){{{");
+)
+
+TEST_BODY(Print, KeysWithoutRecords,
+    Vault vlt;
+    GENERATE_SET(vrs);
+
+    vlt.AddUniqueKey<int>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    TEST_COUT(vrs.Print(), R"{{{(+---+---+
+| A | B |
++---+---+
++---+---+
+ (0 records)
+){{{");
+)
+
+TEST_BODY(Print, FilledVaultWithDefaultArgs,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrf;
+
+    vlt.AddUniqueKey<int>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    vlt.CreateRecord(vrf, { {"A", 1}, {"B", std::string("a")} });
+    vrs.AddRecord(vrf);
+    vlt.CreateRecord(vrf, { {"A", 2}, {"B", std::string("b")} });
+    vrs.AddRecord(vrf);
+    vlt.CreateRecord(vrf, { {"A", 3}, {"B", std::string("c")} });
+    vrs.AddRecord(vrf);
+
+    TEST_COUT(vrs.Print(), R"{{{(+---+---+
+| A | B |
++---+---+
+| 1 | a |
+| 2 | b |
+| 3 | c |
++---+---+
+ (3 records)
+){{{");
+)
+
+TEST_BODY(Print, NotAllRecords,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrf;
+
+    vlt.AddUniqueKey<int>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    vlt.CreateRecord(vrf, { {"A", 1}, {"B", std::string("a")} });
+    vrs.AddRecord(vrf);
+    vlt.CreateRecord(vrf, { {"A", 2}, {"B", std::string("b")} });
+    vrs.AddRecord(vrf);
+    vlt.CreateRecord(vrf, { {"A", 3}, {"B", std::string("c")} });
+    vrs.AddRecord(vrf);
+
+    TEST_COUT(vrs.Print(false, 2), R"{{{(+---+---+
+| A | B |
++---+---+
+| 1 | a |
+| 2 | b |
+$~~~$~~~$
+ (3 records)
+){{{");
+)
+
+TEST_BODY(Print, PrimaryKey,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrf;
+
+    vlt.AddUniqueKey<int>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    vlt.CreateRecord(vrf, { {"A", 1}, {"B", std::string("c")} });
+    vrs.AddRecord(vrf);
+    vlt.CreateRecord(vrf, { {"A", 2}, {"B", std::string("b")} });
+    vrs.AddRecord(vrf);
+    vlt.CreateRecord(vrf, { {"A", 3}, {"B", std::string("a")} });
+    vrs.AddRecord(vrf);
+
+    TEST_COUT(vrs.Print(false, 2, "B"), R"{{{(+---+---+
+| A | B |
++---+---+
+| 3 | a |
+| 2 | b |
+$~~~$~~~$
+ (3 records)
+){{{");
+)
+
+TEST_BODY(Print, Reverse,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrf;
+
+    vlt.AddUniqueKey<int>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    vlt.CreateRecord(vrf, { {"A", 1}, {"B", std::string("a")} });
+    vrs.AddRecord(vrf);
+    vlt.CreateRecord(vrf, { {"A", 2}, {"B", std::string("b")} });
+    vrs.AddRecord(vrf);
+    vlt.CreateRecord(vrf, { {"A", 3}, {"B", std::string("c")} });
+    vrs.AddRecord(vrf);
+
+    TEST_COUT(vrs.Print(false, 2, "B", true), R"{{{(+---+---+
+| A | B |
++---+---+
+| 3 | c |
+| 2 | b |
+$~~~$~~~$
+ (3 records)
+){{{");
+)
+
+TEST_BODY(Print, NotAllKeys,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrf;
+
+    vlt.AddUniqueKey<int>("A");
+    vlt.AddKey<std::string>("B", "none");
+    vlt.AddKey("C", false);
+
+    vlt.CreateRecord(vrf, { {"A", 1}, {"B", std::string("a")}, {"C", true} });
+    vrs.AddRecord(vrf);
+    vlt.CreateRecord(vrf, { {"A", 2}, {"B", std::string("b")}, {"C", false} });
+    vrs.AddRecord(vrf);
+    vlt.CreateRecord(vrf, { {"A", 3}, {"B", std::string("c")}, {"C", true} });
+    vrs.AddRecord(vrf);
+
+    TEST_COUT(vrs.Print(false, 2, "B", true, {"C", "B"}), R"{{{(+-------+---+
+| C     | B |
++-------+---+
+| true  | c |
+| false | b |
+$~~~~~~~$~~~$
+ (3 records)
+){{{");
+)
+
+TEST_BODY(Print, PrintId,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrf;
+
+    vlt.AddUniqueKey<int>("A");
+    vlt.AddKey<std::string>("B", "none");
+
+    vlt.CreateRecord(vrf, { {"A", 1}, {"B", std::string("a")} });
+    vrs.AddRecord(vrf);
+    vlt.CreateRecord(vrf, { {"A", 2}, {"B", std::string("b")} });
+    vrs.AddRecord(vrf);
+    vlt.CreateRecord(vrf, { {"A", 3}, {"B", std::string("c")} });
+    vrs.AddRecord(vrf);
+
+    SUPPRESS_COUT(vrs.Print(true));
+)
+
+TEST_BODY(Join, JoinInvalidToInvalid,
+    VaultRecordSet vrs1, vrs2;
+    VaultOperationResult vor;
+
+    vor = vrs1.Join(vrs2);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::ParentVaultNotValid, SavedType == typeid(void));    
+)
+
+TEST_BODY(Join, JoinValidToInvalid,
+    Vault vlt;
+    VaultRecordSet vrs1;
+    GENERATE_SET(vrs2);
+    VaultOperationResult vor;
+
+    vor = vrs1.Join(vrs2);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::ParentVaultNotValid, SavedType == typeid(void));    
+)
+
+TEST_BODY(Join, JoinInvalidToValid,
+    Vault vlt;
+    VaultRecordSet vrs1;
+    GENERATE_SET(vrs2);
+    VaultOperationResult vor;
+
+    vor = vrs2.Join(vrs1);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::OtherParentVaultNotValid, SavedType == typeid(void));    
+)
+
+TEST_BODY(Join, JoinFilledToEmpty,
+    Vault vlt;
+    GENERATE_SET(vrs1);
+    GENERATE_SET(vrs2); 
+    VaultRecordRef vrf;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+
+    vlt.CreateRecord(vrf, {{}});
+    vrs1.AddRecord(vrf);
+    vlt.CreateRecord(vrf, {{}});
+    vrs1.AddRecord(vrf);
+
+    vor = vrs2.Join(vrs1);
+
+    COMPARE_VAULT(vrs2, {
+        {{"A", 0}},
+        {{"A", 0}}
+    });
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(void));
+)
+
+TEST_BODY(Join, JoinEmptyToFilled,
+    Vault vlt;
+    GENERATE_SET(vrs1);
+    GENERATE_SET(vrs2); 
+    VaultRecordRef vrf;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+
+    vlt.CreateRecord(vrf, {{}});
+    vrs1.AddRecord(vrf);
+    vlt.CreateRecord(vrf, {{}});
+    vrs1.AddRecord(vrf);
+
+    vor = vrs1.Join(vrs2);
+
+    COMPARE_VAULT(vrs1, {
+        {{"A", 0}},
+        {{"A", 0}}
+    });
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(void));
+)
+
+TEST_BODY(Join, JoinFilled,
+    Vault vlt;
+    GENERATE_SET(vrs1);
+    GENERATE_SET(vrs2); 
+    VaultRecordRef vrf;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+
+    vlt.CreateRecord(vrf, {{"A", 1}});
+    vrs1.AddRecord(vrf);
+    vlt.CreateRecord(vrf, {{"A", 2}});
+    vrs2.AddRecord(vrf);
+
+    vor = vrs1.Join(vrs2);
+
+    COMPARE_VAULT(vrs1, {
+        {{"A", 1}},
+        {{"A", 2}}
+    });
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(void));
+)
+
+TEST_BODY(Join, WrongParentVault,
+    Vault vlt1, vlt2;
+    VaultRecordSet vrs1, vrs2;
+
+    VaultRecordRef vrf;
+    VaultOperationResult vor;
+
+    vlt1.AddKey("A", 0);
+    vlt2.AddKey("A", 0);
+
+    vlt1.CreateRecord(vrf, {{"A", 1}});
+    vlt1.RequestEqual("A", 1, vrs1);
+    vlt2.CreateRecord(vrf, {{"A", 1}});
+    vlt2.RequestEqual("A", 1, vrs2);
+
+    vor = vrs1.Join(vrs2);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::ParentVaultNotMatch, SavedType == typeid(void));
+)
+
+TEST_BODY(Join, Self,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultOperationResult vor;
+
+    vor = vrs.Join(vrs);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::SameVaultRecordSet, SavedType == typeid(void));
+)
+
+TEST_BODY(Exclude, ExcludeInvalidFromInvalid, 
+    VaultRecordSet vrs1, vrs2;
+    VaultOperationResult vor;
+
+    vor = vrs1.Exclude(vrs2);
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::ParentVaultNotValid, SavedType == typeid(void));
+)
+
+TEST_BODY(Exclude, ExcludeValidFromInvalid, 
+    Vault vlt;
+    VaultRecordSet vrs1;
+    GENERATE_SET(vrs2);
+    VaultOperationResult vor;
+
+    vor = vrs1.Exclude(vrs2);
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::ParentVaultNotValid, SavedType == typeid(void));
+)
+
+TEST_BODY(Exclude, ExcludeInvalidFromValid, 
+    Vault vlt;
+    GENERATE_SET (vrs1);
+    VaultRecordSet vrs2;
+    VaultOperationResult vor;
+
+    vor = vrs1.Exclude(vrs2);
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::OtherParentVaultNotValid, SavedType == typeid(void));
+)
+
+TEST_BODY(Exclude, ExcludeFilledFromEmpty, 
+    Vault vlt;
+    GENERATE_SET(vrs1);
+    GENERATE_SET(vrs2); 
+    VaultRecordRef vrf;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+
+    vlt.CreateRecord(vrf, {{}});
+    vrs1.AddRecord(vrf);
+    vlt.CreateRecord(vrf, {{}});
+    vrs1.AddRecord(vrf);
+
+    vor = vrs2.Exclude(vrs1);
+
+    TEST_ASSERT(vrs2.Size() == 0);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(void));
+)
+
+TEST_BODY(Exclude, ExcludeEmptyFromFilled, 
+    Vault vlt;
+    GENERATE_SET(vrs1);
+    GENERATE_SET(vrs2); 
+    VaultRecordRef vrf;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+
+    vlt.CreateRecord(vrf, {{}});
+    vrs1.AddRecord(vrf);
+    vlt.CreateRecord(vrf, {{}});
+    vrs1.AddRecord(vrf);
+
+    vor = vrs1.Exclude(vrs2);
+
+    TEST_ASSERT(vrs1.Size() == 2);
+
+    COMPARE_VAULT(vrs1, {
+        {{"A", 0}},
+        {{"A", 0}}
+    })
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(void));
+)
+
+TEST_BODY(Exclude, ExcludeFilled, 
+    Vault vlt;
+    GENERATE_SET(vrs1);
+    GENERATE_SET(vrs2); 
+    VaultRecordRef vrf;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+
+    vlt.CreateRecord(vrf, {{"A", 1}});
+    vrs1.AddRecord(vrf);
+    vlt.CreateRecord(vrf, {{"A", 2}});
+    vrs1.AddRecord(vrf);
+    vrs2.AddRecord(vrf);
+
+    vor = vrs1.Exclude(vrs2);
+
+    COMPARE_VAULT(vrs1, {
+        {{"A", 1}}
+    });
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(void));
+)
+
+TEST_BODY(Exclude, Self,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultOperationResult vor;
+
+    vor = vrs.Exclude(vrs);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::SameVaultRecordSet, SavedType == typeid(void));
+)
+
+TEST_BODY(Intersect, IntersectInvalidWithInvalid, 
+    VaultRecordSet vrs1, vrs2;
+    VaultOperationResult vor;
+
+    vor = vrs1.Intersect(vrs2);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::ParentVaultNotValid, SavedType == typeid(void));
+)
+
+TEST_BODY(Intersect, IntersectInvalidWithValid,
+    Vault vlt;
+    VaultRecordSet vrs1;
+    GENERATE_SET(vrs2);
+    VaultOperationResult vor;
+
+    vor = vrs1.Intersect(vrs2);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::ParentVaultNotValid, SavedType == typeid(void));
+)
+
+TEST_BODY(Intersect, IntersectValidWithInvalid,
+    Vault vlt;
+    GENERATE_SET(vrs1);
+    VaultRecordSet vrs2;
+    VaultOperationResult vor;
+
+    vor = vrs1.Intersect(vrs2);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::OtherParentVaultNotValid, SavedType == typeid(void));
+)
+
+TEST_BODY(Intersect, IntersectFilledFromEmpty,
+    Vault vlt;
+    GENERATE_SET(vrs1);
+    GENERATE_SET(vrs2); 
+    VaultRecordRef vrf;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+
+    vlt.CreateRecord(vrf, {{}});
+    vrs1.AddRecord(vrf);
+    vlt.CreateRecord(vrf, {{}});
+    vrs1.AddRecord(vrf);
+
+    vor = vrs2.Exclude(vrs1);
+
+    TEST_ASSERT(vrs2.Size() == 0);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(void));
+)
+
+TEST_BODY(Intersect, IntersectEmptyFromFilled,
+    Vault vlt;
+    GENERATE_SET(vrs1);
+    GENERATE_SET(vrs2); 
+    VaultRecordRef vrf;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+
+    vlt.CreateRecord(vrf, {{}});
+    vrs1.AddRecord(vrf);
+    vlt.CreateRecord(vrf, {{}});
+    vrs1.AddRecord(vrf);
+
+    vor = vrs1.Exclude(vrs2);
+
+    TEST_ASSERT(vrs1.Size() == 2);
+
+    COMPARE_VAULT(vrs1, {
+        {{"A", 0}},
+        {{"A", 0}}
+    })
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(void));
+)
+
+TEST_BODY(Intersect, IntersectFilled, 
+    Vault vlt;
+    GENERATE_SET(vrs1);
+    GENERATE_SET(vrs2); 
+    VaultRecordRef vrf;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+
+    vlt.CreateRecord(vrf, {{"A", 1}});
+    vrs1.AddRecord(vrf);
+    vlt.CreateRecord(vrf, {{"A", 2}});
+    vrs1.AddRecord(vrf);
+    vrs2.AddRecord(vrf);
+
+    vor = vrs1.Intersect(vrs2);
+
+    COMPARE_VAULT(vrs1, {
+        {{"A", 2}}
+    });
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(void));
+)
+
+TEST_BODY(Intersect, Self,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultOperationResult vor;
+
+    vor = vrs.Intersect(vrs);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::SameVaultRecordSet, SavedType == typeid(void));
+)
 }
 
 void VaultRecordSetUnitTests()
