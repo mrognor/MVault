@@ -8,7 +8,9 @@ vlt.RequestEqual("A", 0, setName); \
 vlt.EraseRecord("A", 0); \
 vlt.RemoveKey("A");
 
-using namespace VaultRecordSetTestNs;
+namespace VaultRecordSetTestNs
+{
+std::vector<std::function<void()>> Tests;
 
 TEST_BODY(DefaultConstructor, Default,
     VaultRecordSet vrs;
@@ -3553,147 +3555,13 @@ TEST_BODY(Clear, FilledSet,
     TEST_ASSERT(vrs.GetUniqueKeys() == std::vector<std::string>({"B"}));
     COMPARE_VAULT(vrs, {});
 )
+}
 
 void VaultRecordSetUnitTests()
 {
-    DefaultConstructor::Default();
+    DBG_LOG_ENTER();
+    SetBackTraceFormat(BackTraceFormat::None);
 
-    CopyConstructor::CopyWithoutParent();
-    CopyConstructor::CopyEmptySet();
-    CopyConstructor::CopyFilledSet();
-
-    AssignmentOperator::AssignWithoutParents();
-    AssignmentOperator::AssignWithParentsToWithoutParent();
-    AssignmentOperator::AssignEmpty();
-    AssignmentOperator::AssignFilledSet();
-
-    MoveConstructor::MoveWithoutParents();
-    MoveConstructor::MoveEmpty();
-    MoveConstructor::MoveFilled();
-
-    MoveAssignmentOperator::AssignWithoutParents();
-    MoveAssignmentOperator::AssignWithParentsToWithoutParent();
-    MoveAssignmentOperator::AssignEmpty();
-    MoveAssignmentOperator::AssignFilledSet();
-
-    GetIsParentVaultValid::Invalid();
-    GetIsParentVaultValid::Valid();
-    GetIsParentVaultValid::Invalidate();
-
-    GetParentVaultUniqueId::Invalid();
-    GetParentVaultUniqueId::Valid();
-    GetParentVaultUniqueId::Invalidate();
-
-    IsKeyExist::Invalid();
-    IsKeyExist::ExistingKey();
-    IsKeyExist::NonExistingKey();
-
-    GetKeyValue::Invalid();
-    GetKeyValue::ExistingKey();
-    GetKeyValue::NonExistingKey();
-    GetKeyValue::WrongType();
-    GetKeyValue::UniqueKey();
-
-    GetKeyType::Invalid();
-    GetKeyType::ExistingKey();
-    GetKeyType::NonExistingKey();
-
-    AddRecord::Invalid();
-    AddRecord::Correct();
-    AddRecord::InvalidRef();
-    AddRecord::OtherVaultParent();
-
-    GetRecord::Invalid();
-    GetRecord::CorrectGetRecord();
-    GetRecord::WrongKey();
-    GetRecord::WrongType();
-    GetRecord::WrongValue();
-
-    GetRecords::Invalid();
-    GetRecords::CorrectGetRecords();
-    GetRecords::CorrectGetNotAllRecords();
-    GetRecords::WrongKey();
-    GetRecords::WrongType();
-    GetRecords::WrongValue();
-
-    RequestEqual::Invalid();
-    RequestEqual::CorrectRequest();
-    RequestEqual::CorrectRequestNotAllRecords();
-    RequestEqual::CorrectRequestWithPredicat();
-    RequestEqual::WrongKey();
-    RequestEqual::WrongType();
-    RequestEqual::ValueNotInVault();
-
-    RequestGreater::Invalid();
-    RequestGreater::CorrectRequest();
-    RequestGreater::CorrectRequestNotAllRecords();
-    RequestGreater::CorrectRequestWithPredicat();
-    RequestGreater::BoundaryValues();
-    RequestGreater::WrongKey();
-    RequestGreater::WrongType();
-    RequestGreater::ValueNotInVault();
-
-    RequestGreaterOrEqual::Invalid();
-    RequestGreaterOrEqual::CorrectRequest();
-    RequestGreaterOrEqual::CorrectRequestNotAllRecords();
-    RequestGreaterOrEqual::CorrectRequestWithPredicat();
-    RequestGreaterOrEqual::BoundaryValues();
-    RequestGreaterOrEqual::WrongKey();
-    RequestGreaterOrEqual::WrongType();
-    RequestGreaterOrEqual::ValueNotInVault();
-
-    RequestLess::Invalid();
-    RequestLess::CorrectRequest();
-    RequestLess::CorrectRequestNotAllRecords();
-    RequestLess::CorrectRequestWithPredicat();
-    RequestLess::BoundaryValues();
-    RequestLess::WrongKey();
-    RequestLess::WrongType();
-    RequestLess::ValueNotInVault();
-
-    RequestLessOrEqual::Invalid();
-    RequestLessOrEqual::CorrectRequest();
-    RequestLessOrEqual::CorrectRequestNotAllRecords();
-    RequestLessOrEqual::CorrectRequestWithPredicat();
-    RequestLessOrEqual::BoundaryValues();
-    RequestLessOrEqual::WrongKey();
-    RequestLessOrEqual::WrongType();
-    RequestLessOrEqual::ValueNotInVault();
-
-    RequestInterval::Invalid();
-    RequestInterval::CorrectRequest();
-    RequestInterval::CorrectRequestWithoutLeftBoundary();
-    RequestInterval::CorrectRequestWithoutRightBoundary();
-    RequestInterval::CorrectRequestWithoutBoundaries();
-    RequestInterval::CorrectRequestNotAllRecords();
-    RequestInterval::CorrectRequestWithPredicat();
-    RequestInterval::BoundaryValues();
-    RequestInterval::SameBoundaries();
-    RequestInterval::IncorrectBoundaries();
-    RequestInterval::WrongKey();
-    RequestInterval::WrongType();
-
-    Request::CorrectRequest();
-    Request::CorrectRequestWithPredicat();
-    Request::BoundaryValues();
-    Request::WrongKey();
-    Request::WrongType();
-    Request::ComplexRequestAnd();
-    Request::ComplexRequestOr();
-    Request::ComplexRequest();
-    Request::ComplexRequestWrongKey();
-    Request::ComplexRequestWrongType();
-
-    CheckRecord::InvalidSet();
-    CheckRecord::InvalidRef();
-    CheckRecord::WrongRef();
-    CheckRecord::Correct();
-    
-    Reset::InvalidSet();
-    Reset::EmptySet();
-    Reset::FilledSet();
-
-    Clear::InvalidSet();
-    Clear::EmptySet();
-    Clear::FilledSet();
+    for (const auto& test : VaultRecordSetTestNs::Tests)
+        test();
 }
