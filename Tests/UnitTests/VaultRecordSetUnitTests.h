@@ -119,6 +119,8 @@ namespace VaultRecordSetTestNs
         TEST_CASE(InvalidRef)
 
         TEST_CASE(OtherVaultParent)
+
+        TEST_CASE(SecondTime)
     )
 
     TEST_SUITE(GetRecord,
@@ -164,6 +166,8 @@ namespace VaultRecordSetTestNs
         TEST_CASE(WrongType)
 
         TEST_CASE(ValueNotInVault)
+
+        TEST_CASE(Self)
     )
 
     TEST_SUITE(RequestGreater,
@@ -183,6 +187,8 @@ namespace VaultRecordSetTestNs
         TEST_CASE(WrongType)
 
         TEST_CASE(ValueNotInVault)
+
+        TEST_CASE(Self)
     )
 
     TEST_SUITE(RequestGreaterOrEqual,
@@ -202,6 +208,8 @@ namespace VaultRecordSetTestNs
         TEST_CASE(WrongType)
 
         TEST_CASE(ValueNotInVault)
+
+        TEST_CASE(Self)
     )
 
     TEST_SUITE(RequestLess,
@@ -221,6 +229,8 @@ namespace VaultRecordSetTestNs
         TEST_CASE(WrongType)
 
         TEST_CASE(ValueNotInVault)
+
+        TEST_CASE(Self)
     )
 
     TEST_SUITE(RequestLessOrEqual,
@@ -240,6 +250,8 @@ namespace VaultRecordSetTestNs
         TEST_CASE(WrongType)
 
         TEST_CASE(ValueNotInVault)
+
+        TEST_CASE(Self)
     )
 
     TEST_SUITE(RequestInterval,
@@ -267,6 +279,8 @@ namespace VaultRecordSetTestNs
         TEST_CASE(WrongKey)
 
         TEST_CASE(WrongType)
+
+        TEST_CASE(Self)
     )
 
     TEST_SUITE(Request,
@@ -290,6 +304,10 @@ namespace VaultRecordSetTestNs
         TEST_CASE(ComplexRequestWrongKey)
 
         TEST_CASE(ComplexRequestWrongType)
+
+        TEST_CASE(Self)
+
+        TEST_CASE(InvalidParent)
     )
 
     TEST_SUITE(CheckRecord,
@@ -497,6 +515,8 @@ namespace VaultRecordSetTestNs
 
         TEST_CASE(ExcludeFilled)
 
+        TEST_CASE(ExcludeDifferentParrent)
+
         TEST_CASE(Self)
     )
 
@@ -513,6 +533,83 @@ namespace VaultRecordSetTestNs
         TEST_CASE(IntersectEmptyFromFilled)
 
         TEST_CASE(IntersectFilled)
+
+        TEST_CASE(ExcludeDifferentParrent)
+
+        TEST_CASE(Self)
+    )
+
+    TEST_SUITE(SaveToFile,
+
+        TEST_CASE(Empty)
+
+        TEST_CASE(KeysWithoutRecords)
+
+        TEST_CASE(FilledVault)
+
+        TEST_CASE(ReverseNotAllKeys)
+
+        TEST_CASE(Separator)
+
+        TEST_CASE(NotSaveKeys)
+
+        TEST_CASE(FailedToOpenFile)
+    )
+
+    TEST_SUITE(Destructor,
+    
+        TEST_CASE(Default)
+    )
+
+    TEST_SUITE(CompareOperator,
+    
+        TEST_CASE(InvalidWithInvalid)
+
+        TEST_CASE(InvalidWithValid)
+
+        TEST_CASE(ValidWithInvalid)
+
+        TEST_CASE(Empty)
+
+        TEST_CASE(Filled)
+
+        TEST_CASE(DifferentData)
+
+        TEST_CASE(DifferentParents)
+    )
+
+    TEST_SUITE(UnionSets, 
+    
+        TEST_CASE(InvalidWithInvalid)
+
+        TEST_CASE(InvalidWithValid)
+
+        TEST_CASE(ValidWithInvalid)
+
+        TEST_CASE(Empty)
+
+        TEST_CASE(Filled)
+
+        TEST_CASE(DifferentParents)
+
+        TEST_CASE(Self)
+    )
+
+    TEST_SUITE(IntersectionSets, 
+    
+        TEST_CASE(InvalidWithInvalid)
+
+        TEST_CASE(InvalidWithValid)
+
+        TEST_CASE(ValidWithInvalid)
+
+        TEST_CASE(Empty)
+
+        TEST_CASE(Filled)
+
+        TEST_CASE(DifferentParents)
+
+        TEST_CASE(RewriteTarget)
 
         TEST_CASE(Self)
     )

@@ -40,13 +40,19 @@ namespace mvlt
         RecursiveReadWriteMtx.Disable();
     }
 
-    void VaultRecordSet::MoveSet(VaultRecordSet& other) noexcept
+    void VaultRecordSet::MoveSet(VaultRecordSet&& other) noexcept
     {
         DBG_LOG_ENTER();
 
         WriteLock<RecursiveReadWriteMutex> writeLock(other.ParentVault->RecursiveReadWriteMtx);
 
         VaultDerivedClass = VaultDerivedClasses::VaultRecordSetDerived;
+
+        for (VaultRecord* record : other.RecordsSet)
+        {
+            record->EraseDependentSet(&other);
+            record->AddToDependentSets(this);
+        }
 
         ParentVault = other.ParentVault;
         other.ParentVault = nullptr;
@@ -68,12 +74,6 @@ namespace mvlt
 
         ParentVault->RecordSetsSet.erase(&other);
         ParentVault->RecordSetsSet.emplace(this);
-
-        for (VaultRecord* record : other.RecordsSet)
-        {
-            record->EraseDependentSet(&other);
-            record->AddToDependentSets(this);
-        }
 
         RecursiveReadWriteMtx.Disable();
     }
@@ -114,7 +114,7 @@ namespace mvlt
         DBG_LOG_ENTER();
 
         if (other.GetIsParentVaultValid())
-            MoveSet(other);
+            MoveSet(std::move(other));
     }
 
     VaultRecordSet& VaultRecordSet::operator=(VaultRecordSet&& other) noexcept
@@ -124,7 +124,7 @@ namespace mvlt
         if (&other != this)
         {
             if (other.GetIsParentVaultValid())
-                MoveSet(other);
+                MoveSet(std::move(other));
             else
                 Reset();
         }
@@ -581,6 +581,21 @@ namespace mvlt
             vor.IsOperationSuccess = false;
             vor.ResultCode = VaultOperationResultCode::SameVaultRecordSet;
         }
+        else if (vor.IsOperationSuccess && !a.GetIsParentVaultValid())
+        {
+            vor.IsOperationSuccess = false;
+            vor.ResultCode = VaultOperationResultCode::ParentVaultNotValid;
+        }
+        else if (vor.IsOperationSuccess && !b.GetIsParentVaultValid())
+        {
+            vor.IsOperationSuccess = false;
+            vor.ResultCode = VaultOperationResultCode::OtherParentVaultNotValid;
+        }
+        else if (a.GetParentVaultUniqueId() != b.GetParentVaultUniqueId())
+        {
+            vor.IsOperationSuccess = false;
+            vor.ResultCode = VaultOperationResultCode::ParentVaultNotMatch;
+        }
         else
         {
             res = a;
@@ -596,6 +611,7 @@ namespace mvlt
 
         VaultOperationResult vor;
         vor.IsOperationSuccess = true;
+        vor.ResultCode = VaultOperationResultCode::Success;
 
         // Handle errors
         if (&a == &b || &a == &res || &b == &res)
@@ -603,26 +619,22 @@ namespace mvlt
             vor.IsOperationSuccess = false;
             vor.ResultCode = VaultOperationResultCode::SameVaultRecordSet;
         }
-
-        if (vor.IsOperationSuccess && !a.GetIsParentVaultValid())
+        else if (vor.IsOperationSuccess && !a.GetIsParentVaultValid())
         {
             vor.IsOperationSuccess = false;
             vor.ResultCode = VaultOperationResultCode::ParentVaultNotValid;
         }
-
-        if (vor.IsOperationSuccess && !b.GetIsParentVaultValid())
+        else if (vor.IsOperationSuccess && !b.GetIsParentVaultValid())
         {
             vor.IsOperationSuccess = false;
             vor.ResultCode = VaultOperationResultCode::OtherParentVaultNotValid;
         }
-
-        if (vor.IsOperationSuccess && a.ParentVault != b.ParentVault)
+        else if (vor.IsOperationSuccess && a.ParentVault != b.ParentVault)
         {
             vor.IsOperationSuccess = false;
             vor.ResultCode = VaultOperationResultCode::ParentVaultNotMatch;
         }
-
-        if (vor.IsOperationSuccess)
+        else if (vor.IsOperationSuccess)
         {
             if (res.GetIsParentVaultValid()) res.Reset();
 

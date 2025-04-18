@@ -190,18 +190,19 @@ TEST_BODY(MoveConstructor, MoveEmpty,
 
 TEST_BODY(MoveConstructor, MoveFilled,
     Vault vlt;
-    VaultRecordSet vrs1;
+    VaultRecordSet* vrs1 = new VaultRecordSet;
+    VaultRecordRef vrr;
 
     vlt.AddKey("A", 0);
     vlt.AddUniqueKey<std::string>("B");
     
     vlt.CreateRecord({ {"A", 0}, {"B", std::string("a")} });
     vlt.CreateRecord({ {"A", 0}, {"B", std::string("b")} });
-    vlt.CreateRecord({ {"A", 0}, {"B", std::string("c")} });
+    vlt.CreateRecord(vrr, { {"A", 0}, {"B", std::string("c")} });
 
-    vlt.RequestEqual("A", 0, vrs1);
+    vlt.RequestEqual("A", 0, *vrs1);
 
-    VaultRecordSet vrs2(std::move(vrs1));
+    VaultRecordSet vrs2(std::move(*vrs1));
 
     TEST_ASSERT(vrs2.Size() == 3);
     TEST_ASSERT(vrs2.GetKeys().size() == 2);
@@ -214,12 +215,15 @@ TEST_BODY(MoveConstructor, MoveFilled,
         {{"A", 0}, {"B",  std::string("c")}},
     });
 
-    TEST_ASSERT(vrs1.Size() == 0);
-    TEST_ASSERT(vrs1.GetKeys().size() == 0);
-    TEST_ASSERT(vrs1.GetUniqueKeys().size() == 0);
-    TEST_ASSERT(vrs1.GetIsParentVaultValid() == false);
-    TEST_ASSERT(vrs1.GetParentVaultUniqueId() == "null");
-    COMPARE_VAULT(vrs1, {});
+    TEST_ASSERT(vrs1->Size() == 0);
+    TEST_ASSERT(vrs1->GetKeys().size() == 0);
+    TEST_ASSERT(vrs1->GetUniqueKeys().size() == 0);
+    TEST_ASSERT(vrs1->GetIsParentVaultValid() == false);
+    TEST_ASSERT(vrs1->GetParentVaultUniqueId() == "null");
+    COMPARE_VAULT(*vrs1, {});
+
+    delete vrs1;
+    vrr.SetData("A", 12);
 )
 
 TEST_BODY(MoveAssignmentOperator, AssignWithoutParents,
@@ -557,6 +561,32 @@ TEST_BODY(AddRecord, OtherVaultParent,
     
     TEST_ASSERT(vrs.Size() == 0);
     COMPARE_VAULT(vrs, {});
+)
+
+TEST_BODY(AddRecord, SecondTime,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.CreateRecord(vrr, {});
+
+    vor = vrs.AddRecord(vrr);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(void));
+    
+    vor = vrs.AddRecord(vrr);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::RecordAlredyInSet, SavedType == typeid(void));
+    
+    TEST_ASSERT(vrs.Size() == 1);
+
+    COMPARE_VAULT(vrs, {
+        {{"A", 0}}
+    });
 )
 
 TEST_BODY(GetRecord, Invalid,
@@ -1078,6 +1108,23 @@ TEST_BODY(RequestEqual, ValueNotInVault,
         RequestedType == typeid(int), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(int));
 )
 
+TEST_BODY(RequestEqual, Self,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+
+    vor = vrs.RequestEqual("A", 4, vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::SameVaultRecordSet, SavedType == typeid(void));
+)
+
 TEST_BODY(RequestGreater, Invalid,
     VaultRecordSet parentVrs;
     VaultRecordSet vrs;
@@ -1357,6 +1404,23 @@ TEST_BODY(RequestGreater, ValueNotInVault,
 
     COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "A", 
         RequestedType == typeid(int), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(int));
+)
+
+TEST_BODY(RequestGreater, Self,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+
+    vor = vrs.RequestGreater("A", 4, vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::SameVaultRecordSet, SavedType == typeid(void));
 )
 
 TEST_BODY(RequestGreaterOrEqual, Invalid,
@@ -1641,6 +1705,23 @@ TEST_BODY(RequestGreaterOrEqual, ValueNotInVault,
         RequestedType == typeid(int), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(int));
 )
 
+TEST_BODY(RequestGreaterOrEqual, Self,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+
+    vor = vrs.RequestGreaterOrEqual("A", 4, vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::SameVaultRecordSet, SavedType == typeid(void));
+)
+
 TEST_BODY(RequestLess, Invalid,
     VaultRecordSet parentVrs;
     VaultRecordSet vrs;
@@ -1921,6 +2002,23 @@ TEST_BODY(RequestLess, ValueNotInVault,
         RequestedType == typeid(int), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(int));
 )
 
+TEST_BODY(RequestLess, Self,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+
+    vor = vrs.RequestLess("A", 4, vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::SameVaultRecordSet, SavedType == typeid(void));
+)
+
 TEST_BODY(RequestLessOrEqual, Invalid,
     VaultRecordSet parentVrs;
     VaultRecordSet vrs;
@@ -2199,6 +2297,23 @@ TEST_BODY(RequestLessOrEqual, ValueNotInVault,
 
     COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "A", 
         RequestedType == typeid(int), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(int));
+)
+
+TEST_BODY(RequestLessOrEqual, Self,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+
+    vor = vrs.RequestLessOrEqual("A", 4, vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::SameVaultRecordSet, SavedType == typeid(void));
 )
 
 TEST_BODY(RequestInterval, Invalid,
@@ -2791,6 +2906,23 @@ TEST_BODY(RequestInterval, WrongType,
 
     COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "B", 
         RequestedType == typeid(int), ResultCode == VaultOperationResultCode::WrongType, SavedType == typeid(std::string));
+)
+
+TEST_BODY(RequestInterval, Self,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+
+    vor = vrs.RequestInterval("A", 2, 4, vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::SameVaultRecordSet, SavedType == typeid(void));
 )
 
 TEST_BODY(Request, CorrectRequest,
@@ -3428,6 +3560,117 @@ TEST_BODY(Request, ComplexRequestWrongType,
     COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
         RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::WrongType, SavedType == typeid(int));
 )
+
+TEST_BODY(Request, Self,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+
+    vor = vrs.Request(Equal("A", 2), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::SameVaultRecordSet, SavedType == typeid(void));
+
+
+    vor = vrs.Request(Greater("A", 2), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::SameVaultRecordSet, SavedType == typeid(void));
+
+
+    vor = vrs.Request(GreaterOrEqual("A", 2), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::SameVaultRecordSet, SavedType == typeid(void));
+
+
+    vor = vrs.Request(Less("A", 2), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::SameVaultRecordSet, SavedType == typeid(void));
+
+
+    vor = vrs.Request(LessOrEqual("A", 2), vrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::SameVaultRecordSet, SavedType == typeid(void));
+ )
+
+ TEST_BODY(Request, InvalidParent,
+    VaultRecordSet vrs, tmpVrs;
+    VaultOperationResult vor;
+
+    vor = vrs.Request(Equal("A", 2), tmpVrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::ParentVaultNotValid, SavedType == typeid(void));
+
+
+    vor = vrs.Request(Greater("A", 2), tmpVrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::ParentVaultNotValid, SavedType == typeid(void));
+
+
+    vor = vrs.Request(GreaterOrEqual("A", 2), tmpVrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::ParentVaultNotValid, SavedType == typeid(void));
+
+
+    vor = vrs.Request(Less("A", 2), tmpVrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::ParentVaultNotValid, SavedType == typeid(void));
+
+
+    vor = vrs.Request(LessOrEqual("A", 2), tmpVrs);
+
+    TEST_ASSERT(vrs.Size() == 0);
+
+    COMPARE_VAULT(vrs, {});
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::ParentVaultNotValid, SavedType == typeid(void));
+ )
 
 TEST_BODY(CheckRecord, InvalidSet,
     VaultRecordSet vrs;
@@ -4680,17 +4923,24 @@ TEST_BODY(Join, JoinFilled,
 
     vlt.AddKey("A", 0);
 
+    vlt.CreateRecord({{"A", -1}});
     vlt.CreateRecord(vrf, {{"A", 1}});
     vrs1.AddRecord(vrf);
     vlt.CreateRecord(vrf, {{"A", 2}});
+    vrs2.AddRecord(vrf);
+    vlt.CreateRecord(vrf, {{"A", 3}});
+    vrs1.AddRecord(vrf);
     vrs2.AddRecord(vrf);
 
     vor = vrs1.Join(vrs2);
 
     COMPARE_VAULT(vrs1, {
         {{"A", 1}},
-        {{"A", 2}}
+        {{"A", 2}},
+        {{"A", 3}}
     });
+
+    TEST_ASSERT(vrs1.Size() == 3);
 
     COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "", 
         RequestedType == typeid(void), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(void));
@@ -4844,6 +5094,29 @@ TEST_BODY(Exclude, Self,
         RequestedType == typeid(void), ResultCode == VaultOperationResultCode::SameVaultRecordSet, SavedType == typeid(void));
 )
 
+TEST_BODY(Exclude, ExcludeDifferentParrent, 
+    Vault vlt1, vlt2;
+    VaultRecordSet vrs1, vrs2;
+    VaultRecordRef vrf;
+    VaultOperationResult vor;
+
+    vlt1.AddKey("A", 0);
+    vlt2.AddKey("A", 0);
+
+    vlt1.CreateRecord({{"A", 1}});
+    vlt1.RequestEqual("A", 1, vrs1);
+
+    vlt2.CreateRecord({{"A", 1}});
+    vlt2.RequestEqual("A", 1, vrs2);
+
+    vor = vrs1.Exclude(vrs2);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::ParentVaultNotMatch, SavedType == typeid(void));
+    
+    TEST_ASSERT(vrs1.Size());
+)
+
 TEST_BODY(Intersect, IntersectInvalidWithInvalid, 
     VaultRecordSet vrs1, vrs2;
     VaultOperationResult vor;
@@ -4961,6 +5234,527 @@ TEST_BODY(Intersect, Self,
 
     COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "", 
         RequestedType == typeid(void), ResultCode == VaultOperationResultCode::SameVaultRecordSet, SavedType == typeid(void));
+)
+
+TEST_BODY(Intersect, ExcludeDifferentParrent, 
+    Vault vlt1, vlt2;
+    VaultRecordSet vrs1, vrs2;
+    VaultRecordRef vrf;
+    VaultOperationResult vor;
+
+    vlt1.AddKey("A", 0);
+    vlt2.AddKey("A", 0);
+
+    vlt1.CreateRecord({{"A", 1}});
+    vlt1.RequestEqual("A", 1, vrs1);
+
+    vlt2.CreateRecord({{"A", 1}});
+    vlt2.RequestEqual("A", 1, vrs2);
+
+    vor = vrs1.Intersect(vrs2);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::ParentVaultNotMatch, SavedType == typeid(void));
+    
+    TEST_ASSERT(vrs1.Size());
+)
+
+TEST_BODY(SaveToFile, FilledVault,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrf;
+
+    vlt.AddKey("A", 0);
+    vlt.CreateRecord(vrf, {{"A", 0}});
+    vrs.AddRecord(vrf);
+
+    std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
+    bool res = false;
+
+    res = vrs.SaveToFile(fileName);
+
+    TEST_ASSERT(res == true);
+
+    COMPARE_FILE(fileName, true, "A\r\n"
+                                 "0\r\n");
+)
+
+TEST_BODY(SaveToFile, ReverseNotAllKeys,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrf;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+    vlt.AddUniqueKey<int>("C");
+
+    vlt.CreateRecord(vrf, {{"A", 0}, {"B", 1}, {"C", 2}});
+    vrs.AddRecord(vrf);
+
+    std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
+    bool res = false;
+
+    res = vrs.SaveToFile(fileName, {"C", "A"});
+
+    TEST_ASSERT(res == true);
+
+    COMPARE_FILE(fileName, true, "C,A\r\n"
+                                 "2,0\r\n");
+)
+
+TEST_BODY(SaveToFile, Separator,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrf;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+    vlt.AddUniqueKey<int>("C");
+
+    vlt.CreateRecord(vrf, {{"A", 0}, {"B", 1}, {"C", 2}});
+    vrs.AddRecord(vrf);
+
+    std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
+    bool res = false;
+
+    res = vrs.SaveToFile(fileName, {}, ";");
+
+    TEST_ASSERT(res == true);
+
+    COMPARE_FILE(fileName, true, "A;B;C\r\n"
+                                 "0;1;2\r\n");
+)
+
+TEST_BODY(SaveToFile, NotSaveKeys,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrf;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+    vlt.AddUniqueKey<int>("C");
+
+    vlt.CreateRecord(vrf, {{"A", 0}, {"B", 1}, {"C", 2}});
+    vrs.AddRecord(vrf);
+
+    std::string fileName = GenTmpFileName(std::string("MVault_") + "Vault_" + __FUNCTION__ + "_");
+    bool res = false;
+
+    res = vrs.SaveToFile(fileName, {}, ",", false);
+
+    TEST_ASSERT(res == true);
+
+    COMPARE_FILE(fileName, true, "0,1,2\r\n");
+)
+
+TEST_BODY(SaveToFile, FailedToOpenFile,
+    Vault vlt;
+    GENERATE_SET(vrs);
+    VaultRecordRef vrf;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+    vlt.AddUniqueKey<int>("C");
+
+    vlt.CreateRecord(vrf, {{"A", 0}, {"B", 1}, {"C", 2}});
+    vrs.AddRecord(vrf);
+
+    TEST_ASSERT(vrs.SaveToFile("") == false);
+)
+
+TEST_BODY(Destructor, Default,
+    Vault vlt;
+    VaultRecordSet* vrs = new VaultRecordSet;
+    VaultRecordRef vrf;
+
+    vlt.AddKey("A", 0);
+    vlt.CreateRecord(vrf, {{"A", 1}});
+    vrs->AddRecord(vrf);
+    vrs->GetRecord("A", 1, vrf);
+
+    VaultRecordSet vrs2(*vrs);
+    delete vrs;
+)
+
+TEST_BODY(CompareOperator, InvalidWithInvalid,
+    VaultRecordSet vrs1, vrs2;
+    TEST_ASSERT((vrs1 == vrs2) == true);
+)
+
+TEST_BODY(CompareOperator, InvalidWithValid,
+    Vault vlt;
+    GENERATE_SET(vrs1);
+    VaultRecordSet vrs2;
+    TEST_ASSERT((vrs1 == vrs2) == false);
+)
+
+TEST_BODY(CompareOperator, ValidWithInvalid,
+    Vault vlt;
+    VaultRecordSet vrs1;
+    GENERATE_SET(vrs2);
+    TEST_ASSERT((vrs1 == vrs2) == false);
+)
+
+TEST_BODY(CompareOperator, Empty,
+    Vault vlt;
+    GENERATE_SET(vrs1);
+    GENERATE_SET(vrs2);
+    TEST_ASSERT((vrs1 == vrs2) == true);
+)
+
+TEST_BODY(CompareOperator, Filled,
+    Vault vlt;
+    GENERATE_SET(vrs1);
+    GENERATE_SET(vrs2);
+    VaultRecordRef vrf;
+
+    vlt.AddKey("A", 0);
+
+    vlt.CreateRecord(vrf, {});
+
+    vrs1.AddRecord(vrf);
+    vrs2.AddRecord(vrf);
+
+    TEST_ASSERT((vrs1 == vrs2) == true);
+)
+
+TEST_BODY(CompareOperator, DifferentData,
+    Vault vlt;
+    GENERATE_SET(vrs1);
+    GENERATE_SET(vrs2);
+    VaultRecordRef vrf;
+
+    vlt.AddKey("A", 0);
+
+    vlt.CreateRecord(vrf, {});
+    vrs1.AddRecord(vrf);
+    vlt.CreateRecord(vrf, {});
+    vrs2.AddRecord(vrf);
+
+    TEST_ASSERT((vrs1 == vrs2) == false);
+)
+
+TEST_BODY(CompareOperator, DifferentParents,
+    Vault vlt1, vlt2;
+    VaultRecordSet vrs1, vrs2;
+    VaultRecordRef vrf;
+    VaultOperationResult vor;
+
+    vlt1.AddKey("A", 0);
+    vlt2.AddKey("A", 0);
+
+    vlt1.CreateRecord(vrf, {});
+    vlt1.RequestEqual("A", 0, vrs1);
+    vlt2.CreateRecord(vrf, {});
+    vlt1.RequestEqual("A", 0, vrs2);
+
+    TEST_ASSERT((vrs1 == vrs2) == true);
+)
+
+
+TEST_BODY(UnionSets, InvalidWithInvalid,
+    VaultRecordSet vrs1, vrs2, vrs3;
+    VaultOperationResult vor;
+
+    vor = Union(vrs1, vrs2, vrs3);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::ParentVaultNotValid, SavedType == typeid(void));
+
+    TEST_ASSERT(vrs3.Size() == 0);
+)
+
+TEST_BODY(UnionSets, InvalidWithValid,
+    Vault vlt;
+    VaultRecordSet vrs1, vrs3;
+    GENERATE_SET(vrs2);
+    VaultOperationResult vor;
+
+    vor = Union(vrs1, vrs2, vrs3);
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::ParentVaultNotValid, SavedType == typeid(void));
+
+    TEST_ASSERT(vrs3.Size() == 0);
+)
+
+TEST_BODY(UnionSets, ValidWithInvalid,
+    Vault vlt;
+    GENERATE_SET(vrs1);
+    VaultRecordSet vrs2, vrs3;
+    VaultOperationResult vor;
+
+    vor = Union(vrs1, vrs2, vrs3);
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::OtherParentVaultNotValid, SavedType == typeid(void));
+
+    TEST_ASSERT(vrs3.Size() == 0);
+)
+
+TEST_BODY(UnionSets, Empty,
+    Vault vlt;
+    GENERATE_SET(vrs1);
+    GENERATE_SET(vrs2);
+    VaultRecordSet vrs3;
+    VaultOperationResult vor;
+
+    vor = Union(vrs1, vrs2, vrs3);
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(void));
+
+    TEST_ASSERT(vrs3.Size() == 0);
+)
+
+TEST_BODY(UnionSets, Filled,
+    Vault vlt;
+    GENERATE_SET(vrs1);
+    GENERATE_SET(vrs2);
+    VaultRecordSet vrs3;
+    VaultRecordRef vrf;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+
+    vlt.CreateRecord({{"A", -1}});
+    vlt.CreateRecord(vrf, {{"A", 0}});
+    vrs1.AddRecord(vrf);
+    vlt.CreateRecord(vrf, {{"A", 1}});
+    vrs2.AddRecord(vrf);
+    vlt.CreateRecord(vrf, {{"A", 2}});
+    vrs1.AddRecord(vrf);
+    vrs2.AddRecord(vrf);
+
+    vor = Union(vrs1, vrs2, vrs3);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(void));
+
+    COMPARE_VAULT(vrs3, {
+        {{"A", 0}},
+        {{"A", 1}},
+        {{"A", 2}}
+    });
+    TEST_ASSERT(vrs3.Size() == 3);
+)
+
+TEST_BODY(UnionSets, DifferentParents,
+    Vault vlt1, vlt2;
+    VaultRecordSet vrs1, vrs2, vrs3;
+    VaultRecordRef vrf;
+    VaultOperationResult vor;
+
+    vlt1.AddKey("A", 0);
+    vlt2.AddKey("A", 0);
+
+    vlt1.CreateRecord(vrf, {});
+    vlt1.RequestEqual("A", 0, vrs1);
+    vlt2.CreateRecord(vrf, {});
+    vlt2.RequestEqual("A", 0, vrs2);
+
+    vor = Union(vrs1, vrs2, vrs3);
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::ParentVaultNotMatch, SavedType == typeid(void));
+
+    TEST_ASSERT(vrs3.Size() == 0);
+)
+
+TEST_BODY(UnionSets, Self,
+    Vault vlt;
+    GENERATE_SET(vrs1);
+    GENERATE_SET(vrs2);
+    VaultOperationResult vor;
+
+    vor = Union(vrs1, vrs2, vrs1);
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::SameVaultRecordSet, SavedType == typeid(void));
+
+    TEST_ASSERT(vrs1.Size() == 0);
+
+    vor = Union(vrs1, vrs1, vrs2);
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::SameVaultRecordSet, SavedType == typeid(void));
+
+    TEST_ASSERT(vrs1.Size() == 0);
+
+    vor = Union(vrs1, vrs1, vrs1);
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::SameVaultRecordSet, SavedType == typeid(void));
+
+    TEST_ASSERT(vrs1.Size() == 0);
+)
+
+TEST_BODY(IntersectionSets, InvalidWithInvalid,
+    VaultRecordSet vrs1, vrs2, vrs3;
+    VaultOperationResult vor;
+
+    vor = Intersection(vrs1, vrs2, vrs3);
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "", 
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::ParentVaultNotValid, SavedType == typeid(void));
+
+    TEST_ASSERT(vrs3.Size() == 0);
+)
+
+TEST_BODY(IntersectionSets, InvalidWithValid,
+    Vault vlt;
+    VaultRecordSet vrs1, vrs3;
+    GENERATE_SET(vrs2);
+    VaultOperationResult vor;
+
+    vor = Intersection(vrs1, vrs2, vrs3);
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::ParentVaultNotValid, SavedType == typeid(void));
+
+    TEST_ASSERT(vrs3.Size() == 0);
+)
+
+TEST_BODY(IntersectionSets, ValidWithInvalid,
+    Vault vlt;
+    GENERATE_SET(vrs1);
+    VaultRecordSet vrs2, vrs3;
+    VaultOperationResult vor;
+
+    vor = Intersection(vrs1, vrs2, vrs3);
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::OtherParentVaultNotValid, SavedType == typeid(void));
+
+    TEST_ASSERT(vrs3.Size() == 0);
+)
+
+TEST_BODY(IntersectionSets, Empty,
+    Vault vlt;
+    GENERATE_SET(vrs1);
+    GENERATE_SET(vrs2);
+    VaultRecordSet vrs3;
+    VaultOperationResult vor;
+
+    vor = Intersection(vrs1, vrs2, vrs3);
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(void));
+
+    TEST_ASSERT(vrs3.Size() == 0);
+)
+
+TEST_BODY(IntersectionSets, Filled,
+    Vault vlt;
+    GENERATE_SET(vrs1);
+    GENERATE_SET(vrs2);
+    VaultRecordSet vrs3;
+    VaultRecordRef vrf;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+
+    vlt.CreateRecord({{"A", -1}});
+    vlt.CreateRecord(vrf, {{"A", 0}});
+    vrs1.AddRecord(vrf);
+    vlt.CreateRecord(vrf, {{"A", 1}});
+    vrs2.AddRecord(vrf);
+    vlt.CreateRecord(vrf, {{"A", 2}});
+    vrs2.AddRecord(vrf);
+
+    // Empty intersecton
+    vor = Intersection(vrs1, vrs2, vrs3);
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(void));
+
+    COMPARE_VAULT(vrs3, {});
+    TEST_ASSERT(vrs3.Size() == 0);
+
+    
+    vlt.CreateRecord(vrf, {{"A", 10}});
+    vrs1.AddRecord(vrf);
+    vrs2.AddRecord(vrf);
+
+    // Left intersection
+    vor = Intersection(vrs1, vrs2, vrs3);
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(void));
+
+    COMPARE_VAULT(vrs3, {{{"A", 10}}});
+    TEST_ASSERT(vrs3.Size() == 1);
+
+    // Right intersection
+    vor = Intersection(vrs2, vrs1, vrs3);
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(void));
+
+    COMPARE_VAULT(vrs3, {{{"A", 10}}});
+    TEST_ASSERT(vrs3.Size() == 1);
+)
+
+TEST_BODY(IntersectionSets, DifferentParents,
+    Vault vlt1, vlt2;
+    VaultRecordSet vrs1, vrs2, vrs3;
+    VaultRecordRef vrf;
+    VaultOperationResult vor;
+
+    vlt1.AddKey("A", 0);
+    vlt2.AddKey("A", 0);
+
+    vlt1.CreateRecord(vrf, {});
+    vlt1.RequestEqual("A", 0, vrs1);
+    vlt2.CreateRecord(vrf, {});
+    vlt2.RequestEqual("A", 0, vrs2);
+
+    vor = Intersection(vrs1, vrs2, vrs3);
+
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::ParentVaultNotMatch, SavedType == typeid(void));
+
+    TEST_ASSERT(vrs3.Size() == 0);
+)
+
+TEST_BODY(IntersectionSets, RewriteTarget,
+    Vault vlt;
+    GENERATE_SET(vrs1);
+    GENERATE_SET(vrs2);
+    GENERATE_SET(vrs3);
+    VaultRecordRef vrf;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+
+    vlt.CreateRecord(vrf, {{"A", -1}});
+    vrs3.AddRecord(vrf);
+    vlt.CreateRecord(vrf, {{"A", 0}});
+    vrs1.AddRecord(vrf);
+    vlt.CreateRecord(vrf, {{"A", 1}});
+    vrs2.AddRecord(vrf);
+
+    vlt.CreateRecord(vrf, {{"A", 10}});
+    vrs1.AddRecord(vrf);
+    vrs2.AddRecord(vrf);
+
+    vor = Intersection(vrs1, vrs2, vrs3);
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(void));
+
+    COMPARE_VAULT(vrs3, {{{"A", 10}}});
+    TEST_ASSERT(vrs3.Size() == 1);
+)
+
+TEST_BODY(IntersectionSets, Self,
+    Vault vlt;
+    GENERATE_SET(vrs1);
+    GENERATE_SET(vrs2);
+    VaultOperationResult vor;
+
+    vor = Intersection(vrs1, vrs2, vrs1);
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::SameVaultRecordSet, SavedType == typeid(void));
+
+    TEST_ASSERT(vrs1.Size() == 0);
+
+    vor = Intersection(vrs1, vrs1, vrs2);
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::SameVaultRecordSet, SavedType == typeid(void));
+
+    TEST_ASSERT(vrs1.Size() == 0);
+
+    vor = Intersection(vrs1, vrs1, vrs1);
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::SameVaultRecordSet, SavedType == typeid(void));
+
+    TEST_ASSERT(vrs1.Size() == 0);
 )
 }
 

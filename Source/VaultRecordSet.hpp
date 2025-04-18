@@ -18,6 +18,7 @@ namespace mvlt
             if (&vaultRecordSet == this)
             {
                 res.IsOperationSuccess = false;
+                res.Key = key;
                 res.ResultCode = VaultOperationResultCode::SameVaultRecordSet;
             }
             else

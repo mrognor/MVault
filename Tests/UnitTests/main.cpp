@@ -61,7 +61,8 @@ int main(int argc, char** argv)
     auto end = std::chrono::high_resolution_clock::now();
 
     ColorizedPrint("[==========]", ConsoleTextColor::Green, "");
-    ColorizedPrint(" " + std::to_string(TestCounter) + " tests from 2 files ran. (" + 
+    /// \todo 2 hardcoded
+    ColorizedPrint(" " + std::to_string(TestCounter) + " tests from 2 files ran. (" +
         std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(end - beg).count()) +
         " ms total)");
     ColorizedPrint("[  PASSED  ]" , ConsoleTextColor::Green, "");

@@ -63,7 +63,7 @@ namespace mvlt
 
             \param [in] other object to move
         */
-        void MoveSet(VaultRecordSet& other) noexcept;
+        void MoveSet(VaultRecordSet&& other) noexcept;
 
     public:
         /// Make Vault class friend
