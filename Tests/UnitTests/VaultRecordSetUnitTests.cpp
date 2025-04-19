@@ -5452,6 +5452,82 @@ TEST_BODY(CompareOperator, DifferentParents,
 )
 
 
+TEST_BODY(NotEquationOperator, InvalidWithInvalid,
+    VaultRecordSet vrs1, vrs2;
+    TEST_ASSERT((vrs1 != vrs2) == false);
+)
+
+TEST_BODY(NotEquationOperator, InvalidWithValid,
+    Vault vlt;
+    GENERATE_SET(vrs1);
+    VaultRecordSet vrs2;
+    TEST_ASSERT((vrs1 != vrs2) == true);
+)
+
+TEST_BODY(NotEquationOperator, ValidWithInvalid,
+    Vault vlt;
+    VaultRecordSet vrs1;
+    GENERATE_SET(vrs2);
+    TEST_ASSERT((vrs1 != vrs2) == true);
+)
+
+TEST_BODY(NotEquationOperator, Empty,
+    Vault vlt;
+    GENERATE_SET(vrs1);
+    GENERATE_SET(vrs2);
+    TEST_ASSERT((vrs1 != vrs2) == false);
+)
+
+TEST_BODY(NotEquationOperator, Filled,
+    Vault vlt;
+    GENERATE_SET(vrs1);
+    GENERATE_SET(vrs2);
+    VaultRecordRef vrf;
+
+    vlt.AddKey("A", 0);
+
+    vlt.CreateRecord(vrf, {});
+
+    vrs1.AddRecord(vrf);
+    vrs2.AddRecord(vrf);
+
+    TEST_ASSERT((vrs1 != vrs2) == false);
+)
+
+TEST_BODY(NotEquationOperator, DifferentData,
+    Vault vlt;
+    GENERATE_SET(vrs1);
+    GENERATE_SET(vrs2);
+    VaultRecordRef vrf;
+
+    vlt.AddKey("A", 0);
+
+    vlt.CreateRecord(vrf, {});
+    vrs1.AddRecord(vrf);
+    vlt.CreateRecord(vrf, {});
+    vrs2.AddRecord(vrf);
+
+    TEST_ASSERT((vrs1 != vrs2) == true);
+)
+
+TEST_BODY(NotEquationOperator, DifferentParents,
+    Vault vlt1, vlt2;
+    VaultRecordSet vrs1, vrs2;
+    VaultRecordRef vrf;
+    VaultOperationResult vor;
+
+    vlt1.AddKey("A", 0);
+    vlt2.AddKey("A", 0);
+
+    vlt1.CreateRecord(vrf, {});
+    vlt1.RequestEqual("A", 0, vrs1);
+    vlt2.CreateRecord(vrf, {});
+    vlt1.RequestEqual("A", 0, vrs2);
+
+    TEST_ASSERT((vrs1 != vrs2) == false);
+)
+
+
 TEST_BODY(UnionSets, InvalidWithInvalid,
     VaultRecordSet vrs1, vrs2, vrs3;
     VaultOperationResult vor;

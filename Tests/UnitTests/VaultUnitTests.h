@@ -17,6 +17,7 @@ using namespace mvlt;
 namespace VaultTestNs
 {
     TEST_SUITE(SetDataToRecord,
+
         TEST_CASE(IncorrectDataRecord)
 
         TEST_CASE(NotExistedKey)

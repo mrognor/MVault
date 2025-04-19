@@ -34,6 +34,14 @@ namespace mvlt
         */
         void SetRecord(VaultRecord* vaultRecord, Vault* vlt) noexcept;
 
+        /**
+            \brief Constructor
+
+            Simply call SetRecord method
+            \param [in] vaultRecord A pointer to the VaultRecord referenced by the class object VaultRecordRef
+            \param [in] vlt A pointer to Vault
+        */
+        VaultRecordRef(VaultRecord* vaultRecord, Vault* vlt) noexcept;
     public:
         /// Making the Vault class friendly so that it has access to the internal members of the VaultRecordRef class
         friend Vault;
@@ -46,15 +54,6 @@ namespace mvlt
 
         /// \brief Default constructor
         VaultRecordRef() noexcept;
-
-        /**
-            \brief Constructor
-
-            Simply call SetRecord method
-            \param [in] vaultRecord A pointer to the VaultRecord referenced by the class object VaultRecordRef
-            \param [in] vlt A pointer to Vault
-        */
-        VaultRecordRef(VaultRecord* vaultRecord, Vault* vlt) noexcept;
 
         /**
             \brief Copy constructor
@@ -90,9 +89,18 @@ namespace mvlt
 
             \param [in] other the object to compare with
 
-            \return true if the objects are equal, otherwise false. Two invalid objects are equal
+            \return true if the objects are equal, otherwise false
         */
         bool operator==(const VaultRecordRef& other) const noexcept;
+
+        /**
+            \brief Not equation operator
+
+            \param [in] other the object to compare with
+
+            \return true if the objects are not equal, otherwise true
+        */
+        bool operator!=(const VaultRecordRef& other) const noexcept;
 
         /**
             \brief A method for obtaining a unique record identifier

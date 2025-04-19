@@ -578,6 +578,23 @@ namespace VaultRecordSetTestNs
         TEST_CASE(DifferentParents)
     )
 
+    TEST_SUITE(NotEquationOperator,
+
+        TEST_CASE(InvalidWithInvalid)
+
+        TEST_CASE(InvalidWithValid)
+
+        TEST_CASE(ValidWithInvalid)
+
+        TEST_CASE(Empty)
+
+        TEST_CASE(Filled)
+
+        TEST_CASE(DifferentData)
+
+        TEST_CASE(DifferentParents)
+    )
+
     TEST_SUITE(UnionSets, 
     
         TEST_CASE(InvalidWithInvalid)

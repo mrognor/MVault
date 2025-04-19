@@ -570,6 +570,18 @@ namespace mvlt
         return res;
     }
 
+    bool operator!=(const VaultRecordSet& a, const VaultRecordSet& b) noexcept
+    {
+        DBG_LOG_ENTER();
+
+        bool res = false;
+
+        if (a.ParentVault != b.ParentVault || a.RecordsSet != b.RecordsSet)
+            res = true;
+
+        return res;
+    }
+
     VaultOperationResult Union(const VaultRecordSet& a, const VaultRecordSet& b, VaultRecordSet& res) noexcept
     {
         DBG_LOG_ENTER();

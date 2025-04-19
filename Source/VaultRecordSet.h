@@ -110,6 +110,9 @@ namespace mvlt
         /// Making operator comparison function friendly
         friend bool operator==(const VaultRecordSet& a, const VaultRecordSet& b) noexcept;
 
+        /// Making operator not equation function friendly
+        friend bool operator!=(const VaultRecordSet& a, const VaultRecordSet& b) noexcept;
+
         /**
             \brief Method for checking the validity of the parent Vault
 
@@ -533,6 +536,17 @@ namespace mvlt
         \return true if a equal b, false otherwise
     */
     bool operator==(const VaultRecordSet& a, const VaultRecordSet& b) noexcept;
+
+
+    /**
+        \brief Friend not equation operator
+
+        \param [in] a first set to compare
+        \param [in] b second set to compare
+
+        \return true if a not equal b, false otherwise
+    */
+    bool operator!=(const VaultRecordSet& a, const VaultRecordSet& b) noexcept;
 
     /**
         \brief A function for combining sets

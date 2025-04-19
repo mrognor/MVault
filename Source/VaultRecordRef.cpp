@@ -74,7 +74,24 @@ namespace mvlt
     {
         DBG_LOG_ENTER();
 
-        *this = other;
+        if (&other != this)
+        {
+            if (other.VaultRecordPtr != nullptr)
+            {
+                if (VaultRecordPtr != nullptr) VaultRecordPtr->RemoveRef();
+
+                VaultRecordPtr = other.VaultRecordPtr;
+                Vlt = other.Vlt;
+                other.VaultRecordPtr = nullptr;
+                other.Vlt = nullptr;
+            }
+            else
+            {
+                if (VaultRecordPtr != nullptr) VaultRecordPtr->RemoveRef();
+                Vlt = nullptr;
+                VaultRecordPtr = nullptr;
+            }
+        }
 
         return *this;
     }
@@ -93,6 +110,25 @@ namespace mvlt
         {
             if (other.IsValid()) res = false;
             else res = true;
+        }
+
+        return res;
+    }
+
+    bool VaultRecordRef::operator!=(const VaultRecordRef& other) const noexcept
+    {
+        DBG_LOG_ENTER();
+
+        bool res;
+
+        if (IsValid())
+        {
+            res = (VaultRecordPtr != other.VaultRecordPtr);
+        }
+        else
+        {
+            if (other.IsValid()) res = true;
+            else res = false;
         }
 
         return res;

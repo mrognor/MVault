@@ -1,8 +1,10 @@
 #include "VaultUnitTests.h"
 #include "VaultRecordSetUnitTests.h"
+#include "VaultRecordRefUnitTests.h"
 
 const std::uint64_t VaultUnitTestsKey = ~0b0001;
 const std::uint64_t VaultRecordSetUnitTestsKey = ~0b0010;
+const std::uint64_t VaultRecordRefUnitTestsKey = ~0b0100;
 
 std::vector<std::string> ReadParams(int argc, char** argv)
 {
@@ -38,6 +40,7 @@ int main(int argc, char** argv)
         {
             if (param == "Vault") requiredTests &= VaultUnitTestsKey;
             else if (param == "VaultRecordSet") requiredTests &= VaultRecordSetUnitTestsKey;
+            else if (param == "VaultRecordRef") requiredTests &= VaultRecordRefUnitTestsKey;
         }
     }
 
@@ -55,6 +58,13 @@ int main(int argc, char** argv)
         ColorizedPrint("[----------]", ConsoleTextColor::Green, "");
         ColorizedPrint(" Tests for VaultRecordSet");
         VaultRecordSetUnitTests();
+        std::cout << std::endl;
+    }
+    if ((requiredTests & ~VaultRecordRefUnitTestsKey) == 0) 
+    {
+        ColorizedPrint("[----------]", ConsoleTextColor::Green, "");
+        ColorizedPrint(" Tests for VaultRecordSet");
+        VaultRecordRefUnitTests();
         std::cout << std::endl;
     }
 

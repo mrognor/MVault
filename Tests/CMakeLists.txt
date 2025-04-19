@@ -31,9 +31,9 @@ add_library(MTests STATIC ${MTestsHeaders} ${MTestsSource})
 
 include_directories(../Source)
 
-set(UnitTestsHeaders UnitTests/VaultUnitTests.h UnitTests/VaultRecordSetUnitTests.h)
+set(UnitTestsHeaders UnitTests/VaultUnitTests.h UnitTests/VaultRecordSetUnitTests.h UnitTests/VaultRecordRefUnitTests.h)
 
-set(UnitTestsSource UnitTests/VaultUnitTests.cpp UnitTests/VaultRecordSetUnitTests.cpp)
+set(UnitTestsSource UnitTests/VaultUnitTests.cpp UnitTests/VaultRecordSetUnitTests.cpp UnitTests/VaultRecordRefUnitTests.cpp)
 
 project(UnitTests)
 
