@@ -2878,7 +2878,8 @@ TEST_BODY(Request, CorrectRequestWithPredicat,
         {{"A", 5}, {"B", 2}},
     });
 
-    COMPARE_OPERATION(vor, IsOperationSuccess == true, ResultCode == VaultOperationResultCode::Success);
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(void));
 
 
     // Greater
@@ -2894,7 +2895,8 @@ TEST_BODY(Request, CorrectRequestWithPredicat,
 
     COMPARE_VAULT(vrs, {{{"A", 8}, {"B", 92}}});
 
-    COMPARE_OPERATION(vor, IsOperationSuccess == true, ResultCode == VaultOperationResultCode::Success);
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(void));
 
 
     // Greater or equal
@@ -2910,7 +2912,8 @@ TEST_BODY(Request, CorrectRequestWithPredicat,
 
     COMPARE_VAULT(vrs, {{{"A", 8}, {"B", 92}}});
 
-    COMPARE_OPERATION(vor, IsOperationSuccess == true, ResultCode == VaultOperationResultCode::Success);
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(void));
 
 
     // Less
@@ -2926,7 +2929,8 @@ TEST_BODY(Request, CorrectRequestWithPredicat,
 
     COMPARE_VAULT(vrs, {{{"A", 0}, {"B", 100}}});
 
-    COMPARE_OPERATION(vor, IsOperationSuccess == true, ResultCode == VaultOperationResultCode::Success);
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(void));
 
 
     // Less or equal
@@ -2942,7 +2946,8 @@ TEST_BODY(Request, CorrectRequestWithPredicat,
 
     COMPARE_VAULT(vrs, {{{"A", 0}, {"B", 100}}, {{"A", 2}, {"B", 98}}});
 
-    COMPARE_OPERATION(vor, IsOperationSuccess == true, ResultCode == VaultOperationResultCode::Success);
+    COMPARE_OPERATION(vor, IsOperationSuccess == true, Key == "",
+        RequestedType == typeid(void), ResultCode == VaultOperationResultCode::Success, SavedType == typeid(void));
 )
 
 TEST_BODY(Request, BoundaryValues,

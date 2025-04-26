@@ -16,7 +16,7 @@ void ColorizedPrint(const std::string& text, const ConsoleTextColor& color, cons
         if (GetConsoleScreenBufferInfo(ConsoleHandle, &info))
         {
             SetConsoleTextAttribute(ConsoleHandle, static_cast<std::uint8_t>(color));
-            std::cout << text << "\n";
+            std::cout << text << end;
             SetConsoleTextAttribute(ConsoleHandle, static_cast<std::uint8_t>(info.wAttributes));
         }
         else std::cout << text << end;

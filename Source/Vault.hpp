@@ -302,7 +302,7 @@ namespace mvlt
 
         for (VaultRecord* record : vaultRecordSet.RecordsSet)
         {
-            // Add pointer to record from this to vaultRecordSet structure
+            // Add pointer to record to vaultRecordSet structure
             for (auto& adder : vaultRecordSet.VaultRecordAdders)
                 adder.second(record);
             
