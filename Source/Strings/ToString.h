@@ -180,7 +180,7 @@ namespace mvlt
     template <>
     inline std::string ToString(const std::int8_t& data) noexcept
     {
-        return std::string(1, data);
+        return std::to_string(static_cast<std::int16_t>(data));
     }
 
     /**
@@ -195,7 +195,7 @@ namespace mvlt
     template <>
     inline std::string ToString(const std::uint8_t& data) noexcept
     {
-        return std::string(1, static_cast<std::int8_t>(data));
+        return std::to_string(static_cast<std::uint16_t>(data));
     }
 
     /**

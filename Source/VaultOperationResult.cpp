@@ -9,7 +9,7 @@ namespace mvlt
         ResultCode = resultCode;
 
 #ifndef NDEBUG
-        if (TraceFormat == BackTraceFormat::Full || TraceFormat == BackTraceFormat::Full)
+        if (TraceFormat == BackTraceFormat::Full || TraceFormat == BackTraceFormat::Compact)
         {
             std::cout << "Internal error! " << ResultCodeString() << "\n";
             std::cout << "\tRequested key: \x1B[31m" << Key << "\033[0m. Requested type: \x1B[31m" << RequestedType.name() << "\033[0m. SavedType: \x1B[31m" << SavedType.name() << "\033[0m.\n";
