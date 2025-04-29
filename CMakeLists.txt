@@ -27,4 +27,9 @@ endif()
 
 add_subdirectory(Source)
 add_subdirectory(Examples)
-add_subdirectory(Tests)
+
+
+if (NOT "$ENV{CI}" STREQUAL "")
+    add_subdirectory(Tests)
+    add_subdirectory(Benchmarks)
+endif()

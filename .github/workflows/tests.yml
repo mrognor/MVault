@@ -24,7 +24,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install packages
-        run: sudo apt-get update && sudo apt-get upgrade && sudo apt-get -y install cmake lcov
+        run: sudo apt-get update && sudo apt-get upgrade && sudo apt-get -y install cmake lcov libhiredis-dev
 
       - name: Configure project
         run: ./Configure.sh
@@ -53,7 +53,10 @@ jobs:
           path: ./Build
 
       - name: Run tests
-        run: ./Scripts/Tests/RunUnitTests.sh
+        run: |
+          cd Build
+          chmod +x ./Tests/UnitTests
+          ./Tests/UnitTests
 
       # Upload artifacts to reuse it in next jobs
       - uses: actions/upload-artifact@v4

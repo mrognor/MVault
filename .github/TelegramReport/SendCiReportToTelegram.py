@@ -40,22 +40,25 @@ with open("../../Build/report.md") as reportFile:
         report = commit.hexsha[0:11] + ": <b>success</b>\n\n" + report
 
     # Code lines
-    file_types = [".h", ".c", ".hpp", ".cpp"]
+    file_types = [".h", ".c", ".hpp", ".cpp", ".py"]
     srcLines, srcFiles = CalculateLinesOfCode("../../Source", file_types)
     testsLines, testsFiles = CalculateLinesOfCode("../../Tests", file_types)
     examplesLines, examplesFiles = CalculateLinesOfCode("../../Examples", file_types)
+    benchmarkLines, benchmarkFiles = CalculateLinesOfCode("../../Benchmarks", file_types)
 
     report += "Lines\n"
     report += "  Total: " + str(srcLines + testsLines + examplesLines) + "\n"
     report += "  Source: " + str(srcLines) + "\n"
     report += "  Tests: " + str(testsLines) + "\n"
-    report += "  Examples: " + str(examplesLines) + "\n\n"
+    report += "  Examples: " + str(examplesLines) + "\n"
+    report += "  Benchmarks: " + str(benchmarkLines) + "\n\n"
 
     report += "Files\n"
     report += "  Total: " + str(srcFiles + testsFiles + examplesFiles) + "\n"
     report += "  Source: " + str(srcFiles) + "\n"
     report += "  Tests: " + str(testsFiles) + "\n"
-    report += "  Examples: " + str(examplesFiles)
+    report += "  Examples: " + str(examplesFiles) + "\n"
+    report += "  Benchmarks: " + str(benchmarkFiles)
 
     # Telegram
     botTimeWeb = telebot.TeleBot(sys.argv[1])
