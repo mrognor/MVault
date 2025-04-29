@@ -2,6 +2,8 @@
 
 namespace mvlt
 {
+    StreamFileReader::StreamFileReader() noexcept{}
+
     StreamFileReader::StreamFileReader(const std::string& fileName) noexcept
     {
         Open(fileName);

@@ -12,7 +12,7 @@ namespace mvlt
         TraceFormat = traceFormat;
     }
 
-#ifndef _WIN32
+#ifndef NO_BACKTRACE_SUPPORT
 
     void PrintBackTrace() noexcept
     {
@@ -53,7 +53,6 @@ namespace mvlt
                 if (!Trace.empty())
                 {
                     std::cout << "\t";
-                    if (TraceFormat == BackTraceFormat::Full) std::cout << Trace.size() << ": ";
                     std::cout << "\x1B[33m" << Trace.back() << "\033[0m from " << std::flush;
                     Trace.pop_back();
                 }
@@ -73,13 +72,8 @@ namespace mvlt
     {
         if (TraceFormat != BackTraceFormat::None)
         {
-            Trace.pop_back();
-            std::size_t counter = Trace.size();
-            for (auto traceIt = Trace.rbegin(); traceIt != Trace.rend(); ++traceIt)
-            {
-                std::cout << "\t" << counter << ": \x1B[33m" << *traceIt << "\033[0m from (File name and file line not available on windows)" << std::endl;
-                --counter;
-            }
+            std::cout << "\t\x1B[33m" << Trace.front() 
+                << "\033[0m from (File name and file line not available on this machine! If you are on linux try to download libexecinfo and reconfigure project. See Checkers/BackTrace)" << std::endl;
         }
     }
 

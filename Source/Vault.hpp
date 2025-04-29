@@ -380,7 +380,7 @@ namespace mvlt
                     break;
                 }
 
-                cachedData.emplace_back(std::move(value));
+                cachedData.push_back(std::move(value));
             }
 
             // If key correct then add data to all places

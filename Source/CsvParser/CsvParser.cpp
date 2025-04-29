@@ -32,6 +32,8 @@ namespace mvlt
     }
 
     
+    CsvParser::CsvParser() noexcept {}
+
     bool CsvParser::OpenFile(const std::string& fileName) noexcept
     {
         return FileReader.Open(fileName);

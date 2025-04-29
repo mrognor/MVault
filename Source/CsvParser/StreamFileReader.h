@@ -53,7 +53,8 @@ namespace mvlt
 
     public:
         /// \brief Default constructor
-        StreamFileReader() noexcept = default;
+        /// \todo Wait new lcc version to make it default
+        StreamFileReader() noexcept;
 
         /**
             \brief Copy constructor

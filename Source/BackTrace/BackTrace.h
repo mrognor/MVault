@@ -6,7 +6,10 @@
 #include <dlfcn.h>
 #include <stdlib.h>
 #include <unistd.h>
+
+#ifndef NO_BACKTRACE_SUPPORT
 #include <execinfo.h>
+#endif
 #endif
 
 #include <vector>
@@ -37,8 +40,7 @@ namespace mvlt
     /// \brief Debug backtrace format
     enum class BackTraceFormat : std::uint8_t
     {
-        Full,    ///< Full backtrace
-        Compact, ///< Only function with error
+        Compact, ///< Function with error
         None     ///< None debug backtrace
     };
 

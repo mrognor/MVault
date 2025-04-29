@@ -44,7 +44,8 @@ namespace mvlt
 
     public:
         /// \brief Default constructor
-        CsvParser() noexcept = default;
+        /// \todo Wait new lcc version to make it default
+        CsvParser() noexcept;
 
         /**
             \brief Deleted copy constructor
