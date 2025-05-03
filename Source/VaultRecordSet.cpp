@@ -24,6 +24,7 @@ namespace mvlt
 
         KeysOrder = other.KeysOrder;
         UniqueKeys = other.UniqueKeys;
+        InvalidFileRecords = std::move(other.InvalidFileRecords);
 
         other.ParentVault->RecordSetsSet.emplace(this);
 
@@ -57,15 +58,9 @@ namespace mvlt
         ParentVault = other.ParentVault;
         other.ParentVault = nullptr;
 
-        RecordTemplate = std::move(other.RecordTemplate);
-        VaultHashMapStructure = std::move(other.VaultHashMapStructure);
-        VaultMapStructure = std::move(other.VaultMapStructure);
-        KeysTypes = std::move(other.KeysTypes);
-        VaultRecordAdders = std::move(other.VaultRecordAdders);
-        VaultRecordClearers = std::move(other.VaultRecordClearers);
-        VaultRecordErasers = std::move(other.VaultRecordErasers);
-        VaultRecordSorters = std::move(other.VaultRecordSorters);
-        VaultKeyCopiers = std::move(other.VaultKeyCopiers);
+        for (auto& keyCopierIt : other.VaultKeyCopiers)
+            keyCopierIt.second(this);
+
         KeysOrder = std::move(other.KeysOrder);
         UniqueKeys = std::move(other.UniqueKeys);
         InvalidFileRecords = std::move(other.InvalidFileRecords);

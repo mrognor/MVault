@@ -2,7 +2,7 @@
 
 namespace VaultRecordRefTestNs
 {
-std::vector<std::function<void()>> Tests;
+std::vector<std::pair<std::string, std::function<void()>>> Tests;
 
 TEST_BODY(DefaultConstructor, Default,
     VaultRecordRef vrr;
@@ -66,11 +66,14 @@ TEST_BODY(MoveConstructor, FromFilled,
 )
 }
 
-void VaultRecordRefUnitTests()
+void VaultRecordRefUnitTests(const std::string& testName)
 {
     DBG_LOG_ENTER();
     SetBackTraceFormat(BackTraceFormat::None);
 
     for (const auto& test : VaultRecordRefTestNs::Tests)
-        test();
+    {
+        if (testName.empty() || testName == test.first)
+            test.second();
+    }
 }

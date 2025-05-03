@@ -36,9 +36,13 @@ namespace VaultRecordSetTestNs
 
         TEST_CASE(AssignWithParentsToWithoutParent)
 
+        TEST_CASE(AssignWithoutParentToWithParent)
+
         TEST_CASE(AssignEmpty)
 
         TEST_CASE(AssignFilledSet)
+
+        TEST_CASE(AssignEmptyToFilled)
     )
 
     TEST_SUITE(MoveConstructor,
@@ -56,9 +60,13 @@ namespace VaultRecordSetTestNs
 
         TEST_CASE(AssignWithParentsToWithoutParent)
 
+        TEST_CASE(AssignWithoutParentToWithParent)
+
         TEST_CASE(AssignEmpty)
 
         TEST_CASE(AssignFilledSet)
+
+        TEST_CASE(AssignEmptyToFilled)
     )
 
     TEST_SUITE(GetIsParentVaultValid,
@@ -632,4 +640,4 @@ namespace VaultRecordSetTestNs
     )
 }
 
-void VaultRecordSetUnitTests();
+void VaultRecordSetUnitTests(const std::string& testName);

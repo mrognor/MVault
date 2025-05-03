@@ -36,4 +36,4 @@ namespace VaultRecordRefTestNs
     )
 }
 
-void VaultRecordRefUnitTests();
+void VaultRecordRefUnitTests(const std::string& testName);

@@ -12,4 +12,4 @@ cd Build
 make -j
 
 # Run unit tests
-./Tests/UnitTests
+./Tests/UnitTests $1

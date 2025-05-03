@@ -526,4 +526,4 @@ namespace VaultTestNs
     )
 }
 
-void VaultUnitTests();
+void VaultUnitTests(const std::string& testName);

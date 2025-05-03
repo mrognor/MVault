@@ -2,7 +2,7 @@
 
 namespace VaultTestNs
 {
-std::vector<std::function<void()>> Tests;
+std::vector<std::pair<std::string, std::function<void()>>> Tests;
 
 class VaultSetDataToRecordTest : public Vault
 {
@@ -4820,11 +4820,14 @@ TEST_BODY(Destructor, Default,
 )
 }
 
-void VaultUnitTests()
+void VaultUnitTests(const std::string& testName)
 {
     DBG_LOG_ENTER();
     SetBackTraceFormat(BackTraceFormat::None);
 
     for (const auto& test : VaultTestNs::Tests)
-        test();
+    {
+        if (testName.empty() || testName == test.first)
+            test.second();
+    }
 }

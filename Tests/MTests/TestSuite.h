@@ -24,7 +24,7 @@ class TmpObj_##className##_##methodName \
 public: \
     TmpObj_##className##_##methodName() \
     { \
-        Tests.emplace_back([]() {className::methodName();}); \
+        Tests.emplace_back(std::string(#className) + "::" + #methodName, []() {className::methodName();}); \
     } \
 }; \
  \

@@ -6,6 +6,24 @@ const std::uint64_t VaultUnitTestsKey = ~0b0001;
 const std::uint64_t VaultRecordSetUnitTestsKey = ~0b0010;
 const std::uint64_t VaultRecordRefUnitTestsKey = ~0b0100;
 
+bool IsStartsWith(const std::string& strToFindIn, const std::string& strToFind)
+{
+    if (strToFind.length() > strToFindIn.length()) return false;
+
+    bool res = true;
+
+    for (std::size_t i = 0; i < strToFind.length(); ++i)
+    {
+        if (strToFind[i] != strToFindIn[i])
+        {
+            res = false;
+            break;
+        }
+    }
+
+    return res;
+}
+
 std::vector<std::string> ReadParams(int argc, char** argv)
 {
     std::vector<std::string> res;
@@ -32,15 +50,21 @@ int main(int argc, char** argv)
 {
     std::uint64_t requiredTests = 0;
     std::vector<std::string> params = ReadParams(argc, argv);
+    std::string requiredTest;
 
     if (!params.empty())
     {
-        requiredTests = ~0;
+        // requiredTests = ~0;
         for (const std::string& param : params)
         {
             if (param == "Vault") requiredTests &= VaultUnitTestsKey;
             else if (param == "VaultRecordSet") requiredTests &= VaultRecordSetUnitTestsKey;
             else if (param == "VaultRecordRef") requiredTests &= VaultRecordRefUnitTestsKey;
+
+            if (IsStartsWith(param, "--filter="))
+            {
+                requiredTest = param.substr(9);
+            }
         }
     }
 
@@ -50,21 +74,21 @@ int main(int argc, char** argv)
     {
         ColorizedPrint("[----------]", ConsoleTextColor::Green, "");
         ColorizedPrint(" Tests for Vault");
-        VaultUnitTests();
+        VaultUnitTests(requiredTest);
         std::cout << std::endl;
     }
     if ((requiredTests & ~VaultRecordSetUnitTestsKey) == 0) 
     {
         ColorizedPrint("[----------]", ConsoleTextColor::Green, "");
         ColorizedPrint(" Tests for VaultRecordSet");
-        VaultRecordSetUnitTests();
+        VaultRecordSetUnitTests(requiredTest);
         std::cout << std::endl;
     }
     if ((requiredTests & ~VaultRecordRefUnitTestsKey) == 0) 
     {
         ColorizedPrint("[----------]", ConsoleTextColor::Green, "");
         ColorizedPrint(" Tests for VaultRecordSet");
-        VaultRecordRefUnitTests();
+        VaultRecordRefUnitTests(requiredTest);
         std::cout << std::endl;
     }
 

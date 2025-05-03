@@ -10,7 +10,7 @@ vlt.RemoveKey("A");
 
 namespace VaultRecordSetTestNs
 {
-std::vector<std::function<void()>> Tests;
+std::vector<std::pair<std::string, std::function<void()>>> Tests;
 
 TEST_BODY(DefaultConstructor, Default,
     VaultRecordSet vrs;
@@ -114,6 +114,29 @@ TEST_BODY(AssignmentOperator, AssignWithParentsToWithoutParent,
     COMPARE_VAULT(vrs1, {});
 )
 
+TEST_BODY(AssignmentOperator, AssignWithoutParentToWithParent,
+    Vault vlt;
+    VaultRecordSet vrs1, vrs2;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<std::string>("B");
+
+    vlt.CreateRecord({ {"A", 0}, {"B", std::string("a")} });
+    vlt.CreateRecord({ {"A", 0}, {"B", std::string("b")} });
+    vlt.CreateRecord({ {"A", 0}, {"B", std::string("c")} });
+
+    vlt.RequestEqual("A", 0, vrs2);
+
+    vrs2 = vrs1;
+
+    TEST_ASSERT(vrs2.Size() == 0);
+    TEST_ASSERT(vrs2.GetKeys().size() == 0);
+    TEST_ASSERT(vrs2.GetUniqueKeys().size() == 0);
+    TEST_ASSERT(vrs2.GetIsParentVaultValid() == false);
+
+    COMPARE_VAULT(vrs2, {});
+)
+
 TEST_BODY(AssignmentOperator, AssignEmpty,
     Vault vlt;
     GENERATE_SET(vrs1);
@@ -154,6 +177,33 @@ TEST_BODY(AssignmentOperator, AssignFilledSet,
         {{"A", 0}, {"B",  std::string("b")}},
         {{"A", 0}, {"B",  std::string("c")}},
     });
+)
+
+TEST_BODY(AssignmentOperator, AssignEmptyToFilled,
+    Vault vlt;
+    VaultRecordSet vrs1, vrs2;
+    VaultRecordRef vrr;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<std::string>("B");
+
+    vlt.CreateRecord(vrr, { {"A", 0}, {"B", std::string("a")} });
+    vlt.Request(Equal("A", 0), vrs1);
+    vrs1.RemoveRecord(vrr);
+
+    vlt.CreateRecord({ {"A", 0}, {"B", std::string("b")} });
+    vlt.CreateRecord({ {"A", 0}, {"B", std::string("c")} });
+
+    vlt.RequestEqual("A", 0, vrs2);
+
+    vrs2 = vrs1;
+
+    TEST_ASSERT(vrs2.Size() == 0);
+    TEST_ASSERT(vrs2.GetKeys().size() == 2);
+    TEST_ASSERT(vrs2.GetUniqueKeys().size() == 1);
+    TEST_ASSERT(vrs2.GetIsParentVaultValid() == true);
+
+    COMPARE_VAULT(vrs2, {});
 )
 
 TEST_BODY(MoveConstructor, MoveWithoutParents,
@@ -263,6 +313,29 @@ TEST_BODY(MoveAssignmentOperator, AssignWithParentsToWithoutParent,
     COMPARE_VAULT(vrs1, {});
 )
 
+TEST_BODY(MoveAssignmentOperator, AssignWithoutParentToWithParent,
+    Vault vlt;
+    VaultRecordSet vrs1, vrs2;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<std::string>("B");
+
+    vlt.CreateRecord({ {"A", 0}, {"B", std::string("a")} });
+    vlt.CreateRecord({ {"A", 0}, {"B", std::string("b")} });
+    vlt.CreateRecord({ {"A", 0}, {"B", std::string("c")} });
+
+    vlt.RequestEqual("A", 0, vrs2);
+
+    vrs2 = std::move(vrs1);
+
+    TEST_ASSERT(vrs2.Size() == 0);
+    TEST_ASSERT(vrs2.GetKeys().size() == 0);
+    TEST_ASSERT(vrs2.GetUniqueKeys().size() == 0);
+    TEST_ASSERT(vrs2.GetIsParentVaultValid() == false);
+
+    COMPARE_VAULT(vrs2, {});
+)
+
 TEST_BODY(MoveAssignmentOperator, AssignEmpty,
     Vault vlt;
     GENERATE_SET(vrs1);
@@ -311,6 +384,33 @@ TEST_BODY(MoveAssignmentOperator, AssignFilledSet,
     TEST_ASSERT(vrs1.GetParentVaultUniqueId() == "null");
 
     COMPARE_VAULT(vrs1, {});
+)
+
+TEST_BODY(MoveAssignmentOperator, AssignEmptyToFilled,
+    Vault vlt;
+    VaultRecordSet vrs1, vrs2;
+    VaultRecordRef vrr;
+
+    vlt.AddKey("A", 0);
+    vlt.AddUniqueKey<std::string>("B");
+
+    vlt.CreateRecord(vrr, { {"A", 0}, {"B", std::string("a")} });
+    vlt.Request(Equal("A", 0), vrs1);
+    vrs1.RemoveRecord(vrr);
+
+    vlt.CreateRecord({ {"A", 0}, {"B", std::string("b")} });
+    vlt.CreateRecord({ {"A", 0}, {"B", std::string("c")} });
+
+    vlt.RequestEqual("A", 0, vrs2);
+
+    vrs2 = std::move(vrs1);
+
+    TEST_ASSERT(vrs2.Size() == 0);
+    TEST_ASSERT(vrs2.GetKeys().size() == 2);
+    TEST_ASSERT(vrs2.GetUniqueKeys().size() == 1);
+    TEST_ASSERT(vrs2.GetIsParentVaultValid() == true);
+
+    COMPARE_VAULT(vrs2, {});
 )
 
 TEST_BODY(GetIsParentVaultValid, Invalid,
@@ -5839,11 +5939,14 @@ TEST_BODY(IntersectionSets, Self,
 )
 }
 
-void VaultRecordSetUnitTests()
+void VaultRecordSetUnitTests(const std::string& testName)
 {
     DBG_LOG_ENTER();
     SetBackTraceFormat(BackTraceFormat::None);
 
     for (const auto& test : VaultRecordSetTestNs::Tests)
-        test();
+    {
+        if (testName.empty() || testName == test.first)
+            test.second();
+    }
 }
