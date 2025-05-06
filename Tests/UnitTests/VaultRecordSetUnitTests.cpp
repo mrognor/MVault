@@ -3819,14 +3819,6 @@ TEST_BODY(CheckRecord, Correct,
     TEST_ASSERT(vrs.CheckRecord(vrr) == true);
 )
 
-// TEST_SUITE(Reset,
-        
-//     TEST_CASE(InvalidSet)
-
-//     TEST_CASE(EmptySet)
-
-//     TEST_CASE(FilledSet)
-// )
 
 TEST_BODY(Reset, InvalidSet,
     VaultRecordSet vrs;

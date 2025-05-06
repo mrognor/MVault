@@ -87,7 +87,7 @@ int main(int argc, char** argv)
     if ((requiredTests & ~VaultRecordRefUnitTestsKey) == 0) 
     {
         ColorizedPrint("[----------]", ConsoleTextColor::Green, "");
-        ColorizedPrint(" Tests for VaultRecordSet");
+        ColorizedPrint(" Tests for VaultRecordRef");
         VaultRecordRefUnitTests(requiredTest);
         std::cout << std::endl;
     }

@@ -34,6 +34,46 @@ namespace VaultRecordRefTestNs
 
         TEST_CASE(FromFilled)
     )
+
+    TEST_SUITE(AssignmentOperator,
+
+        TEST_CASE(AssignWithoutParents)
+
+        TEST_CASE(AssignWithParentsToWithoutParent)
+
+        TEST_CASE(AssignWithoutParentToWithParent)
+
+        TEST_CASE(Assign)
+    )
+
+    TEST_SUITE(MoveAssignmentOperator,
+
+        TEST_CASE(AssignWithoutParents)
+
+        TEST_CASE(AssignWithParentsToWithoutParent)
+
+        TEST_CASE(AssignWithoutParentToWithParent)
+
+        TEST_CASE(Assign)
+    )
+
+    TEST_SUITE(OperatorComparison,
+    
+        TEST_CASE(CompareWithoutParents)
+
+        TEST_CASE(CompareWithParentToWithoutParent)
+
+        TEST_CASE(Compare)
+    )
+
+    TEST_SUITE(OperatorNonComparison,
+    
+        TEST_CASE(CompareWithoutParents)
+
+        TEST_CASE(CompareWithParentToWithoutParent)
+
+        TEST_CASE(Compare)
+    )
 }
 
 void VaultRecordRefUnitTests(const std::string& testName);

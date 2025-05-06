@@ -64,6 +64,185 @@ TEST_BODY(MoveConstructor, FromFilled,
 
     TEST_ASSERT(vrr1.IsValid() == false);
 )
+
+TEST_BODY(AssignmentOperator, AssignWithoutParents,
+    VaultRecordRef vrr1, vrr2;
+
+    vrr1 = vrr2;
+
+    TEST_ASSERT(vrr1.IsValid() == false);
+    TEST_ASSERT(vrr1.GetRecordUniqueId() == "null");
+)
+
+TEST_BODY(AssignmentOperator, AssignWithParentsToWithoutParent,
+    Vault vlt;
+    VaultRecordRef vrr1, vrr2;
+
+    vlt.AddKey("A", 0);
+    vlt.CreateRecord({{"A", 0}});
+    vlt.GetRecord("A", 0, vrr1);
+
+    vrr2 = vrr1;
+
+    TEST_ASSERT(vrr2.IsValid() == true);
+    TEST_ASSERT(vrr2.ToJson(false) == R"({"A":0})");
+)
+
+TEST_BODY(AssignmentOperator, AssignWithoutParentToWithParent,
+    Vault vlt;
+    VaultRecordRef vrr1, vrr2;
+
+    vlt.AddKey("A", 0);
+    vlt.CreateRecord({{"A", 0}});
+    vlt.GetRecord("A", 0, vrr2);
+
+    vrr2 = vrr1;
+
+    TEST_ASSERT(vrr1.IsValid() == false);
+    TEST_ASSERT(vrr1.GetRecordUniqueId() == "null");
+)
+
+TEST_BODY(AssignmentOperator, Assign,
+    Vault vlt;
+    VaultRecordRef vrr1, vrr2;
+
+    vlt.AddKey("A", 0);
+    vlt.CreateRecord({{"A", 0}});
+    vlt.CreateRecord({{"A", 1}});
+    vlt.GetRecord("A", 0, vrr1);
+    vlt.GetRecord("A", 1, vrr2);
+
+    vrr2 = vrr1;
+
+    TEST_ASSERT(vrr2.IsValid() == true);
+    TEST_ASSERT(vrr2.ToJson(false) == R"({"A":0})");
+)
+
+
+TEST_BODY(MoveAssignmentOperator, AssignWithoutParents,
+    VaultRecordRef vrr1, vrr2;
+
+    vrr1 = std::move(vrr2);
+
+    TEST_ASSERT(vrr1.IsValid() == false);
+    TEST_ASSERT(vrr1.GetRecordUniqueId() == "null");
+)
+
+TEST_BODY(MoveAssignmentOperator, AssignWithParentsToWithoutParent,
+    Vault vlt;
+    VaultRecordRef vrr1, vrr2;
+
+    vlt.AddKey("A", 0);
+    vlt.CreateRecord({{"A", 0}});
+    vlt.GetRecord("A", 0, vrr1);
+
+    vrr2 = std::move(vrr1);
+
+    TEST_ASSERT(vrr1.IsValid() == false);
+    TEST_ASSERT(vrr1.GetRecordUniqueId() == "null");
+    TEST_ASSERT(vrr2.IsValid() == true);
+    TEST_ASSERT(vrr2.ToJson(false) == R"({"A":0})");
+)
+
+TEST_BODY(MoveAssignmentOperator, AssignWithoutParentToWithParent,
+    Vault vlt;
+    VaultRecordRef vrr1, vrr2;
+
+    vlt.AddKey("A", 0);
+    vlt.CreateRecord({{"A", 0}});
+    vlt.GetRecord("A", 0, vrr2);
+
+    vrr2 = std::move(vrr1);
+
+    TEST_ASSERT(vrr1.IsValid() == false);
+    TEST_ASSERT(vrr1.GetRecordUniqueId() == "null");
+)
+
+TEST_BODY(MoveAssignmentOperator, Assign,
+    Vault vlt;
+    VaultRecordRef vrr1, vrr2;
+
+    vlt.AddKey("A", 0);
+    vlt.CreateRecord({{"A", 0}});
+    vlt.CreateRecord({{"A", 1}});
+    vlt.GetRecord("A", 0, vrr1);
+    vlt.GetRecord("A", 1, vrr2);
+
+    vrr2 = std::move(vrr1);
+
+    TEST_ASSERT(vrr1.IsValid() == false);
+    TEST_ASSERT(vrr1.GetRecordUniqueId() == "null");
+    TEST_ASSERT(vrr2.IsValid() == true);
+    TEST_ASSERT(vrr2.ToJson(false) == R"({"A":0})");
+)
+
+TEST_BODY(OperatorComparison, CompareWithoutParents,
+    VaultRecordRef vrr1, vrr2;
+
+    TEST_ASSERT(vrr1 == vrr2);
+)
+
+TEST_BODY(OperatorComparison, CompareWithParentToWithoutParent,
+    Vault vlt;
+    VaultRecordRef vrr1, vrr2;
+
+    vlt.AddKey("A", 0);
+    vlt.CreateRecord({{"A", 0}});
+    vlt.GetRecord("A", 0, vrr2);
+
+    TEST_ASSERT(!(vrr1 == vrr2));
+    TEST_ASSERT(!(vrr2 == vrr1));
+)
+
+TEST_BODY(OperatorComparison, Compare,
+    Vault vlt;
+    VaultRecordRef vrr1, vrr2;
+
+    vlt.AddKey("A", 0);
+    vlt.CreateRecord({{"A", 0}});
+    vlt.CreateRecord({{"A", 1}});
+    vlt.GetRecord("A", 0, vrr1);
+    vlt.GetRecord("A", 0, vrr2);
+
+    TEST_ASSERT(vrr1 == vrr2);
+    
+    vlt.GetRecord("A", 1, vrr2);
+    TEST_ASSERT(!(vrr1 == vrr2));
+)
+
+TEST_BODY(OperatorNonComparison, CompareWithoutParents,
+    VaultRecordRef vrr1, vrr2;
+
+    TEST_ASSERT(!(vrr1 != vrr2));
+)
+
+TEST_BODY(OperatorNonComparison, CompareWithParentToWithoutParent,
+    Vault vlt;
+    VaultRecordRef vrr1, vrr2;
+
+    vlt.AddKey("A", 0);
+    vlt.CreateRecord({{"A", 0}});
+    vlt.GetRecord("A", 0, vrr2);
+
+    TEST_ASSERT(vrr1 != vrr2);
+    TEST_ASSERT(vrr2 != vrr1);
+)
+
+TEST_BODY(OperatorNonComparison, Compare,
+    Vault vlt;
+    VaultRecordRef vrr1, vrr2;
+
+    vlt.AddKey("A", 0);
+    vlt.CreateRecord({{"A", 0}});
+    vlt.CreateRecord({{"A", 1}});
+    vlt.GetRecord("A", 0, vrr1);
+    vlt.GetRecord("A", 0, vrr2);
+
+    TEST_ASSERT(!(vrr1 != vrr2));
+    
+    vlt.GetRecord("A", 1, vrr2);
+    TEST_ASSERT(vrr1 != vrr2);
+)
 }
 
 void VaultRecordRefUnitTests(const std::string& testName)
