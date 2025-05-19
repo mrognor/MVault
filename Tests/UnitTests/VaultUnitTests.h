@@ -328,6 +328,8 @@ namespace VaultTestNs
 
         TEST_CASE(ComplexRequest)
 
+        TEST_CASE(ComplexRequestInterval)
+
         TEST_CASE(ComplexRequestWrongKey)
 
         TEST_CASE(ComplexRequestWrongType)

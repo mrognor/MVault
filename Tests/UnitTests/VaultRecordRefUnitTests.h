@@ -84,11 +84,17 @@ namespace VaultRecordRefTestNs
 
     TEST_SUITE(SetDataByKeyAndValue,
 
+        TEST_CASE(Invalid)
+
+        TEST_CASE(Deleted)
+
         TEST_CASE(Default)
 
         TEST_CASE(WrongKey)
 
         TEST_CASE(WrongType)
+
+        TEST_CASE(DuplicateUniqueKeyValue)
     )
 
     TEST_SUITE(SetDataByVectorOfParams,
@@ -109,7 +115,11 @@ namespace VaultRecordRefTestNs
     )
 
     TEST_SUITE(GetData,
-        
+
+        TEST_CASE(Invalid)
+
+        TEST_CASE(Deleted)
+
         TEST_CASE(Default)
 
         TEST_CASE(WrongKey)
@@ -118,6 +128,10 @@ namespace VaultRecordRefTestNs
     )
 
     TEST_SUITE(GetDataAsString,
+
+        TEST_CASE(Invalid)
+
+        TEST_CASE(Deleted)
 
         TEST_CASE(Default)
 
@@ -150,6 +164,8 @@ namespace VaultRecordRefTestNs
     TEST_SUITE(PrintRecord,
         
         TEST_CASE(Invalid)
+
+        TEST_CASE(Deleted)
 
         TEST_CASE(Valid)
     )

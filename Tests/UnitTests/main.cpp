@@ -48,49 +48,56 @@ std::vector<std::string> ReadParams(int argc, char** argv)
 
 int main(int argc, char** argv)
 {
-    std::uint64_t requiredTests = 0;
-    std::vector<std::string> params = ReadParams(argc, argv);
-    std::string requiredTest;
+    // std::uint64_t requiredTests = 0;
+    // std::vector<std::string> params = ReadParams(argc, argv);
+    // std::string requiredTest;
 
-    if (!params.empty())
-    {
-        // requiredTests = ~0;
-        for (const std::string& param : params)
-        {
-            if (param == "Vault") requiredTests &= VaultUnitTestsKey;
-            else if (param == "VaultRecordSet") requiredTests &= VaultRecordSetUnitTestsKey;
-            else if (param == "VaultRecordRef") requiredTests &= VaultRecordRefUnitTestsKey;
+    // if (!params.empty())
+    // {
+    //     // requiredTests = ~0;
+    //     for (const std::string& param : params)
+    //     {
+    //         if (param == "Vault") requiredTests &= VaultUnitTestsKey;
+    //         else if (param == "VaultRecordSet") requiredTests &= VaultRecordSetUnitTestsKey;
+    //         else if (param == "VaultRecordRef") requiredTests &= VaultRecordRefUnitTestsKey;
 
-            if (IsStartsWith(param, "--filter="))
-            {
-                requiredTest = param.substr(9);
-            }
-        }
-    }
+    //         if (IsStartsWith(param, "--filter="))
+    //         {
+    //             requiredTest = param.substr(9);
+    //         }
+    //     }
+    // }
 
     auto beg = std::chrono::high_resolution_clock::now();
 
-    if ((requiredTests & ~VaultUnitTestsKey) == 0) 
-    {
-        ColorizedPrint("[----------]", ConsoleTextColor::Green, "");
-        ColorizedPrint(" Tests for Vault");
-        VaultUnitTests(requiredTest);
-        std::cout << std::endl;
-    }
-    if ((requiredTests & ~VaultRecordSetUnitTestsKey) == 0) 
-    {
-        ColorizedPrint("[----------]", ConsoleTextColor::Green, "");
-        ColorizedPrint(" Tests for VaultRecordSet");
-        VaultRecordSetUnitTests(requiredTest);
-        std::cout << std::endl;
-    }
-    if ((requiredTests & ~VaultRecordRefUnitTestsKey) == 0) 
-    {
-        ColorizedPrint("[----------]", ConsoleTextColor::Green, "");
-        ColorizedPrint(" Tests for VaultRecordRef");
-        VaultRecordRefUnitTests(requiredTest);
-        std::cout << std::endl;
-    }
+    // if ((requiredTests & ~VaultUnitTestsKey) == 0) 
+    // {
+    //     ColorizedPrint("[----------]", ConsoleTextColor::Green, "");
+    //     ColorizedPrint(" Tests for Vault");
+    //     VaultUnitTests(requiredTest);
+    //     std::cout << std::endl;
+    // }
+    // if ((requiredTests & ~VaultRecordSetUnitTestsKey) == 0) 
+    // {
+    //     ColorizedPrint("[----------]", ConsoleTextColor::Green, "");
+    //     ColorizedPrint(" Tests for VaultRecordSet");
+    //     VaultRecordSetUnitTests(requiredTest);
+    //     std::cout << std::endl;
+    // }
+    // if ((requiredTests & ~VaultRecordRefUnitTestsKey) == 0) 
+    // {
+    //     ColorizedPrint("[----------]", ConsoleTextColor::Green, "");
+    //     ColorizedPrint(" Tests for VaultRecordRef");
+    //     VaultRecordRefUnitTests(requiredTest);
+    //     std::cout << std::endl;
+    // }
+
+    VaultUnitTests("");
+    std::cout << "\n";
+    VaultRecordSetUnitTests("");
+    std::cout << "\n";
+    VaultRecordRefUnitTests("");
+    std::cout << "\n";
 
     auto end = std::chrono::high_resolution_clock::now();
 

@@ -295,6 +295,16 @@ namespace mvlt
         }
 
         /**
+            \brief The method to check if it is multi container
+
+            \return true if it is multicontiner, otherwise return false
+        */
+        bool IsMultiContainer() const noexcept
+        {
+            return IsMultiMap;
+        }
+
+        /**
             \brief The method for inserting data into the Map
 
             \tparam <EmplaceKeyType> - Key type

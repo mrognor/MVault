@@ -49,23 +49,24 @@ cd Build
 make -j
 cd ..
 
-# Get script arguments count
-if [ $# -eq 0 ]
-then # If 0 arguments passed then launch all
-    # Create report for all separate parts
-    array=("Vault" "VaultRecordSet")
-    for element in "${array[@]}"
-    do
-        create_report $element
-    done
+create_report
+# # Get script arguments count
+# if [ $# -eq 0 ]
+# then # If 0 arguments passed then launch all
+#     # Create report for all separate parts
+#     array=("Vault" "VaultRecordSet")
+#     for element in "${array[@]}"
+#     do
+#         create_report $element
+#     done
 
-    # Create full report
-    create_report
-else # Create required report
-    if  [ "$1" == "Full" ]
-    then
-        create_report
-    else
-        create_report $1
-    fi
-fi
+#     # Create full report
+#     create_report
+# else # Create required report
+#     if  [ "$1" == "Full" ]
+#     then
+#         create_report
+#     else
+#         create_report $1
+#     fi
+# fi

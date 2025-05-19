@@ -3351,6 +3351,45 @@ TEST_BODY(Request, ComplexRequest,
     });
 )
 
+TEST_BODY(Request, ComplexRequestInterval,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultOperationResult vor;
+    VaultRecordRef vrr;
+
+    vlt.AddKey("A", 0);
+    vlt.AddKey("B", 0);
+    vlt.AddKey<std::string>("C", "");
+    vlt.AddKey<bool>("D", false);
+
+    for (int i = 0; i < 10; ++i)
+    {
+        vlt.CreateRecord(vrr, {{"A", i}, {"B", i}, {"C", std::to_string(i)}});
+        if (i == 5 || i == 9) vrr.SetData("D", true);
+    }
+
+    vlt.Request(Greater("A", 3) && Less("A", 7), vrs);
+
+    CompareVault(vrs, {
+        {{"A", 4}, {"B", 4}, {"C", std::string("4")}, {"D", false}},
+        {{"A", 5}, {"B", 5}, {"C", std::string("5")}, {"D", true}},
+        {{"A", 6}, {"B", 6}, {"C", std::string("6")}, {"D", false}},
+    });
+
+    vlt.Request(Greater("A", 3, [](const VaultRecordRef& ref) -> bool 
+    {
+        bool d = false;
+        ref.GetData("D", d);
+        if (!d) return true;
+        else return false;
+    }) && Less("A", 7), vrs);
+
+    CompareVault(vrs, {
+        {{"A", 4}, {"B", 4}, {"C", std::string("4")}, {"D", false}},
+        {{"A", 6}, {"B", 6}, {"C", std::string("6")}, {"D", false}},
+    });
+)
+
 TEST_BODY(Request, ComplexRequestWrongKey,
     Vault vlt;
     VaultRecordSet vrs;

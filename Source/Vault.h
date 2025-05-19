@@ -448,7 +448,7 @@ namespace mvlt
             \brief Method to create new VaultRecord.
 
             If there are unique keys in the vault, then when you try to add a record with a unique key value that is already in the vault,
-            the new record will not be added, and the record created earlier will be placed in vaultRecordRef.
+            the new record will not be added.
 
             \param [in] vaultRecordRef The reference to the VaultRecordRef to which the new record will be assigned
             \param [in] params a vector of pairs with data to be put in the Vault

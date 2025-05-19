@@ -260,6 +260,32 @@ TEST_BODY(GetRecordUniqueId, Valid,
     TEST_ASSERT(vrr.GetRecordUniqueId() != "null");
 )
 
+TEST_BODY(SetDataByKeyAndValue, Invalid,
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+
+    vor = vrr.SetData("A", 1);
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::DataRecordNotValid, SavedType == typeid(void));
+)
+
+TEST_BODY(SetDataByKeyAndValue, Deleted,
+    Vault vlt;
+    VaultRecordRef vrr1, vrr2;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 0);
+    vlt.CreateRecord({{"A", 0}});
+    vlt.GetRecord("A", 0, vrr1);
+    vlt.GetRecord("A", 0, vrr2);
+
+    vlt.EraseRecord(vrr2);
+
+    vor = vrr1.SetData("A", 1);
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::DataRecordNotValid, SavedType == typeid(void));
+)
+
 TEST_BODY(SetDataByKeyAndValue, Default,
     Vault vlt;
     VaultRecordSet vrs1, vrs2;
@@ -348,6 +374,25 @@ TEST_BODY(SetDataByKeyAndValue, WrongType,
     vlt.RequestLess("A", 0, vrs2);
     vrs2.GetRecord("A", -10, vrr4);
     TEST_ASSERT(vrr1 == vrr4);
+)
+
+TEST_BODY(SetDataByKeyAndValue, DuplicateUniqueKeyValue,
+    Vault vlt;
+    VaultRecordSet vrs;
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+
+    vlt.AddUniqueKey<int>("A");
+    vlt.CreateRecord({{"A", 0}});
+    vlt.CreateRecord({{"A", 1}});
+    vlt.GetRecord("A", 0, vrr);
+
+    // Check set data
+    vor = vrr.SetData("A", 1);
+
+    COMPARE_VAULT(vlt, {{{"A", 0}}, {{"A", 1}}});
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::UniqueKeyValueAlredyInSet, SavedType == typeid(int));
 )
 
 TEST_BODY(SetDataByVectorOfParams, Default,
@@ -658,6 +703,38 @@ TEST_BODY(SetDataByVectorOfParams, WrongTypeOnBothKeys,
     TEST_ASSERT(vrr1 == vrr7);
 )
 
+TEST_BODY(GetData, Invalid,
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+
+    int i = 0;
+    vor = vrr.GetData("A", i);
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::DataRecordNotValid, SavedType == typeid(void));
+    
+    TEST_ASSERT(i == 0);
+)
+
+TEST_BODY(GetData, Deleted,
+    Vault vlt;
+    VaultRecordRef vrr1, vrr2;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 1);
+    vlt.CreateRecord({{"A", 1}});
+    vlt.GetRecord("A", 1, vrr1);
+    vlt.GetRecord("A", 1, vrr2);
+
+    vlt.EraseRecord(vrr2);
+
+    int i = 0;
+    vor = vrr1.GetData("A", i);
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(int), ResultCode == VaultOperationResultCode::DataRecordNotValid, SavedType == typeid(void));
+    
+    TEST_ASSERT(i == 0);
+)
+
 TEST_BODY(GetData, Default,
     Vault vlt;
     VaultRecordRef vrr;
@@ -740,6 +817,38 @@ TEST_BODY(GetData, WrongType,
     COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A",
         RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::WrongType, SavedType == typeid(int));
 
+    TEST_ASSERT(s.empty());
+)
+
+TEST_BODY(GetDataAsString, Invalid,
+    VaultRecordRef vrr;
+    VaultOperationResult vor;
+
+    std::string s;
+    vor = vrr.GetDataAsString("A", s);
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::DataRecordNotValid, SavedType == typeid(void));
+    
+    TEST_ASSERT(s.empty());
+)
+
+TEST_BODY(GetDataAsString, Deleted,
+    Vault vlt;
+    VaultRecordRef vrr1, vrr2;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 1);
+    vlt.CreateRecord({{"A", 1}});
+    vlt.GetRecord("A", 1, vrr1);
+    vlt.GetRecord("A", 1, vrr2);
+
+    vlt.EraseRecord(vrr2);
+
+    std::string s;
+    vor = vrr1.GetDataAsString("A", s);
+    COMPARE_OPERATION(vor, IsOperationSuccess == false, Key == "A", 
+        RequestedType == typeid(std::string), ResultCode == VaultOperationResultCode::DataRecordNotValid, SavedType == typeid(void));
+    
     TEST_ASSERT(s.empty());
 )
 
@@ -881,8 +990,22 @@ TEST_BODY(GetKeys, Valid,
 TEST_BODY(PrintRecord, Invalid,
     VaultRecordRef vrr;
 
-    vrr.PrintRecord();
     TEST_COUT(vrr.PrintRecord(), "VaultRecordRef not valid!\n");
+)
+
+TEST_BODY(PrintRecord, Deleted,
+    Vault vlt;
+    VaultRecordRef vrr1, vrr2;
+    VaultOperationResult vor;
+
+    vlt.AddKey("A", 1);
+    vlt.CreateRecord({{"A", 1}});
+    vlt.GetRecord("A", 1, vrr1);
+    vlt.GetRecord("A", 1, vrr2);
+
+    vlt.EraseRecord(vrr2);
+
+    TEST_COUT(vrr1.PrintRecord(), "VaultRecordRef not valid!\n");
 )
 
 TEST_BODY(PrintRecord, Valid,

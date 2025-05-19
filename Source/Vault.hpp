@@ -63,6 +63,15 @@ namespace mvlt
         // Remove oldData from TtoVaultRecordHashMap from VaultHashMapStructure
         auto FirstAndLastIteratorsWithKeyOnHashMap = TtoVaultRecordHashMap->EqualRange(oldData);
 
+        // Check if it is unique key and try to set duplicate data
+        if (!TtoVaultRecordHashMap->IsMultiContainer() && FirstAndLastIteratorsWithKeyOnHashMap.first != TtoVaultRecordHashMap->End())
+        {
+            res.IsOperationSuccess = false;
+            res.ResultCode = VaultOperationResultCode::UniqueKeyValueAlredyInSet;
+
+            return res;
+        }
+
         // Iterate over all data records with oldData key
         for (auto& pairIt = FirstAndLastIteratorsWithKeyOnHashMap.first; pairIt != FirstAndLastIteratorsWithKeyOnHashMap.second; ++pairIt)
         {
