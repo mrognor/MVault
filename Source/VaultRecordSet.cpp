@@ -24,7 +24,7 @@ namespace mvlt
 
         KeysOrder = other.KeysOrder;
         UniqueKeys = other.UniqueKeys;
-        InvalidFileRecords = std::move(other.InvalidFileRecords);
+        InvalidFileRecords = other.InvalidFileRecords;
 
         other.ParentVault->RecordSetsSet.emplace(this);
 
@@ -41,6 +41,7 @@ namespace mvlt
         RecursiveReadWriteMtx.Disable();
     }
 
+    // codechecker_intentional [all] dont move other because
     void VaultRecordSet::MoveSet(VaultRecordSet&& other) noexcept
     {
         DBG_LOG_ENTER();
