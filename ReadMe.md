@@ -92,7 +92,7 @@ Z,93172,0.0
 </table>
 </details>
 
-## Table Of Content
+## Table Of Contents
 
 - [Project overview](#project-overview)
     - [Key features](#key-features)
@@ -101,11 +101,19 @@ Z,93172,0.0
         - [Code coverage](#code-coverage)
         - [Sast](#sast)
         - [Documentation](#documentation)
-  
+- [Installation guide](#installation-guide)
+    - [Make](#make)
+    - [CMake](#cmake)
+- [Simple demo](#simple-demo)
+    - [Adding keys](#adding-keys)
+    - [Creating records](#creating-records)
+    - [Requests](#requests)
+- [Compatibility](#compatibility)
+
 ## Project overview
 
 ### Key features
-1. The stl strings are used as keys.
+1. The STL strings are used as keys.
 2. Type safety.
 3. A custom data type can be used inside the database.
 4. Supports complex queries and subqueries.
@@ -124,12 +132,12 @@ At the moment, more than 500 tests have been written.
 
 #### Code coverage
 A test coverage verification process is set up for the project.
-Now the percentage of code coverage exceeds 95%. Test coverage data is created for each commit and is available on
+Currently the percentage of code coverage exceeds 95%. Test coverage data is created for each commit and is available on
 [Github Actions](https://github.com/mrognor/MVault/actions/workflows/tests.yml).
 
 ![image](https://github.com/user-attachments/assets/0ff53344-d756-43c5-a81e-9f31992001f5)
 
-#### Sast
+#### SAST
 The CI has a static code analysis process set up. After each commit, an analysis is performed using clangsa and clang_tidy. 
 The results of the analysis are completely [open](https://github.com/mrognor/MVault/actions/workflows/sast.yml).
 
@@ -137,3 +145,230 @@ The results of the analysis are completely [open](https://github.com/mrognor/MVa
 
 #### Documentation
 Doxygen is used for documentation. Documentation is generated for each commit and hosted on [Github Pages](https://mrognor.github.io/MVault/).
+
+# Installation guide
+First of all, [download](https://github.com/mrognor/MVault/releases) a project release suitable for your environment.
+
+## Make
+Assuming you are in the working directory, the folder with the library is in the same directory.
+Create a simple main.cpp file with minimal code:
+
+```c++
+#include <MVault.h>
+
+int main()
+{
+    mvlt::Vault vlt;
+    vlt.AddKey<std::string>("Key", "Hello world!");
+    vlt.CreateRecord({});
+    vlt.Print();
+}
+```
+
+Now create a Makefile with this content:
+
+```Makefile
+demo: main.cpp
+	g++ main.cpp -IMVault/include -LMVault/lib -lMVault -o demo
+
+all: demo
+```
+Call `make` to build project.
+Now check that the installation is correct by calling demo
+
+![image](https://github.com/user-attachments/assets/032d761f-d7a7-48b0-9f4e-a1a910e9ddc3)
+
+In order for syntax highlighting to work in your ide, you can use the bear utility.
+```bash
+bear -- make
+```
+Restart your ide so that the backlight appears.
+
+## CMake
+Assume that you are in the working directory, the folder with the library is in the same directory.
+Create a simple main.cpp file with minimal code:
+
+```c++
+#include <MVault.h>
+
+int main()
+{
+    mvlt::Vault vlt;
+    vlt.AddKey<std::string>("Key", "Hello world!");
+    vlt.CreateRecord({});
+    vlt.Print();
+}
+```
+
+Now create a CMakeLists.txt with this content:
+
+```CMakeLists
+cmake_minimum_required(VERSION 4.0)
+
+project(demo)
+
+add_executable(demo main.cpp)
+include_directories(${CMAKE_SOURCE_DIR}/MVault/include)
+target_link_libraries(demo ${CMAKE_SOURCE_DIR}/MVault/lib/libMVault.a)
+```
+
+Now build and run the project for verification
+
+```bash
+mkdir build
+cd build
+cmake ..
+make
+./demo
+```
+
+To create a database with compilation commands for your ide, use the CMAKE_EXPORT_COMPILE_COMMAND option when calling cmake.
+```bash
+cmake .. -D CMAKE_EXPORT_COMPILE_COMMANDS=1
+```
+# Simple demo
+Let's write a simple program that stores information about airplane flights.
+The initial code:
+```c++
+#include <MVault.h>
+
+int main()
+{
+}
+```
+All subsequent code will be added to the main.
+
+## Adding keys
+
+Let the flight have the following set of parameters: unique id, flight number, departure airport, arrival airport.
+
+```c++
+// Create vault object
+mvlt::Vault vlt;
+
+// Add keys to vault
+vlt.AddUniqueKey<std::size_t>("Id");
+vlt.AddKey<int>("Flight", 0);
+vlt.AddKey<std::string>("Arrival", "");
+vlt.AddKey<std::string>("Departure", "");
+```
+
+## Creating records
+
+Create 5 records
+
+```c++
+// Create records
+vlt.CreateRecord({{"Id", 1ul}, {"Flight", 246}, {"Arrival", std::string("SVO")}, {"Departure", std::string("LED")}});
+vlt.CreateRecord({{"Id", 2ul}, {"Flight", 117}, {"Arrival", std::string("DXB")}, {"Departure", std::string("SIN")}});
+vlt.CreateRecord({{"Id", 3ul}, {"Flight", 203}, {"Arrival", std::string("SIP")}, {"Departure", std::string("SVO ")}});
+vlt.CreateRecord({{"Id", 4ul}, {"Flight", 318}, {"Arrival", std::string("PEC")}, {"Departure", std::string("SHA")}});
+vlt.CreateRecord({{"Id", 5ul}, {"Flight", 509}, {"Arrival", std::string("ADD")}, {"Departure", std::string("JNB")}});
+
+// Print table
+vlt.Print();
+```
+
+After compiling and running the program, the output will be as follows:
+
+![image](https://github.com/user-attachments/assets/e80302f4-b61a-474f-9999-26bb2c32e64d)
+
+## Requests
+
+Now a request for all flights that are associated with SVO.
+
+```c++
+// Create set to store request result
+mvlt::VaultRecordSet vrs;
+
+// Request records with arrival or depature equals svo
+vlt.Request(mvlt::Equal("Arrival", std::string("SVO")) || mvlt::Equal("Departure", std::string("SVO")), vrs);
+
+// Print request result
+vrs.Print();
+```
+
+The result will be like this:
+
+![image](https://github.com/user-attachments/assets/2e470528-8de3-4f60-90ff-cc23646b9027)
+
+# Compatibility
+
+The library is written in c++11 without using third-party libraries, so it is built for almost any platform.
+
+<table>
+    <tr>
+        <th>Os</th>
+        <th>Arch</th>
+        <th>Compiler</th>
+        <th>Stdlib</th>
+    </tr>
+    <tr>
+        <td rowspan="12">Linux</td>
+        <td rowspan="4">amd64</td>
+        <td rowspan="2">gcc</td>
+        <td>glibc</td>
+    </tr>
+    <tr>
+        <td>musl</td>
+    </tr>
+    <tr>
+        <td rowspan="2">clang</td>
+        <td>glibc</td>
+    </tr>
+    <tr>
+        <td>musl</td>
+    </tr>
+    <tr>
+        <td rowspan="3">aarch64</td>
+        <td rowspan="2">gcc</td>
+        <td>glibc</td>
+    </tr>
+    <tr>
+        <td>musl</td>
+    </tr>
+    <tr>
+        <td>clang</td>
+        <td>glibc</td>
+    </tr>
+    <tr>
+        <td>e2k</td>
+        <td>lcc</td>
+        <td>glibc</td>
+    </tr>
+    <tr>
+        <td rowspan="4">risc-v</td>
+        <td rowspan="2">gcc</td>
+        <td>glibc</td>
+    </tr>
+    <tr>
+        <td>musl</td>
+    </tr>
+    <tr>
+        <td rowspan="2">clang</td>
+        <td>glibc</td>
+    </tr>
+    <tr>
+        <td>musl</td>
+    </tr>
+    <tr>
+        <td>Android(termux)</td>
+        <td>aarch64</td>
+        <td>clang</td>
+        <td>musl</td>
+    </tr>
+    <tr>
+        <td rowspan="3">Windows</td>
+        <td rowspan="3">amd64</td>
+        <td>mingw(gcc)</td>
+        <td>MSVCRT</td>
+    </tr>
+    <tr>
+        <td>clang</td>
+        <td>MSVCRT</td>
+    </tr>
+    <tr>
+        <td>MSVC</td>
+        <td>MSVCRT</td>
+    </tr>
+</table>
