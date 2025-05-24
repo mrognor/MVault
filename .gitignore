@@ -9,3 +9,4 @@ Resources/Telegram/BotToken
 Resources/Telegram/env
 compile_commands.json
 .cache
+MVault
