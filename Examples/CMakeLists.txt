@@ -6,26 +6,23 @@ project(Examples)
 
 include_directories(../Source)	
 
-add_executable(Example1 Example1.cpp)
-target_link_libraries(Example1 MVault)
+add_executable(Basics Basics.cpp)
+target_link_libraries(Basics MVault)
 
-add_executable(SortExample SortExample.cpp)
-target_link_libraries(SortExample MVault)
+add_executable(Keys Keys.cpp)
+target_link_libraries(Keys MVault)
 
-add_executable(CustomTypeExample CustomTypeExample.cpp)
-target_link_libraries(CustomTypeExample MVault)
+add_executable(Requests Requests.cpp)
+target_link_libraries(Requests MVault)
 
-add_executable(HandlingErrors HandlingErrors.cpp)
-target_link_libraries(HandlingErrors MVault)
+add_executable(Sets Sets.cpp)
+target_link_libraries(Sets MVault)
 
-add_executable(VaultRecordSet VaultRecordSet.cpp)
-target_link_libraries(VaultRecordSet MVault)
+add_executable(CustomType CustomType.cpp)
+target_link_libraries(CustomType MVault)
 
-add_executable(VaultRequests VaultRequests.cpp)
-target_link_libraries(VaultRequests MVault)
+add_executable(ErrorHandling ErrorHandling.cpp)
+target_link_libraries(ErrorHandling MVault)
 
-add_executable(Csv Csv.cpp)
-target_link_libraries(Csv MVault)
-
-add_executable(DebugPrint DebugPrint.cpp)
-target_link_libraries(DebugPrint MVault)
+add_executable(Sorting ErrorHandling.cpp)
+target_link_libraries(Sorting MVault)
