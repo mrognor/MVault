@@ -243,10 +243,10 @@ namespace mvlt
         /// Is this multi map
         bool IsMultiMap = false;
 
-        // Multi container
+        /// Multi container
         MultiContainer DataMultiMap;
 
-        // Container
+        /// Container
         Container DataMap;
     public:
 

@@ -92,8 +92,6 @@ namespace mvlt
 
             \param [in] request1 first request
             \param [in] request2 second request
-            \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request.
-            When the function returns true, the record is added, and when false is not added.
         */
         template <VaultRequestType RequestType1, VaultRequestType RequestType2>
         VaultRequest(const VaultRequest<RequestType1>& request1, const VaultRequest<RequestType2>& request2) noexcept;

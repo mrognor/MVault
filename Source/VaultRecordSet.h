@@ -206,7 +206,7 @@ namespace mvlt
 
             \param [in] key the name of the key to search for
             \param [in] keyValue the value of the key to be found
-            \param [in] vaultRecordRef A reference to VaultRecordSet
+            \param [in] vaultRecordSet A reference to VaultRecordSet
             \param [in] amountOfRecords The number of records requested. By default request all records
             \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request.
             When the function returns true, the record is added, and when false is not added.
@@ -224,7 +224,7 @@ namespace mvlt
 
             \param [in] key the name of the key to search for
             \param [in] keyValue the value of the key to be found
-            \param [in] vaultRecordRef A reference to VaultRecordSet
+            \param [in] vaultRecordSet A reference to VaultRecordSet
             \param [in] amountOfRecords The number of records requested. By default request all records
             \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request.
             When the function returns true, the record is added, and when false is not added.
@@ -242,7 +242,7 @@ namespace mvlt
 
             \param [in] key the name of the key to search for
             \param [in] keyValue the value of the key to be found
-            \param [in] vaultRecordRef A reference to VaultRecordSet
+            \param [in] vaultRecordSet A reference to VaultRecordSet
             \param [in] amountOfRecords The number of records requested. By default request all records
             \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request.
             When the function returns true, the record is added, and when false is not added.
@@ -260,7 +260,7 @@ namespace mvlt
 
             \param [in] key the name of the key to search for
             \param [in] keyValue the value of the key to be found
-            \param [in] vaultRecordRef A reference to VaultRecordSet
+            \param [in] vaultRecordSet A reference to VaultRecordSet
             \param [in] amountOfRecords The number of records requested. By default request all records
             \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request.
             When the function returns true, the record is added, and when false is not added.
@@ -278,7 +278,7 @@ namespace mvlt
 
             \param [in] key the name of the key to search for
             \param [in] keyValue the value of the key to be found
-            \param [in] vaultRecordRef A reference to VaultRecordSet
+            \param [in] vaultRecordSet A reference to VaultRecordSet
             \param [in] amountOfRecords The number of records requested. By default request all records
             \param [in] requestPredicat A function that accepts VaultRecordRef and decides whether to add an record to the request.
             When the function returns true, the record is added, and when false is not added.
@@ -451,6 +451,7 @@ namespace mvlt
             \param [in] tabSize the number of spaces when tabbing
             \param [in] isUseRecordTemplate will recordTemplate be used for the title of the record or will an internal unique identifier be used
             \param [in] recordTemplate a template for the record name to which the record number will be added
+            \param [in] isArray A variable for determining the conversion format. If the variable is true, the data will be presented as a json array.
 
             \return json string
         */

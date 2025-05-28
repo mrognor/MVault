@@ -4,47 +4,47 @@ namespace mvlt
 {
     DataSaver::DataSaver() noexcept : DataType(typeid(void)) {}
 
-    DataSaver::DataSaver(const DataSaver& dataSaver) noexcept : DataType(typeid(void))
+    DataSaver::DataSaver(const DataSaver& other) noexcept : DataType(typeid(void))
     {
         // Call operator= method
-        *this = dataSaver;
+        *this = other;
     }
 
-    DataSaver& DataSaver::operator=(const DataSaver& dataSaver) noexcept
+    DataSaver& DataSaver::operator=(const DataSaver& other) noexcept
     {
         // We check that there is no self-bonding
-        if (&dataSaver != this)
+        if (&other != this)
         {
             // Clear Ptr if it was data before
             if (Ptr != nullptr)
                 DeleteFunc(Ptr);
 
-            // Check that dataSaver is not empty
-            if (dataSaver.Ptr != nullptr)
+            // Check that other DataSaver is not empty
+            if (other.Ptr != nullptr)
             {
-                // Create new DataType object copying data type from dataSaver
-                DataType = dataSaver.DataType;
+                // Create new DataType object copying data type from other
+                DataType = other.DataType;
 
-                // Set new CopyFunc from dataSaver
-                CopyFunc = dataSaver.CopyFunc;
+                // Set new CopyFunc from other
+                CopyFunc = other.CopyFunc;
 
-                // Call new copy func to copy data from dataSaver void pointer to local void pointer. Data to Ptr will be allocated inside function
-                CopyFunc(Ptr, dataSaver.Ptr);
+                // Call new copy func to copy data from other void pointer to local void pointer. Data to Ptr will be allocated inside function
+                CopyFunc(Ptr, other.Ptr);
 
                 // Copy to string function
-                ToStringFunc = dataSaver.ToStringFunc;
+                ToStringFunc = other.ToStringFunc;
 
-                // Set delete function from dataSaver
-                DeleteFunc = dataSaver.DeleteFunc;
+                // Set delete function from other
+                DeleteFunc = other.DeleteFunc;
 
-                // Set custom delete function from dataSaver
-                CustomDeleteFunc = dataSaver.CustomDeleteFunc;
+                // Set custom delete function from other
+                CustomDeleteFunc = other.CustomDeleteFunc;
 
-                SetDataFromStringFunc = dataSaver.SetDataFromStringFunc;
+                SetDataFromStringFunc = other.SetDataFromStringFunc;
             }
             else
             {
-                // If dataSaver is empty clear the variables
+                // If other is empty clear the variables
                 Ptr = nullptr;
             }
         }
@@ -77,10 +77,10 @@ namespace mvlt
         SetDataFromStringFunc = nullptr;
     }
 
-    void DataSaver::Swap(DataSaver& dataSaver) noexcept
+    void DataSaver::Swap(DataSaver& other) noexcept
     {
-        DataSaver tmp = dataSaver;
-        dataSaver = *this;
+        DataSaver tmp = other;
+        other = *this;
         *this = tmp;
     }
 

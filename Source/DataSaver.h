@@ -48,14 +48,14 @@ namespace mvlt
         /**
             \brief Copy constructor
 
-            \param [in] dataSaver object to be copied
+            \param [in] other object to be copied
         */
-        DataSaver(const DataSaver& dataSaver) noexcept;
+        DataSaver(const DataSaver& other) noexcept;
 
         /**
             \brief Deleted move constructor
 
-            \param [in] dataSaver object to be moved
+            \param [in] other object to be moved
         */
         DataSaver(DataSaver&& other) noexcept = delete;
 
@@ -93,16 +93,16 @@ namespace mvlt
         /**
             \brief Assignment operator
 
-            \param [in] dataSaver object to be copied
-            \return returns a new object, with data from dataSaver
+            \param [in] other object to be copied
+            \return returns a new object, with data from other
         */
-        DataSaver& operator=(const DataSaver& dataSaver) noexcept;
+        DataSaver& operator=(const DataSaver& other) noexcept;
 
         /**
             \brief Deleted assignment operator
 
-            \param [in] dataSaver object to be moved
-            \return returns a new object, with data from dataSaver
+            \param [in] other object to be moved
+            \return returns a new object, with data from other
         */
         DataSaver& operator=(DataSaver&& other) noexcept = delete;
 
@@ -218,9 +218,9 @@ namespace mvlt
         /**
             \brief Swap data between 2 DataSavers
 
-            \param [in, out] dataSaver dataSaver from where the data will be copied to this and where the data from this will be written
+            \param [in, out] other other from where the data will be copied to this and where the data from this will be written
         */
-        void Swap(DataSaver& dataSaver) noexcept;
+        void Swap(DataSaver& other) noexcept;
 
         /**
             \brief A method for getting a string that represents data inside a class object

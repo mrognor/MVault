@@ -323,7 +323,7 @@ namespace mvlt
 
     template <class T>
     VaultOperationResult Vault::AddKey(const std::string& key, const T& defaultKeyValue, const bool& isUniqueKey, const bool& isUniqueKeyWithoutLambda,
-        const std::function<T(const std::size_t& keys, const VaultRecordRef& values)>& uniqueKeyFunction) noexcept
+        const std::function<T(const std::size_t& counter, const VaultRecordRef& ref)>& uniqueKeyFunction) noexcept
     {
         DBG_LOG_ENTER();
 
