@@ -3,25 +3,46 @@ cd $(dirname "$0")
 cd ..
 
 # Clear previous
-rm -rf Release
 rm -rf MVault
 
 # Create release build dir
-mkdir -p Release
+mkdir MVault
+cd MVault
 
-# Build lib
+# Build release binaries
+mkdir Release
 cd Release
-cmake -DCMAKE_BUILD_TYPE=Release ../Source/
-make MVault -j
+cmake -DCMAKE_BUILD_TYPE=Release ../..
+make MVault -j $1
 cd ..
 
-# Create release dir
-mkdir -p MVault
+# Build debug binaries
+mkdir Debug
+cd Debug
+cmake -DCMAKE_BUILD_TYPE=Debug ../..
+make MVault -j $1
+cd ..
 
 # Move headers
-cp -r Source MVault/include
-find ./MVault/include -type f -not -iname "*.h*" -delete
+cp -r ../Source .
+mv Source include
+find include -type f -not -iname "*.h*" -delete
 
-# Move lib file
-mkdir ./MVault/lib
-cp ./Release/libMVault.a ./MVault/lib
+# Create release release dir
+mkdir MVault
+mkdir MVault/lib
+cp Release/Source/libMVault.a MVault/lib
+cp -r include MVault/
+
+# Create debug release dir
+mkdir MVaultD
+mkdir MVaultD/lib
+cp Debug/Source/libMVault.a MVaultD/lib
+cp -r include MVaultD/
+
+# Create tar archives
+if command -v tar 2>&1 >/dev/null
+then
+    tar -czf MVault.tar.gz MVault
+    tar -czf MVaultD.tar.gz MVaultD
+fi
