@@ -19,7 +19,7 @@ cd ..
 # Build debug binaries
 mkdir Debug
 cd Debug
-cmake -DCMAKE_BUILD_TYPE=Debug ../..
+cmake -DCMAKE_BUILD_TYPE=ReleaseDebug ../..
 make MVault -j $1
 cd ..
 
