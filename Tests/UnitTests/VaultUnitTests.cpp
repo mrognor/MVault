@@ -4361,7 +4361,7 @@ TEST_BODY(SaveToFile, Empty,
 
     TEST_ASSERT(res == true);
 
-    COMPARE_FILE(fileName, true, "\r\n");
+    COMPARE_FILE(fileName, true, "");
 )
 
 TEST_BODY(SaveToFile, KeysWithoutRecords,

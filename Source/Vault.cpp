@@ -971,7 +971,8 @@ namespace mvlt
                 csvFile << *keysOrderIt;
                 ++keysOrderIt;
                 for (;keysOrderIt != KeysOrder.cend(); ++keysOrderIt) csvFile << separator << *keysOrderIt;
-                csvFile.write(endOfLine, 2);
+                if (KeysOrder.size() != 0)
+                    csvFile.write(endOfLine, 2);
             }
             else 
             {
@@ -979,7 +980,8 @@ namespace mvlt
                 csvFile << *keysOrderIt;
                 ++keysOrderIt;
                 for (;keysOrderIt != keys.cend(); ++keysOrderIt) csvFile << separator << *keysOrderIt;
-                csvFile.write(endOfLine, 2);
+                if (KeysOrder.size() != 0)
+                    csvFile.write(endOfLine, 2);
             }
         }
 
@@ -1025,8 +1027,6 @@ namespace mvlt
                 csvFile.write(endOfLine, 2);
             }
         }
-
-        csvFile.close();
 
         return true;
     }

@@ -1,6 +1,7 @@
 import sys
 import glob
 import telebot
+import sys
 from git import Repo
 
 def CalculateLinesOfCode(directory, file_types):
@@ -66,3 +67,7 @@ with open("../../Build/report.md") as reportFile:
         botTimeWeb.send_message(sys.argv[2], report, parse_mode='html', reply_markup=telebot.types.InlineKeyboardMarkup())
     elif len(sys.argv) == 4:
         botTimeWeb.send_message(sys.argv[2], report, parse_mode='html', reply_markup=telebot.types.InlineKeyboardMarkup(), message_thread_id=sys.argv[3])
+
+    # Raise error in github actions
+    if (failedTests != 0):
+        sys.exit(1) # Some tests failed!
